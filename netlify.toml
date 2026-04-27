@@ -1,0 +1,32 @@
+# ════════════════════════════════════════════
+# DESPY — Configuration Netlify
+# ════════════════════════════════════════════
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# ── Redirections ──
+[[redirects]]
+  from = "/app"
+  to = "/despy_app_v23.html"
+  status = 301
+
+[[redirects]]
+  from = "/application"
+  to = "/despy_app_v23.html"
+  status = 301
+
+# ── Headers de sécurité ──
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: http:"
+
+# ── Rapport hebdomadaire — chaque lundi à 9h ──
+[functions.weekly-report]
+  schedule = "0 9 * * 1"

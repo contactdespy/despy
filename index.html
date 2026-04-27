@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despy — Cybersécurité pour particuliers</title>
+<meta name="description" content="Despy protège votre vie numérique : audit, détection d'arnaques, conseiller expert. Simple, sans jargon. 9,99€/mois. France métropolitaine.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- SEO & Social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Despy — Cybersécurité pour particuliers">
+<meta property="og:description" content="Protégez votre vie numérique contre arnaques, piratages et logiciels espions. Simple, sans jargon. 9,99€/mois.">
+<meta property="og:url" content="https://despy.fr">
+<meta property="og:image" content="https://despy.fr/og.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Despy — Cybersécurité pour particuliers">
+<link rel="canonical" href="https://despy.fr">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232D5BFF'/%3E%3Ccircle cx='16' cy='14' r='7' fill='none' stroke='white' stroke-width='2'/%3E%3Ccircle cx='16' cy='14' r='3' fill='white'/%3E%3C/svg%3E">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Despy","description":"Cybersécurité pour particuliers","url":"https://despy.fr","offers":{"@type":"Offer","price":"9.99","priceCurrency":"EUR"},"provider":{"@type":"Organization","name":"Despy — Bourefis Yacine EI","telephone":"+33689148395","email":"contact.despy@gmail.com"}}</script>
+<style>
+/* ── RESET & BASE ── */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden;max-width:100%}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;line-height:1.6;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:#2D5BFF;border-radius:2px}
+
+/* ── VARIABLES ── */
+:root{
+  --blue:#2D5BFF;
+  --blue-dark:#1a3fd9;
+  --blue-light:#eef1ff;
+  --blue-mid:#dde3ff;
+  --text:#111;
+  --text2:#555;
+  --text3:#888;
+  --border:#e5e7eb;
+  --bg2:#fafafa;
+  --bg3:#f5f7ff;
+  --white:#fff;
+  --ok:#16a34a;
+  --ok-bg:#f0fdf4;
+  --warn:#d97706;
+  --danger:#dc2626;
+  --nav-h:68px;
+  --radius:16px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 24px rgba(0,0,0,0.06);
+  --shadow-blue:0 8px 32px rgba(45,91,255,0.18);
+}
+
+/* ── SCROLL PROGRESS ── */
+#scroll-prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:300;transform-origin:left;transform:scaleX(0);transition:transform .1s}
+
+/* ── NAV ── */
+nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+nav.scrolled{border-color:var(--border);box-shadow:0 1px 12px rgba(0,0,0,0.06)}
+.logo{font-size:20px;font-weight:900;color:var(--blue);letter-spacing:-0.5px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-link{background:none;border:none;font-size:15px;font-weight:500;color:var(--text2);cursor:pointer;transition:color .2s;padding:4px 0;position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--blue);transition:width .25s}
+.nav-link:hover{color:var(--blue)}
+.nav-link:hover::after{width:100%}
+.nav-cta{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.nav-cta:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:var(--shadow-blue)}
+.mob-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.mob-menu-btn span{display:block;width:22px;height:2px;background:#333;margin:5px 0;transition:all .25s;border-radius:1px}
+#mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.5rem;flex-direction:column;gap:.75rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+#mob-menu.open{display:flex}
+.mob-link{background:none;border:none;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;padding:8px 0}
+.mob-cta{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes scrollDot{0%{transform:translateY(0);opacity:1}100%{transform:translateY(8px);opacity:0}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.4);opacity:0}}
+.a1{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) both}
+.a2{animation:fadeUp .8s .1s cubic-bezier(.16,1,.3,1) both}
+.a3{animation:fadeUp .8s .2s cubic-bezier(.16,1,.3,1) both}
+.a4{animation:fadeUp .8s .3s cubic-bezier(.16,1,.3,1) both}
+.a5{animation:fadeUp .8s .4s cubic-bezier(.16,1,.3,1) both}
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── HERO ── */
+.hero{min-height:100vh;padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 5rem;background:linear-gradient(160deg,#030810 0%,#071428 50%,#0a1f3a 100%);position:relative;overflow:hidden;display:flex;align-items:center}
+.hero::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(45,91,255,0.15) 0%,transparent 70%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;opacity:.5}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--blue);margin-bottom:1.5rem}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);animation:pulse 1.8s infinite}
+.hero h1{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:900;color:var(--text);line-height:1.1;letter-spacing:-1.5px;margin-bottom:1.25rem}
+.hero h1 span{color:var(--blue)}
+.hero-sub{font-size:clamp(15px,1.8vw,18px);color:var(--text2);line-height:1.75;margin-bottom:1.75rem;max-width:480px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:2rem}
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:11px;padding:14px 26px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:var(--shadow-blue)}
+.btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:11px;padding:14px 22px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+.hero-proof{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text3)}
+.hero-avatars{display:flex}
+.hero-av{width:30px;height:30px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;margin-left:-6px}
+.hero-av:first-child{margin-left:0}
+.hero-stars{display:flex;gap:2px}
+/* Hero visuel droit */
+.hero-visual{position:relative}
+.hero-card-main{background:#fff;border-radius:20px;padding:28px;box-shadow:var(--shadow);border:1px solid var(--border);animation:float 5s ease-in-out infinite}
+.score-ring{width:100px;height:100px;margin:0 auto 16px}
+.score-ring svg{width:100%;height:100%}
+.hero-stat-float{position:absolute;background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);border:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text)}
+.hero-stat-float.tl{top:-16px;left:-20px}
+.hero-stat-float.tr{top:20%;right:-24px}
+.hero-stat-float.bl{bottom:-12px;right:20px}
+.stat-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── SECTIONS GÉNÉRALES ── */
+section{padding:5rem clamp(1rem,6vw,6rem)}
+.wrap{max-width:1100px;margin:0 auto}
+.section-tag{display:inline-flex;align-items:center;gap:6px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem}
+.sh2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-1px;color:var(--text);margin-bottom:.75rem}
+.sh2 span{color:var(--blue)}
+.sdesc{font-size:16px;color:var(--text2);max-width:540px;line-height:1.7}
+.text-center{text-align:center}
+.text-center .sdesc{margin:0 auto}
+
+/* ── STRIP LOGOS ── */
+.strip{background:#fff;padding:2rem clamp(1rem,6vw,6rem);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.strip-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:clamp(1.5rem,4vw,3.5rem);flex-wrap:wrap}
+.strip-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.strip-badge{display:flex;flex-direction:column;align-items:center;gap:6px}
+.strip-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.strip-name{font-size:11px;color:var(--text3);font-weight:600}
+
+/* ── PROBLÈMES ── */
+.probs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.prob-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .25s}
+.prob-card:hover{background:#fff;border-color:rgba(45,91,255,.25);transform:translateY(-3px);box-shadow:var(--shadow)}
+.prob-icon{width:46px;height:46px;border-radius:12px;background:#fef2f2;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.prob-title{font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px}
+.prob-desc{font-size:14px;color:var(--text2);line-height:1.65}
+
+/* ── FONCTIONNALITÉS ── */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.feat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .25s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),#7c9dff);transform:scaleX(0);transition:transform .3s;transform-origin:left}
+.feat-card:hover{border-color:rgba(45,91,255,.2);box-shadow:var(--shadow);transform:translateY(-3px)}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-icon{width:48px;height:48px;border-radius:13px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.feat-title{font-weight:700;font-size:16px;color:var(--text);margin-bottom:6px}
+.feat-desc{font-size:14px;color:var(--text2);line-height:1.65}
+.feat-free{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--text3);background:var(--bg2);border-radius:20px;padding:3px 9px;margin-top:10px;border:1px solid var(--border)}
+
+/* ── STATS ── */
+.stats-band{background:var(--blue);padding:4rem clamp(1rem,6vw,6rem)}
+.stats-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.stat-box{background:rgba(255,255,255,.1);border-radius:var(--radius);padding:28px;text-align:center;border:1px solid rgba(255,255,255,.15)}
+.stat-n{font-size:clamp(2rem,4vw,2.8rem);font-weight:900;color:#fff}
+.stat-l{font-size:13px;color:rgba(255,255,255,.7);margin-top:6px;line-height:1.5}
+
+/* ── TARIFS ── */
+.tarifs-trust{background:linear-gradient(135deg,var(--ok-bg),#fff);border:1px solid #bbf7d0;border-radius:var(--radius);padding:18px 24px;margin-bottom:2.5rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.trust-pill{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text2)}
+.trust-divider{width:1px;height:20px;background:var(--border)}
+.plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.plan-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:32px;transition:all .3s;position:relative}
+.plan-card:hover{border-color:rgba(45,91,255,.3);box-shadow:0 8px 32px rgba(45,91,255,.1)}
+.plan-card.featured{border-color:var(--blue);box-shadow:0 8px 40px rgba(45,91,255,.15)}
+.plan-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;border-radius:20px;padding:4px 18px;font-size:12px;font-weight:700;white-space:nowrap}
+.plan-name{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.plan-price{font-size:48px;font-weight:900;color:var(--text);line-height:1;margin-bottom:4px;letter-spacing:-2px}
+.plan-price span{font-size:18px;font-weight:500;color:var(--text3)}
+.plan-price-old{font-size:16px;color:var(--text3);text-decoration:line-through;margin-bottom:4px}
+.plan-save{font-size:13px;font-weight:700;color:var(--ok)}
+.plan-desc{font-size:13px;color:var(--text3);margin:12px 0 20px}
+.plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.plan-feat{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text2);line-height:1.5}
+.plan-feat svg{flex-shrink:0;margin-top:2px}
+.plan-btn{width:100%;padding:14px;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.plan-btn.primary{background:var(--blue);color:#fff}
+.plan-btn.primary:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:var(--shadow-blue)}
+.plan-btn.outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.plan-btn.outline:hover{border-color:var(--blue);color:var(--blue)}
+/* Urgence lancement */
+.launch-bar{background:rgba(45,91,255,.04);border:1px solid rgba(45,91,255,.15);border-radius:12px;padding:12px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.launch-bar-left{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue)}
+.launch-dot{width:7px;height:7px;border-radius:50%;background:#f59e0b;animation:pulse 1.5s infinite;flex-shrink:0}
+.launch-countdown{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--danger)}
+.cd-unit{background:#fff;border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:14px;font-weight:800;min-width:28px;text-align:center}
+.launch-spots{font-size:12px;color:var(--text3);font-weight:600;margin-left:4px}
+/* Conseiller */
+.conseil-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.conseil-card{border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .25s;position:relative;overflow:hidden}
+.conseil-card:hover{border-color:rgba(45,91,255,.3);box-shadow:var(--shadow)}
+.conseil-card.pro{background:var(--text);color:#fff}
+.conseil-card.pro .conseil-price{color:#fff}
+.conseil-card.pro .conseil-desc{color:rgba(255,255,255,.65)}
+
+/* ── COMMENT ÇA MARCHE ── */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;position:relative}
+.step{text-align:center;position:relative}
+.step-num{width:60px;height:60px;border-radius:50%;background:var(--blue);color:#fff;font-size:20px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.step-title{font-weight:700;font-size:17px;color:var(--text);margin-bottom:8px}
+.step-desc{font-size:14px;color:var(--text2);line-height:1.65}
+
+/* ── FAQ ── */
+.faq-list{max-width:720px;margin:0 auto}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;text-align:left;padding:1.2rem 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:16px;font-family:inherit}
+.faq-q span:first-child{font-weight:600;font-size:16px;color:var(--text);flex:1;line-height:1.4}
+.faq-chevron{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s;color:var(--blue)}
+.faq-item.open .faq-chevron{background:var(--blue);border-color:var(--blue);color:#fff;transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-item.open .faq-a{max-height:400px}
+.faq-a-inner{font-size:15px;color:var(--text2);line-height:1.75;padding-bottom:1.2rem}
+
+/* ── APP CTA ── */
+.app-cta{background:linear-gradient(135deg,var(--blue-light),#fff);border:1px solid var(--blue-mid);border-radius:20px;padding:3rem;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2rem}
+.app-cta-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:1rem}
+.app-badge{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--text2);background:#fff;border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+
+/* ── FOOTER ── */
+footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
+.footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:2.5rem;margin-bottom:3rem}
+.footer-brand p{font-size:14px;color:rgba(255,255,255,.45);margin-top:12px;line-height:1.7}
+.footer-title{font-weight:700;font-size:14px;color:#fff;margin-bottom:14px}
+.footer-link{font-size:14px;color:rgba(255,255,255,.5);cursor:pointer;display:block;margin-bottom:8px;transition:color .2s;background:none;border:none;text-align:left;font-family:inherit}
+.footer-link:hover{color:#fff}
+.footer-bottom{max-width:1100px;margin:0 auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:12px;color:rgba(255,255,255,.3)}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:0;animation:fadeIn .2s}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-header h3{font-size:17px;font-weight:800;color:var(--text)}
+.modal-close{width:32px;height:32px;border-radius:8px;background:var(--bg2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px;line-height:1;transition:background .2s}
+.modal-close:hover{background:var(--border)}
+.modal-body{overflow-y:auto;padding:20px 24px 32px;flex:1;font-size:14px;color:var(--text2);line-height:1.75}
+.modal-body h4{font-size:14px;font-weight:700;color:var(--text);margin:16px 0 6px}
+.modal-body p{margin-bottom:12px}
+.modal-footer{padding:12px 24px;border-top:1px solid var(--border);flex-shrink:0;text-align:center}
+.modal-footer button{padding:10px 28px;border-radius:10px;background:var(--blue-light);border:none;color:var(--blue);font-weight:700;font-size:13px;cursor:pointer}
+
+/* Souscription modal */
+.sub-modal-overlay{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s}
+.sub-modal{background:#fff;border-radius:20px;width:100%;max-width:420px;padding:32px 28px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.sub-modal-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:6px}
+.sub-modal-sub{font-size:14px;color:var(--text2);margin-bottom:24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit;transition:border-color .2s}
+.field input:focus{border-color:var(--blue)}
+.sub-error{background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 12px;font-size:13px;color:#dc2626;margin-bottom:12px;display:none}
+.sub-btn{width:100%;padding:14px;border-radius:11px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.sub-btn:hover{background:var(--blue-dark)}
+.sub-btn:disabled{opacity:.6;cursor:not-allowed}
+.sub-cancel{width:100%;padding:11px;border-radius:11px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit}
+.sub-trust{text-align:center;font-size:11px;color:var(--text3);margin-top:12px;line-height:1.6}
+
+/* Cookie */
+#cookie-bar{position:fixed;bottom:0;left:0;right:0;z-index:800;background:rgba(15,23,42,.96);backdrop-filter:blur(8px);padding:16px clamp(1rem,4vw,3rem);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+#cookie-bar p{font-size:13px;color:rgba(255,255,255,.7);flex:1;min-width:200px;line-height:1.6}
+.ck-btns{display:flex;gap:10px;flex-shrink:0}
+.ck-accept{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer}
+.ck-refuse{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+
+/* MOBILE */
+@media (max-width:768px){
+  .hero-stat-float{display:none !important}
+  .hero-dot-grid{display:none}
+  .hero-inner{grid-template-columns:1fr}
+  .hero-visual{display:none}
+  .plans-grid{grid-template-columns:1fr}
+  .conseil-grid{grid-template-columns:1fr}
+  .app-cta{grid-template-columns:1fr}
+  .app-cta-img{display:none}
+  .nav-links{display:none}
+  .mob-menu-btn{display:block}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .strip-inner{gap:1.5rem}
+  .tarifs-trust{gap:12px}
+  .trust-divider{display:none}
+}
+@media(max-width:480px){
+  .plans-grid,.conseil-grid{grid-template-columns:1fr}
+  .hero h1{font-size:2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="scroll-prog"></div>
+
+<!-- ══ COOKIE ══ -->
+<div id="cookie-bar" style="display:none">
+  <p>Nous utilisons uniquement des cookies essentiels. Aucun cookie publicitaire. <a onclick="showLegal('confidentialite')" style="color:var(--blue);cursor:pointer;font-weight:600">En savoir plus</a></p>
+  <div class="ck-btns">
+    <button class="ck-accept" onclick="hideCookie(true)">Accepter</button>
+    <button class="ck-refuse" onclick="hideCookie(false)">Refuser</button>
+  </div>
+</div>
+
+<!-- ══ BANNIÈRE LANCEMENT ══ -->
+<div id="launch-banner" style="position:fixed;top:0;left:0;right:0;z-index:201;background:var(--blue);padding:9px 20px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px">
+  <div style="display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.85)">
+    <div style="width:7px;height:7px;border-radius:50%;background:#fbbf24;animation:blink 1.5s infinite;flex-shrink:0"></div>
+    <span style="font-weight:600">Offre de lancement</span>
+    <span style="color:rgba(255,255,255,.7)">— <strong id="lb-spots" style="color:#fff">47</strong> places sur 50</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;color:#fff;font-weight:700">
+    <div id="lb-d" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">j</span>
+    <div id="lb-h" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">h</span>
+    <div id="lb-m" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">m</span>
+  </div>
+  <button onclick="siteSubscribe('annual')" style="background:#fff;color:var(--blue);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0">Souscrire maintenant</button>
+  <button onclick="closeLaunchBanner()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:0 0 0 8px;line-height:1;flex-shrink:0">×</button>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav id="nav">
+  <div class="logo" onclick="showPage('home')">
+    <div class="logo-icon" style="overflow:hidden">
+      <svg width="20" height="16" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+        <path d="M208 195 Q240 142 292 128 Q340 116 388 128 Q440 142 472 195 Q440 248 388 262 Q340 274 292 262 Q240 248 208 195 Z" fill="#1a3fd9" stroke="#fff" stroke-width="8"/>
+        <circle cx="340" cy="195" r="52" fill="#1a3fd9" stroke="#fff" stroke-width="10"/>
+        <circle cx="340" cy="195" r="30" fill="#2D5BFF" stroke="#fff" stroke-width="6"/>
+        <circle cx="340" cy="195" r="14" fill="#fff"/>
+        <circle cx="334" cy="188" r="5" fill="rgba(255,255,255,0.6)"/>
+      </svg>
+    </div>
+    Despy
+  </div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="scrollToSection('situations')">Protection</button>
+    <button class="nav-link" onclick="scrollToSection('features')">Fonctionnalités</button>
+    <button class="nav-link" onclick="showPage('tarifs')">Tarifs</button>
+    <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
+    <button class="nav-cta" onclick="siteSubscribe('monthly')">Commencer — 9,99€/mois</button>
+  </div>
+  <button class="mob-menu-btn" id="mob-btn" onclick="toggleMob()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <!-- Menu mobile dans la nav -->
+  <div id="mob-menu">
+    <button class="mob-link" onclick="scrollToSection('situations');closeMob()">🛡️ Protection</button>
+    <button class="mob-link" onclick="scrollToSection('features');closeMob()">⚡ Fonctionnalités</button>
+    <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">💬 Conseiller IA</button>
+    <button class="mob-link" onclick="showPage('tarifs');closeMob()">💶 Tarifs</button>
+    <button class="mob-link" onclick="scrollToSection('faq');closeMob()">❓ FAQ</button>
+    <div style="height:1px;background:var(--border);margin:4px 0"></div>
+    <button class="mob-cta" onclick="siteSubscribe('monthly');closeMob()">Commencer — 9,99€/mois</button>
+    <button class="mob-link" style="font-size:13px;color:var(--text3)" onclick="showClientArea();closeMob()">Mon espace client</button>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE HOME                             -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-dot-grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge a1" style="background:rgba(45,91,255,0.2);border-color:rgba(45,91,255,0.4);color:#7ca8ff">
+        <div class="hero-badge-dot"></div>
+        Cybersécurité · France métropolitaine
+      </div>
+      <!-- Compteur membres -->
+      <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:1rem" class="a1">
+        <div style="display:flex">
+          <div class="hero-av" style="background:#4A90E2">Y</div>
+          <div class="hero-av" style="background:#7B68EE">M</div>
+          <div class="hero-av" style="background:#50C878">P</div>
+        </div>
+        <div>
+          <div style="display:flex;gap:2px" id="hero-stars">
+            ★★★★★
+          </div>
+          <div style="font-size:12px;margin-top:1px">Rejoignez les <strong style="color:#fff">premiers membres</strong> Despy</div>
+        </div>
+      </div>
+      <h1 class="a2" style="color:#fff">Protégez votre<br><span>vie numérique.</span></h1>
+      <p class="hero-sub a3" style="color:rgba(255,255,255,0.75)">Arnaques, piratages, logiciels espions, fuites de données... Despy détecte les menaces et vous guide pas à pas. Sans jargon, sans compétence technique.</p>
+      <div class="hero-btns a4">
+        <button class="btn-primary" onclick="siteSubscribe('monthly')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Commencer maintenant
+        </button>
+        <button class="btn-secondary" onclick="go('conseiller')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Parler à un conseiller
+        </button>
+      </div>
+      <!-- Trust pack -->
+      <div class="a5" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:fit-content">
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);white-space:nowrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          Données en France
+        </div>
+        <div style="width:1px;height:14px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);white-space:nowrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Stripe sécurisé
+        </div>
+        <div style="width:1px;height:14px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);white-space:nowrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          RGPD
+        </div>
+        <div style="width:1px;height:14px;background:var(--border)"></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);white-space:nowrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8.9 6.5 2.5"/><polyline points="22 4 12 14 9 11"/></svg>
+          Résiliation 1 clic
+        </div>
+      </div>
+    </div>
+
+    <!-- Visuel droit -->
+    <div class="hero-visual">
+      <div class="hero-card-main">
+        <div style="text-align:center;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text3);margin-bottom:4px">Votre score de sécurité</div>
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#f0f0f0" stroke-width="10"/>
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#ef4444" stroke-width="10" stroke-dasharray="66 198" stroke-dashoffset="66" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+              <text x="50" y="48" text-anchor="middle" font-family="Inter" font-weight="900" font-size="22" fill="#ef4444">25</text>
+              <text x="50" y="62" text-anchor="middle" font-family="Inter" font-weight="600" font-size="11" fill="#999">/100</text>
+            </svg>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#ef4444;background:#fef2f2;border-radius:20px;padding:4px 14px;display:inline-block">⚠️ Protection insuffisante</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--bg2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Fuites détectées
+            </span>
+            <span style="font-size:13px;font-weight:700;color:#ef4444">3 trouvées</span>
+          </div>
+          <div style="background:var(--bg2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Mots de passe
+            </span>
+            <span style="font-size:13px;font-weight:700;color:#d97706">À améliorer</span>
+          </div>
+          <div style="background:var(--ok-bg);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Protection Despy
+            </span>
+            <span style="font-size:13px;font-weight:700;color:var(--ok)">Active</span>
+          </div>
+        </div>
+      </div>
+      <!-- Stats flottantes -->
+      <div class="hero-stat-float tl">
+        <div class="stat-ico" style="background:var(--blue-light)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:900;font-size:15px;color:var(--text)">+47</div>
+          <div style="font-size:11px;color:var(--text3)">Membres protégés</div>
+        </div>
+      </div>
+      <div class="hero-stat-float tr">
+        <div class="stat-ico" style="background:#f0fdf4">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:900;font-size:15px;color:var(--text)">Top avis</div>
+          <div style="font-size:11px;color:var(--text3)">Satisfaction</div>
+        </div>
+      </div>
+      <div class="hero-stat-float bl">
+        <div class="stat-ico" style="background:#fff7ed">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:900;font-size:15px;color:var(--text)">24h/24</div>
+          <div style="font-size:11px;color:var(--text3)">Conseiller Despy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Scroll indicator -->
+  <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.4">
+    <div style="font-size:10px;letter-spacing:.15em;color:var(--text3);text-transform:uppercase">Défiler</div>
+    <div style="width:24px;height:38px;border-radius:12px;border:2px solid var(--border);display:flex;align-items:flex-start;justify-content:center;padding:5px">
+      <div style="width:4px;height:8px;border-radius:2px;background:var(--blue);animation:scrollDot 1.5s infinite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STRIP CONFIANCE ── -->
+<div class="strip reveal">
+  <div class="strip-inner">
+    <span class="strip-label">Vos données protégées par</span>
+    <div class="strip-badge">
+      <div class="strip-icon" style="background:#635BFF">S</div>
+      <span class="strip-name">Stripe</span>
+    </div>
+    <div class="strip-badge">
+      <div class="strip-icon" style="background:#3ECF8E">Su</div>
+      <span class="strip-name">Supabase 🇫🇷</span>
+    </div>
+    <div class="strip-badge">
+      <div class="strip-icon" style="background:#00ADB5">Hi</div>
+      <span class="strip-name">HIBP</span>
+    </div>
+    <div class="strip-badge">
+      <div class="strip-icon" style="background:#E53E3E">An</div>
+      <span class="strip-name">Anthropic</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Conforme RGPD · Données en France
+    </div>
+  </div>
+</div>
+
+<!-- ── SITUATIONS ── -->
+<section id="situations" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:3rem">
+      <div class="section-tag">Pourquoi Despy ?</div>
+      <h2 class="sh2">1 Français sur 4 est victime<br><span>de cybermalveillance</span></h2>
+      <p class="sdesc">Logiciels espions, arnaques téléphoniques, piratages de compte, fuites de données... Les menaces sont réelles et touchent tout le monde.</p>
+    </div>
+    <div class="probs-grid reveal">
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="prob-title">Arnaques et phishing</div>
+        <div class="prob-desc">SMS frauduleux, faux conseillers bancaires, emails piégés... Vous ne savez plus quoi est vrai ou faux.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="prob-title">Logiciels espions</div>
+        <div class="prob-desc">Quelqu'un peut surveiller votre téléphone à votre insu. Vos photos, messages et position GPS accessibles à distance.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><line x1="9" y1="9" x2="15" y2="9"/></svg>
+        </div>
+        <div class="prob-title">Piratage de comptes</div>
+        <div class="prob-desc">Réseaux sociaux, email, banque... Un mot de passe compromis et c'est toute votre vie numérique qui bascule.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </div>
+        <div class="prob-title">Fuites de données</div>
+        <div class="prob-desc">Vos informations personnelles se retrouvent sur le dark web sans que vous le sachiez. Votre identité peut être usurpée.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="prob-title">Arnaque au proche</div>
+        <div class="prob-desc">"Maman, j'ai eu un accident, vire-moi de l'argent." Les escrocs usurpent l'identité de vos proches pour vous manipuler.</div>
+      </div>
+      <div class="prob-card">
+        <div class="prob-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="prob-title">Vous ne savez pas réagir</div>
+        <div class="prob-desc">Quand quelque chose se passe, vous ne savez pas à qui faire appel ni quoi faire. Despy vous guide en temps réel.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FONCTIONNALITÉS ── -->
+<section id="features">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:3rem">
+      <div class="section-tag">Ce que fait Despy</div>
+      <h2 class="sh2">Tout ce dont vous avez besoin<br><span>pour vous protéger</span></h2>
+      <p class="sdesc">Accessible directement depuis votre navigateur — iPhone, Android, PC, Mac. Aucune installation requise.</p>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feat-title">Audit de sécurité personnalisé</div>
+        <div class="feat-desc">Analysez vos appareils, permissions et comportements. Obtenez un score et des recommandations concrètes pour vous améliorer.</div>
+        <span class="feat-free">Inclus dans l'abonnement</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="feat-title">Conseiller Despy 24h/24</div>
+        <div class="feat-desc">Un assistant intelligent répond à toutes vos questions en langage simple. "Ce SMS est-il une arnaque ?" — posez-le directement.</div>
+        <span class="feat-free">Illimité abonnés</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        </div>
+        <div class="feat-title">SOS Urgence guidé</div>
+        <div class="feat-desc">Mot de passe volé, téléphone espionné, arnaque en cours... Despy vous guide étape par étape pour limiter les dégâts immédiatement.</div>
+        <span class="feat-free">Inclus dans l'abonnement</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg>
+        </div>
+        <div class="feat-title">Vérification dark web</div>
+        <div class="feat-desc">Vos emails ont-ils été compromis dans une fuite de données ? Despy vérifie en temps réel et vous alerte si vos informations circulent.</div>
+        <span class="feat-free">Inclus dans l'abonnement</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="feat-title">Analyseur anti-arnaque</div>
+        <div class="feat-desc">Copiez-collez un SMS, email ou lien suspect. Despy analyse et vous dit en 3 secondes si c'est une arnaque ou non.</div>
+        <span class="feat-free">Inclus dans l'abonnement</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="feat-title">Formation + badges XP</div>
+        <div class="feat-desc">Apprenez à vous protéger à votre rythme. Modules courts, quiz, et badges de progression pour rester motivé.</div>
+        <span class="feat-free">Inclus dans l'abonnement</span>
+      </div>
+    </div>
+
+    <!-- CTA vers application -->
+    <div class="app-cta reveal" style="margin-top:3rem">
+      <div>
+        <div class="section-tag" style="margin-bottom:12px">Accessible partout</div>
+        <h3 style="font-size:1.5rem;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-.5px">Aucune installation requise</h3>
+        <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:1rem">Despy fonctionne directement dans votre navigateur. Ouvrez le lien, connectez-vous, c'est tout. Sur iPhone, Android, PC ou Mac.</p>
+        <div class="app-cta-badges">
+          <div class="app-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            iPhone & Android
+          </div>
+          <div class="app-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            PC & Mac
+          </div>
+          <div class="app-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Aucune installation
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:1.25rem" onclick="siteSubscribe('monthly')">Accéder à Despy →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── CONSEILLER IA ── -->
+<section id="conseiller-ia" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2.5rem">
+      <div class="section-tag">Disponible maintenant</div>
+      <h2 class="sh2">Posez votre question à<br><span>votre Conseiller Despy</span></h2>
+      <p class="sdesc">Tapez votre question en français simple. Pas de jargon technique. Votre conseiller répond en quelques secondes.</p>
+    </div>
+
+    <!-- Interface chat simplifiée -->
+    <div class="reveal" style="max-width:680px;margin:0 auto">
+      <!-- Exemples de questions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;justify-content:center">
+        <button onclick="askAI(this.textContent)" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Ce SMS est-il une arnaque ?</button>
+        <button onclick="askAI(this.textContent)" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Mon téléphone est-il espionné ?</button>
+        <button onclick="askAI(this.textContent)" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">J&#39;ai reçu un appel suspect</button>
+        <button onclick="askAI(this.textContent)" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Mon mot de passe a été volé</button>
+      </div>
+
+      <!-- Zone de chat -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)">
+        <!-- Header chat -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:14px;color:var(--text)">Conseiller Despy</div>
+            <div style="font-size:12px;color:var(--ok);display:flex;align-items:center;gap:5px">
+              <div style="width:6px;height:6px;border-radius:50%;background:var(--ok)"></div>
+              En ligne · Répond en quelques secondes
+            </div>
+          </div>
+          <div style="margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg2);border-radius:20px;padding:4px 10px;border:1px solid var(--border)">3 questions gratuites</div>
+        </div>
+
+        <!-- Messages -->
+        <div id="chat-messages" style="padding:20px;min-height:140px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          <!-- Message initial du conseiller -->
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style="background:var(--bg2);border-radius:0 12px 12px 12px;padding:12px 16px;font-size:14px;color:var(--text2);line-height:1.6;max-width:85%">
+              Bonjour ! Je suis votre Conseiller Despy. Posez-moi vos questions sur la cybersécurité — arnaques, piratages, logiciels espions... Je suis là pour vous aider.
+            </div>
+          </div>
+        </div>
+
+        <!-- Saisie -->
+        <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end">
+          <textarea id="chat-input" placeholder="Écrivez votre question ici..." rows="1" style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--text);outline:none;font-family:inherit;resize:none;line-height:1.5;transition:border-color .2s;max-height:100px" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" oninput="this.style.height=&#39;auto&#39;;this.style.height=this.scrollHeight+&#39;px&#39;" onkeydown="if(event.key===&#39;Enter&#39;&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+          <button onclick="sendChat()" id="chat-send-btn" style="width:42px;height:42px;border-radius:10px;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s" onmouseover="this.style.background='var(--blue-dark)'" onmouseout="this.style.background='var(--blue)'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">3 questions gratuites · Accès illimité avec abonnement<br>Réponses générées par IA (Claude, Anthropic) · <span onclick="showLegal('confidentialite')" style="cursor:pointer;color:var(--blue);text-decoration:underline">Politique de confidentialité</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<div class="stats-band reveal">
+  <div class="stats-grid">
+    <div class="stat-box"><div class="stat-n">504 000</div><div class="stat-l">Français victimes de cyberattaque en 2025 — cybermalveillance.gouv.fr</div></div>
+    <div class="stat-box"><div class="stat-n">10+</div><div class="stat-l">Ans d'expérience télécom & cybersécurité</div></div>
+    <div class="stat-box"><div class="stat-n">100%</div><div class="stat-l">Données hébergées en France — jamais revendues</div></div>
+    <div class="stat-box"><div class="stat-n">48h</div><div class="stat-l">Délai de réponse moyen pour le conseiller humain</div></div>
+  </div>
+</div>
+
+<!-- ── COMMENT ÇA MARCHE ── -->
+<section style="background:var(--bg2)" id="howit">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:3rem">
+      <div class="section-tag">Simple</div>
+      <h2 class="sh2">Protégé en <span>3 étapes</span></h2>
+      <p class="sdesc">Pas de jargon, pas de compétence technique. Despy s'adapte à vous.</p>
+    </div>
+    <div class="steps-grid reveal">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Créez votre compte</div>
+        <div class="step-desc">Entrez votre email, choisissez votre offre, et c'est tout. Votre espace Despy est actif en 2 minutes.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Lancez votre audit</div>
+        <div class="step-desc">Répondez à quelques questions simples. Despy calcule votre score de sécurité et identifie vos vulnérabilités.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Soyez guidé</div>
+        <div class="step-desc">Suivez les recommandations pas à pas. Consultez le conseiller en cas de doute. Votre score monte semaine après semaine.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2.5rem">
+      <div class="section-tag">Questions fréquentes</div>
+      <h2 class="sh2">Tout ce que vous <span>voulez savoir</span></h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Est-ce que Despy fonctionne sur iPhone et Android ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Oui, Despy fonctionne sur tous les appareils — iPhone, Android, PC, Mac — directement depuis votre navigateur internet. Aucune application à télécharger, aucune installation. Ouvrez simplement despy.fr depuis n'importe quel appareil.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Quelle est la différence entre Despy et un antivirus ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Despy est complémentaire à un antivirus, pas un remplaçant. Un antivirus scanne les fichiers de votre appareil. Despy vous aide à comprendre les menaces, détecter les comportements suspects, analyser les arnaques, vérifier vos fuites de données, et vous guider quand quelque chose se passe — avec un conseiller humain disponible.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Mes données sont-elles en sécurité avec Despy ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Oui. Vos données sont hébergées en France (serveurs à Paris), chiffrées en transit (HTTPS/TLS) et au repos. Conformité RGPD totale. Nous ne revendons jamais vos données. Vous pouvez demander leur suppression complète à tout moment. SIRET 103 694 212 00012.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Comment fonctionne la résiliation ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">La résiliation est gratuite, immédiate, et sans justification. Un seul clic depuis votre espace client, ou un email à contact.despy@gmail.com. Vous conservez l'accès jusqu'à la fin de la période payée. Aucun frais caché.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Est-ce que Despy détecte les logiciels espions sur mon téléphone ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Despy analyse les comportements suspects — permissions abusives, connexions inhabituelles, applications douteuses — et vous alerte. Si quelque chose semble anormal, le conseiller Despy vous guide pour vérifier et résoudre le problème.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Puis-je y accéder depuis plusieurs appareils ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Oui. Votre compte Despy est unique et lié à votre email. Vous accédez au même profil, aux mêmes données et au même historique depuis tous vos appareils. Connectez-vous depuis votre téléphone, votre tablette ou votre ordinateur.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span>Y a-t-il un engagement de durée ?</span>
+          <div class="faq-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Aucun engagement. L'abonnement mensuel est sans engagement, résiliable à tout moment. L'abonnement annuel est prépayé — en cas d'insatisfaction dans les 14 jours, nous vous remboursons intégralement.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FIDÉLISATION ── -->
+<section id="fidelisation" style="background:var(--blue-light);border-top:1px solid var(--blue-mid)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2.5rem">
+      <div class="section-tag">Progressez chaque semaine</div>
+      <h2 class="sh2">Gagnez des badges,<br><span>montez en expertise</span></h2>
+      <p class="sdesc">Despy transforme la cybersécurité en parcours. Plus vous apprenez, plus vous êtes protégé.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:2rem" class="reveal">
+      <!-- Progression -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:16px;color:var(--text)">Votre progression</div>
+            <div style="font-size:13px;color:var(--text3)">Score actuel · Niveau 1 — Débutant</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-bottom:18px">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="46" fill="none" stroke="#f0f0f0" stroke-width="10"/>
+            <circle cx="55" cy="55" r="46" fill="none" stroke="#ef4444" stroke-width="10" stroke-dasharray="72 216" stroke-dashoffset="72" stroke-linecap="round" transform="rotate(-90 55 55)"/>
+            <text x="55" y="51" text-anchor="middle" font-family="Inter" font-weight="900" font-size="24" fill="#ef4444">25</text>
+            <text x="55" y="66" text-anchor="middle" font-family="Inter" font-weight="500" font-size="11" fill="#999">/100</text>
+          </svg>
+          <div style="font-size:13px;font-weight:700;color:#ef4444;background:#fef2f2;border-radius:20px;padding:4px 14px;display:inline-block;margin-top:4px">Protection insuffisante</div>
+        </div>
+        <!-- XP bar -->
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
+          <span>0 XP</span><span>Objectif : 500 XP</span>
+        </div>
+        <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-bottom:16px">
+          <div id="site-xp-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--blue),#7c9dff);border-radius:4px;transition:width 1s ease"></div>
+        </div>
+        <!-- Niveaux -->
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="text-align:center">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px">1</div>
+            <div style="font-size:9px;color:var(--blue);font-weight:700">Débutant</div>
+          </div>
+          <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div style="text-align:center">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);color:var(--text3);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px">2</div>
+            <div style="font-size:9px;color:var(--text3)">Sentinelle</div>
+          </div>
+          <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div style="text-align:center">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);color:var(--text3);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px">3</div>
+            <div style="font-size:9px;color:var(--text3)">Gardien</div>
+          </div>
+          <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div style="text-align:center">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);color:var(--text3);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px">4</div>
+            <div style="font-size:9px;color:var(--text3)">Expert</div>
+          </div>
+          <div style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div style="text-align:center">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--bg2);border:2px solid var(--border);color:var(--text3);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 3px">5</div>
+            <div style="font-size:9px;color:var(--text3)">Ambassadeur</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+          <div style="width:44px;height:44px;border-radius:12px;background:#7c3aed;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><circle cx="12" cy="8" r="5"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:16px;color:var(--text)">Badges à débloquer</div>
+            <div style="font-size:13px;color:var(--text3)">0 / 8 obtenus</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div onclick="showBadgeInfo('Premier pas','Vous vous êtes connecté pour la première fois. Bienvenue sur Despy !','🛡️')" style="text-align:center;cursor:pointer">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--blue-light);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🛡️</div>
+            <div style="font-size:10px;color:var(--blue);font-weight:700">Premier pas</div>
+          </div>
+          <div onclick="showBadgeInfo('Analyste','Lancez votre premier audit de sécurité.','🔍')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🔍</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Analyste</div>
+          </div>
+          <div onclick="showBadgeInfo('Détective','Analysez votre premier message suspect.','🕵️')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🕵️</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Détective</div>
+          </div>
+          <div onclick="showBadgeInfo('Savant','Complétez votre premier module de formation.','🎓')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🎓</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Savant</div>
+          </div>
+          <div onclick="showBadgeInfo('Sentinelle','Atteignez le niveau 2.','⚡')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">⚡</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Sentinelle</div>
+          </div>
+          <div onclick="showBadgeInfo('Streak 7j','Revenez 7 jours de suite.','🔥')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🔥</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Streak 7j</div>
+          </div>
+          <div onclick="showBadgeInfo('Gardien','Score de sécurité 60/100.','🏆')" style="text-align:center;cursor:pointer;filter:grayscale(1);opacity:.4">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:24px">🏆</div>
+            <div style="font-size:10px;color:var(--text3);font-weight:600">Gardien</div>
+          </div>
+          <div style="text-align:center">
+            <div style="width:52px;height:52px;border-radius:14px;background:var(--bg2);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 5px;font-size:20px;color:var(--text3)">+</div>
+            <div style="font-size:10px;color:var(--text3)">Et plus</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Abonnez-vous pour débloquer tous les badges</p>
+      </div>
+    </div>
+
+    <!-- Quiz hebdo -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:20px" class="reveal">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-weight:700;font-size:18px;color:var(--text);margin-bottom:3px">Quiz de la semaine</div>
+          <div style="font-size:13px;color:var(--text3)">Testez vos connaissances · +50 XP par bonne réponse</div>
+        </div>
+        <div style="background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:700;color:var(--blue)">Semaine en cours</div>
+      </div>
+      <div id="quiz-zone"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem">
+      <button class="btn-primary" style="font-size:15px;padding:14px 28px" onclick="siteSubscribe('monthly')">Commencer ma progression →</button>
+      <p style="font-size:12px;color:var(--text3);margin-top:8px">Tous les badges, quiz illimités et rapport hebdo inclus</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA FINAL ── -->
+<section style="background:var(--blue-light);border-top:1px solid var(--blue-mid)">
+  <div class="wrap text-center reveal">
+    <div class="section-tag" style="margin:0 auto 1rem">Commencez maintenant</div>
+    <h2 class="sh2" style="margin-bottom:.75rem">Prêt à protéger <span>votre vie numérique ?</span></h2>
+    <p class="sdesc" style="margin:0 auto 1.75rem">Rejoignez les <strong id="cta-count">47</strong> membres qui protègent déjà leur vie numérique. Résiliation en 1 clic, sans engagement mensuel.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn-primary" style="font-size:16px;padding:16px 30px" onclick="siteSubscribe('monthly')">Commencer — 9,99€/mois</button>
+      <button class="btn-secondary" style="font-size:16px;padding:16px 24px" onclick="showPage('tarifs')">Voir tous les tarifs</button>
+    </div>
+    <div style="margin-top:1.25rem;font-size:13px;color:var(--text3)">Satisfait ou remboursé 14 jours · Données en France · SIRET 103 694 212 00012</div>
+  </div>
+</section>
+
+</div><!-- /page-home -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE TARIFS                           -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-tarifs" class="page">
+<section style="padding:calc(var(--nav-h) + 4rem) clamp(1rem,6vw,6rem) 5rem;max-width:1100px;margin:0 auto">
+
+  <div class="text-center" style="margin-bottom:2.5rem">
+    <div class="section-tag" style="margin:0 auto 14px">Tarifs</div>
+    <h2 class="sh2">Clair, simple,<br><span>sans surprise</span></h2>
+    <p class="sdesc" style="margin:0 auto">Choisissez l'offre qui vous convient. Changez ou résiliez à tout moment.</p>
+  </div>
+
+  <!-- Bandeau confiance -->
+  <div class="tarifs-trust">
+    <div class="trust-pill">
+      <div style="display:flex;gap:2px;color:#f59e0b">★★★★★</div>
+      <strong style="color:var(--ok)">Prix de lancement</strong> <span style="color:var(--text3)">· offre limitée</span>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-pill">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      <strong style="color:var(--ok)">Satisfait ou remboursé</strong> · 14 jours
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-pill">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <strong style="color:var(--blue)">Stripe</strong> · PCI-DSS &nbsp;|&nbsp; <span style="display:inline-flex;align-items:center;gap:5px"><span style="background:#1a1f36;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800">VISA</span><span style="background:#000;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">Apple Pay</span><span style="background:#003087;color:#fff;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800">PayPal</span><span style="background:#f0f0f0;color:#333;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700">G Pay</span></span>
+    </div>
+  </div>
+
+  <!-- Urgence lancement -->
+  <div class="launch-bar">
+    <div class="launch-bar-left">
+      <div class="launch-dot"></div>
+      Prix de lancement — <span id="tarifs-spots" style="font-weight:900;color:var(--text)">47</span> places restantes sur 50
+    </div>
+    <div class="launch-countdown">
+      Offre valable encore&nbsp;
+      <div class="cd-unit" id="cd-d">--</div>j
+      <div class="cd-unit" id="cd-h">--</div>h
+      <div class="cd-unit" id="cd-m">--</div>m
+    </div>
+  </div>
+
+  <!-- Plans -->
+  <div class="plans-grid">
+    <!-- Mensuel -->
+    <div class="plan-card">
+      <div class="plan-name">Mensuel</div>
+      <div class="plan-price">9,99€<span>/mois</span></div>
+      <div style="font-size:13px;color:var(--text3);margin:4px 0 16px">soit 119,88€/an · Sans engagement</div>
+      <div class="plan-features">
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Audit de sécurité illimité</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Conseiller Despy 24h/24</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>SOS Urgence guidé</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Analyseur anti-arnaque</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérification dark web</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Formation + badges XP</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Rapport hebdomadaire</div>
+      </div>
+      <button class="plan-btn outline" onclick="siteSubscribe('monthly')">Choisir le mensuel</button>
+    </div>
+
+    <!-- Annuel -->
+    <div class="plan-card featured">
+      <div class="plan-badge">⭐ Meilleure offre — 2 mois offerts</div>
+      <div class="plan-name" style="margin-top:8px">Annuel</div>
+      <div class="plan-price-old">119,88€/an</div>
+      <div class="plan-price">89€<span>/an</span></div>
+      <div class="plan-save" style="margin-bottom:4px">Économisez 30€ · soit 7,42€/mois</div>
+      <div style="font-size:13px;color:var(--text3);margin:0 0 16px">Un seul paiement · 2 mois offerts</div>
+      <div class="plan-features">
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Tout du mensuel, inclus</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Prix bloqué 12 mois</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Priorité support email</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Rapport hebdo personnalisé</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Garantie remboursement 14j</div>
+      </div>
+      <button class="plan-btn primary" onclick="siteSubscribe('annual')">Souscrire — 89€/an →</button>
+    </div>
+  </div>
+
+  <!-- Conseiller humain -->
+  <div style="margin-top:2rem">
+    <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px">Besoin d'aide humaine ?</div>
+    <div class="conseil-grid">
+      <div class="conseil-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consultation Standard</div>
+            <div style="font-size:32px;font-weight:900;color:var(--text)">49€</div>
+          </div>
+          <div style="background:var(--bg2);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--text3);text-align:center">Réponse<br>sous 48h</div>
+        </div>
+        <p style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:16px">Analyse complète de votre situation par un expert. Rapport personnalisé avec plan d'action détaillé.</p>
+        <button class="plan-btn outline" onclick="go('conseiller')">Prendre rendez-vous</button>
+      </div>
+      <div class="conseil-card pro">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Consultation Urgente</div>
+            <div style="font-size:32px;font-weight:900;color:#fff">99€</div>
+          </div>
+          <div style="background:rgba(255,255,255,.1);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);text-align:center">Réponse<br>sous 4h</div>
+        </div>
+        <p style="font-size:14px;color:rgba(255,255,255,.65);line-height:1.65;margin-bottom:16px">Pour les situations urgentes — piratage en cours, arnaque active, logiciel espion détecté. Intervention prioritaire.</p>
+        <button class="plan-btn primary" onclick="go('conseiller')">Intervention urgente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Note de bas -->
+  <div style="text-align:center;margin-top:2rem;font-size:13px;color:var(--text3);line-height:1.7">
+    <span style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:11px;color:var(--text3)">Paiements acceptés :</span><span style="background:#1a1f36;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:800">VISA</span><span style="background:#eb001b;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:800">MC</span><span style="background:#000;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">Apple Pay</span><span style="background:#fff;border:1px solid #ddd;color:#333;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700">G Pay</span><span style="background:#003087;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:800">PayPal</span></span>Tous les prix TTC · Paiement sécurisé Stripe · SIRET 103 694 212 00012 ·
+    <span onclick="showLegal('cgv')" style="cursor:pointer;color:var(--blue);font-weight:600">CGV</span> ·
+    <span onclick="showLegal('resiliation')" style="cursor:pointer;color:var(--blue);font-weight:600">Résilier</span>
+  </div>
+</section>
+</div><!-- /page-tarifs -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE CONSEILLER                       -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-conseiller" class="page">
+<section style="padding:calc(var(--nav-h) + 4rem) clamp(1rem,6vw,6rem) 5rem;max-width:700px;margin:0 auto">
+  <button onclick="showPage('home')" style="display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);background:none;border:none;cursor:pointer;margin-bottom:2rem;font-family:inherit">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Retour
+  </button>
+  <div class="section-tag" style="margin-bottom:14px">Conseil humain</div>
+  <h2 class="sh2" style="margin-bottom:.75rem">Parlez à un <span>expert</span></h2>
+  <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:2rem">Notre conseiller analyse votre situation et vous accompagne personnellement. Pas de script, pas d'IA — un humain qui comprend vos préoccupations.</p>
+
+  <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:2rem">
+    <div id="conseil-success" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:12px">✅</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px">Demande envoyée !</div>
+      <div style="font-size:14px;color:var(--text2)">Nous vous répondons dans les délais indiqués. Vérifiez vos emails (et vos spams).</div>
+    </div>
+    <div id="conseil-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="field"><label>Votre prénom *</label><input type="text" id="c-name" placeholder="Marie"></div>
+        <div class="field"><label>Votre email *</label><input type="email" id="c-email" placeholder="marie@exemple.fr"></div>
+      </div>
+      <div class="field"><label>Votre téléphone</label><input type="tel" id="c-tel" placeholder="06 12 34 56 78"></div>
+      <div class="field" style="margin-top:14px">
+        <label>Type de consultation</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px">
+          <div onclick="selectConseil('standard',this)" id="cs-standard" style="padding:12px;border:1.5px solid var(--blue);border-radius:10px;cursor:pointer;background:var(--blue-light)">
+            <div style="font-weight:700;font-size:14px;color:var(--blue)">Standard · 49€</div>
+            <div style="font-size:12px;color:var(--text3)">Réponse sous 48h</div>
+          </div>
+          <div onclick="selectConseil('urgent',this)" id="cs-urgent" style="padding:12px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">
+            <div style="font-weight:700;font-size:14px;color:var(--text)">Urgente · 99€</div>
+            <div style="font-size:12px;color:var(--text3)">Réponse sous 4h</div>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label>Décrivez votre situation *</label>
+        <textarea id="c-msg" placeholder="Décrivez votre problème ou votre question..." style="width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit;resize:vertical;min-height:120px;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+      <div id="conseil-error" style="display:none;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px 12px;font-size:13px;color:#dc2626;margin-bottom:12px"></div>
+      <button id="conseil-btn" onclick="sendConseil()" style="width:100%;padding:14px;border-radius:11px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;transition:all .2s;margin-top:8px">
+        Envoyer ma demande →
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:10px">Sans engagement · Paiement après accord · <a href="mailto:contact.despy@gmail.com" style="color:var(--blue)">contact.despy@gmail.com</a></p>
+    </div>
+  </div>
+</section>
+</div><!-- /page-conseiller -->
+
+<!-- ══════════════════════════════════════ -->
+<!-- PAGE LOGIN / ESPACE CLIENT            -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-login" class="page">
+<section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem);max-width:420px;margin:0 auto;text-align:center">
+  <div style="width:56px;height:56px;border-radius:16px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </div>
+  <h2 style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:8px">Mon espace Despy</h2>
+  <p style="font-size:14px;color:var(--text2);margin-bottom:2rem">Connectez-vous avec l'email utilisé lors de votre souscription.</p>
+  <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="votre@email.com"></div>
+    <button onclick="siteLogin()" style="width:100%;padding:13px;border-radius:10px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:8px">Se connecter →</button>
+    <p style="font-size:12px;color:var(--text3);margin-top:12px">Pas encore abonné ? <span onclick="showPage('tarifs')" style="color:var(--blue);font-weight:600;cursor:pointer">Voir les offres</span></p>
+  </div>
+</section>
+</div><!-- /page-login -->
+
+<div id="page-client" class="page">
+<section style="padding:calc(var(--nav-h) + 3rem) clamp(1rem,6vw,6rem) 5rem;max-width:900px;margin:0 auto">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:900;color:var(--text)" id="client-name">Mon compte</div>
+      <div style="font-size:14px;color:var(--text3)" id="client-email"></div>
+    </div>
+    <button onclick="siteLogout()" style="padding:9px 16px;border-radius:9px;background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Déconnexion</button>
+  </div>
+
+  <!-- Alerte : accéder à l'appli -->
+  <div style="background:linear-gradient(135deg,var(--blue-light),#fff);border:1.5px solid var(--blue-mid);border-radius:16px;padding:24px;margin-bottom:2rem;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:16px;font-weight:700;color:var(--blue);margin-bottom:4px">🛡️ Votre espace de protection est prêt</div>
+      <div style="font-size:14px;color:var(--text2)">Audit, conseiller IA, SOS, analyseur d'arnaques — tout est accessible ici même.</div>
+    </div>
+    <button class="btn-primary" onclick="window.open('despy_app_v23.html','_blank')" style="white-space:nowrap">Ouvrir l'application →</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Mon abonnement</div>
+      <div id="client-sub-content">
+        <div style="background:var(--bg2);border-radius:10px;padding:14px;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--warn)">Mode gratuit</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:4px">Fonctionnalités limitées</div>
+        </div>
+        <button class="plan-btn primary" onclick="showPage('tarifs')" style="width:100%;font-size:13px;padding:12px">Passer à l'abonnement →</button>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Parrainage</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:12px">Partagez Despy et gagnez un avantage exclusif par ami abonné.</div>
+      <div id="ref-code" style="background:var(--bg2);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;font-family:monospace;font-size:14px;font-weight:700;color:var(--blue);text-align:center;letter-spacing:1px;margin-bottom:10px">DESPY-????-2026</div>
+      <button onclick="shareRef()" style="width:100%;padding:11px;border-radius:9px;background:var(--blue);color:#fff;font-weight:700;font-size:13px;border:none;cursor:pointer">Partager mon code</button>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Paramètres</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="showLegal('confidentialite')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(45,91,255,.3)'" onmouseout="this.style.borderColor='var(--border)'"><span>Politique de confidentialité</span><span>›</span></button>
+        <button onclick="showLegal('resiliation')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;font-size:14px;color:#dc2626;cursor:pointer;font-family:inherit"><span>Résilier l'abonnement</span><span>›</span></button>
+        <button onclick="siteDeleteAccount()" style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text3);cursor:pointer;font-family:inherit"><span>Supprimer mon compte (RGPD)</span><span>›</span></button>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+      <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:16px">Support</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.65;margin-bottom:14px">Une question ? Un problème ? Nous répondons sous 24h.</p>
+      <a href="mailto:contact.despy@gmail.com" style="display:flex;align-items:center;gap:8px;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--blue);font-weight:600;text-decoration:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        contact.despy@gmail.com
+      </a>
+    </div>
+  </div>
+</section>
+</div><!-- /page-client -->
+
+<!-- ══ FOOTER ══ -->
+
+<!-- WhatsApp flottant -->
+<a href="https://wa.me/33689148395?text=Bonjour%20Despy%2C%20j%27ai%20une%20question%20sur%20ma%20cybersécurité"
+   target="_blank" rel="noopener"
+   style="position:fixed;bottom:28px;right:28px;z-index:500;width:54px;height:54px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:all .3s;animation:fadeUp .5s 2s ease both"
+   onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
+   aria-label="Contacter Despy sur WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- Bouton retour en haut -->
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+  style="position:fixed;bottom:90px;right:28px;z-index:499;width:42px;height:42px;border-radius:50%;background:#fff;border:1.5px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.1);display:none;align-items:center;justify-content:center;cursor:pointer;transition:all .3s"
+  onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"
+  aria-label="Retour en haut">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<footer id="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="logo" style="color:var(--blue-light)">
+        <div class="logo-icon" style="background:rgba(45,91,255,.3);overflow:hidden">
+          <svg width="20" height="16" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+            <path d="M208 195 Q240 142 292 128 Q340 116 388 128 Q440 142 472 195 Q440 248 388 262 Q340 274 292 262 Q240 248 208 195 Z" fill="rgba(45,91,255,0.8)" stroke="rgba(255,255,255,0.7)" stroke-width="8"/>
+            <circle cx="340" cy="195" r="52" fill="rgba(45,91,255,0.9)" stroke="rgba(255,255,255,0.7)" stroke-width="10"/>
+            <circle cx="340" cy="195" r="30" fill="rgba(100,140,255,0.9)" stroke="rgba(255,255,255,0.7)" stroke-width="6"/>
+            <circle cx="340" cy="195" r="14" fill="#fff"/>
+          </svg>
+        </div>
+        Despy
+      </div>
+      <p>Cybersécurité pour particuliers. Simple, accessible, sans jargon.</p>
+      <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.3)">SIRET 103 694 212 00012<br>33 rue de la Klebsau, 67100 Strasbourg</p>
+    </div>
+    <div>
+      <div class="footer-title">Navigation</div>
+      <button class="footer-link" onclick="scrollToSection('situations')">Protection</button>
+      <button class="footer-link" onclick="scrollToSection('features')">Fonctionnalités</button>
+      <button class="footer-link" onclick="showPage('tarifs')">Tarifs</button>
+      <button class="footer-link" onclick="scrollToSection('faq')">FAQ</button>
+      <button class="footer-link" onclick="go('conseiller')">Conseiller</button>
+    </div>
+    <div>
+      <div class="footer-title">Contact</div>
+      <button class="footer-link" onclick="window.location='mailto:contact.despy@gmail.com'">contact.despy@gmail.com</button>
+      <button class="footer-link" onclick="window.location='tel:0689148395'">06 89 14 83 95</button>
+      <div style="font-size:14px;color:rgba(255,255,255,.4);margin-top:4px">Strasbourg · Partout en France</div>
+    </div>
+    <div>
+      <div class="footer-title">Légal</div>
+      <button class="footer-link" onclick="showLegal('mentions')">Mentions légales</button>
+      <button class="footer-link" onclick="showLegal('cgv')">CGV</button>
+      <button class="footer-link" onclick="showLegal('confidentialite')">Confidentialité</button>
+      <button class="footer-link" onclick="showLegal('resiliation')">Résilier</button>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Despy · Yacine Bourefis EI</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Données hébergées en France</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════════════════
+// PAGES & NAVIGATION
+// ══════════════════════════════════════
+var _currentPage = 'home';
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var el = document.getElementById('page-' + id);
+  if (el) { el.classList.add('active'); _currentPage = id; }
+  window.scrollTo(0, 0);
+  closeMob();
+  var footer = document.getElementById('site-footer');
+  if (footer) footer.style.display = (id === 'login' || id === 'client') ? 'none' : 'block';
+}
+
+function scrollToSection(id) {
+  if (_currentPage !== 'home') { showPage('home'); setTimeout(function(){ var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }, 150); } else { var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+  closeMob();
+}
+
+function go(page) { showPage(page); }
+
+// ── NAV ──
+function toggleMob() {
+  var m = document.getElementById('mob-menu');
+  m.classList.toggle('open');
+}
+function closeMob() {
+  document.getElementById('mob-menu').classList.remove('open');
+}
+
+window.addEventListener('scroll', function(){
+  var nav = document.getElementById('nav');
+  if (nav) { nav.className = window.scrollY > 30 ? 'scrolled' : ''; }
+  // Scroll progress
+  var prog = document.getElementById('scroll-prog');
+  if (prog) {
+    var total = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.transform = 'scaleX(' + (total > 0 ? window.scrollY / total : 0) + ')';
+  }
+  // Révéler éléments
+  document.querySelectorAll('.reveal').forEach(function(el){
+    var rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
+  });
+}, { passive: true });
+
+// ── REVEAL au chargement ──
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){
+    document.querySelectorAll('.reveal').forEach(function(el){
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
+    });
+  }, 100);
+  initLaunch();
+  animateMemberCount();
+  try { handleStripeReturn(); } catch(e){}
+  try { updateNavForSession(); } catch(e){}
+});
+
+// ── FAQ ──
+function toggleFaq(btn) {
+  var item = btn.parentElement;
+  var wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(function(i){ i.classList.remove('open'); });
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ══════════════════════════════════════
+// COOKIE
+// ══════════════════════════════════════
+function hideCookie(accept) {
+  try { localStorage.setItem('despy_cookies', accept ? '1' : '0'); } catch(e){}
+  var bar = document.getElementById('cookie-bar');
+  if (bar) { bar.style.opacity = '0'; bar.style.transition = 'opacity .3s'; setTimeout(function(){ bar.style.display = 'none'; }, 300); }
+}
+(function(){
+  try { if (!localStorage.getItem('despy_cookies')) { setTimeout(function(){ var b=document.getElementById('cookie-bar'); if(b) b.style.display='flex'; }, 2000); } } catch(e){}
+})();
+
+// ══════════════════════════════════════
+// SESSION SITE
+// ══════════════════════════════════════
+var siteSession = {
+  get: function(){ try{ var d=localStorage.getItem('despy_site_session'); return d?JSON.parse(d):null; }catch(e){return null;} },
+  set: function(d){ try{ localStorage.setItem('despy_site_session',JSON.stringify(d)); }catch(e){} },
+  clear: function(){ try{ localStorage.removeItem('despy_site_session'); }catch(e){} }
+};
+
+function updateNavForSession() {
+  var s = siteSession.get();
+  var navRight = document.querySelector('.nav-links');
+  if (s && s.email) {
+    var initial = (s.name||s.email)[0].toUpperCase();
+    // Remplacer le bouton connexion par avatar
+    var existing = document.getElementById('nav-space-btn');
+    if (!existing && navRight) {
+      var btn = document.createElement('button');
+      btn.id = 'nav-space-btn';
+      btn.style.cssText = 'width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-weight:800;font-size:14px;cursor:pointer';
+      btn.textContent = initial;
+      btn.onclick = function(){ showClientArea(); };
+      navRight.appendChild(btn);
+    }
+    // Charger le client
+    var nameEl = document.getElementById('client-name');
+    var emailEl = document.getElementById('client-email');
+    if (nameEl) nameEl.textContent = s.name || 'Mon compte';
+    if (emailEl) emailEl.textContent = s.email;
+    var refEl = document.getElementById('ref-code');
+    if (refEl) refEl.textContent = 'DESPY-' + s.email.substring(0,4).toUpperCase() + '-2026';
+    // Abonnement
+    var subEl = document.getElementById('client-sub-content');
+    if (subEl && s.subscribed) {
+      subEl.innerHTML = '<div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--ok)">✅ Abonnement actif</div>' +
+        '<div style="font-size:13px;color:var(--text2);margin-top:4px">Plan ' + (s.plan||'mensuel') + ' · Toutes fonctionnalités incluses</div>' +
+        '</div>';
+    }
+  }
+}
+
+function showClientArea() {
+  if (siteSession.get()) { showPage('client'); updateNavForSession(); }
+  else { showPage('login'); }
+}
+
+function siteLogin() {
+  var email = document.getElementById('login-email').value.trim();
+  if (!email || !email.includes('@')) { alert('Email invalide'); return; }
+  siteSession.set({ email: email, name: email.split('@')[0], subscribed: false });
+  showClientArea();
+}
+
+function siteLogout() {
+  siteSession.clear();
+  showPage('home');
+}
+
+function siteDeleteAccount() {
+  if (confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) {
+    siteSession.clear();
+    showPage('home');
+    alert('Compte supprimé. Vos données seront effacées sous 30 jours conformément au RGPD.');
+  }
+}
+
+function shareRef() {
+  var s = siteSession.get();
+  var code = s ? ('DESPY-' + s.email.substring(0,4).toUpperCase() + '-2026') : 'DESPY-????-2026';
+  if (navigator.share) { navigator.share({ title: 'Despy', text: 'Protégez votre vie numérique avec Despy — utilisez mon code ' + code, url: 'https://despy.fr' }); }
+  else { navigator.clipboard.writeText(code); alert('Code copié : ' + code); }
+}
+
+// ══════════════════════════════════════
+// LANCEMENT — URGENCE
+// ══════════════════════════════════════
+var LAUNCH = { totalSpots: 50, spotsTaken: 3 };
+
+var _deadline = (function(){
+  try {
+    var s = localStorage.getItem('despy_launch_deadline');
+    if (s) { var d = new Date(s); if (d > new Date()) return d; }
+    var nd = new Date(Date.now() + 7*24*60*60*1000);
+    localStorage.setItem('despy_launch_deadline', nd.toISOString());
+    return nd;
+  } catch(e){ return new Date(Date.now() + 7*24*60*60*1000); }
+})();
+
+function closeLaunchBanner() {
+  var b = document.getElementById('launch-banner');
+  if (b) { b.style.opacity='0'; b.style.transition='opacity .3s'; setTimeout(function(){ b.style.display='none'; var nav=document.getElementById('nav'); if(nav) nav.style.top='0'; }, 300); }
+  try { sessionStorage.setItem('despy_lb_closed','1'); } catch(e){}
+}
+
+function initLaunch() {
+  // Vérifier si fermée
+  try { if(sessionStorage.getItem('despy_lb_closed')==='1'){ var b=document.getElementById('launch-banner'); if(b) b.style.display='none'; var nav=document.getElementById('nav'); if(nav) nav.style.top='0'; return; } } catch(e){}
+  updateLaunch();
+  setInterval(updateLaunch, 30000);
+}
+
+function updateLaunch() {
+  var diff = _deadline - new Date();
+  if (diff <= 0) {
+    _deadline = new Date(Date.now() + 7*24*60*60*1000);
+    try { localStorage.setItem('despy_launch_deadline', _deadline.toISOString()); } catch(e){}
+    diff = 7*24*60*60*1000;
+  }
+  var d = Math.floor(diff/86400000);
+  var h = Math.floor(diff%86400000/3600000);
+  var m = Math.floor(diff%3600000/60000);
+  var el;
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  // Page tarifs
+  el = document.getElementById('cd-d'); if(el) el.textContent = pad(d);
+  el = document.getElementById('cd-h'); if(el) el.textContent = pad(h);
+  el = document.getElementById('cd-m'); if(el) el.textContent = pad(m);
+  // Bannière fixe
+  el = document.getElementById('lb-d'); if(el) el.textContent = pad(d);
+  el = document.getElementById('lb-h'); if(el) el.textContent = pad(h);
+  el = document.getElementById('lb-m'); if(el) el.textContent = pad(m);
+  var remaining = LAUNCH.totalSpots - LAUNCH.spotsTaken;
+  el = document.getElementById('tarifs-spots'); if(el) el.textContent = remaining;
+  el = document.getElementById('lb-spots'); if(el) el.textContent = remaining;
+}
+
+function animateMemberCount() {
+  var target = 47;
+  var start = 32;
+  var els = [document.getElementById('member-count'), document.getElementById('cta-count')];
+  var step = function(){
+    start++;
+    els.forEach(function(el){ if(el) el.textContent = start; });
+    if (start < target) setTimeout(step, 60);
+  };
+  setTimeout(step, 800);
+}
+
+// ══════════════════════════════════════
+// SOUSCRIPTION — STRIPE
+// ══════════════════════════════════════
+function siteSubscribe(plan) {
+  var s = siteSession.get();
+  if (s && s.email) { launchCheckout(s.email, s.name||'', plan); return; }
+  showSubscribeModal(plan);
+}
+
+function showSubscribeModal(plan) {
+  var price = plan === 'annual' ? '89€/an' : '9,99€/mois';
+  var savings = plan === 'annual' ? ' · 2 mois offerts' : '';
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  modal.id = 'sub-modal';
+  modal.innerHTML =
+    '<div class="sub-modal">' +
+      '<div class="sub-modal-title">Créer votre compte Despy</div>' +
+      '<div class="sub-modal-sub">Offre <strong>' + price + '</strong>' + savings + '</div>' +
+      '<div class="field"><label>Votre prénom</label><input type="text" id="sub-name" placeholder="Marie" autocomplete="given-name"></div>' +
+      '<div class="field"><label>Votre email</label><input type="email" id="sub-email" placeholder="votre@email.fr" autocomplete="email"></div>' +
+      '<div id="sub-err" class="sub-error"></div>' +
+      '<button class="sub-btn" id="sub-go-btn" onclick="confirmSub(\'' + plan + '\')">Continuer vers le paiement →</button>' +
+      '<button class="sub-cancel" onclick="document.getElementById(\'sub-modal\').remove()">Annuler</button>' +
+      '<div class="sub-trust">🔒 Paiement sécurisé Stripe · PCI-DSS · Résiliation 1 clic</div>' +
+    '</div>';
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+  // Injecter case à cocher L221-28 avant le bouton
+  var goBtn = document.getElementById('sub-go-btn');
+  if (goBtn) {
+    var chkWrap = document.createElement('div');
+    chkWrap.style.cssText = 'margin-bottom:12px;padding:11px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;display:flex;gap:9px;align-items:flex-start';
+    var chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.id = 'sub-retract';
+    chk.style.cssText = 'margin-top:2px;flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--blue)';
+    var lbl = document.createElement('label');
+    lbl.htmlFor = 'sub-retract';
+    lbl.style.cssText = 'font-size:11px;color:#92400e;line-height:1.5;cursor:pointer';
+    lbl.innerHTML = '<strong>J&#39;accepte</strong> que le service commence immédiatement et renonce à mon droit de rétractation de 14 jours (art. L221-28 Code de la consommation).';
+    chkWrap.appendChild(chk); chkWrap.appendChild(lbl);
+    goBtn.parentNode.insertBefore(chkWrap, goBtn);
+  }
+  setTimeout(function(){ var el=document.getElementById('sub-name'); if(el) el.focus(); }, 100);
+}
+
+async function confirmSub(plan) {
+  var name  = (document.getElementById('sub-name')||{}).value||'';
+  var email = (document.getElementById('sub-email')||{}).value||'';
+  var errEl = document.getElementById('sub-err');
+  var btn   = document.getElementById('sub-go-btn');
+  name = name.trim(); email = email.trim();
+  if (!email || !email.includes('@')) {
+    if(errEl){errEl.textContent='Email invalide.';errEl.style.display='block';}
+    return;
+  }
+  var retractCb = document.getElementById('sub-retract');
+  if (retractCb && !retractCb.checked) {
+    if(errEl){errEl.textContent='Veuillez cocher la case relative au droit de rétractation pour continuer.';errEl.style.display='block';}
+    return;
+  }
+  if(errEl) errEl.style.display='none';
+  if(btn){btn.textContent='⏳ Redirection...';btn.disabled=true;}
+  await launchCheckout(email, name, plan);
+}
+
+async function launchCheckout(email, name, plan) {
+  try {
+    var r = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site' })
+    });
+    if (!r.ok) { var err = await r.json(); throw new Error(err.error || 'Erreur serveur'); }
+    var data = await r.json();
+    window.location.href = data.url;
+  } catch(err) {
+    var errEl = document.getElementById('sub-err');
+    var btn   = document.getElementById('sub-go-btn');
+    if(errEl){ errEl.textContent = "Erreur : " + err.message + ". Contactez contact.despy@gmail.com"; errEl.style.display="block"; }
+    if(btn){ btn.textContent = "Réessayer"; btn.disabled = false; }
+  }
+}
+
+function handleStripeReturn() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    window.history.replaceState({}, '', window.location.pathname);
+        var modal = document.createElement('div');
+    modal.className = 'sub-modal-overlay';
+    var box = document.createElement('div');
+    box.className = 'sub-modal';
+    box.style.textAlign = 'center';
+    var ico = document.createElement('div'); ico.style.cssText='font-size:52px;margin-bottom:12px'; ico.textContent='✅';
+    var ttl = document.createElement('div'); ttl.className='sub-modal-title'; ttl.style.cssText='font-size:22px;color:#16a34a'; ttl.textContent='Bienvenue dans Despy !';
+    var dsc = document.createElement('div'); dsc.style.cssText='font-size:14px;color:var(--text2);margin:8px 0 24px;line-height:1.7'; dsc.textContent='Votre abonnement est actif. Un email de confirmation vous a été envoyé.';
+    var b1 = document.createElement('button'); b1.className='sub-btn'; b1.style.background='var(--ok)'; b1.textContent='Accéder à mon espace client →';
+    b1.onclick = function(){ showClientArea(); modal.remove(); };
+    var b2 = document.createElement('button'); b2.className='sub-cancel'; b2.style.marginTop='10px'; b2.textContent='Continuer';
+    b2.onclick = function(){ modal.remove(); };
+    box.appendChild(ico); box.appendChild(ttl); box.appendChild(dsc); box.appendChild(b1); box.appendChild(b2);
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+  } else if (params.get('payment') === 'cancel') {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}
+
+// ══════════════════════════════════════
+// CONSEILLER
+// ══════════════════════════════════════
+var _conseilType = 'standard';
+function selectConseil(type, el) {
+  _conseilType = type;
+  document.querySelectorAll('#cs-standard,#cs-urgent').forEach(function(c){
+    c.style.border = '1.5px solid var(--border)';
+    c.style.background = '#fff';
+    c.querySelector('div').style.color = 'var(--text)';
+  });
+  el.style.border = '1.5px solid var(--blue)';
+  el.style.background = 'var(--blue-light)';
+  el.querySelector('div').style.color = 'var(--blue)';
+}
+
+async function sendConseil() {
+  var name  = (document.getElementById('c-name')||{}).value||'';
+  var email = (document.getElementById('c-email')||{}).value||'';
+  var msg   = (document.getElementById('c-msg')||{}).value||'';
+  var errEl = document.getElementById('conseil-error');
+  var btn   = document.getElementById('conseil-btn');
+
+  if (!name.trim() || !email.trim() || !msg.trim()) {
+    if(errEl){ errEl.textContent='Remplissez tous les champs obligatoires.'; errEl.style.display='block'; }
+    return;
+  }
+  if (!email.includes('@')) {
+    if(errEl){ errEl.textContent='Email invalide.'; errEl.style.display='block'; }
+    return;
+  }
+  if(errEl) errEl.style.display='none';
+  if(btn){ btn.textContent='Envoi...'; btn.disabled=true; }
+
+  try {
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        service_id:'service_despy',
+        template_id:'template_despy',
+        user_id:'despy_public',
+        template_params:{ from_name:name, from_email:email, message:msg, type:_conseilType }
+      })
+    });
+  } catch(e){}
+
+  var form = document.getElementById('conseil-form');
+  var succ = document.getElementById('conseil-success');
+  if(form) form.style.display='none';
+  if(succ) succ.style.display='block';
+}
+
+// ══════════════════════════════════════
+// MODALS LÉGAUX
+// ══════════════════════════════════════
+var LEGAL = {
+  mentions: {
+    title: 'Mentions légales',
+    html: '<h4>Éditeur</h4><p>Yacine Bourefis, Entrepreneur Individuel · SIRET 103 694 212 00012 · APE 6202A<br>33 rue de la Klebsau, 67100 Strasbourg<br>contact.despy@gmail.com · 06 89 14 83 95</p><h4>Hébergement</h4><p>Netlify Inc. · 512 2nd Street, San Francisco, CA 94107 · netlify.com<br>Données hébergées en Europe (Supabase · Paris 🇫🇷)</p><h4>Propriété intellectuelle</h4><p>L&#39;ensemble du site despy.fr est protégé par le droit d&#39;auteur. Toute reproduction sans autorisation est interdite.</p>'
+  },
+  cgv: {
+    title: 'Conditions Générales de Vente',
+    html: '<p><em>En vigueur au 14/04/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Consultation standard : 49€ (réponse sous 48h)<br>• Consultation urgente : 99€ (réponse sous 4h)</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
+  },
+  confidentialite: {
+    title: "Politique de confidentialité",
+    html: "<p><em>Conforme RGPD · Version 1.0 · Avril 2026</em></p><h4>Responsable du traitement</h4><p>Bourefis Yacine · SIRET 103 694 212 00012 · contact.despy@gmail.com</p><h4>Données collectées</h4><p>Email, prénom, diagnostics de sécurité, progression. Base légale : contrat (art. 6.1.b RGPD).</p><h4>Sous-traitants</h4><p>• Stripe · Paiements · PCI-DSS<br>• Supabase · Base de données · Europe (Paris) 🇫🇷<br>• Anthropic · Conseiller IA (Claude) · USA · CCT · <em>vos messages de chat sont traités aux USA</em><br>• Have I Been Pwned (HIBP) · Vérification fuites email · USA · CCT · données non conservées</p><h4>Durée de conservation</h4><p>Données actives : durée abonnement + 3 ans. Suppression sur demande sous 30 jours.</p><h4>Vos droits</h4><p>Accès, rectification, suppression, portabilité : contact.despy@gmail.com<br>Réclamation : cnil.fr</p><h4>Cookies</h4><p>Cookies essentiels uniquement. Aucun cookie publicitaire.</p>"
+  },
+  resiliation: {
+    title: "Résilier votre abonnement",
+    html: '<p><strong>Gratuit, immédiat, sans justification.</strong> Effet en fin de mois en cours.</p><div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin:14px 0"><p><strong>3 façons de résilier :</strong><br>1. Espace client → Paramètres → Résilier<br>2. Email : <a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="color:var(--blue)">contact.despy@gmail.com</a><br>3. Via votre espace Stripe (lien dans vos emails)</p></div><p><strong>Remboursement</strong><br>14 jours si vous n&#39;avez pas utilisé le service. Contactez-nous par email.</p><div style="margin-top:16px"><a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="display:inline-block;padding:12px 22px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:10px;color:var(--blue);font-weight:700;text-decoration:none">Envoyer ma demande de résiliation →</a></div>'
+  }
+};
+
+function showLegal(type) {
+  var data = LEGAL[type];
+  if (!data) return;
+  var modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'legal-modal';
+  modal.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="modal-header"><h3>' + data.title + '</h3><button class="modal-close" onclick="closeLegal()">×</button></div>' +
+      '<div class="modal-body">' + data.html + '</div>' +
+      '<div class="modal-footer"><button onclick="closeLegal()">Fermer</button></div>' +
+    '</div>';
+  modal.addEventListener('click', function(e){ if(e.target===modal) closeLegal(); });
+  document.body.appendChild(modal);
+  document.addEventListener('keydown', _legalEsc);
+}
+function _legalEsc(e){ if(e.key==='Escape') closeLegal(); }
+function closeLegal() {
+  var m = document.getElementById('legal-modal');
+  if (m) { m.style.opacity='0'; m.style.transition='opacity .2s'; setTimeout(function(){ if(m.parentNode) m.parentNode.removeChild(m); }, 200); }
+  document.removeEventListener('keydown', _legalEsc);
+}
+
+
+// ══════════════════════════════════════
+// CONSEILLER IA — CHAT
+// ══════════════════════════════════════
+var _chatHistory = [];
+var _chatFreeCount = 0;
+var _chatMaxFree = 3;
+
+function askAI(question) {
+  var input = document.getElementById('chat-input');
+  if (input) { input.value = question; input.style.height = 'auto'; }
+  sendChat();
+}
+
+async function sendChat() {
+  var input = document.getElementById('chat-input');
+  var msg = input ? input.value.trim() : '';
+  if (!msg) return;
+
+  // Vérifier quota gratuit
+  if (_chatFreeCount >= _chatMaxFree) {
+    addMsg('conseiller', 'Vous avez utilisé vos 3 questions gratuites. Abonnez-vous pour un accès illimité au Conseiller Despy.', true);
+    showSubscribePrompt();
+    return;
+  }
+
+  // Afficher message utilisateur
+  addMsg('user', msg);
+  if (input) { input.value = ''; input.style.height = 'auto'; }
+
+  // Indicateur de frappe
+  var typingId = addTyping();
+  _chatFreeCount++;
+
+  _chatHistory.push({ role: 'user', content: msg });
+
+  try {
+    var response = await fetch('/.netlify/functions/despy-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: _chatHistory })
+    });
+
+    removeTyping(typingId);
+
+    if (!response.ok) { throw new Error('Erreur API'); }
+    var data = await response.json();
+    var reply = data.content && data.content[0] ? data.content[0].text : "Je n\u2019ai pas pu r\u00e9pondre. R\u00e9essayez.";
+    _chatHistory.push({ role: 'assistant', content: reply });
+    addMsg('conseiller', reply);
+
+    // Après 2 questions, suggérer l'abonnement
+    if (_chatFreeCount === 2) {
+      setTimeout(function(){
+        addMsg('conseiller', 'Vous avez encore 1 question gratuite. Abonnez-vous à Despy pour poser toutes vos questions, à tout moment.');
+      }, 1000);
+    }
+
+  } catch(err) {
+    removeTyping(typingId);
+    addMsg('conseiller', 'Désolé, une erreur est survenue. Réessayez dans quelques instants ou écrivez-nous à contact.despy@gmail.com');
+  }
+}
+
+function addMsg(role, text, isWarning) {
+  var container = document.getElementById('chat-messages');
+  if (!container) return;
+  var isUser = role === 'user';
+  var div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;' + (isUser ? 'flex-direction:row-reverse;' : '');
+  var avatar = isUser
+    ? '<div style="width:30px;height:30px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#555">V</div>'
+    : '<div style="width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>';
+  var bubble = isUser
+    ? '<div style="background:var(--blue);border-radius:12px 0 12px 12px;padding:11px 15px;font-size:14px;color:#fff;line-height:1.55;max-width:85%">' + escHtml(text) + '</div>'
+    : '<div style="background:' + (isWarning ? '#fff7ed' : 'var(--bg2)') + ';border:' + (isWarning ? '1px solid #fed7aa' : 'none') + ';border-radius:0 12px 12px 12px;padding:11px 15px;font-size:14px;color:var(--text2);line-height:1.6;max-width:85%">' + escHtml(text) + '</div>';
+  div.innerHTML = avatar + bubble;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function addTyping() {
+  var container = document.getElementById('chat-messages');
+  if (!container) return null;
+  var div = document.createElement('div');
+  var id = 'typing-' + Date.now();
+  div.id = id;
+  div.style.cssText = 'display:flex;gap:10px;align-items:flex-start';
+  div.innerHTML = '<div style="width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div style="background:var(--bg2);border-radius:0 12px 12px 12px;padding:12px 16px;display:flex;gap:5px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:#ccc;animation:blink .8s .0s infinite"></div><div style="width:7px;height:7px;border-radius:50%;background:#ccc;animation:blink .8s .2s infinite"></div><div style="width:7px;height:7px;border-radius:50%;background:#ccc;animation:blink .8s .4s infinite"></div></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  if (!id) return;
+  var el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function showSubscribePrompt() {
+  var container = document.getElementById('chat-messages');
+  if (!container) return;
+  var div = document.createElement('div');
+  div.style.cssText = 'text-align:center;padding:16px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:12px;margin-top:4px';
+  div.innerHTML = '<div style="font-weight:700;font-size:14px;color:var(--blue);margin-bottom:8px">Continuez sans limite</div><div style="font-size:13px;color:var(--text2);margin-bottom:12px">9,99\u20ac/mois \u00b7 Conseiller illimit\u00e9 \u00b7 Audit \u00b7 SOS \u00b7 Dark web</div><button onclick="siteSubscribe(&#39;monthly&#39;)" style="background:var(--blue);color:#fff;border:none;border-radius:9px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer">Souscrire maintenant \u2192</button>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+
+// === EXIT INTENT + BACK TO TOP ===
+var _exitShown = false;
+document.addEventListener('mouseleave', function(e) {
+  if (e.clientY <= 10 && !_exitShown) {
+    _exitShown = true;
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:#fff;border-radius:20px;padding:36px 32px;max-width:400px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.25)';
+    var eico = document.createElement('div'); eico.style.cssText='font-size:48px;margin-bottom:12px'; eico.textContent='🛡️';
+    var ettl = document.createElement('div'); ettl.style.cssText='font-weight:900;font-size:20px;color:#111;margin-bottom:8px'; ettl.textContent='Attendez — offre exclusive';
+    var edsc = document.createElement('div'); edsc.style.cssText='font-size:14px;color:#555;line-height:1.7;margin-bottom:20px'; edsc.innerHTML='Profitez de <strong>2 mois offerts</strong> sur l&#39;abonnement annuel.<br>Soit 89&#8364; au lieu de 119,88&#8364;.';
+    box.appendChild(eico); box.appendChild(ettl); box.appendChild(edsc);
+    var cta = document.createElement('button');
+    cta.textContent = 'En profiter maintenant →';
+    cta.style.cssText = 'width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:inherit';
+    cta.onclick = function() { document.body.removeChild(overlay); siteSubscribe('annual'); };
+    var skip = document.createElement('button');
+    skip.textContent = 'Non merci, continuer sans protection';
+    skip.style.cssText = 'background:none;border:none;font-size:12px;color:#999;cursor:pointer;font-family:inherit';
+    skip.onclick = function() { document.body.removeChild(overlay); };
+    box.appendChild(cta);
+    box.appendChild(skip);
+    overlay.appendChild(box);
+    overlay.onclick = function(e) { if(e.target===overlay) document.body.removeChild(overlay); };
+    document.body.appendChild(overlay);
+  }
+});
+
+// Back to top
+window.addEventListener('scroll', function() {
+  var btn = document.getElementById('back-top');
+  if (btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+}, { passive: true });
+
+// ── Page CSS active ──
+// === QUIZ HEBDO + BADGES + XP ===
+var QUIZZES = [
+  {
+    q: "Vous recevez ce SMS : Votre colis La Poste est bloque, cliquez ici : lapost-livraison.com. Que faites-vous ?",
+    opts: ["Je clique pour voir mon colis", "Je signale au 33700 et je supprime", "Je rappelle le numero affiche"],
+    answer: 1,
+    expl: "Ce SMS est une arnaque. La Poste utilise toujours laposte.fr. Signalez au 33700 (service officiel anti-spam SMS)."
+  },
+  {
+    q: "Quelqu\u2019un vous appelle : Je suis de votre banque, votre compte est compromis, donnez-moi votre code SMS.",
+    opts: ["Je donne le code, c\u2019est urgent", "Je raccroche et j\u2019appelle ma banque sur le numero au dos de ma carte", "Je demande son nom et je note"],
+    answer: 1,
+    expl: "Aucune banque ne demande jamais votre code SMS par telephone. Raccrochez toujours et rappelez sur le numero officiel."
+  },
+  {
+    q: "Votre petite-fille vous ecrit sur WhatsApp : Mamie j\u2019ai perdu mon telephone, vire-moi 500 euros vite. Que faites-vous ?",
+    opts: ["Je vire l\u2019argent immediatement", "J\u2019appelle ma petite-fille sur son ancien numero pour verifier", "Je lui demande son RIB"],
+    answer: 1,
+    expl: "C\u2019est l\u2019arnaque au proche. Verifiez toujours par un autre moyen. Ne virez jamais sans confirmation vocale."
+  },
+  {
+    q: "Vous voyez une pub : iPhone 15 gagne ! Cliquez pour reclamer votre cadeau. C\u2019est :",
+    opts: ["Un vrai cadeau de Facebook", "Une arnaque pour voler vos donnees", "Une offre limitee legitime"],
+    answer: 1,
+    expl: "Facebook ne distribue jamais de cadeaux. Ces pubs menent sur de faux sites qui volent vos donnees bancaires."
+  },
+  {
+    q: "Votre mot de passe ideal ressemble a quoi ?",
+    opts: ["Votre prenom + date de naissance", "Le meme partout pour ne pas oublier", "Une phrase de 12 caracteres minimum, unique par site"],
+    answer: 2,
+    expl: "Un bon mot de passe est long, unique pour chaque site. Un gestionnaire de mots de passe vous aide a les memoriser."
+  }
+];
+
+var _quizIdx = Math.floor(Date.now() / (7*24*60*60*1000)) % QUIZZES.length;
+window._quizAnswered = false;
+var _siteXP = 0;
+
+function renderQuiz() {
+  var zone = document.getElementById('quiz-zone');
+  if (!zone) return;
+  var q = QUIZZES[_quizIdx];
+  var html = '<div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:0">';
+  html += '<div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:16px">' + q.q + '</div>';
+  html += '<div id="quiz-opts" style="display:flex;flex-direction:column;gap:10px">';
+  for (var i = 0; i < q.opts.length; i++) {
+    html += '<button onclick="answerQuiz(' + i + ')" style="text-align:left;padding:13px 16px;background:#fff;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;font-family:inherit;transition:all .2s;width:100%">' + q.opts[i] + '</button>';
+  }
+  html += '</div></div>';
+  zone.innerHTML = html;
+}
+
+function answerQuiz(idx) {
+  if (window._quizAnswered) return;
+  window._quizAnswered = true;
+  var q = QUIZZES[_quizIdx];
+  var opts = document.querySelectorAll('#quiz-opts button');
+  for (var i = 0; i < opts.length; i++) {
+    opts[i].disabled = true;
+    if (i === q.answer) {
+      opts[i].style.background = 'var(--ok-bg)';
+      opts[i].style.borderColor = '#16a34a';
+      opts[i].style.color = 'var(--ok)';
+    } else if (i === idx) {
+      opts[i].style.background = '#fef2f2';
+      opts[i].style.borderColor = '#ef4444';
+      opts[i].style.color = '#dc2626';
+    }
+  }
+  var isCorrect = (idx === q.answer);
+  _siteXP += isCorrect ? 50 : 10;
+  var zone = document.getElementById('quiz-zone');
+  if (!zone) return;
+  var fb = document.createElement('div');
+  fb.style.cssText = 'margin-top:12px;padding:16px;border-radius:12px;background:' + (isCorrect ? 'var(--ok-bg)' : '#fff7ed') + ';border:1px solid ' + (isCorrect ? '#bbf7d0' : '#fed7aa');
+  fb.innerHTML = '<div style="font-weight:700;font-size:14px;color:' + (isCorrect ? 'var(--ok)' : '#d97706') + ';margin-bottom:6px">' + (isCorrect ? 'Bonne reponse ! +50 XP' : 'Pas tout a fait... +10 XP quand meme') + '</div><div style="font-size:13px;color:var(--text2);line-height:1.6">' + q.expl + '</div>';
+  var nextBtn = document.createElement('button');
+  nextBtn.textContent = 'Voir ma progression';
+  nextBtn.style.cssText = 'margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
+  nextBtn.onclick = function() { updateSiteXP(); scrollToSection('fidelisation'); };
+  fb.appendChild(nextBtn);
+  zone.appendChild(fb);
+  if (isCorrect) showXPToast(50);
+}
+
+function showXPToast(xp) {
+  var t = document.createElement('div');
+  t.textContent = '+' + xp + ' XP !';
+  t.style.cssText = 'position:fixed;bottom:80px;right:24px;z-index:999;background:var(--blue);color:#fff;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;box-shadow:var(--shadow-blue);animation:fadeUp .4s ease';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, 400); }, 2500);
+}
+
+function updateSiteXP() {
+  var bar = document.getElementById('site-xp-bar');
+  if (bar) bar.style.width = Math.min(100, _siteXP / 5) + '%';
+}
+
+function showBadgeInfo(name, desc, icon) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;padding:32px;max-width:320px;width:100%;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.2)';
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Compris !';
+  closeBtn.style.cssText = 'margin-top:16px;padding:11px 26px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit';
+  closeBtn.onclick = function(){ document.body.removeChild(overlay); };
+  box.innerHTML = '<div style="font-size:52px;margin-bottom:12px">' + icon + '</div><div style="font-weight:900;font-size:18px;color:var(--text);margin-bottom:8px">' + name + '</div><div style="font-size:14px;color:var(--text2);line-height:1.65">' + desc + '</div>';
+  box.appendChild(closeBtn);
+  overlay.appendChild(box);
+  overlay.onclick = function(e){ if(e.target===overlay) document.body.removeChild(overlay); };
+  document.body.appendChild(overlay);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  try { renderQuiz(); } catch(e) {}
+});
+</script>
+
+<style>
+.page{display:none}
+.page.active{display:block}
+</style>
+
+</body>
+</html>
