@@ -342,6 +342,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     <button class="nav-link" onclick="scrollToSection('features')">Fonctionnalités</button>
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
+    <button class="nav-cta" style="background:var(--bg2);color:var(--blue);border:1.5px solid var(--blue-mid);margin-right:8px" onclick="showFreeSignup()">Compte gratuit</button>
     <button class="nav-cta" onclick="siteSubscribe('monthly')">Commencer — 9,99€/mois</button>
   </div>
   <button class="mob-menu-btn" id="mob-btn" onclick="toggleMob()" aria-label="Menu">
@@ -396,7 +397,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Commencer maintenant
         </button>
-        <button class="btn-secondary" onclick="go('conseiller')">
+        <button class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Créer un compte gratuit
+        </button>
+        <button class="btn-secondary" onclick="go('conseiller')" style="display:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           Parler à un conseiller
         </button>
@@ -1873,6 +1878,121 @@ window.addEventListener('scroll', function() {
   var btn = document.getElementById('back-top');
   if (btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
 }, { passive: true });
+
+
+// === COMPTE GRATUIT (FREEMIUM) ===
+function showFreeSignup() {
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  modal.id = 'free-signup-modal';
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+
+  var title = document.createElement('div');
+  title.className = 'sub-modal-title';
+  title.textContent = 'Créer votre compte gratuit';
+
+  var sub = document.createElement('div');
+  sub.className = 'sub-modal-sub';
+  sub.innerHTML = 'Accès limité · <strong>3 questions IA</strong> · Audit de base<br><span style="font-size:11px;color:var(--text3)">Sans carte bancaire · Sans engagement</span>';
+
+  var nameDiv = document.createElement('div'); nameDiv.className = 'field';
+  var nameLbl = document.createElement('label'); nameLbl.textContent = 'Votre prénom';
+  var nameInp = document.createElement('input'); nameInp.type='text'; nameInp.id='free-name'; nameInp.placeholder='Marie';
+
+  var emailDiv = document.createElement('div'); emailDiv.className = 'field';
+  var emailLbl = document.createElement('label'); emailLbl.textContent = 'Votre email';
+  var emailInp = document.createElement('input'); emailInp.type='email'; emailInp.id='free-email'; emailInp.placeholder='marie@exemple.fr';
+
+  nameDiv.appendChild(nameLbl); nameDiv.appendChild(nameInp);
+  emailDiv.appendChild(emailLbl); emailDiv.appendChild(emailInp);
+
+  var errDiv = document.createElement('div');
+  errDiv.id = 'free-err'; errDiv.className = 'sub-error';
+
+  var btn = document.createElement('button');
+  btn.className = 'sub-btn';
+  btn.textContent = 'Créer mon compte gratuit →';
+  btn.onclick = createFreeAccount;
+
+  var sep = document.createElement('div');
+  sep.style.cssText = 'text-align:center;font-size:13px;color:var(--text3);margin:8px 0';
+  sep.textContent = '— ou —';
+
+  var paidBtn = document.createElement('button');
+  paidBtn.className = 'sub-btn';
+  paidBtn.style.background = 'var(--blue-light)';
+  paidBtn.style.color = 'var(--blue)';
+  paidBtn.style.border = '1px solid var(--blue-mid)';
+  paidBtn.textContent = 'Voir les offres payantes →';
+  paidBtn.onclick = function(){ modal.remove(); showPage('tarifs'); };
+
+  var cancel = document.createElement('button');
+  cancel.className = 'sub-cancel';
+  cancel.textContent = 'Annuler';
+  cancel.onclick = function(){ modal.remove(); };
+
+  var trust = document.createElement('div');
+  trust.className = 'sub-trust';
+  trust.textContent = 'Gratuit pour toujours · Pas de carte bancaire requise';
+
+  box.appendChild(title); box.appendChild(sub);
+  box.appendChild(nameDiv); box.appendChild(emailDiv);
+  box.appendChild(errDiv); box.appendChild(btn);
+  box.appendChild(sep); box.appendChild(paidBtn);
+  box.appendChild(cancel); box.appendChild(trust);
+  modal.appendChild(box);
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+  document.body.appendChild(modal);
+  setTimeout(function(){ nameInp.focus(); }, 100);
+}
+
+async function createFreeAccount() {
+  var name  = (document.getElementById('free-name')||{}).value||'';
+  var email = (document.getElementById('free-email')||{}).value||'';
+  var errEl = document.getElementById('free-err');
+  name = name.trim(); email = email.trim();
+
+  if (!email || !email.includes('@')) {
+    if(errEl){ errEl.textContent='Email invalide.'; errEl.style.display='block'; }
+    return;
+  }
+
+  // Créer session locale
+  siteSession.set({ email: email, name: name || email.split('@')[0], subscribed: false, plan: 'free' });
+
+  // Fermer la modal
+  var modal = document.getElementById('free-signup-modal');
+  if (modal) modal.remove();
+
+  // Afficher espace client
+  showClientArea();
+  updateNavForSession();
+
+  // Enregistrer dans Supabase (optionnel — ne bloque pas)
+  try {
+    await fetch('/.netlify/functions/register-free', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, name: name || email.split('@')[0] })
+    });
+  } catch(e) { /* silencieux */ }
+}
+
+// === VÉRIFICATION ABONNEMENT POUR LE CHAT IA ===
+async function checkSubscription(email) {
+  try {
+    var r = await fetch('/.netlify/functions/check-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    var d = await r.json();
+    return d.subscribed === true;
+  } catch(e) {
+    return false;
+  }
+}
 
 // ── Page CSS active ──
 // === QUIZ HEBDO + BADGES + XP ===
