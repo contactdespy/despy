@@ -1771,7 +1771,7 @@ async function sendChat() {
 
     if (!response.ok) { throw new Error('Erreur API'); }
     var data = await response.json();
-    var reply = data.content && data.content[0] ? data.content[0].text : "Je n\u2019ai pas pu r\u00e9pondre. R\u00e9essayez.";
+    var reply = data.reply || (data.content && data.content[0] ? data.content[0].text : "Je n\u2019ai pas pu r\u00e9pondre. R\u00e9essayez.");
     _chatHistory.push({ role: 'assistant', content: reply });
     addMsg('conseiller', reply);
 
