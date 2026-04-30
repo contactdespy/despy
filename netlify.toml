@@ -1,13 +1,46 @@
+# ════════════════════════════════════════════
+# DESPY — Configuration Netlify
+# ════════════════════════════════════════════
+
 [build]
   publish = "."
   functions = "netlify/functions"
 
+# ── Redirections ──
+[[redirects]]
+  from = "/app"
+  to = "/despy_app_v23.html"
+  status = 301
+
+[[redirects]]
+  from = "/application"
+  to = "/despy_app_v23.html"
+  status = 301
+
+# ── Headers de sécurité ──
 [[headers]]
   for = "/*"
   [headers.values]
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy = "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https: http:"
 
+# ── Crons automatiques ──
+
+# Rapport hebdomadaire — chaque lundi à 9h
 [functions.weekly-report]
   schedule = "0 9 * * 1"
+
+# Rapport mensuel personnalisé — 1er du mois à 9h
+[functions.monthly-report]
+  schedule = "0 9 1 * *"
+
+# Alertes cybermenaces — tous les jours à 8h
+[functions.cyber-alerts]
+  schedule = "0 8 * * *"
+
+# Relance leads J+3 — tous les jours à 10h
+[functions.relance-leads]
+  schedule = "0 10 * * *"
