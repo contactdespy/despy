@@ -44,3 +44,11 @@
 # Relance leads J+3 — tous les jours à 10h
 [functions.relance-leads]
   schedule = "0 10 * * *"
+
+# Vérification HIBP dark web — 1er du mois à 7h
+[functions.hibp-check]
+  schedule = "0 7 1 * *"
+
+# Bilan trimestriel — 1er jan/avr/juil/oct à 10h
+[functions.quarterly-report]
+  schedule = "0 10 1 1,4,7,10 *"
