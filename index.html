@@ -1277,7 +1277,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">🚀 Par où commencer ?</div>
     <div style="display:flex;flex-direction:column;gap:10px">
 
-      <div onclick="scrollToSection('conseiller-ia');showPage('home')" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--blue-light);border:1.5px solid var(--blue-mid);border-radius:12px;cursor:pointer">
+      <div onclick="scrollToSection(&quot;conseiller-ia&quot;);showPage(&quot;home&quot;)" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--blue-light);border:1.5px solid var(--blue-mid);border-radius:12px;cursor:pointer">
         <div style="width:40px;height:40px;border-radius:10px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">💬</div>
         <div style="flex:1">
           <div style="font-weight:700;font-size:14px;color:var(--blue)">Poser une question au Conseiller Despy</div>
@@ -1314,6 +1314,25 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button onclick="siteSubscribe(&quot;monthly&quot;)" style="padding:10px 18px;background:#fff;color:var(--blue);border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer">9,99€/mois →</button>
       <button onclick="siteSubscribe('annual')" style="padding:10px 18px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;font-weight:700;font-size:13px;cursor:pointer">89€/an · 2 mois offerts</button>
+    </div>
+  </div>
+
+  <!-- Carte Dark Web dans espace client -->
+  <div id="darkweb-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(45,91,255,.06)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:#0f0f1a;display:flex;align-items:center;justify-content:center;font-size:18px">🌑</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;color:var(--text)">Surveillance Dark Web</div>
+          <div style="font-size:12px;color:var(--text3)">Vos données sur Have I Been Pwned</div>
+        </div>
+      </div>
+      <button onclick="checkDarkWebNow()" id="darkweb-btn" style="padding:8px 14px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:8px;color:var(--blue);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit">
+        Vérifier maintenant
+      </button>
+    </div>
+    <div id="darkweb-result" style="background:var(--bg2);border-radius:10px;padding:12px;font-size:13px;color:var(--text3);text-align:center">
+      Cliquez sur "Vérifier maintenant" pour analyser vos données
     </div>
   </div>
 
@@ -2411,6 +2430,47 @@ function showSOSPlan(planKey) {
     '</div>';
 
   box.innerHTML = html;
+}
+
+
+// === VERIFICATION DARK WEB TEMPS REEL ===
+async function checkDarkWebNow() {
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+  if (!session.subscribed) { showChronoUpgradePrompt(); return; }
+
+  var btn = document.getElementById('darkweb-btn');
+  var result = document.getElementById('darkweb-result');
+  if (btn) { btn.textContent = 'Vérification...'; btn.disabled = true; }
+  if (result) result.innerHTML = '<div style="color:var(--text2)">🔍 Analyse en cours... (peut prendre quelques secondes)</div>';
+
+  try {
+    var r = await fetch('/.netlify/functions/hibp-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: session.email, manual: true })
+    });
+    var data = await r.json();
+
+    if (data.breachCount === 0) {
+      if (result) result.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;color:var(--ok)">' +
+        '<span style="font-size:24px">✅</span>' +
+        '<div><div style="font-weight:700">Aucune fuite détectée</div>' +
+        '<div style="font-size:12px;color:var(--text3)">Votre email n’apparaît dans aucune fuite connue</div></div></div>';
+    } else {
+      if (result) result.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;color:#dc2626">' +
+        '<span style="font-size:24px">⚠️</span>' +
+        '<div><div style="font-weight:700">' + data.breachCount + ' fuite(s) détectée(s)</div>' +
+        '<div style="font-size:12px;color:var(--text3)">Un email de détail a été envoyé à ' + session.email + '</div></div></div>' +
+        '<button onclick="scrollToSection(&quot;conseiller-ia&quot;);showPage(&quot;home&quot;)" style="margin-top:10px;padding:8px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:700">Obtenir de l’aide →</button>';
+    }
+  } catch(e) {
+    if (result) result.innerHTML = '<div style="color:var(--text3)">Vérification momentanément indisponible. Réessayez dans quelques minutes.</div>';
+  }
+
+  if (btn) { btn.textContent = 'Vérifier à nouveau'; btn.disabled = false; }
 }
 
 // === COMPTE GRATUIT (FREEMIUM) ===
