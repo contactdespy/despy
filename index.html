@@ -74,22 +74,23 @@ nav.scrolled{border-color:var(--border);box-shadow:0 1px 12px rgba(0,0,0,0.06)}
 .mob-cta{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
 
 /* ── ANIMATIONS ── */
+@media(prefers-reduced-motion:reduce){.a1,.a2,.a3,.a4,}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes scrollDot{0%{transform:translateY(0);opacity:1}100%{transform:translateY(8px);opacity:0}}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.4);opacity:0}}
-.a1{animation:fadeUp .8s cubic-bezier(.16,1,.3,1) both}
-.a2{animation:fadeUp .8s .1s cubic-bezier(.16,1,.3,1) both}
-.a3{animation:fadeUp .8s .2s cubic-bezier(.16,1,.3,1) both}
-.a4{animation:fadeUp .8s .3s cubic-bezier(.16,1,.3,1) both}
-.a5{animation:fadeUp .8s .4s cubic-bezier(.16,1,.3,1) both}
+
+
+
+
+
 .reveal{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
 .reveal.visible{opacity:1;transform:none}
 
 /* ── HERO ── */
-.hero{min-height:100vh;padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 5rem;background:linear-gradient(160deg,#030810 0%,#071428 50%,#0a1f3a 100%);position:relative;overflow:hidden;display:flex;align-items:center}
+.hero{min-height:100vh;padding:calc(var(--nav-h) + 38px + 2rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(160deg,#030810 0%,#071428 50%,#0a1f3a 100%);position:relative;overflow:hidden;display:flex;align-items:flex-start}
 .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(45,91,255,0.15) 0%,transparent 70%);pointer-events:none}
 .hero::after{content:'';position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.08) 0%,transparent 70%);pointer-events:none}
 .hero-dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;opacity:.5}
@@ -272,10 +273,20 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 /* MOBILE */
 @media (max-width:768px){
+  .hero{min-height:auto;padding:calc(var(--nav-h) + 16px) 1.25rem 3rem;align-items:flex-start}
+  /* Formation — 1 colonne sur mobile */
+  #fidelisation .wrap > div:last-child > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
   .hero-stat-float{display:none !important}
   .hero-dot-grid{display:none}
-  .hero-inner{grid-template-columns:1fr}
+  .hero-inner{grid-template-columns:1fr;gap:2rem}
   .hero-visual{display:none}
+  .hero h1{font-size:2rem;letter-spacing:-0.5px}
+  .hero-sub{font-size:15px}
+  .hero-btns{flex-direction:column;gap:10px}
+  .hero-btns button{width:100%;justify-content:center}
+  .reveal{opacity:1 !important;transform:none !important}
   .plans-grid{grid-template-columns:1fr}
   .conseil-grid{grid-template-columns:1fr}
   .app-cta{grid-template-columns:1fr}
@@ -286,11 +297,29 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   .strip-inner{gap:1.5rem}
   .tarifs-trust{gap:12px}
   .trust-divider{display:none}
+  /* Formation badges — 1 colonne */
+  .formation-grid{grid-template-columns:1fr !important}
+  /* Badges grille — 1 colonne sur mobile */
+  .formation-grid > div > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
 }
 @media(max-width:480px){
   .plans-grid,.conseil-grid{grid-template-columns:1fr}
-  .hero h1{font-size:2rem}
+  .hero h1{font-size:1.8rem}
+  .hero{padding:calc(var(--nav-h) + 12px) 1rem 2.5rem}
 }
+
+@keyframes fadeUp {
+  from { opacity:1; transform:translateY(0); }
+  to { opacity:0; transform:translateY(-30px); }
+}
+@keyframes pulse {
+  0%,100% { transform:scale(1); }
+  50% { transform:scale(1.05); }
+}
+.page{display:none}
+.page.active{display:block}
 </style>
 </head>
 <body>
@@ -373,12 +402,12 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   <div class="hero-dot-grid"></div>
   <div class="hero-inner">
     <div>
-      <div class="hero-badge a1" style="background:rgba(45,91,255,0.2);border-color:rgba(45,91,255,0.4);color:#7ca8ff">
+      <div class="hero-badge" style="background:rgba(45,91,255,0.2);border-color:rgba(45,91,255,0.4);color:#7ca8ff">
         <div class="hero-badge-dot"></div>
         Cybersécurité · France métropolitaine
       </div>
       <!-- Compteur membres -->
-      <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:1rem" class="a1">
+      <div style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:1rem">
         <div style="display:flex">
           <div class="hero-av" style="background:#4A90E2">Y</div>
           <div class="hero-av" style="background:#7B68EE">M</div>
@@ -391,10 +420,10 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <div style="font-size:12px;margin-top:1px">Rejoignez les <strong style="color:#fff">premiers membres</strong> Despy</div>
         </div>
       </div>
-      <h1 class="a2" style="color:#fff">Protégez votre<br><span>vie numérique.</span></h1>
-      <p class="hero-sub a3" style="color:rgba(255,255,255,0.75)">Arnaques, piratages, logiciels espions, fuites de données... Despy détecte les menaces et vous guide pas à pas. Sans jargon, sans compétence technique.</p>
-      <div class="hero-btns a4">
-        <button class="btn-primary" onclick="siteSubscribe('monthly')">
+      <h1 style="color:#fff">Protégez votre<br><span>vie numérique.</span></h1>
+      <p class="hero-sub" style="color:rgba(255,255,255,0.75)">Arnaques, piratages, logiciels espions, fuites de données... Despy détecte les menaces et vous guide pas à pas. Sans jargon, sans compétence technique.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('tarifs')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Commencer maintenant
         </button>
@@ -408,7 +437,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
         </button>
       </div>
       <!-- Trust pack -->
-      <div class="a5" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:fit-content">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:fit-content">
         <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.75);white-space:nowrap">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
           Données en France
@@ -847,7 +876,42 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
         <p class="section-sub">8 modules · 40 questions · 6 niveaux · Classement en temps réel</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
+      <!-- DEFI CHRONO — Hero -->
+      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:20px;padding:28px;margin-bottom:2rem;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+        <div style="position:absolute;bottom:-40px;left:-20px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.03)"></div>
+        <div style="position:relative;z-index:1">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:36px">⏱️</div>
+            <div>
+              <div style="font-size:20px;font-weight:900">Défi Chrono</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.7)">5 questions · 30 secondes chacune · XP bonus selon la vitesse</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">100</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6)">XP bonne réponse</div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">+150</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6)">XP bonus vitesse</div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">🏆</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.6)">Badge Sans Faute</div>
+            </div>
+          </div>
+          <div id="chrono-zone" style="background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:16px;min-height:60px;display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center;color:rgba(255,255,255,.6);font-size:14px">Prêt à relever le défi ?</div>
+          </div>
+          <button onclick="startChrono()" style="width:100%;padding:14px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#f0f3ff'" onmouseout="this.style.background='#fff'">
+            ⚡ Lancer le Défi Chrono
+          </button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start" class="formation-grid">
 
         <!-- COLONNE GAUCHE : Progression + Quiz -->
         <div>
@@ -866,7 +930,19 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
             </div>
 
             <!-- Les 6 niveaux -->
-            <div style="margin-top:16px;display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
+            <!-- Score securite dynamique -->
+            <div style="margin:14px 0;padding:12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:12px;font-weight:600;color:var(--text2)">🛡️ Score de sécurité</span>
+                <span id="dynamic-score" style="font-size:18px;font-weight:900;color:#ef4444">25</span>
+              </div>
+              <div style="background:#e2e8f0;border-radius:99px;height:8px;overflow:hidden;margin-bottom:5px">
+                <div id="dynamic-score-bar" style="height:100%;width:25%;background:#ef4444;border-radius:99px;transition:width .8s ease,background .5s"></div>
+              </div>
+              <div id="dynamic-score-msg" style="font-size:11px;color:var(--text3)">Continuez la formation pour améliorer votre score</div>
+            </div>
+
+            <div style="margin-top:4px;display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
               <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#94a3b8;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N1</div><div style="font-size:9px;color:var(--text3)">Novice</div></div>
               <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#cd7f32;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N2</div><div style="font-size:9px;color:var(--text3)">Apprenti</div></div>
               <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#c0c0c0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N3</div><div style="font-size:9px;color:var(--text3)">Vigilant</div></div>
@@ -1236,7 +1312,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     <div style="font-size:15px;font-weight:700;margin-bottom:5px">✨ Passez à l’abonnement complet</div>
     <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:14px">Questions illimitées · Dark web · Rapport hebdo · SOS urgence</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button onclick="siteSubscribe('monthly')" style="padding:10px 18px;background:#fff;color:var(--blue);border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer">9,99€/mois →</button>
+      <button onclick="siteSubscribe(&quot;monthly&quot;)" style="padding:10px 18px;background:#fff;color:var(--blue);border:none;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer">9,99€/mois →</button>
       <button onclick="siteSubscribe('annual')" style="padding:10px 18px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:9px;font-weight:700;font-size:13px;cursor:pointer">89€/an · 2 mois offerts</button>
     </div>
   </div>
@@ -1370,7 +1446,7 @@ function scrollToSection(id) {
 
 function go(page) { showPage(page); }
 
-// ── NAV ──
+// -- NAV --
 function toggleMob() {
   var m = document.getElementById('mob-menu');
   m.classList.toggle('open');
@@ -1395,7 +1471,7 @@ window.addEventListener('scroll', function(){
   });
 }, { passive: true });
 
-// ── REVEAL au chargement ──
+// -- REVEAL au chargement --
 document.addEventListener('DOMContentLoaded', function(){
   setTimeout(function(){
     document.querySelectorAll('.reveal').forEach(function(el){
@@ -1409,7 +1485,7 @@ document.addEventListener('DOMContentLoaded', function(){
   try { updateNavForSession(); } catch(e){}
 });
 
-// ── FAQ ──
+// -- FAQ --
 function toggleFaq(btn) {
   var item = btn.parentElement;
   var wasOpen = item.classList.contains('open');
@@ -1594,60 +1670,182 @@ function siteSubscribe(plan) {
 }
 
 function showSubscribeModal(plan) {
-  var price = plan === 'annual' ? '89€/an' : '9,99€/mois';
-  var savings = plan === 'annual' ? ' · 2 mois offerts' : '';
+  var price = plan === 'annual' ? '89\u20ac/an' : '9,99\u20ac/mois';
+  var savings = plan === 'annual' ? ' \u00b7 2 mois offerts' : '';
+
+  // Récupérer la session existante pour pré-remplir
+  var session = siteSession.get();
+
   var modal = document.createElement('div');
   modal.className = 'sub-modal-overlay';
   modal.id = 'sub-modal';
-  modal.innerHTML =
-    '<div class="sub-modal">' +
-      '<div class="sub-modal-title">Créer votre compte Despy</div>' +
-      '<div class="sub-modal-sub">Offre <strong>' + price + '</strong>' + savings + '</div>' +
-      '<div class="field"><label>Votre prénom</label><input type="text" id="sub-name" placeholder="Marie" autocomplete="given-name"></div>' +
-      '<div class="field"><label>Votre email</label><input type="email" id="sub-email" placeholder="votre@email.fr" autocomplete="email"></div>' +
-      '<div id="sub-err" class="sub-error"></div>' +
-      '<button class="sub-btn" id="sub-go-btn" onclick="confirmSub(\'' + plan + '\')">Continuer vers le paiement →</button>' +
-      '<button class="sub-cancel" onclick="document.getElementById(\'sub-modal\').remove()">Annuler</button>' +
-      '<div class="sub-trust">🔒 Paiement sécurisé Stripe · PCI-DSS · Résiliation 1 clic</div>' +
-    '</div>';
+
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.style.maxWidth = '460px';
+
+  function makeField(lText, id, type, ph, ac, prefill) {
+    var w = document.createElement('div'); w.className = 'field';
+    var l = document.createElement('label'); l.textContent = lText + ' *';
+    var i = document.createElement('input');
+    i.type = type; i.id = id; i.placeholder = ph;
+    if (ac) i.autocomplete = ac;
+    if (prefill) i.value = prefill;
+    w.appendChild(l); w.appendChild(i); return w;
+  }
+
+  // Titre — adapté si déjà connecté
+  var title = document.createElement('div');
+  title.className = 'sub-modal-title';
+  title.textContent = session && session.email ? 'Finaliser votre abonnement' : 'Cr\u00e9er votre compte Despy';
+
+  var sub = document.createElement('div');
+  sub.className = 'sub-modal-sub';
+
+  // Si déjà connecté — afficher un message simplifié
+  if (session && session.email) {
+    sub.innerHTML = 'Offre <strong>' + price + '</strong>' + savings +
+      '<br><span style="font-size:12px;color:var(--ok)">✅ Compte : ' + session.email + '</span>';
+  } else {
+    sub.innerHTML = 'Offre <strong>' + price + '</strong>' + savings;
+  }
+
+  // Pré-remplir depuis la session si disponible
+  var prenomVal = session ? (session.prenom || (session.name ? session.name.split(' ')[0] : '')) : '';
+  var nomVal    = session ? (session.nom    || (session.name ? session.name.split(' ').slice(1).join(' ') : '')) : '';
+  var emailVal  = session ? session.email : '';
+  var telVal    = session ? (session.tel || '') : '';
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px';
+  grid.appendChild(makeField('Pr\u00e9nom', 'sub-prenom', 'text', 'Marie', 'given-name', prenomVal));
+  grid.appendChild(makeField('Nom', 'sub-nom', 'text', 'Dupont', 'family-name', nomVal));
+
+  var emailF = makeField('Email', 'sub-email', 'email', 'votre@email.fr', 'email', emailVal);
+  var telF   = makeField('T\u00e9l\u00e9phone', 'sub-tel', 'tel', '06 12 34 56 78', 'tel', telVal);
+
+  var dobW = document.createElement('div'); dobW.className = 'field';
+  var dobL = document.createElement('label'); dobL.textContent = 'Date de naissance *';
+  var dobI = document.createElement('input');
+  dobI.type = 'date'; dobI.id = 'sub-dob';
+  dobI.max = new Date().toISOString().split('T')[0];
+  if (session && session.dob) dobI.value = session.dob;
+  dobI.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit';
+  dobW.appendChild(dobL); dobW.appendChild(dobI);
+
+  var errDiv = document.createElement('div');
+  errDiv.id = 'sub-err'; errDiv.className = 'sub-error';
+
+  // CGU
+  var cguW = document.createElement('div');
+  cguW.style.cssText = 'display:flex;gap:9px;align-items:flex-start;padding:11px;background:#f5f7ff;border:1px solid var(--blue-mid);border-radius:10px';
+  var cguCb = document.createElement('input');
+  cguCb.type = 'checkbox'; cguCb.id = 'sub-cgu';
+  cguCb.style.cssText = 'margin-top:3px;flex-shrink:0;width:15px;height:15px;accent-color:var(--blue)';
+  var cguL = document.createElement('label');
+  cguL.htmlFor = 'sub-cgu';
+  cguL.style.cssText = 'font-size:11px;color:var(--text2);line-height:1.5;cursor:pointer';
+  var ct1 = document.createTextNode('J\u2019accepte les ');
+  var cs1 = document.createElement('span');
+  cs1.textContent = 'CGV'; cs1.style.cssText = 'color:var(--blue);cursor:pointer;text-decoration:underline';
+  cs1.onclick = function(){ showLegal('cgv'); };
+  var ct2 = document.createTextNode(' et la ');
+  var cs2 = document.createElement('span');
+  cs2.textContent = 'politique de confidentialit\u00e9'; cs2.style.cssText = 'color:var(--blue);cursor:pointer;text-decoration:underline';
+  cs2.onclick = function(){ showLegal('confidentialite'); };
+  cguL.appendChild(ct1); cguL.appendChild(cs1); cguL.appendChild(ct2); cguL.appendChild(cs2);
+  cguW.appendChild(cguCb); cguW.appendChild(cguL);
+
+  // Rétractation L221-28
+  var retW = document.createElement('div');
+  retW.style.cssText = 'display:flex;gap:9px;align-items:flex-start;padding:11px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px';
+  var retCb = document.createElement('input');
+  retCb.type = 'checkbox'; retCb.id = 'sub-retract';
+  retCb.style.cssText = 'margin-top:3px;flex-shrink:0;width:15px;height:15px;accent-color:var(--blue)';
+  var retL = document.createElement('label');
+  retL.htmlFor = 'sub-retract';
+  retL.style.cssText = 'font-size:11px;color:#92400e;line-height:1.5;cursor:pointer';
+  var rt1 = document.createElement('strong'); rt1.textContent = 'J\u2019accepte';
+  var rt2 = document.createTextNode(' que le service commence imm\u00e9diatement et renonce \u00e0 mon droit de r\u00e9tractation de 14 jours (art. L221-28).');
+  retL.appendChild(rt1); retL.appendChild(rt2);
+  retW.appendChild(retCb); retW.appendChild(retL);
+
+  var goBtn = document.createElement('button');
+  goBtn.className = 'sub-btn'; goBtn.id = 'sub-go-btn';
+  goBtn.textContent = 'Continuer vers le paiement \u2192';
+  goBtn.onclick = function(){ confirmSub(plan); };
+
+  var cancelBtn = document.createElement('button');
+  cancelBtn.className = 'sub-cancel';
+  cancelBtn.textContent = 'Annuler';
+  cancelBtn.onclick = function(){ modal.remove(); };
+
+  var trust = document.createElement('div');
+  trust.className = 'sub-trust';
+  trust.textContent = '\uD83D\uDD12 Paiement s\u00e9curis\u00e9 Stripe \u00b7 PCI-DSS \u00b7 R\u00e9siliation 1 clic';
+
+  box.appendChild(title); box.appendChild(sub);
+  box.appendChild(grid);
+  box.appendChild(emailF); box.appendChild(telF); box.appendChild(dobW);
+  box.appendChild(errDiv);
+  box.appendChild(cguW); box.appendChild(retW);
+  box.appendChild(goBtn); box.appendChild(cancelBtn); box.appendChild(trust);
+  modal.appendChild(box);
   modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
   document.body.appendChild(modal);
-  // Injecter case à cocher L221-28 avant le bouton
-  var goBtn = document.getElementById('sub-go-btn');
-  if (goBtn) {
-    var chkWrap = document.createElement('div');
-    chkWrap.style.cssText = 'margin-bottom:12px;padding:11px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;display:flex;gap:9px;align-items:flex-start';
-    var chk = document.createElement('input');
-    chk.type = 'checkbox'; chk.id = 'sub-retract';
-    chk.style.cssText = 'margin-top:2px;flex-shrink:0;width:15px;height:15px;cursor:pointer;accent-color:var(--blue)';
-    var lbl = document.createElement('label');
-    lbl.htmlFor = 'sub-retract';
-    lbl.style.cssText = 'font-size:11px;color:#92400e;line-height:1.5;cursor:pointer';
-    lbl.innerHTML = '<strong>J&#39;accepte</strong> que le service commence immédiatement et renonce à mon droit de rétractation de 14 jours (art. L221-28 Code de la consommation).';
-    chkWrap.appendChild(chk); chkWrap.appendChild(lbl);
-    goBtn.parentNode.insertBefore(chkWrap, goBtn);
-  }
-  setTimeout(function(){ var el=document.getElementById('sub-name'); if(el) el.focus(); }, 100);
+  setTimeout(function(){ 
+    // Focus sur le premier champ vide
+    var first = !prenomVal ? 'sub-prenom' : !emailVal ? 'sub-email' : 'sub-go-btn';
+    var el = document.getElementById(first); if(el) el.focus();
+  }, 100);
 }
 
 async function confirmSub(plan) {
-  var name  = (document.getElementById('sub-name')||{}).value||'';
-  var email = (document.getElementById('sub-email')||{}).value||'';
-  var errEl = document.getElementById('sub-err');
-  var btn   = document.getElementById('sub-go-btn');
-  name = name.trim(); email = email.trim();
-  if (!email || !email.includes('@')) {
-    if(errEl){errEl.textContent='Email invalide.';errEl.style.display='block';}
-    return;
-  }
+  var prenom = (document.getElementById('sub-prenom')||{}).value||'';
+  var nom    = (document.getElementById('sub-nom')||{}).value||'';
+  var email  = (document.getElementById('sub-email')||{}).value||'';
+  var tel    = (document.getElementById('sub-tel')||{}).value||'';
+  var dob    = (document.getElementById('sub-dob')||{}).value||'';
+  var cgu    = document.getElementById('sub-cgu');
+  var errEl  = document.getElementById('sub-err');
+  var btn    = document.getElementById('sub-go-btn');
   var retractCb = document.getElementById('sub-retract');
-  if (retractCb && !retractCb.checked) {
-    if(errEl){errEl.textContent='Veuillez cocher la case relative au droit de rétractation pour continuer.';errEl.style.display='block';}
-    return;
+
+  prenom = prenom.trim(); nom = nom.trim(); email = email.trim(); tel = tel.trim();
+
+  if (!prenom || !nom) {
+    if(errEl){errEl.textContent='Veuillez entrer votre pr\u00e9nom et nom.';errEl.style.display='block';} return;
+  }
+  if (!email || !email.includes('@')) {
+    if(errEl){errEl.textContent='Email invalide.';errEl.style.display='block';} return;
+  }
+  if (!tel || tel.replace(/\s/g,'').length < 10) {
+    if(errEl){errEl.textContent='Num\u00e9ro de t\u00e9l\u00e9phone invalide.';errEl.style.display='block';} return;
+  }
+  if (!dob) {
+    if(errEl){errEl.textContent='Veuillez entrer votre date de naissance.';errEl.style.display='block';} return;
+  }
+  if (!cgu || !cgu.checked) {
+    if(errEl){errEl.textContent='Veuillez accepter les CGV.';errEl.style.display='block';} return;
+  }
+  if (!retractCb || !retractCb.checked) {
+    if(errEl){errEl.textContent='Veuillez cocher la case relative au droit de r\u00e9tractation.';errEl.style.display='block';} return;
   }
   if(errEl) errEl.style.display='none';
-  if(btn){btn.textContent='⏳ Redirection...';btn.disabled=true;}
-  await launchCheckout(email, name, plan);
+  if(btn){btn.textContent='\u23F3 Redirection...';btn.disabled=true;}
+
+  var fullName = prenom + ' ' + nom;
+
+  // Enregistrer dans Supabase
+  try {
+    await fetch('/.netlify/functions/register-free', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, nom, prenom, tel, dob, name: fullName })
+    });
+  } catch(e) {}
+
+  await launchCheckout(email, fullName, plan);
 }
 
 async function launchCheckout(email, name, plan) {
@@ -2047,6 +2245,174 @@ async function doLogin() {
   }
 }
 
+
+// === ANALYSE DE LIEN SUSPECT ===
+function analyzeLink() {
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+
+  var link = window.prompt('Collez le lien suspect ci-dessous :');
+  if (!link || !link.trim()) return;
+
+  link = link.trim();
+  var input = document.getElementById('chat-input');
+  if (input) {
+    input.value = 'Peux-tu analyser ce lien et me dire si c’est dangereux ? ' + link;
+    sendChat();
+  }
+}
+
+function quickQuestion(question) {
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+  var input = document.getElementById('chat-input');
+  if (input) { input.value = question; sendChat(); }
+}
+
+
+// ========================================
+// SOS POST-PIRATAGE — Plan d'action guidé
+// ========================================
+var SOS_PLANS = {
+  compte_pirate: {
+    title: "Compte piraté",
+    icon: "🔓",
+    color: "#ef4444",
+    urgence: "URGENT — Agissez dans les 30 minutes",
+    etapes: [
+      { temps: "0-5 min", action: "Changez IMMÉDIATEMENT votre mot de passe email depuis un autre appareil (téléphone ou ordinateur non compromis)", icon: "🔑" },
+      { temps: "5-10 min", action: "Activez la vérification en 2 étapes sur votre email si ce n'est pas déjà fait", icon: "🔒" },
+      { temps: "10-15 min", action: "Vérifiez les appareils connectés à votre compte et déconnectez les inconnus (Paramètres → Sécurité)", icon: "📱" },
+      { temps: "15-20 min", action: "Changez le mot de passe de tout site où vous utilisez le même mot de passe", icon: "🔄" },
+      { temps: "20-30 min", action: "Prévenez vos contacts que votre compte a été compromis — des messages frauduleux ont pu être envoyés en votre nom", icon: "📢" },
+      { temps: "Ensuite", action: "Signalez sur cybermalveillance.gouv.fr et déposez plainte au commissariat si des données personnelles ont été volées", icon: "🚨" }
+    ]
+  },
+  arnaque_argent: {
+    title: "Arnaque financière",
+    icon: "💸",
+    color: "#f59e0b",
+    urgence: "URGENT — Chaque minute compte",
+    etapes: [
+      { temps: "0-5 min", action: "Appelez IMMÉDIATEMENT votre banque au numéro au dos de votre carte pour bloquer les transactions et contester", icon: "📞" },
+      { temps: "5-10 min", action: "Bloquez votre carte bancaire depuis l'application de votre banque en attendant de les joindre", icon: "💳" },
+      { temps: "10-30 min", action: "Notez tout : montants, dates, numéros de téléphone des arnaqueurs, captures d'écran des messages", icon: "📝" },
+      { temps: "Même jour", action: "Déposez plainte au commissariat ou en ligne sur masecurite.fr — indispensable pour le remboursement", icon: "🚔" },
+      { temps: "Même jour", action: "Signalez sur cybermalveillance.gouv.fr — ils peuvent vous orienter vers des aides spécifiques", icon: "🌐" },
+      { temps: "Ensuite", action: "Contactez votre assurance habitation — certains contrats couvrent les escroqueries en ligne", icon: "🛡️" }
+    ]
+  },
+  virus_ransomware: {
+    title: "Virus ou ransomware",
+    icon: "🦠",
+    color: "#8b5cf6",
+    urgence: "Ne payez JAMAIS la rançon",
+    etapes: [
+      { temps: "Immédiatement", action: "Déconnectez l'appareil d'internet (coupez le Wi-Fi et débranchez le câble réseau) pour stopper la propagation", icon: "📴" },
+      { temps: "Immédiatement", action: "N'éteignez PAS l'ordinateur — certains ransomwares chiffrent au redémarrage", icon: "⚠️" },
+      { temps: "Depuis un autre appareil", action: "Changez vos mots de passe importants (email, banque) depuis votre téléphone non infecté", icon: "🔑" },
+      { temps: "Dans la journée", action: "Contactez un professionnel informatique — n'essayez pas de supprimer le virus vous-même", icon: "🔧" },
+      { temps: "Dans la journée", action: "Déposez plainte au commissariat — obligatoire pour toute démarche d'assurance", icon: "🚔" },
+      { temps: "Ensuite", action: "Restaurez depuis votre dernière sauvegarde propre. Si vous n'avez pas de sauvegarde, le professionnel peut récupérer certains fichiers", icon: "💾" }
+    ]
+  },
+  usurpation: {
+    title: "Usurpation d'identité",
+    icon: "👤",
+    color: "#dc2626",
+    urgence: "Agissez dès aujourd'hui",
+    etapes: [
+      { temps: "Aujourd'hui", action: "Signalez à la police ou gendarmerie — l'usurpation d'identité est un délit pénal. Obtenez un récépissé de plainte", icon: "🚔" },
+      { temps: "Aujourd'hui", action: "Contactez les organismes concernés (banque, CAF, impôts, assurance maladie) avec votre récépissé de plainte", icon: "📞" },
+      { temps: "Cette semaine", action: "Signalez à la CNIL si des données personnelles ont été utilisées : cnil.fr", icon: "🔏" },
+      { temps: "Cette semaine", action: "Consultez votre dossier de crédit sur fichier-clients.fr pour vérifier si des crédits ont été souscrits en votre nom", icon: "💳" },
+      { temps: "Cette semaine", action: "Changez tous vos mots de passe et activez la vérification en 2 étapes partout", icon: "🔐" },
+      { temps: "Suivi", action: "Gardez une trace écrite de toutes vos démarches — dates, interlocuteurs, références de dossier", icon: "📋" }
+    ]
+  }
+};
+
+function showSOS() {
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  modal.id = 'sos-modal';
+
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.style.cssText = 'max-width:500px;max-height:85vh;overflow-y:auto';
+
+  box.innerHTML = '<div style="background:#dc2626;margin:-24px -24px 20px;padding:20px 24px;border-radius:12px 12px 0 0">' +
+    '<div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;opacity:.8">DESPY — SOS URGENCE</div>' +
+    '<div style="color:#fff;font-size:20px;font-weight:900;margin-top:4px">Que s’est-il passé ?</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px">' +
+    Object.entries(SOS_PLANS).map(function(entry) {
+      var key = entry[0]; var plan = entry[1];
+      return '<div data-sos="' + key + '" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s">' +
+        '<span style="font-size:28px;flex-shrink:0">' + plan.icon + '</span>' +
+        '<div><div style="font-weight:700;font-size:14px;color:var(--text)">' + plan.title + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + plan.urgence + '</div></div>' +
+        '<div style="margin-left:auto;color:var(--text3);font-size:18px">›</div></div>';
+    }).join('') +
+    '</div>' +
+    '<button onclick="document.getElementById(&quot;sos-modal&quot;).remove()" class="sub-cancel" style="margin-top:12px">Fermer</button>';
+
+  modal.appendChild(box);
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+  document.body.appendChild(modal);
+  // Ajouter les event listeners sur les cartes SOS
+  modal.querySelectorAll('[data-sos]').forEach(function(el) {
+    var key = el.getAttribute('data-sos');
+    var plan = SOS_PLANS[key];
+    el.addEventListener('mouseover', function(){ el.style.borderColor = plan ? plan.color : 'var(--blue)'; });
+    el.addEventListener('mouseout', function(){ el.style.borderColor = 'var(--border)'; });
+    el.addEventListener('click', function(){ showSOSPlan(key); });
+  });
+}
+
+function showSOSPlan(planKey) {
+  var plan = SOS_PLANS[planKey];
+  if (!plan) return;
+
+  var modal = document.getElementById('sos-modal');
+  if (!modal) return;
+
+  var box = modal.querySelector('.sub-modal');
+  box.style.maxHeight = '90vh';
+  box.style.overflowY = 'auto';
+
+  var html = '<div style="background:' + plan.color + ';margin:-24px -24px 20px;padding:20px 24px;border-radius:12px 12px 0 0">' +
+    '<div style="color:#fff;font-size:11px;font-weight:700;letter-spacing:2px;opacity:.8">' + plan.urgence + '</div>' +
+    '<div style="color:#fff;font-size:20px;font-weight:900;margin-top:4px">' + plan.icon + ' ' + plan.title + '</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:12px">';
+
+  plan.etapes.forEach(function(etape, i) {
+    html += '<div style="display:flex;gap:12px;align-items:flex-start;padding:14px;background:var(--bg2);border-radius:12px;border-left:3px solid ' + plan.color + '">' +
+      '<div style="flex-shrink:0;text-align:center">' +
+        '<div style="font-size:20px">' + etape.icon + '</div>' +
+        '<div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:2px;white-space:nowrap">' + etape.temps + '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--text);line-height:1.6;font-weight:' + (i===0?'700':'400') + '">' + etape.action + '</div>' +
+    '</div>';
+  });
+
+  html += '</div>' +
+    '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:16px">' +
+      '<div style="font-weight:700;color:#15803d;font-size:13px;margin-bottom:6px">💬 Besoin d’aide maintenant ?</div>' +
+      '<div style="font-size:13px;color:#555">Posez vos questions au Conseiller Despy — il vous guide étape par étape selon votre situation précise.</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">' +
+      '<button onclick="document.getElementById(&quot;sos-modal&quot;).remove();scrollToSection(&quot;conseiller-ia&quot;)" class="sub-btn" style="flex:1">Parler au Conseiller →</button>' +
+      '<button onclick="showSOS()" class="sub-cancel">Retour</button>' +
+    '</div>';
+
+  box.innerHTML = html;
+}
+
 // === COMPTE GRATUIT (FREEMIUM) ===
 function showFreeSignup() {
   var modal = document.createElement('div');
@@ -2254,10 +2620,10 @@ async function checkSubscription(email) {
   }
 }
 
-// ── Page CSS active ──
+// -- Page CSS active --
 // === QUIZ HEBDO + BADGES + XP + CLASSEMENT ===
 
-// ── 8 Modules × 5 questions = 40 questions ──
+// -- 8 Modules × 5 questions = 40 questions --
 var MODULES = [
   {
     id: 1,
@@ -2605,9 +2971,357 @@ var SPECIAL_BADGES = [
 
 
 
+
+
+// ========================================
+// SCORE DE SECURITE DYNAMIQUE
+// ========================================
+var SCORE_WEIGHTS = {
+  quiz_completed:    3,   // +3 pts par quiz termine
+  quiz_perfect:      8,   // +8 pts module parfait
+  chrono_completed:  5,   // +5 pts defi chrono
+  chrono_perfect:    12,  // +12 pts chrono parfait
+  account_created:   5,   // +5 pts inscription
+  subscribed:        10,  // +10 pts abonnement actif
+  daily_login:       1,   // +1 pt connexion quotidienne
+};
+var SCORE_MAX = 100;
+var SCORE_BASE = 25;
+
+function calculateSecurityScore() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('despy_score_data') || '{}');
+    var score = SCORE_BASE;
+
+    // Quiz completés
+    score += Math.min(25, (stored.quizCompleted || 0) * SCORE_WEIGHTS.quiz_completed);
+    // Quiz parfaits
+    score += Math.min(15, (stored.quizPerfect || 0) * SCORE_WEIGHTS.quiz_perfect);
+    // Défis chrono
+    score += Math.min(15, (stored.chronoCompleted || 0) * SCORE_WEIGHTS.chrono_completed);
+    // Chrono parfaits
+    score += Math.min(10, (stored.chronoPerfect || 0) * SCORE_WEIGHTS.chrono_perfect);
+    // Connexions régulières
+    score += Math.min(5, (stored.loginStreak || 0) * SCORE_WEIGHTS.daily_login);
+    // Abonnement actif
+    var session = siteSession.get();
+    if (session && session.subscribed) score += SCORE_WEIGHTS.subscribed;
+
+    return Math.min(SCORE_MAX, Math.round(score));
+  } catch(e) { return SCORE_BASE; }
+}
+
+function updateScoreData(action) {
+  try {
+    var stored = JSON.parse(localStorage.getItem('despy_score_data') || '{}');
+    if (action === 'quiz_completed') stored.quizCompleted = (stored.quizCompleted || 0) + 1;
+    if (action === 'quiz_perfect')   stored.quizPerfect   = (stored.quizPerfect   || 0) + 1;
+    if (action === 'chrono_completed') stored.chronoCompleted = (stored.chronoCompleted || 0) + 1;
+    if (action === 'chrono_perfect') stored.chronoPerfect = (stored.chronoPerfect || 0) + 1;
+    if (action === 'login') {
+      var today = new Date().toDateString();
+      if (stored.lastLogin !== today) {
+        stored.loginStreak = (stored.loginStreak || 0) + 1;
+        stored.lastLogin = today;
+      }
+    }
+    localStorage.setItem('despy_score_data', JSON.stringify(stored));
+  } catch(e) {}
+  refreshSecurityScore();
+}
+
+function refreshSecurityScore() {
+  var score = calculateSecurityScore();
+  var scoreEl = document.getElementById('dynamic-score');
+  var barEl   = document.getElementById('dynamic-score-bar');
+  var msgEl   = document.getElementById('dynamic-score-msg');
+  var colorEl = document.getElementById('dynamic-score-color');
+
+  var color = score < 40 ? '#ef4444' : score < 60 ? '#f59e0b' : score < 80 ? '#2D5BFF' : '#22c55e';
+  var msg = score < 40 ? 'Protection insuffisante — continuez la formation' :
+            score < 60 ? 'Protection partielle — vous progressez bien !' :
+            score < 80 ? 'Bonne protection — encore quelques efforts !' :
+                         'Excellente protection — vous êtes un expert !';
+
+  if (scoreEl) {
+    scoreEl.textContent = score;
+  }
+  if (barEl) barEl.style.width = score + '%';
+  if (barEl) barEl.style.background = color;
+  if (msgEl) msgEl.textContent = msg;
+  if (colorEl) colorEl.style.color = color;
+}
+
+// Appeler refreshSecurityScore au chargement
+document.addEventListener('DOMContentLoaded', function() {
+  refreshSecurityScore();
+  updateScoreData('login');
+});
+
+// ========================================
+// DEFI CHRONO — 5 questions, 30s chacune
+// ========================================
+var _chronoState = {
+  active: false,
+  timer: null,
+  timeLeft: 30,
+  questionIndex: 0,
+  questions: [],
+  score: 0,
+  xpEarned: 0,
+  answers: []
+};
+
+
+function showChronoUpgradePrompt() {
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.style.cssText = 'max-width:420px;text-align:center';
+  box.innerHTML = '<div style="font-size:48px;margin-bottom:12px">⏱️</div>' +
+    '<div class="sub-modal-title">Fonctionnalite reservee aux abonnes</div>' +
+    '<div class="sub-modal-sub">Le Défi Chrono avec XP bonus vitesse est exclusivement disponible avec l’abonnement Despy.</div>' +
+    '<div style="background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:12px;padding:16px;margin:16px 0;text-align:left">' +
+    '<div style="font-size:13px;color:var(--text2)">Avec l’abonnement :</div>' +
+    '<div style="font-size:13px;color:var(--text);margin-top:6px">✅ Defi Chrono hebdomadaire<br>✅ Quiz illimites<br>✅ Rapport mensuel personnalise<br>✅ Alertes cybermenaces<br>✅ Chat IA illimite</div>' +
+    '</div>';
+  var btnSub = document.createElement('button');
+  btnSub.className = 'sub-btn';
+  btnSub.textContent = 'S’abonner — des 9,99€/mois →';
+  btnSub.onclick = function(){ modal.remove(); siteSubscribe('monthly'); };
+  var btnClose = document.createElement('button');
+  btnClose.className = 'sub-cancel';
+  btnClose.textContent = 'Plus tard';
+  btnClose.onclick = function(){ modal.remove(); };
+  box.appendChild(btnSub); box.appendChild(btnClose);
+  modal.appendChild(box);
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function startChrono() {
+  // Verifier abonnement actif
+  var session = siteSession.get();
+  if (!session || !session.email) {
+    showFreeSignup();
+    return;
+  }
+  if (!session.subscribed) {
+    // Afficher popup upgrade
+    showChronoUpgradePrompt();
+    return;
+  }
+
+  // Preparer les questions (module actuel, ordre aleatoire)
+  var mod = getCurrentModule();
+  var shuffled = mod.questions.slice().sort(function(){ return Math.random() - 0.5; });
+  _chronoState.questions = shuffled.slice(0, 5);
+  _chronoState.questionIndex = 0;
+  _chronoState.score = 0;
+  _chronoState.xpEarned = 0;
+  _chronoState.answers = [];
+  _chronoState.active = true;
+
+  showChronoQuestion();
+}
+
+function showChronoQuestion() {
+  var zone = document.getElementById('chrono-zone');
+  if (!zone) return;
+
+  var state = _chronoState;
+  var q = state.questions[state.questionIndex];
+  var qNum = state.questionIndex + 1;
+
+  // Vider la zone
+  zone.innerHTML = '';
+
+  // Header avec progression et timer
+  var header = document.createElement('div');
+  header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px';
+
+  var progress = document.createElement('div');
+  progress.style.cssText = 'font-size:13px;font-weight:700;color:var(--text2)';
+  progress.textContent = 'Question ' + qNum + ' / 5';
+
+  var timerBox = document.createElement('div');
+  timerBox.id = 'chrono-timer';
+  timerBox.style.cssText = 'min-width:52px;height:52px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;transition:background .5s';
+  timerBox.textContent = '30';
+
+  // Barre de progression
+  var progBar = document.createElement('div');
+  progBar.style.cssText = 'background:#e2e8f0;border-radius:99px;height:6px;margin-bottom:16px;overflow:hidden';
+  var progFill = document.createElement('div');
+  progFill.id = 'chrono-prog';
+  progFill.style.cssText = 'height:100%;width:' + ((qNum-1)/5*100) + '%;background:linear-gradient(90deg,#2D5BFF,#60a5fa);border-radius:99px;transition:width .4s';
+  progBar.appendChild(progFill);
+
+  header.appendChild(progress);
+  header.appendChild(timerBox);
+  zone.appendChild(header);
+  zone.appendChild(progBar);
+
+  // Question
+  var qText = document.createElement('div');
+  qText.style.cssText = 'font-size:15px;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:12px;border-left:4px solid var(--blue)';
+  qText.textContent = q.q;
+  zone.appendChild(qText);
+
+  // Options
+  q.opts.forEach(function(opt, i) {
+    var btn = document.createElement('button');
+    btn.style.cssText = 'display:block;width:100%;text-align:left;padding:13px 16px;margin-bottom:9px;background:#fff;border:1.5px solid var(--border);border-radius:11px;font-size:14px;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit';
+    btn.textContent = opt;
+    btn.onmouseover = function(){ if(!btn.disabled) btn.style.borderColor='var(--blue)'; btn.style.background='var(--blue-light)'; };
+    btn.onmouseout = function(){ if(!btn.disabled && !btn.dataset.selected) { btn.style.borderColor='var(--border)'; btn.style.background='#fff'; }};
+    btn.onclick = function() { answerChrono(i, q.answer); };
+    btn.id = 'chrono-opt-' + i;
+    zone.appendChild(btn);
+  });
+
+  // Demarrer le timer
+  _chronoState.timeLeft = 30;
+  if (_chronoState.timer) clearInterval(_chronoState.timer);
+  _chronoState.timer = setInterval(function() {
+    _chronoState.timeLeft--;
+    var timerEl = document.getElementById('chrono-timer');
+    if (timerEl) {
+      timerEl.textContent = _chronoState.timeLeft;
+      if (_chronoState.timeLeft <= 10) timerEl.style.background = '#dc2626';
+      if (_chronoState.timeLeft <= 5) timerEl.style.background = '#7f1d1d';
+    }
+    if (_chronoState.timeLeft <= 0) {
+      clearInterval(_chronoState.timer);
+      answerChrono(-1, q.answer); // Temps ecoule = mauvaise reponse
+    }
+  }, 1000);
+}
+
+function answerChrono(chosen, correct) {
+  clearInterval(_chronoState.timer);
+  var state = _chronoState;
+  var q = state.questions[state.questionIndex];
+  var isCorrect = chosen === correct;
+  var timeBonus = Math.max(0, state.timeLeft);
+
+  // XP selon vitesse : 100 + bonus temps (max 50 bonus)
+  var xp = isCorrect ? (100 + Math.floor(timeBonus * 1.5)) : 5;
+  state.xpEarned += xp;
+  if (isCorrect) state.score++;
+  state.answers.push({ isCorrect: isCorrect, timeLeft: state.timeLeft, xp: xp });
+
+  // Afficher feedback sur les boutons
+  for (var i = 0; i < q.opts.length; i++) {
+    var btn = document.getElementById('chrono-opt-' + i);
+    if (!btn) continue;
+    btn.disabled = true;
+    btn.style.cursor = 'default';
+    if (i === correct) {
+      btn.style.background = '#f0fdf4'; btn.style.borderColor = '#22c55e'; btn.style.color = '#15803d';
+    } else if (i === chosen) {
+      btn.style.background = '#fef2f2'; btn.style.borderColor = '#ef4444'; btn.style.color = '#dc2626';
+    }
+  }
+
+  // XP badge flottant
+  var zone = document.getElementById('chrono-zone');
+  if (zone) {
+    var xpBadge = document.createElement('div');
+    xpBadge.style.cssText = 'position:absolute;right:20px;top:10px;background:' + (isCorrect?'#22c55e':'#94a3b8') + ';color:#fff;padding:6px 12px;border-radius:20px;font-weight:900;font-size:13px;animation:fadeUp .6s ease forwards';
+    xpBadge.textContent = (isCorrect?'+':'') + xp + ' XP';
+    zone.style.position = 'relative';
+    zone.appendChild(xpBadge);
+    setTimeout(function(){ xpBadge.remove(); }, 1500);
+  }
+
+  // Passer a la question suivante apres 1.5s
+  setTimeout(function() {
+    state.questionIndex++;
+    if (state.questionIndex < 5) {
+      showChronoQuestion();
+    } else {
+      showChronoResult();
+    }
+  }, 1500);
+}
+
+function showChronoResult() {
+  var zone = document.getElementById('chrono-zone');
+  if (!zone) return;
+  var state = _chronoState;
+  state.active = false;
+
+  // Ajouter XP global
+  _siteXP += state.xpEarned;
+  updateSiteXP();
+
+  // Mettre a jour le score de securite
+  updateScoreData('chrono_completed');
+  if (state.score === 5) updateScoreData('chrono_perfect');
+
+  // Sauvegarder en localStorage
+  try {
+    var history = JSON.parse(localStorage.getItem('despy_chrono_history') || '[]');
+    history.unshift({
+      date: new Date().toISOString(),
+      score: state.score,
+      xp: state.xpEarned,
+      module: getCurrentModule().title
+    });
+    localStorage.setItem('despy_chrono_history', JSON.stringify(history.slice(0, 10)));
+  } catch(e) {}
+
+  // Afficher le resultat
+  zone.innerHTML = '';
+  var scoreColor = state.score >= 4 ? '#22c55e' : state.score >= 2 ? '#f59e0b' : '#ef4444';
+  var scoreEmoji = state.score === 5 ? '🏆' : state.score >= 4 ? '⭐' : state.score >= 2 ? '👍' : '💪';
+  var scoreMsg = state.score === 5 ? 'Parfait ! Score maximum !' : state.score >= 4 ? 'Excellent ! Presque parfait !' : state.score >= 2 ? 'Bien joue ! Continuez ainsi !' : 'Bon debut ! Reessayez !';
+
+  var resultHTML = '<div style="text-align:center;padding:20px 0">' +
+    '<div style="font-size:52px;margin-bottom:8px">' + scoreEmoji + '</div>' +
+    '<div style="font-size:28px;font-weight:900;color:' + scoreColor + ';margin-bottom:4px">' + state.score + ' / 5</div>' +
+    '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:16px">' + scoreMsg + '</div>' +
+    '<div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1.5px solid var(--blue-mid);border-radius:12px;padding:10px 20px;margin-bottom:20px">' +
+    '<span style="font-size:18px">⚡</span>' +
+    '<span style="font-weight:700;color:var(--blue);font-size:16px">+' + state.xpEarned + ' XP gagnes !</span>' +
+    '</div>';
+
+  // Tableau de detail
+  resultHTML += '<div style="text-align:left;background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:16px">';
+  state.answers.forEach(function(a, i) {
+    resultHTML += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">' +
+      '<span>' + (a.isCorrect ? '✅' : '❌') + ' Question ' + (i+1) + '</span>' +
+      '<span style="font-weight:700;color:var(--blue)">+' + a.xp + ' XP' + (a.isCorrect ? ' · ' + a.timeLeft + 's restantes' : '') + '</span></div>';
+  });
+  resultHTML += '</div>';
+
+  resultHTML += '<button onclick="startChrono()" class="sub-btn" style="margin-bottom:8px">Rejouer ce module →</button>' +
+    '<div style="font-size:12px;color:var(--text3)">Prochain module disponible la semaine prochaine</div>' +
+    '</div>';
+
+  zone.innerHTML = resultHTML;
+}
+
 function renderQuiz() {
   var zone = document.getElementById('quiz-zone');
   if (!zone) return;
+
+  // Verifier abonnement
+  var session = siteSession.get();
+  if (!session || !session.subscribed) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px">' +
+      '<div style="font-size:36px;margin-bottom:10px">🔒</div>' +
+      '<div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:8px">Quiz reservé aux abonnés</div>' +
+      '<div style="font-size:13px;color:var(--text3);margin-bottom:16px">Accédez aux 8 modules et 40 questions avec l’abonnement Despy.</div>' +
+      '<button onclick="siteSubscribe(&quot;monthly&quot;)" class="sub-btn" style="margin-bottom:8px">S’abonner — des 9,99€/mois →</button>' +
+      ((!session || !session.email) ? '<button onclick="showFreeSignup()" class="sub-cancel">Créer un compte gratuit</button>' : '') +
+      '</div>';
+    var optsZone = document.getElementById('quiz-opts');
+    if (optsZone) optsZone.innerHTML = '';
+    return;
+  }
   
   // Afficher le module actif de la semaine
   var mod = getCurrentModule();
@@ -2649,6 +3363,7 @@ function answerQuiz(idx) {
   // XP : 100 bon premier coup, 50 bon 2eme, 10 mauvais
   var firstTry = !zone.dataset.triedWrong;
   _siteXP += isCorrect ? (firstTry ? 100 : 50) : 10;
+  if (isCorrect) updateScoreData && updateScoreData('quiz_completed');
   if (!isCorrect) zone.dataset.triedWrong = "1";
   var zone = document.getElementById('quiz-zone');
   if (!zone) return;
@@ -2711,14 +3426,19 @@ function showBadgeInfo(name, desc, icon) {
 }
 
 document.addEventListener('DOMContentLoaded', function(){
+  // Afficher la page home par défaut
+  showPage('home');
+  // Initialiser le quiz
   try { renderQuiz(); } catch(e) {}
+  // Initialiser le score
+  try { refreshSecurityScore(); updateScoreData('login'); } catch(e) {}
+  // Restaurer la session
+  try { updateNavForSession(); } catch(e) {}
 });
 </script>
 
-<style>
-.page{display:none}
-.page.active{display:block}
-</style>
+  <!-- Bouton SOS flottant -->
+  <button onclick="showSOS()" style="position:fixed;bottom:90px;right:20px;z-index:999;width:52px;height:52px;border-radius:50%;background:#dc2626;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(220,38,38,.4);font-size:22px" title="SOS Urgence">🚨</button>
 
 </body>
 </html>
