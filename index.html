@@ -1564,7 +1564,8 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     </div>
   </div>
 
-  <!-- Carte Dark Web dans espace client -->
+  <div style="background:#fff"><div id="journal-zone">Chargement...</div></div>
+<!-- Carte Dark Web dans espace client -->
   <div id="darkweb-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(45,91,255,.06)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1703,6 +1704,7 @@ function showPage(id) {
   closeMob();
   var footer = document.getElementById('site-footer');
   if (footer) footer.style.display = (id === 'login' || id === 'client') ? 'none' : 'block';
+  if (id === 'client') { setTimeout(function(){ try{ renderJournal(); }catch(e){} }, 150); }
 }
 
 function scrollToSection(id) {
@@ -2719,6 +2721,410 @@ async function checkDarkWebNow() {
 
   if (btn) { btn.textContent = 'Vérifier à nouveau'; btn.disabled = false; }
 }
+
+// ========================================
+// SIMULATEUR D'ARNAQUE INTERACTIF
+// ========================================
+var ARNAQUES = [
+  {
+    id: 1, type: "email", difficulte: "Facile", xp: 150,
+    expediteur: "service@ameli-sante-gouv.fr",
+    objet: "URGENT : Votre remboursement de 87,50 euros est en attente",
+    corps: "Bonjour,\n\nSuite a votre derniere consultation, un remboursement de 87,50 euros vous est du. Pour le recevoir sous 24h, mettez a jour vos coordonnees bancaires. Si vous ne le faites pas dans les 48 heures, votre remboursement sera annule.\n\nCliquez ici : http://ameli-remboursement.net/update\n\nL\u2019Assurance Maladie",
+    indices: [
+      { id: "exp", texte: "ameli-sante-gouv.fr", explication: "Le vrai site est ameli.fr \u2014 ce domaine est faux" },
+      { id: "lien", texte: "ameli-remboursement.net", explication: "Ameli utilise toujours ameli.fr \u2014 jamais ameli-remboursement.net" },
+      { id: "urgence", texte: "48 heures", explication: "L\u2019urgence artificielle est la signature des arnaques" }
+    ]
+  },
+  {
+    id: 2, type: "sms", difficulte: "Facile", xp: 120,
+    expediteur: "+33 7 56 89 23 14",
+    objet: "SMS recu",
+    corps: "La Poste : Votre colis REF#FR847291 est bloque. Des frais de douane de 2,99 euros sont dus. Payez maintenant : lapost-livraison.fr/payer",
+    indices: [
+      { id: "exp", texte: "+33 7 56 89 23 14", explication: "La Poste utilise des numeros courts officiels, jamais un portable" },
+      { id: "lien", texte: "lapost-livraison.fr", explication: "Le vrai site est laposte.fr \u2014 ce domaine est un faux" },
+      { id: "urgence", texte: "2,99 euros", explication: "La Poste ne demande jamais de payer des frais par SMS" }
+    ]
+  },
+  {
+    id: 3, type: "email", difficulte: "Moyen", xp: 180,
+    expediteur: "security@paypal-secure-account.com",
+    objet: "Votre compte PayPal a ete suspendu",
+    corps: "Cher client,\n\nNous avons detecte une activite suspecte. Votre compte est suspendu. Verifiez votre identite dans les 24h pour eviter la fermeture et la perte de votre solde.\n\nVerifier : https://paypal-secure-account.com/verify\n\nEquipe PayPal",
+    indices: [
+      { id: "exp", texte: "paypal-secure-account.com", explication: "PayPal envoie toujours depuis @paypal.com" },
+      { id: "lien", texte: "paypal-secure-account.com/verify", explication: "PayPal utilise toujours paypal.com \u2014 jamais un autre domaine" },
+      { id: "urgence", texte: "perte de votre solde", explication: "Menace financiere pour creer la panique \u2014 signature d\u2019arnaque" }
+    ]
+  },
+  {
+    id: 4, type: "appel", difficulte: "Difficile", xp: 200,
+    expediteur: "01 45 78 23 90",
+    objet: "Appel support Microsoft",
+    corps: "Bonjour, je suis du support Microsoft. Vos serveurs emettent des virus. Si je ne me connecte pas a distance dans l\u2019heure, vous risquez des poursuites judiciaires. Telechargez : microsoft-support-secure.com",
+    indices: [
+      { id: "exp", texte: "01 45 78 23 90", explication: "Microsoft ne vous appellera JAMAIS spontanement" },
+      { id: "lien", texte: "microsoft-support-secure.com", explication: "Microsoft utilise uniquement microsoft.com" },
+      { id: "urgence", texte: "poursuites judiciaires", explication: "Menace judiciaire pour creer la panique \u2014 arnaque classique" }
+    ]
+  },
+  {
+    id: 5, type: "sms", difficulte: "Moyen", xp: 150,
+    expediteur: "Impots-DGFiP",
+    objet: "SMS recu",
+    corps: "DGFIP : Un remboursement fiscal de 243 euros vous a ete attribue. Confirmez vos informations bancaires avant le 31/05 : impots-remboursement.fr/cb",
+    indices: [
+      { id: "exp", texte: "Impots-DGFiP", explication: "Les impots n\u2019envoient pas de SMS pour des remboursements" },
+      { id: "lien", texte: "impots-remboursement.fr", explication: "Les impots utilisent uniquement impots.gouv.fr" },
+      { id: "urgence", texte: "avant le 31/05", explication: "Date limite artificielle pour forcer l\u2019action" }
+    ]
+  }
+];
+
+var _simState = { currentIndex: 0, foundIndices: [], totalXP: 0, completed: [] };
+
+function showSimulator() {
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+  if (!session.subscribed) { showChronoUpgradePrompt(); return; }
+  _simState.foundIndices = [];
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  modal.id = 'sim-modal';
+  modal.style.cssText = 'align-items:flex-start;padding-top:20px';
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.id = 'sim-box';
+  box.style.cssText = 'max-width:580px;max-height:88vh;overflow-y:auto;padding:0';
+  modal.appendChild(box);
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  document.body.appendChild(modal);
+  renderSimHome();
+}
+
+function renderSimHome() {
+  var box = document.getElementById('sim-box');
+  if (!box) return;
+  box.innerHTML = '';
+
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:24px;border-radius:12px 12px 0 0;color:#fff';
+  hdr.innerHTML = '<div style="font-size:11px;opacity:.7;letter-spacing:2px">DESPY \u2014 ENTRAINEMENT</div><div style="font-size:22px;font-weight:900;margin-top:4px">\uD83C\uDFAD Simulateur d\u2019Arnaque</div><div style="font-size:13px;opacity:.7;margin-top:6px">Trouvez les 3 indices qui prouvent que c\u2019est une fraude</div>';
+  box.appendChild(hdr);
+
+  var body = document.createElement('div');
+  body.style.cssText = 'padding:20px';
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px';
+
+  ARNAQUES.forEach(function(a, i) {
+    var done = _simState.completed.includes(a.id);
+    var card = document.createElement('div');
+    card.style.cssText = 'padding:14px;background:' + (done ? '#f0fdf4' : 'var(--bg2)') + ';border:1.5px solid ' + (done ? '#22c55e' : 'var(--border)') + ';border-radius:12px;cursor:pointer;text-align:center';
+    var icon = a.type === 'email' ? '\uD83D\uDCE7' : a.type === 'sms' ? '\uD83D\uDCF1' : '\uD83D\uDCDE';
+    card.innerHTML = '<div style="font-size:24px;margin-bottom:6px">' + icon + '</div><div style="font-size:12px;font-weight:700;color:var(--text)">' + (done ? '\u2705 ' : '') + a.difficulte + '</div><div style="font-size:11px;color:var(--text3);margin-top:3px">+' + a.xp + ' XP</div>';
+    card.addEventListener('click', function(){ startSim(i); });
+    grid.appendChild(card);
+  });
+  body.appendChild(grid);
+
+  var xpBadge = document.createElement('div');
+  xpBadge.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--blue-light);border-radius:10px;margin-bottom:16px';
+  xpBadge.innerHTML = '<span style="font-size:13px;color:var(--text2)">XP gagn\u00e9s :</span><span style="font-weight:900;color:var(--blue);font-size:16px">+' + _simState.totalXP + ' XP</span>';
+  body.appendChild(xpBadge);
+
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'sub-cancel';
+  closeBtn.textContent = 'Fermer';
+  closeBtn.addEventListener('click', function(){ document.getElementById('sim-modal').remove(); });
+  body.appendChild(closeBtn);
+  box.appendChild(body);
+}
+
+function startSim(index) {
+  var a = ARNAQUES[index];
+  _simState.currentIndex = index;
+  _simState.foundIndices = [];
+  var box = document.getElementById('sim-box');
+  if (!box) return;
+  box.innerHTML = '';
+
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:20px;border-radius:12px 12px 0 0;color:#fff;display:flex;justify-content:space-between;align-items:center';
+  var typeLabel = a.type === 'email' ? '\uD83D\uDCE7 Email' : a.type === 'sms' ? '\uD83D\uDCF1 SMS' : '\uD83D\uDCDE Appel';
+  hdr.innerHTML = '<div><div style="font-size:11px;opacity:.7">SIMULATION ' + (index+1) + '/' + ARNAQUES.length + '</div><div style="font-size:18px;font-weight:900">' + typeLabel + ' suspect</div></div><div style="background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">' + a.difficulte + '</div>';
+  box.appendChild(hdr);
+
+  var body = document.createElement('div');
+  body.style.cssText = 'padding:20px';
+
+  var instr = document.createElement('div');
+  instr.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#856404;font-weight:600';
+  instr.textContent = '\uD83D\uDD0D Cliquez sur les 3 \u00e9l\u00e9ments suspects dans le message ci-dessous';
+  body.appendChild(instr);
+
+  var msgBox = document.createElement('div');
+  msgBox.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px';
+
+  var msgHdr = document.createElement('div');
+  msgHdr.style.cssText = 'background:#f8faff;padding:12px 16px;border-bottom:1px solid var(--border)';
+
+  var fromRow = document.createElement('div');
+  fromRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
+  var fromLabel = document.createElement('span');
+  fromLabel.style.cssText = 'font-size:11px;font-weight:700;color:var(--text3)';
+  fromLabel.textContent = 'DE :';
+  var expSpan = document.createElement('span');
+  expSpan.style.cssText = 'font-size:13px;color:#0066cc;cursor:pointer;padding:3px 8px;border-radius:6px;background:var(--bg2)';
+  expSpan.textContent = a.expediteur;
+  expSpan.id = 'sim-exp';
+  expSpan.addEventListener('click', function(){ clickIndice(0); });
+  fromRow.appendChild(fromLabel); fromRow.appendChild(expSpan);
+  msgHdr.appendChild(fromRow);
+
+  var subj = document.createElement('div');
+  subj.style.cssText = 'font-size:13px;font-weight:700;color:var(--text)';
+  subj.textContent = a.objet;
+  msgHdr.appendChild(subj);
+  msgBox.appendChild(msgHdr);
+
+  var msgBody = document.createElement('div');
+  msgBody.style.cssText = 'padding:16px';
+
+  var parts = a.corps.split(a.indices[1].texte);
+  var p = document.createElement('div');
+  p.style.cssText = 'font-size:13px;color:var(--text);line-height:1.8;white-space:pre-line';
+
+  var t1 = document.createTextNode(parts[0]);
+  var lienSpan = document.createElement('span');
+  lienSpan.style.cssText = 'color:#0066cc;cursor:pointer;text-decoration:underline;padding:2px 4px;border-radius:4px;background:var(--bg2)';
+  lienSpan.textContent = a.indices[1].texte;
+  lienSpan.id = 'sim-lien';
+  lienSpan.addEventListener('click', function(){ clickIndice(1); });
+
+  var rest = parts.slice(1).join(a.indices[1].texte);
+  var parts2 = rest.split(a.indices[2].texte);
+  var t2 = document.createTextNode(parts2[0]);
+  var urgSpan = document.createElement('span');
+  urgSpan.style.cssText = 'color:#dc2626;font-weight:700;cursor:pointer;padding:2px 4px;border-radius:4px;background:#fef2f2';
+  urgSpan.textContent = a.indices[2].texte;
+  urgSpan.id = 'sim-urgence';
+  urgSpan.addEventListener('click', function(){ clickIndice(2); });
+  var t3 = document.createTextNode(parts2.slice(1).join(a.indices[2].texte));
+
+  p.appendChild(t1); p.appendChild(lienSpan); p.appendChild(t2); p.appendChild(urgSpan); p.appendChild(t3);
+  msgBody.appendChild(p);
+  msgBox.appendChild(msgBody);
+  body.appendChild(msgBox);
+
+  var progBar = document.createElement('div');
+  progBar.id = 'sim-progress';
+  progBar.style.cssText = 'display:flex;gap:8px;margin-bottom:16px';
+  for (var i = 0; i < 3; i++) {
+    var pEl = document.createElement('div');
+    pEl.style.cssText = 'flex:1;padding:8px;background:var(--bg2);border-radius:8px;text-align:center;font-size:12px;color:var(--text3)';
+    pEl.textContent = 'Indice ' + (i+1) + ' \u2B1C';
+    progBar.appendChild(pEl);
+  }
+  body.appendChild(progBar);
+
+  var feedback = document.createElement('div');
+  feedback.id = 'sim-feedback';
+  feedback.style.cssText = 'display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--text2)';
+  body.appendChild(feedback);
+
+  var backBtn = document.createElement('button');
+  backBtn.className = 'sub-cancel';
+  backBtn.textContent = 'Retour';
+  backBtn.addEventListener('click', renderSimHome);
+  body.appendChild(backBtn);
+  box.appendChild(body);
+}
+
+function clickIndice(num) {
+  var a = ARNAQUES[_simState.currentIndex];
+  if (_simState.foundIndices.includes(num)) return;
+  _simState.foundIndices.push(num);
+
+  var ids = ['sim-exp', 'sim-lien', 'sim-urgence'];
+  var el = document.getElementById(ids[num]);
+  if (el) {
+    el.style.background = '#dcfce7';
+    el.style.color = '#15803d';
+    el.style.fontWeight = '700';
+    el.style.cursor = 'default';
+    el.replaceWith(el.cloneNode(true));
+  }
+
+  var progEls = document.getElementById('sim-progress');
+  if (progEls) {
+    var items = progEls.children;
+    for (var i = 0; i < _simState.foundIndices.length; i++) {
+      if (items[i]) {
+        items[i].style.background = '#f0fdf4';
+        items[i].style.color = '#15803d';
+        items[i].textContent = 'Indice ' + (i+1) + ' \u2705';
+      }
+    }
+  }
+
+  var fb = document.getElementById('sim-feedback');
+  if (fb) {
+    fb.style.display = 'block';
+    fb.innerHTML = '<strong>\u2705 Bien vu !</strong> ' + a.indices[num].explication;
+  }
+
+  if (_simState.foundIndices.length === 3) {
+    setTimeout(function(){ showSimResult(a); }, 700);
+  }
+}
+
+function showSimResult(a) {
+  var box = document.getElementById('sim-box');
+  if (!box) return;
+  if (!_simState.completed.includes(a.id)) {
+    _simState.completed.push(a.id);
+    _simState.totalXP += a.xp;
+    _siteXP += a.xp;
+    updateSiteXP();
+    if (typeof updateScoreData === 'function') updateScoreData('quiz_completed');
+  }
+  box.innerHTML = '';
+
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:24px;border-radius:12px 12px 0 0;color:#fff;text-align:center';
+  hdr.innerHTML = '<div style="font-size:52px;margin-bottom:8px">\uD83C\uDF89</div><div style="font-size:22px;font-weight:900">Excellent !</div><div style="font-size:14px;opacity:.7;margin-top:4px">Vous avez identifi\u00e9 les 3 indices</div>';
+  box.appendChild(hdr);
+
+  var body = document.createElement('div');
+  body.style.cssText = 'padding:24px;text-align:center';
+
+  var xpEl = document.createElement('div');
+  xpEl.style.cssText = 'background:var(--blue-light);border:1.5px solid var(--blue-mid);border-radius:14px;padding:20px;margin-bottom:20px';
+  xpEl.innerHTML = '<div style="font-size:36px;font-weight:900;color:var(--blue)">+' + a.xp + ' XP</div><div style="font-size:13px;color:var(--text3);margin-top:4px">Gagn\u00e9s pour cette simulation</div>';
+  body.appendChild(xpEl);
+
+  var recap = document.createElement('div');
+  recap.style.cssText = 'background:#f8faff;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left';
+  recap.innerHTML = '<div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Les 3 signaux d\u2019alerte :</div>' +
+    a.indices.map(function(ind){ return '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;color:var(--text2)"><span style="color:#22c55e;flex-shrink:0">\u2705</span><span><strong>' + ind.texte + '</strong> \u2014 ' + ind.explication + '</span></div>'; }).join('');
+  body.appendChild(recap);
+
+  var btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:10px';
+  var nextBtn = document.createElement('button');
+  nextBtn.className = 'sub-btn';
+  nextBtn.style.flex = '1';
+  nextBtn.textContent = _simState.completed.length < ARNAQUES.length ? 'Simulation suivante \u2192' : 'Toutes termin\u00e9es ! \uD83C\uDFC6';
+  nextBtn.addEventListener('click', renderSimHome);
+  var menuBtn = document.createElement('button');
+  menuBtn.className = 'sub-cancel';
+  menuBtn.textContent = 'Menu';
+  menuBtn.addEventListener('click', renderSimHome);
+  btns.appendChild(nextBtn); btns.appendChild(menuBtn);
+  body.appendChild(btns);
+  box.appendChild(body);
+}
+
+
+
+
+// ========================================
+// JOURNAL DE SECURITE PERSONNEL
+// ========================================
+function initJournal() {
+  // Créer le journal si inexistant
+  try {
+    var j = JSON.parse(localStorage.getItem('despy_journal') || '[]');
+    return j;
+  } catch(e) { return []; }
+}
+
+function addJournalEntry(type, message) {
+  try {
+    var j = initJournal();
+    j.unshift({
+      date: new Date().toISOString(),
+      type: type,  // 'check', 'quiz', 'alert', 'chrono', 'sos', 'hibp', 'login'
+      message: message
+    });
+    localStorage.setItem('despy_journal', JSON.stringify(j.slice(0, 50)));
+  } catch(e) {}
+}
+
+function renderJournal() {
+  var zone = document.getElementById('journal-zone');
+  if (!zone) return;
+
+  var session = siteSession.get();
+  if (!session || !session.subscribed) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Journal disponible pour les abonn\u00e9s</div>';
+    return;
+  }
+
+  var journal = initJournal();
+
+  // Ajouter entree de connexion
+  addJournalEntry('login', 'Connexion \u00e0 votre espace Despy');
+
+  // Entrees par defaut si journal vide
+  if (journal.length === 0) {
+    var now = new Date();
+    journal = [
+      { date: now.toISOString(), type: 'check', message: 'Bienvenue sur Despy \u2014 votre protection est active' },
+    ];
+  }
+
+  var icons = {
+    'login':  { icon: '\uD83D\uDD11', color: '#2D5BFF', bg: '#EEF1FF' },
+    'quiz':   { icon: '\uD83C\uDFAF', color: '#8b5cf6', bg: '#f5f3ff' },
+    'chrono': { icon: '\u23F1\uFE0F', color: '#f59e0b', bg: '#fffbeb' },
+    'alert':  { icon: '\uD83D\uDEA8', color: '#dc2626', bg: '#fef2f2' },
+    'hibp':   { icon: '\uD83C\uDF11', color: '#0a1f3a', bg: '#e8eaf0' },
+    'sos':    { icon: '\uD83D\uDEA8', color: '#dc2626', bg: '#fef2f2' },
+    'check':  { icon: '\u2705', color: '#15803d', bg: '#f0fdf4' },
+  };
+
+  zone.innerHTML = '';
+  journal.slice(0, 15).forEach(function(entry) {
+    var meta = icons[entry.type] || icons['check'];
+    var date = new Date(entry.date);
+    var dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+    var timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)';
+
+    var iconEl = document.createElement('div');
+    iconEl.style.cssText = 'width:36px;height:36px;border-radius:10px;background:' + meta.bg + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0';
+    iconEl.textContent = meta.icon;
+
+    var textEl = document.createElement('div');
+    textEl.style.cssText = 'flex:1';
+    var msgEl = document.createElement('div');
+    msgEl.style.cssText = 'font-size:13px;font-weight:600;color:var(--text)';
+    msgEl.textContent = entry.message;
+    var dateEl = document.createElement('div');
+    dateEl.style.cssText = 'font-size:11px;color:var(--text3);margin-top:2px';
+    dateEl.textContent = dateStr + ' \u00e0 ' + timeStr;
+    textEl.appendChild(msgEl);
+    textEl.appendChild(dateEl);
+
+    row.appendChild(iconEl);
+    row.appendChild(textEl);
+    zone.appendChild(row);
+  });
+
+  if (journal.length === 0) {
+    zone.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Aucune activit\u00e9 pour le moment \u2014 commencez un quiz !</div>';
+  }
+}
+
+// Appeler renderJournal quand la page client s'affiche
+
 
 // === COMPTE GRATUIT (FREEMIUM) ===
 function showFreeSignup() {
@@ -3744,8 +4150,23 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-  <!-- Bouton SOS flottant -->
-  <button onclick="showSOS()" style="position:fixed;bottom:90px;right:20px;z-index:999;width:52px;height:52px;border-radius:50%;background:#dc2626;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(220,38,38,.4);font-size:22px" title="SOS Urgence">🚨</button>
 
+
+
+  <div id="despy-fab" style="position:fixed;bottom:28px;right:24px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+    <div id="fab-menu" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
+      <button onclick="toggleFab();showPage('conseiller')" style="padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
+      <button onclick="toggleFab();showSOS()" style="padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#dc2626;white-space:nowrap">🚨 SOS Urgence</button>
+      <a href="https://wa.me/33689148395" target="_blank" onclick="toggleFab()" style="padding:10px 16px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:13px;font-weight:700;color:#25D366;text-decoration:none;white-space:nowrap">📱 WhatsApp</a>
+    </div>
+    <button onclick="toggleFab()" title="Aide Despy" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(45,91,255,.5);position:relative">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div id="fab-notif" style="position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ef4444;border-radius:50%;border:2px solid #fff"></div>
+    </button>
+  </div>
+  <script>
+function toggleFab(){var m=document.getElementById('fab-menu');if(!m)return;m.style.display=m.style.display==='flex'?'none':'flex';var n=document.getElementById('fab-notif');if(n)n.style.display='none';try{localStorage.setItem('despy_fab_seen','1');}catch(e){}}
+document.addEventListener('DOMContentLoaded',function(){try{if(localStorage.getItem('despy_fab_seen')){var n=document.getElementById('fab-notif');if(n)n.style.display='none';}}catch(e){}document.addEventListener('click',function(e){var f=document.getElementById('despy-fab');if(f&&!f.contains(e.target)){var m=document.getElementById('fab-menu');if(m)m.style.display='none';}});});
+  </script>
 </body>
 </html>
