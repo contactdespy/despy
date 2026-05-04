@@ -273,6 +273,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 /* MOBILE */
 @media (max-width:768px){
+  .interventions-grid{grid-template-columns:1fr !important;max-width:100% !important}
   .hero{min-height:auto;padding:calc(var(--nav-h) + 16px) 1.25rem 3rem;align-items:flex-start}
   /* Formation — 1 colonne sur mobile */
   #fidelisation .wrap > div:last-child > div[style*="grid-template-columns:1fr 1fr"]{
@@ -355,15 +356,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 <!-- ══ NAV ══ -->
 <nav id="nav">
   <div class="logo" onclick="showPage('home')">
-    <div class="logo-icon" style="overflow:hidden">
-      <svg width="20" height="16" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
-        <path d="M208 195 Q240 142 292 128 Q340 116 388 128 Q440 142 472 195 Q440 248 388 262 Q340 274 292 262 Q240 248 208 195 Z" fill="#1a3fd9" stroke="#fff" stroke-width="8"/>
-        <circle cx="340" cy="195" r="52" fill="#1a3fd9" stroke="#fff" stroke-width="10"/>
-        <circle cx="340" cy="195" r="30" fill="#2D5BFF" stroke="#fff" stroke-width="6"/>
-        <circle cx="340" cy="195" r="14" fill="#fff"/>
-        <circle cx="334" cy="188" r="5" fill="rgba(255,255,255,0.6)"/>
-      </svg>
-    </div>
+    <img src="data:image/png;base64,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" style="height:48px;width:48px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)) brightness(1.1)" alt="Despy">
     Despy
   </div>
   <div class="nav-links">
@@ -807,6 +800,91 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </section>
 
 <!-- ── FAQ ── -->
+
+
+  <!-- ═══ INTERVENTIONS ═══ -->
+  <section style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
+    <div class="wrap">
+      <div style="text-align:center;margin-bottom:3rem">
+        <div class="section-badge">Interventions</div>
+        <h2 class="section-title">Besoin d'aide personnalisée ?</h2>
+        <p class="section-sub">Diagnostic, sécurisation, formation — à distance ou à domicile sur Strasbourg et alentours</p>
+      </div>
+
+      <div class="interventions-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;max-width:900px;margin:0 auto">
+
+        <!-- Intervention à distance -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(45,91,255,.12)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none';this.style.boxShadow='none'">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:22px">💻</div>
+          <div>
+            <div style="font-weight:800;font-size:17px;color:var(--text);margin-bottom:6px">À distance</div>
+            <div style="font-size:13px;color:var(--text3);line-height:1.6">Par téléphone ou visio — depuis chez vous, sans déplacement</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Signalement SMS et emails frauduleux</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Activation double authentification</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Inscription Bloctel anti-démarchage</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Vérification email compromis (HIBP)</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Filtres anti-spam et mots de passe</div>
+          </div>
+          <div style="margin-top:auto">
+            <div style="font-size:28px;font-weight:900;color:var(--text)">49€</div>
+            <div style="font-size:12px;color:var(--text3)">Durée ~1h · Par téléphone ou visio</div>
+          </div>
+          <a href="https://wa.me/33689148395?text=Bonjour,%20j%27aimerais%20prendre%20rendez-vous%20pour%20une%20consultation%20%C3%A0%20distance." target="_blank" class="sub-btn" style="text-align:center;text-decoration:none;padding:12px">Prendre rendez-vous →</a>
+        </div>
+
+        <!-- Intervention à domicile -->
+        <div style="background:linear-gradient(160deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(45,91,255,.25)">
+          <div style="position:absolute;top:12px;right:12px;background:#ffd700;color:#111;font-size:9px;font-weight:900;padding:3px 9px;border-radius:20px;letter-spacing:.5px">POPULAIRE</div>
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px">🏠</div>
+          <div>
+            <div style="font-weight:800;font-size:17px;color:#fff;margin-bottom:6px">À domicile</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.7);line-height:1.6">Je me déplace chez vous — Strasbourg et 15 km alentours</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,.85)"><span style="color:#4ade80;flex-shrink:0;font-weight:700">✓</span>Tout ce qui est inclus à distance</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,.85)"><span style="color:#4ade80;flex-shrink:0;font-weight:700">✓</span>Vérification physique des appareils</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,.85)"><span style="color:#4ade80;flex-shrink:0;font-weight:700">✓</span>Sécurisation PC, téléphone, tablette</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,.85)"><span style="color:#4ade80;flex-shrink:0;font-weight:700">✓</span>Détection logiciels espions</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:rgba(255,255,255,.85)"><span style="color:#4ade80;flex-shrink:0;font-weight:700">✓</span>Formation sur les bons réflexes</div>
+          </div>
+          <div style="margin-top:auto">
+            <div style="font-size:28px;font-weight:900;color:#fff">89€</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6)">Durée ~1h30 · Déplacement inclus</div>
+          </div>
+          <a href="https://wa.me/33689148395?text=Bonjour,%20j%27aimerais%20prendre%20rendez-vous%20pour%20une%20intervention%20%C3%A0%20domicile." target="_blank" style="text-align:center;text-decoration:none;padding:12px;background:#fff;color:var(--blue);border-radius:10px;font-weight:900;font-size:14px">Prendre rendez-vous →</a>
+        </div>
+
+        <!-- Forfait complet -->
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;display:flex;flex-direction:column;gap:16px;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(45,91,255,.12)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='none';this.style.boxShadow='none'">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:22px">🏆</div>
+          <div>
+            <div style="font-weight:800;font-size:17px;color:var(--text);margin-bottom:6px">Forfait complet</div>
+            <div style="font-size:13px;color:var(--text3);line-height:1.6">Sécurisation totale de votre vie numérique</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Tout ce qui est inclus à domicile</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Tous vos appareils sécurisés</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Rapport écrit remis après intervention</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>1 mois Despy offert</div>
+            <div style="display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2)"><span style="color:var(--blue);flex-shrink:0;font-weight:700">✓</span>Suivi prioritaire 30 jours</div>
+          </div>
+          <div style="margin-top:auto">
+            <div style="font-size:28px;font-weight:900;color:var(--text)">129€</div>
+            <div style="font-size:12px;color:var(--text3)">Durée ~2h · Rapport inclus · 1 mois offert</div>
+          </div>
+          <a href="https://wa.me/33689148395?text=Bonjour,%20j%27aimerais%20prendre%20rendez-vous%20pour%20le%20forfait%20complet%20Despy." target="_blank" class="sub-btn" style="text-align:center;text-decoration:none;padding:12px">Prendre rendez-vous →</a>
+        </div>
+
+      </div>
+
+      <!-- Note bas de section -->
+      <div style="text-align:center;margin-top:2rem;font-size:13px;color:var(--text3)">
+        📍 Interventions à domicile sur Strasbourg et 15 km alentours · Prise de contact par WhatsApp ou email
+      </div>
+    </div>
+  </section>
 
   <!-- ═══ POURQUOI J'AI CRÉÉ DESPY ═══ -->
   <section style="background:linear-gradient(160deg,#030810,#0a1f3a);padding:6rem 0;position:relative;overflow:hidden">
@@ -1375,7 +1453,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <div style="text-align:center;margin-bottom:24px">
             <div style="display:inline-block;padding:6px 16px;background:rgba(255,255,255,.15);border-radius:20px;font-size:13px;font-weight:700;color:#fff;margin-bottom:8px">ABONNEMENT</div>
             <div style="font-size:28px;font-weight:900;color:#fff">9,99€<span style="font-size:16px;font-weight:400;opacity:.7">/mois</span></div>
-            <div style="font-size:13px;color:rgba(255,255,255,.6)">Soit 0,33€/jour — le prix d'un café</div>
+            <div style="font-size:13px;color:rgba(255,255,255,.6)">Soit 0,33€/jour — moins qu'un SMS surtaxé</div>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px">
             <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.1);border-radius:10px">
@@ -1564,8 +1642,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     </div>
   </div>
 
-  <div style="background:#fff"><div id="journal-zone">Chargement...</div></div>
-<!-- Carte Dark Web dans espace client -->
+  <!-- Carte Dark Web dans espace client -->
   <div id="darkweb-card" style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(45,91,255,.06)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1645,17 +1722,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 <footer id="site-footer">
   <div class="footer-grid">
     <div class="footer-brand">
-      <div class="logo" style="color:var(--blue-light)">
-        <div class="logo-icon" style="background:rgba(45,91,255,.3);overflow:hidden">
-          <svg width="20" height="16" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
-            <path d="M208 195 Q240 142 292 128 Q340 116 388 128 Q440 142 472 195 Q440 248 388 262 Q340 274 292 262 Q240 248 208 195 Z" fill="rgba(45,91,255,0.8)" stroke="rgba(255,255,255,0.7)" stroke-width="8"/>
-            <circle cx="340" cy="195" r="52" fill="rgba(45,91,255,0.9)" stroke="rgba(255,255,255,0.7)" stroke-width="10"/>
-            <circle cx="340" cy="195" r="30" fill="rgba(100,140,255,0.9)" stroke="rgba(255,255,255,0.7)" stroke-width="6"/>
-            <circle cx="340" cy="195" r="14" fill="#fff"/>
-          </svg>
-        </div>
-        Despy
-      </div>
+      <div class="logo" style="color:var(--blue-light)"><img src="data:image/png;base64,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" style="height:50px;width:50px;object-fit:contain" alt="Despy"></div>
       <p>Cybersécurité pour particuliers. Simple, accessible, sans jargon.</p>
       <p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,.3)">SIRET 103 694 212 00012<br>33 rue de la Klebsau, 67100 Strasbourg</p>
     </div>
@@ -1704,7 +1771,6 @@ function showPage(id) {
   closeMob();
   var footer = document.getElementById('site-footer');
   if (footer) footer.style.display = (id === 'login' || id === 'client') ? 'none' : 'block';
-  if (id === 'client') { setTimeout(function(){ try{ renderJournal(); }catch(e){} }, 150); }
 }
 
 function scrollToSection(id) {
@@ -2721,410 +2787,6 @@ async function checkDarkWebNow() {
 
   if (btn) { btn.textContent = 'Vérifier à nouveau'; btn.disabled = false; }
 }
-
-// ========================================
-// SIMULATEUR D'ARNAQUE INTERACTIF
-// ========================================
-var ARNAQUES = [
-  {
-    id: 1, type: "email", difficulte: "Facile", xp: 150,
-    expediteur: "service@ameli-sante-gouv.fr",
-    objet: "URGENT : Votre remboursement de 87,50 euros est en attente",
-    corps: "Bonjour,\n\nSuite a votre derniere consultation, un remboursement de 87,50 euros vous est du. Pour le recevoir sous 24h, mettez a jour vos coordonnees bancaires. Si vous ne le faites pas dans les 48 heures, votre remboursement sera annule.\n\nCliquez ici : http://ameli-remboursement.net/update\n\nL\u2019Assurance Maladie",
-    indices: [
-      { id: "exp", texte: "ameli-sante-gouv.fr", explication: "Le vrai site est ameli.fr \u2014 ce domaine est faux" },
-      { id: "lien", texte: "ameli-remboursement.net", explication: "Ameli utilise toujours ameli.fr \u2014 jamais ameli-remboursement.net" },
-      { id: "urgence", texte: "48 heures", explication: "L\u2019urgence artificielle est la signature des arnaques" }
-    ]
-  },
-  {
-    id: 2, type: "sms", difficulte: "Facile", xp: 120,
-    expediteur: "+33 7 56 89 23 14",
-    objet: "SMS recu",
-    corps: "La Poste : Votre colis REF#FR847291 est bloque. Des frais de douane de 2,99 euros sont dus. Payez maintenant : lapost-livraison.fr/payer",
-    indices: [
-      { id: "exp", texte: "+33 7 56 89 23 14", explication: "La Poste utilise des numeros courts officiels, jamais un portable" },
-      { id: "lien", texte: "lapost-livraison.fr", explication: "Le vrai site est laposte.fr \u2014 ce domaine est un faux" },
-      { id: "urgence", texte: "2,99 euros", explication: "La Poste ne demande jamais de payer des frais par SMS" }
-    ]
-  },
-  {
-    id: 3, type: "email", difficulte: "Moyen", xp: 180,
-    expediteur: "security@paypal-secure-account.com",
-    objet: "Votre compte PayPal a ete suspendu",
-    corps: "Cher client,\n\nNous avons detecte une activite suspecte. Votre compte est suspendu. Verifiez votre identite dans les 24h pour eviter la fermeture et la perte de votre solde.\n\nVerifier : https://paypal-secure-account.com/verify\n\nEquipe PayPal",
-    indices: [
-      { id: "exp", texte: "paypal-secure-account.com", explication: "PayPal envoie toujours depuis @paypal.com" },
-      { id: "lien", texte: "paypal-secure-account.com/verify", explication: "PayPal utilise toujours paypal.com \u2014 jamais un autre domaine" },
-      { id: "urgence", texte: "perte de votre solde", explication: "Menace financiere pour creer la panique \u2014 signature d\u2019arnaque" }
-    ]
-  },
-  {
-    id: 4, type: "appel", difficulte: "Difficile", xp: 200,
-    expediteur: "01 45 78 23 90",
-    objet: "Appel support Microsoft",
-    corps: "Bonjour, je suis du support Microsoft. Vos serveurs emettent des virus. Si je ne me connecte pas a distance dans l\u2019heure, vous risquez des poursuites judiciaires. Telechargez : microsoft-support-secure.com",
-    indices: [
-      { id: "exp", texte: "01 45 78 23 90", explication: "Microsoft ne vous appellera JAMAIS spontanement" },
-      { id: "lien", texte: "microsoft-support-secure.com", explication: "Microsoft utilise uniquement microsoft.com" },
-      { id: "urgence", texte: "poursuites judiciaires", explication: "Menace judiciaire pour creer la panique \u2014 arnaque classique" }
-    ]
-  },
-  {
-    id: 5, type: "sms", difficulte: "Moyen", xp: 150,
-    expediteur: "Impots-DGFiP",
-    objet: "SMS recu",
-    corps: "DGFIP : Un remboursement fiscal de 243 euros vous a ete attribue. Confirmez vos informations bancaires avant le 31/05 : impots-remboursement.fr/cb",
-    indices: [
-      { id: "exp", texte: "Impots-DGFiP", explication: "Les impots n\u2019envoient pas de SMS pour des remboursements" },
-      { id: "lien", texte: "impots-remboursement.fr", explication: "Les impots utilisent uniquement impots.gouv.fr" },
-      { id: "urgence", texte: "avant le 31/05", explication: "Date limite artificielle pour forcer l\u2019action" }
-    ]
-  }
-];
-
-var _simState = { currentIndex: 0, foundIndices: [], totalXP: 0, completed: [] };
-
-function showSimulator() {
-  var session = siteSession.get();
-  if (!session || !session.email) { showFreeSignup(); return; }
-  if (!session.subscribed) { showChronoUpgradePrompt(); return; }
-  _simState.foundIndices = [];
-  var modal = document.createElement('div');
-  modal.className = 'sub-modal-overlay';
-  modal.id = 'sim-modal';
-  modal.style.cssText = 'align-items:flex-start;padding-top:20px';
-  var box = document.createElement('div');
-  box.className = 'sub-modal';
-  box.id = 'sim-box';
-  box.style.cssText = 'max-width:580px;max-height:88vh;overflow-y:auto;padding:0';
-  modal.appendChild(box);
-  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
-  document.body.appendChild(modal);
-  renderSimHome();
-}
-
-function renderSimHome() {
-  var box = document.getElementById('sim-box');
-  if (!box) return;
-  box.innerHTML = '';
-
-  var hdr = document.createElement('div');
-  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:24px;border-radius:12px 12px 0 0;color:#fff';
-  hdr.innerHTML = '<div style="font-size:11px;opacity:.7;letter-spacing:2px">DESPY \u2014 ENTRAINEMENT</div><div style="font-size:22px;font-weight:900;margin-top:4px">\uD83C\uDFAD Simulateur d\u2019Arnaque</div><div style="font-size:13px;opacity:.7;margin-top:6px">Trouvez les 3 indices qui prouvent que c\u2019est une fraude</div>';
-  box.appendChild(hdr);
-
-  var body = document.createElement('div');
-  body.style.cssText = 'padding:20px';
-
-  var grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px';
-
-  ARNAQUES.forEach(function(a, i) {
-    var done = _simState.completed.includes(a.id);
-    var card = document.createElement('div');
-    card.style.cssText = 'padding:14px;background:' + (done ? '#f0fdf4' : 'var(--bg2)') + ';border:1.5px solid ' + (done ? '#22c55e' : 'var(--border)') + ';border-radius:12px;cursor:pointer;text-align:center';
-    var icon = a.type === 'email' ? '\uD83D\uDCE7' : a.type === 'sms' ? '\uD83D\uDCF1' : '\uD83D\uDCDE';
-    card.innerHTML = '<div style="font-size:24px;margin-bottom:6px">' + icon + '</div><div style="font-size:12px;font-weight:700;color:var(--text)">' + (done ? '\u2705 ' : '') + a.difficulte + '</div><div style="font-size:11px;color:var(--text3);margin-top:3px">+' + a.xp + ' XP</div>';
-    card.addEventListener('click', function(){ startSim(i); });
-    grid.appendChild(card);
-  });
-  body.appendChild(grid);
-
-  var xpBadge = document.createElement('div');
-  xpBadge.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--blue-light);border-radius:10px;margin-bottom:16px';
-  xpBadge.innerHTML = '<span style="font-size:13px;color:var(--text2)">XP gagn\u00e9s :</span><span style="font-weight:900;color:var(--blue);font-size:16px">+' + _simState.totalXP + ' XP</span>';
-  body.appendChild(xpBadge);
-
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'sub-cancel';
-  closeBtn.textContent = 'Fermer';
-  closeBtn.addEventListener('click', function(){ document.getElementById('sim-modal').remove(); });
-  body.appendChild(closeBtn);
-  box.appendChild(body);
-}
-
-function startSim(index) {
-  var a = ARNAQUES[index];
-  _simState.currentIndex = index;
-  _simState.foundIndices = [];
-  var box = document.getElementById('sim-box');
-  if (!box) return;
-  box.innerHTML = '';
-
-  var hdr = document.createElement('div');
-  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:20px;border-radius:12px 12px 0 0;color:#fff;display:flex;justify-content:space-between;align-items:center';
-  var typeLabel = a.type === 'email' ? '\uD83D\uDCE7 Email' : a.type === 'sms' ? '\uD83D\uDCF1 SMS' : '\uD83D\uDCDE Appel';
-  hdr.innerHTML = '<div><div style="font-size:11px;opacity:.7">SIMULATION ' + (index+1) + '/' + ARNAQUES.length + '</div><div style="font-size:18px;font-weight:900">' + typeLabel + ' suspect</div></div><div style="background:rgba(255,255,255,.15);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700">' + a.difficulte + '</div>';
-  box.appendChild(hdr);
-
-  var body = document.createElement('div');
-  body.style.cssText = 'padding:20px';
-
-  var instr = document.createElement('div');
-  instr.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#856404;font-weight:600';
-  instr.textContent = '\uD83D\uDD0D Cliquez sur les 3 \u00e9l\u00e9ments suspects dans le message ci-dessous';
-  body.appendChild(instr);
-
-  var msgBox = document.createElement('div');
-  msgBox.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px';
-
-  var msgHdr = document.createElement('div');
-  msgHdr.style.cssText = 'background:#f8faff;padding:12px 16px;border-bottom:1px solid var(--border)';
-
-  var fromRow = document.createElement('div');
-  fromRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
-  var fromLabel = document.createElement('span');
-  fromLabel.style.cssText = 'font-size:11px;font-weight:700;color:var(--text3)';
-  fromLabel.textContent = 'DE :';
-  var expSpan = document.createElement('span');
-  expSpan.style.cssText = 'font-size:13px;color:#0066cc;cursor:pointer;padding:3px 8px;border-radius:6px;background:var(--bg2)';
-  expSpan.textContent = a.expediteur;
-  expSpan.id = 'sim-exp';
-  expSpan.addEventListener('click', function(){ clickIndice(0); });
-  fromRow.appendChild(fromLabel); fromRow.appendChild(expSpan);
-  msgHdr.appendChild(fromRow);
-
-  var subj = document.createElement('div');
-  subj.style.cssText = 'font-size:13px;font-weight:700;color:var(--text)';
-  subj.textContent = a.objet;
-  msgHdr.appendChild(subj);
-  msgBox.appendChild(msgHdr);
-
-  var msgBody = document.createElement('div');
-  msgBody.style.cssText = 'padding:16px';
-
-  var parts = a.corps.split(a.indices[1].texte);
-  var p = document.createElement('div');
-  p.style.cssText = 'font-size:13px;color:var(--text);line-height:1.8;white-space:pre-line';
-
-  var t1 = document.createTextNode(parts[0]);
-  var lienSpan = document.createElement('span');
-  lienSpan.style.cssText = 'color:#0066cc;cursor:pointer;text-decoration:underline;padding:2px 4px;border-radius:4px;background:var(--bg2)';
-  lienSpan.textContent = a.indices[1].texte;
-  lienSpan.id = 'sim-lien';
-  lienSpan.addEventListener('click', function(){ clickIndice(1); });
-
-  var rest = parts.slice(1).join(a.indices[1].texte);
-  var parts2 = rest.split(a.indices[2].texte);
-  var t2 = document.createTextNode(parts2[0]);
-  var urgSpan = document.createElement('span');
-  urgSpan.style.cssText = 'color:#dc2626;font-weight:700;cursor:pointer;padding:2px 4px;border-radius:4px;background:#fef2f2';
-  urgSpan.textContent = a.indices[2].texte;
-  urgSpan.id = 'sim-urgence';
-  urgSpan.addEventListener('click', function(){ clickIndice(2); });
-  var t3 = document.createTextNode(parts2.slice(1).join(a.indices[2].texte));
-
-  p.appendChild(t1); p.appendChild(lienSpan); p.appendChild(t2); p.appendChild(urgSpan); p.appendChild(t3);
-  msgBody.appendChild(p);
-  msgBox.appendChild(msgBody);
-  body.appendChild(msgBox);
-
-  var progBar = document.createElement('div');
-  progBar.id = 'sim-progress';
-  progBar.style.cssText = 'display:flex;gap:8px;margin-bottom:16px';
-  for (var i = 0; i < 3; i++) {
-    var pEl = document.createElement('div');
-    pEl.style.cssText = 'flex:1;padding:8px;background:var(--bg2);border-radius:8px;text-align:center;font-size:12px;color:var(--text3)';
-    pEl.textContent = 'Indice ' + (i+1) + ' \u2B1C';
-    progBar.appendChild(pEl);
-  }
-  body.appendChild(progBar);
-
-  var feedback = document.createElement('div');
-  feedback.id = 'sim-feedback';
-  feedback.style.cssText = 'display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;margin-bottom:12px;font-size:13px;color:var(--text2)';
-  body.appendChild(feedback);
-
-  var backBtn = document.createElement('button');
-  backBtn.className = 'sub-cancel';
-  backBtn.textContent = 'Retour';
-  backBtn.addEventListener('click', renderSimHome);
-  body.appendChild(backBtn);
-  box.appendChild(body);
-}
-
-function clickIndice(num) {
-  var a = ARNAQUES[_simState.currentIndex];
-  if (_simState.foundIndices.includes(num)) return;
-  _simState.foundIndices.push(num);
-
-  var ids = ['sim-exp', 'sim-lien', 'sim-urgence'];
-  var el = document.getElementById(ids[num]);
-  if (el) {
-    el.style.background = '#dcfce7';
-    el.style.color = '#15803d';
-    el.style.fontWeight = '700';
-    el.style.cursor = 'default';
-    el.replaceWith(el.cloneNode(true));
-  }
-
-  var progEls = document.getElementById('sim-progress');
-  if (progEls) {
-    var items = progEls.children;
-    for (var i = 0; i < _simState.foundIndices.length; i++) {
-      if (items[i]) {
-        items[i].style.background = '#f0fdf4';
-        items[i].style.color = '#15803d';
-        items[i].textContent = 'Indice ' + (i+1) + ' \u2705';
-      }
-    }
-  }
-
-  var fb = document.getElementById('sim-feedback');
-  if (fb) {
-    fb.style.display = 'block';
-    fb.innerHTML = '<strong>\u2705 Bien vu !</strong> ' + a.indices[num].explication;
-  }
-
-  if (_simState.foundIndices.length === 3) {
-    setTimeout(function(){ showSimResult(a); }, 700);
-  }
-}
-
-function showSimResult(a) {
-  var box = document.getElementById('sim-box');
-  if (!box) return;
-  if (!_simState.completed.includes(a.id)) {
-    _simState.completed.push(a.id);
-    _simState.totalXP += a.xp;
-    _siteXP += a.xp;
-    updateSiteXP();
-    if (typeof updateScoreData === 'function') updateScoreData('quiz_completed');
-  }
-  box.innerHTML = '';
-
-  var hdr = document.createElement('div');
-  hdr.style.cssText = 'background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:24px;border-radius:12px 12px 0 0;color:#fff;text-align:center';
-  hdr.innerHTML = '<div style="font-size:52px;margin-bottom:8px">\uD83C\uDF89</div><div style="font-size:22px;font-weight:900">Excellent !</div><div style="font-size:14px;opacity:.7;margin-top:4px">Vous avez identifi\u00e9 les 3 indices</div>';
-  box.appendChild(hdr);
-
-  var body = document.createElement('div');
-  body.style.cssText = 'padding:24px;text-align:center';
-
-  var xpEl = document.createElement('div');
-  xpEl.style.cssText = 'background:var(--blue-light);border:1.5px solid var(--blue-mid);border-radius:14px;padding:20px;margin-bottom:20px';
-  xpEl.innerHTML = '<div style="font-size:36px;font-weight:900;color:var(--blue)">+' + a.xp + ' XP</div><div style="font-size:13px;color:var(--text3);margin-top:4px">Gagn\u00e9s pour cette simulation</div>';
-  body.appendChild(xpEl);
-
-  var recap = document.createElement('div');
-  recap.style.cssText = 'background:#f8faff;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left';
-  recap.innerHTML = '<div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Les 3 signaux d\u2019alerte :</div>' +
-    a.indices.map(function(ind){ return '<div style="display:flex;gap:10px;margin-bottom:8px;font-size:13px;color:var(--text2)"><span style="color:#22c55e;flex-shrink:0">\u2705</span><span><strong>' + ind.texte + '</strong> \u2014 ' + ind.explication + '</span></div>'; }).join('');
-  body.appendChild(recap);
-
-  var btns = document.createElement('div');
-  btns.style.cssText = 'display:flex;gap:10px';
-  var nextBtn = document.createElement('button');
-  nextBtn.className = 'sub-btn';
-  nextBtn.style.flex = '1';
-  nextBtn.textContent = _simState.completed.length < ARNAQUES.length ? 'Simulation suivante \u2192' : 'Toutes termin\u00e9es ! \uD83C\uDFC6';
-  nextBtn.addEventListener('click', renderSimHome);
-  var menuBtn = document.createElement('button');
-  menuBtn.className = 'sub-cancel';
-  menuBtn.textContent = 'Menu';
-  menuBtn.addEventListener('click', renderSimHome);
-  btns.appendChild(nextBtn); btns.appendChild(menuBtn);
-  body.appendChild(btns);
-  box.appendChild(body);
-}
-
-
-
-
-// ========================================
-// JOURNAL DE SECURITE PERSONNEL
-// ========================================
-function initJournal() {
-  // Créer le journal si inexistant
-  try {
-    var j = JSON.parse(localStorage.getItem('despy_journal') || '[]');
-    return j;
-  } catch(e) { return []; }
-}
-
-function addJournalEntry(type, message) {
-  try {
-    var j = initJournal();
-    j.unshift({
-      date: new Date().toISOString(),
-      type: type,  // 'check', 'quiz', 'alert', 'chrono', 'sos', 'hibp', 'login'
-      message: message
-    });
-    localStorage.setItem('despy_journal', JSON.stringify(j.slice(0, 50)));
-  } catch(e) {}
-}
-
-function renderJournal() {
-  var zone = document.getElementById('journal-zone');
-  if (!zone) return;
-
-  var session = siteSession.get();
-  if (!session || !session.subscribed) {
-    zone.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Journal disponible pour les abonn\u00e9s</div>';
-    return;
-  }
-
-  var journal = initJournal();
-
-  // Ajouter entree de connexion
-  addJournalEntry('login', 'Connexion \u00e0 votre espace Despy');
-
-  // Entrees par defaut si journal vide
-  if (journal.length === 0) {
-    var now = new Date();
-    journal = [
-      { date: now.toISOString(), type: 'check', message: 'Bienvenue sur Despy \u2014 votre protection est active' },
-    ];
-  }
-
-  var icons = {
-    'login':  { icon: '\uD83D\uDD11', color: '#2D5BFF', bg: '#EEF1FF' },
-    'quiz':   { icon: '\uD83C\uDFAF', color: '#8b5cf6', bg: '#f5f3ff' },
-    'chrono': { icon: '\u23F1\uFE0F', color: '#f59e0b', bg: '#fffbeb' },
-    'alert':  { icon: '\uD83D\uDEA8', color: '#dc2626', bg: '#fef2f2' },
-    'hibp':   { icon: '\uD83C\uDF11', color: '#0a1f3a', bg: '#e8eaf0' },
-    'sos':    { icon: '\uD83D\uDEA8', color: '#dc2626', bg: '#fef2f2' },
-    'check':  { icon: '\u2705', color: '#15803d', bg: '#f0fdf4' },
-  };
-
-  zone.innerHTML = '';
-  journal.slice(0, 15).forEach(function(entry) {
-    var meta = icons[entry.type] || icons['check'];
-    var date = new Date(entry.date);
-    var dateStr = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
-    var timeStr = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)';
-
-    var iconEl = document.createElement('div');
-    iconEl.style.cssText = 'width:36px;height:36px;border-radius:10px;background:' + meta.bg + ';display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0';
-    iconEl.textContent = meta.icon;
-
-    var textEl = document.createElement('div');
-    textEl.style.cssText = 'flex:1';
-    var msgEl = document.createElement('div');
-    msgEl.style.cssText = 'font-size:13px;font-weight:600;color:var(--text)';
-    msgEl.textContent = entry.message;
-    var dateEl = document.createElement('div');
-    dateEl.style.cssText = 'font-size:11px;color:var(--text3);margin-top:2px';
-    dateEl.textContent = dateStr + ' \u00e0 ' + timeStr;
-    textEl.appendChild(msgEl);
-    textEl.appendChild(dateEl);
-
-    row.appendChild(iconEl);
-    row.appendChild(textEl);
-    zone.appendChild(row);
-  });
-
-  if (journal.length === 0) {
-    zone.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px">Aucune activit\u00e9 pour le moment \u2014 commencez un quiz !</div>';
-  }
-}
-
-// Appeler renderJournal quand la page client s'affiche
-
 
 // === COMPTE GRATUIT (FREEMIUM) ===
 function showFreeSignup() {
@@ -4150,14 +3812,15 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+  
 
 
-
+  <!-- Bouton flottant Despy -->
   <div id="despy-fab" style="position:fixed;bottom:28px;right:24px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
     <div id="fab-menu" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
-      <button onclick="toggleFab();showPage('conseiller')" style="padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
-      <button onclick="toggleFab();showSOS()" style="padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#dc2626;white-space:nowrap">🚨 SOS Urgence</button>
-      <a href="https://wa.me/33689148395" target="_blank" onclick="toggleFab()" style="padding:10px 16px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);font-size:13px;font-weight:700;color:#25D366;text-decoration:none;white-space:nowrap">📱 WhatsApp</a>
+      <button onclick="toggleFab();showPage('conseiller')" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
+      <button onclick="toggleFab();showSOS()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#dc2626;white-space:nowrap">🚨 SOS Urgence</button>
+      <a href="https://wa.me/33689148395" target="_blank" onclick="toggleFab()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);font-size:13px;font-weight:700;color:#25D366;text-decoration:none;white-space:nowrap">📱 WhatsApp</a>
     </div>
     <button onclick="toggleFab()" title="Aide Despy" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(45,91,255,.5);position:relative">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -4165,8 +3828,9 @@ document.addEventListener('DOMContentLoaded', function(){
     </button>
   </div>
   <script>
-function toggleFab(){var m=document.getElementById('fab-menu');if(!m)return;m.style.display=m.style.display==='flex'?'none':'flex';var n=document.getElementById('fab-notif');if(n)n.style.display='none';try{localStorage.setItem('despy_fab_seen','1');}catch(e){}}
-document.addEventListener('DOMContentLoaded',function(){try{if(localStorage.getItem('despy_fab_seen')){var n=document.getElementById('fab-notif');if(n)n.style.display='none';}}catch(e){}document.addEventListener('click',function(e){var f=document.getElementById('despy-fab');if(f&&!f.contains(e.target)){var m=document.getElementById('fab-menu');if(m)m.style.display='none';}});});
+  function toggleFab(){var m=document.getElementById('fab-menu');if(!m)return;m.style.display=m.style.display==='flex'?'none':'flex';var n=document.getElementById('fab-notif');if(n)n.style.display='none';try{localStorage.setItem('despy_fab_seen','1');}catch(e){}}
+  document.addEventListener('DOMContentLoaded',function(){try{if(localStorage.getItem('despy_fab_seen')){var n=document.getElementById('fab-notif');if(n)n.style.display='none';}}catch(e){}document.addEventListener('click',function(e){var f=document.getElementById('despy-fab');if(f&&!f.contains(e.target)){var m=document.getElementById('fab-menu');if(m)m.style.display='none';}});});
   </script>
+
 </body>
 </html>
