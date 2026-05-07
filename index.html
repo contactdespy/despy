@@ -374,7 +374,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
     <button class="nav-link" onclick="scrollToSection('fidelisation')">Formation</button>
-    <button class="nav-link" onclick="showPage('conseiller')">Conseiller IA</button>
+    <button class="nav-link" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">Conseiller IA</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
     <button class="nav-cta" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);margin-right:6px;font-size:13px" onclick="showLoginModal()">Connexion</button>
     <button class="nav-cta" style="background:var(--bg2);color:var(--blue);border:1.5px solid var(--blue-mid);margin-right:8px" onclick="showFreeSignup()">Compte gratuit</button>
@@ -1424,6 +1424,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
               <span style="color:#dc2626;font-size:16px;flex-shrink:0">❌</span>
               <span style="font-size:13px;color:#dc2626">Quiz et formation bloqués</span>
             </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;opacity:.7"><span style="color:#dc2626;font-size:16px;flex-shrink:0">❌</span><span style="font-size:13px;color:#dc2626">Simulateur d'arnaque inaccessible</span></div>
           </div>
         </div>
 
@@ -1472,6 +1473,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
               <span style="color:#4ade80;font-size:16px;flex-shrink:0">✅</span>
               <span style="font-size:13px;color:#fff;font-weight:600">6 niveaux et badges de progression</span>
             </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.1);border-radius:10px"><span style="color:#4ade80;font-size:16px;flex-shrink:0">✅</span><span style="font-size:13px;color:#fff;font-weight:600">Simulateur d'arnaque interactif</span></div>
           </div>
           <button onclick="siteSubscribe('monthly')" style="width:100%;margin-top:20px;padding:14px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer">
             Je m'abonne maintenant →
@@ -3550,8 +3552,8 @@ function showFreeSignup() {
   // Grille 2 colonnes pour nom/prénom
   var grid = document.createElement('div');
   grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0';
-  var nomField = makeField('Nom', 'free-nom', 'text', 'Bourefis', true);
-  var prenomField = makeField('Prénom', 'free-prenom', 'text', 'Yacine', true);
+  var nomField = makeField('Nom', 'free-nom', 'text', 'Dupont', true);
+  var prenomField = makeField('Prénom', 'free-prenom', 'text', 'Marie', true);
   grid.appendChild(nomField); grid.appendChild(prenomField);
 
   var emailField = makeField('Email', 'free-email', 'email', 'votre@email.fr', true);
@@ -4553,7 +4555,7 @@ document.addEventListener('DOMContentLoaded', function(){
   <!-- Bouton flottant Despy -->
   <div id="despy-fab" style="position:fixed;bottom:28px;right:24px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
     <div id="fab-menu" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
-      <button onclick="toggleFab();showPage('conseiller')" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
+      <button onclick="toggleFab();showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
       <button onclick="toggleFab();showSOS()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#dc2626;white-space:nowrap">🚨 SOS Urgence</button>
       <a href="https://wa.me/33689148395" target="_blank" onclick="toggleFab()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);font-size:13px;font-weight:700;color:#25D366;text-decoration:none;white-space:nowrap">📱 WhatsApp</a>
     </div>
