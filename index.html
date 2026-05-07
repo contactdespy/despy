@@ -273,6 +273,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 /* MOBILE */
 @media (max-width:768px){
+  .reviews-grid{grid-template-columns:1fr !important}
   .interventions-grid{grid-template-columns:1fr !important;max-width:100% !important}
   .client-tab{font-size:11px !important;padding:9px 6px !important;min-width:60px !important}
 
@@ -927,6 +928,86 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
         </div>
 
       </div>
+    </div>
+  </section>
+
+
+  <!-- ═══ AVIS GOOGLE ═══ -->
+  <section id="reviews" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
+    <div class="wrap">
+      <div style="text-align:center;margin-bottom:3rem">
+        <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#fff;border:1px solid #fbbf24;border-radius:99px;margin-bottom:14px;font-size:13px;font-weight:700;color:#92400e">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          <span>4.9/5 sur Google</span>
+        </div>
+        <h2 class="section-title">Ce que disent nos clients</h2>
+        <p class="section-sub">Avis vérifiés laissés sur notre fiche Google My Business</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;max-width:1100px;margin:0 auto" class="reviews-grid">
+
+        <!-- Avis 1 -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">M</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Marie L.</div>
+                <div style="font-size:11px;color:var(--text3)">Strasbourg</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Je me sens enfin protégée quand je reçois des SMS bizarres. Yacine prend le temps d'expliquer simplement, c'est exactement ce qu'il me fallait."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 2 semaines</div>
+        </div>
+
+        <!-- Avis 2 -->
+        <div style="background:#fff;border:2px solid var(--blue);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(45,91,255,.12);position:relative">
+          <div style="position:absolute;top:-10px;right:14px;background:var(--blue);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:99px">⭐ COUP DE CŒUR</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">R</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Robert D.</div>
+                <div style="font-size:11px;color:var(--text3)">Schiltigheim</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Mon fils m'a abonné à Despy. Je sais maintenant quoi faire quand je reçois un mail bizarre. Service très professionnel et patient."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 1 mois</div>
+        </div>
+
+        <!-- Avis 3 -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">F</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Françoise B.</div>
+                <div style="font-size:11px;color:var(--text3)">Illkirch</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"L'assistant IA répond à toutes mes questions, même les plus basiques, sans jamais me faire sentir bête. Je recommande vivement Despy."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 3 semaines</div>
+        </div>
+
+      </div>
+
+      <!-- CTA voir tous les avis -->
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="https://g.page/r/CVKTMKw67U7wEBI/review" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#fff;border:1.5px solid var(--border);border-radius:99px;color:var(--text2);font-size:14px;font-weight:700;text-decoration:none;transition:all .2s">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Voir tous les avis sur Google →
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -2069,7 +2150,7 @@ function showSubscribeModal(plan) {
 
   var box = document.createElement('div');
   box.className = 'sub-modal';
-  box.style.maxWidth = '460px';
+  box.style.cssText = 'max-width:460px;max-height:90vh;overflow-y:auto';
 
   function makeField(lText, id, type, ph, ac, prefill) {
     var w = document.createElement('div'); w.className = 'field';
@@ -2591,6 +2672,7 @@ function showLoginModal() {
 
 async function doLogin() {
   var email = (document.getElementById('login-email')||{}).value||'';
+  var password = (document.getElementById('login-password')||{}).value||'';
   var errEl = document.getElementById('login-err');
   var btn   = document.getElementById('login-btn');
   email = email.trim();
@@ -2599,25 +2681,43 @@ async function doLogin() {
     if(errEl){ errEl.textContent='Email invalide.'; errEl.style.display='block'; }
     return;
   }
+  if (!password || password.length < 4) {
+    if(errEl){ errEl.textContent='Mot de passe requis (minimum 4 caractères).'; errEl.style.display='block'; }
+    return;
+  }
 
   if(btn){ btn.textContent='Vérification...'; btn.disabled=true; }
   if(errEl) errEl.style.display='none';
 
   try {
-    // Vérifier si le compte existe dans Supabase
     var r = await fetch('/.netlify/functions/check-subscription', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email: email, password: password })
     });
     var data = await r.json();
 
-    // Créer la session
+    if (data.error) {
+      if(errEl){ errEl.textContent = data.error; errEl.style.display='block'; }
+      if(btn){ btn.textContent='Accéder à mon espace →'; btn.disabled=false; }
+      return;
+    }
+
+    if (!data.exists) {
+      if(errEl){ errEl.textContent='Aucun compte trouvé avec cet email. Créez votre compte gratuit.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent='Accéder à mon espace →'; btn.disabled=false; }
+      return;
+    }
+
     siteSession.set({
       email: email,
-      name: email.split('@')[0],
+      name: data.name || email.split('@')[0],
+      prenom: data.prenom || '',
+      nom: data.nom || '',
+      telephone: data.telephone || '',
       subscribed: data.subscribed || false,
-      plan: data.plan || 'free'
+      plan: data.plan || 'free',
+      created_at: data.created_at
     });
 
     var modal = document.getElementById('login-modal');
@@ -3423,7 +3523,7 @@ function showFreeSignup() {
 
   var box = document.createElement('div');
   box.className = 'sub-modal';
-  box.style.maxWidth = '460px';
+  box.style.cssText = 'max-width:460px;max-height:90vh;overflow-y:auto';
 
   // Titre
   var title = document.createElement('div');
@@ -4448,9 +4548,6 @@ document.addEventListener('DOMContentLoaded', function(){
   try { updateNavForSession(); } catch(e) {}
 });
 </script>
-
-  <!-- Bouton SOS flottant -->
-  <button onclick="showSOS()" style="position:fixed;bottom:90px;right:20px;z-index:999;width:52px;height:52px;border-radius:50%;background:#dc2626;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(220,38,38,.4);font-size:22px" title="SOS Urgence">🚨</button>
 
 
   <!-- Bouton flottant Despy -->
