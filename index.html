@@ -1115,6 +1115,45 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
         </div>
       </div>
 
+      <!-- ═══ SIMULATEUR D'ARNAQUE ═══ -->
+      <div style="background:linear-gradient(135deg,#7c2d12,#dc2626);border-radius:20px;padding:28px;margin-bottom:2rem;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
+        <div style="position:absolute;bottom:-40px;left:-20px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.03)"></div>
+        <div style="position:relative;z-index:1">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:36px">🎭</div>
+            <div>
+              <div style="font-size:20px;font-weight:900">Simulateur d'arnaque</div>
+              <div style="font-size:13px;color:rgba(255,255,255,.8)">Plongez dans des scénarios réalistes · Trouvez les indices · Gagnez des XP</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">5</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7)">Scénarios réalistes</div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">3</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7)">Indices à trouver</div>
+            </div>
+            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
+              <div style="font-size:22px;font-weight:900">+200</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.7)">XP bonus parfait</div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center">
+            <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6">
+              📧 SMS de banque · 📞 Faux support technique · 💌 Email de phishing<br>
+              🎁 Concours frauduleux · 💼 Arnaque LinkedIn
+            </div>
+          </div>
+          <button onclick="showSimulator()" style="width:100%;padding:14px;background:#fff;color:#dc2626;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
+            🎬 Lancer une simulation
+          </button>
+        </div>
+      </div>
+
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start" class="formation-grid">
 
         <!-- COLONNE GAUCHE : Progression + Quiz -->
