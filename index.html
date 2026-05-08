@@ -70,8 +70,13 @@ nav.scrolled{border-color:var(--border);box-shadow:0 1px 12px rgba(0,0,0,0.06)}
 .mob-menu-btn span{display:block;width:22px;height:2px;background:#333;margin:5px 0;transition:all .25s;border-radius:1px}
 #mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.5rem;flex-direction:column;gap:.75rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08)}
 #mob-menu.open{display:flex}
-.mob-link{background:none;border:none;font-size:16px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;padding:8px 0}
-.mob-cta{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
+.mob-link{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;padding:14px 16px;border-radius:10px;font-family:inherit;transition:background .15s ease;-webkit-tap-highlight-color:transparent}
+.mob-link:hover,.mob-link:active{background:var(--bg2)}
+.mob-link svg{color:var(--text3);transition:transform .2s,color .2s;flex-shrink:0;margin-left:12px}
+.mob-link:hover svg{color:var(--blue);transform:translateX(2px)}
+.mob-link-secondary{font-size:14px;color:var(--text2);font-weight:500}
+.mob-divider{height:1px;background:var(--border);margin:8px 0}
+.mob-cta{display:block;width:100%;padding:14px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-align:center;margin-top:6px;transition:background .15s}.mob-cta:hover,.mob-cta:active{background:var(--blue-mid,#1a3fd9)}
 
 /* ── ANIMATIONS ── */
 @media(prefers-reduced-motion:reduce){.a1,.a2,.a3,.a4,}
@@ -385,14 +390,32 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </button>
   <!-- Menu mobile dans la nav -->
   <div id="mob-menu">
-    <button class="mob-link" onclick="scrollToSection('situations');closeMob()">🛡️ Protection</button>
-    <button class="mob-link" onclick="scrollToSection('features');closeMob()">⚡ Fonctionnalités</button>
-    <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">💬 Conseiller IA</button>
-    <button class="mob-link" onclick="showPage('tarifs');closeMob()">💶 Tarifs</button>
-    <button class="mob-link" onclick="scrollToSection('faq');closeMob()">❓ FAQ</button>
-    <div style="height:1px;background:var(--border);margin:4px 0"></div>
+    <button class="mob-link" onclick="showPage('tarifs');closeMob()">
+      <span>Tarifs &amp; services</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="scrollToSection('fidelisation');closeMob()">
+      <span>Formation</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">
+      <span>Conseiller Despy</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="scrollToSection('reviews');closeMob()">
+      <span>Avis clients</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="scrollToSection('faq');closeMob()">
+      <span>Questions fréquentes</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="mob-divider"></div>
+    <button class="mob-link mob-link-secondary" onclick="showClientArea();closeMob()">
+      <span>Mon espace client</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
     <button class="mob-cta" onclick="siteSubscribe('monthly');closeMob()">Commencer — 9,99€/mois</button>
-    <button class="mob-link" style="font-size:13px;color:var(--text3)" onclick="showClientArea();closeMob()">Mon espace client</button>
   </div>
 </nav>
 
@@ -1461,7 +1484,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
             </div>
             <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;opacity:.7">
               <span style="color:#dc2626;font-size:16px;flex-shrink:0">❌</span>
-              <span style="font-size:13px;color:#dc2626">Quiz et formation bloqués</span>
+              <span style="font-size:13px;color:#dc2626">Quiz limité à 5 questions/mois</span>
             </div>
             <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#fef2f2;border-radius:10px;border:1px solid #fecaca;opacity:.7"><span style="color:#dc2626;font-size:16px;flex-shrink:0">❌</span><span style="font-size:13px;color:#dc2626">Simulateur d'arnaque inaccessible</span></div>
           </div>
@@ -1820,7 +1843,85 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       </div>
     <!-- PANEL MON COMPTE -->
     <div id="panel-compte" style="display:none">
-      <!-- Géré par renderAccountPanel() -->
+
+      <!-- Infos personnelles -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:14px">👤 Informations personnelles</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:8px">
+            <span style="font-size:13px;color:var(--text3)">Email</span>
+            <span style="font-size:13px;color:var(--text);font-weight:600" id="compte-email">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:8px">
+            <span style="font-size:13px;color:var(--text3)">Prénom</span>
+            <span style="font-size:13px;color:var(--text);font-weight:600" id="compte-prenom">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:8px">
+            <span style="font-size:13px;color:var(--text3)">Nom</span>
+            <span style="font-size:13px;color:var(--text);font-weight:600" id="compte-nom">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:8px">
+            <span style="font-size:13px;color:var(--text3)">Téléphone</span>
+            <span style="font-size:13px;color:var(--text);font-weight:600" id="compte-tel">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--bg2);border-radius:8px">
+            <span style="font-size:13px;color:var(--text3)">Membre depuis</span>
+            <span style="font-size:13px;color:var(--text);font-weight:600" id="compte-since">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mon abonnement -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:14px">💳 Mon abonnement</div>
+        <div id="compte-sub-content">
+          <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:14px;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:800;color:#92400e">Compte gratuit</div>
+            <div style="font-size:12px;color:#92400e;margin-top:4px;opacity:.8">3 questions IA · Fonctionnalités limitées</div>
+          </div>
+          <button onclick="showPage('tarifs')" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">
+            Passer à l'abonnement →
+          </button>
+        </div>
+      </div>
+
+      <!-- Parrainage -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:6px">🎁 Parrainage</div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:12px">Partagez Despy et gagnez 1 mois offert par filleul</div>
+        <div id="ref-code" style="background:var(--bg2);border:1.5px dashed var(--border);border-radius:10px;padding:12px;font-family:monospace;font-size:14px;font-weight:800;color:var(--blue);text-align:center;letter-spacing:2px;margin-bottom:10px">DESPY-XXXX-2026</div>
+        <button onclick="shareRef()" style="width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
+          Partager mon code
+        </button>
+      </div>
+
+      <!-- Paramètres -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:14px">⚙️ Paramètres</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button onclick="showLegal('confidentialite')" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;text-align:left">
+            <span>🔒 Politique de confidentialité</span><span>›</span>
+          </button>
+          <button onclick="showLegal('cgv')" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit;text-align:left">
+            <span>📄 Conditions générales</span><span>›</span>
+          </button>
+          <a href="mailto:contact.despy@gmail.com" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text2);text-decoration:none">
+            <span>✉️ Contacter le support</span><span>›</span>
+          </a>
+          <button onclick="showLegal('resiliation')" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;font-size:13px;color:#dc2626;cursor:pointer;font-family:inherit;text-align:left">
+            <span>🚫 Résilier mon abonnement</span><span>›</span>
+          </button>
+          <button onclick="if(confirm('Êtes-vous sûr ? Cette action est irréversible.')) siteDeleteAccount()" style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;text-align:left">
+            <span>🗑️ Supprimer mon compte (RGPD)</span><span>›</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Déconnexion -->
+      <button onclick="siteLogout()" style="width:100%;padding:14px;background:#fff;border:1.5px solid var(--border);color:var(--text2);border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">
+        Se déconnecter
+      </button>
+
     </div>
 
   </div>
@@ -3006,15 +3107,27 @@ function switchTab(tabName) {
 function fillCompteInfo() {
   try {
     var s = siteSession.get();
-    if (!s) return;
+    if (!s) {
+      console.log('fillCompteInfo: pas de session');
+      return;
+    }
     var elEmail = document.getElementById('compte-email');
     var elPrenom = document.getElementById('compte-prenom');
+    var elNom = document.getElementById('compte-nom');
     var elTel = document.getElementById('compte-tel');
     var elSince = document.getElementById('compte-since');
     if (elEmail) elEmail.textContent = s.email || '—';
-    if (elPrenom) elPrenom.textContent = s.prenom || s.name || '—';
+    if (elPrenom) elPrenom.textContent = s.prenom || (s.name || '').split(' ')[0] || '—';
+    if (elNom) elNom.textContent = s.nom || (s.name || '').split(' ').slice(1).join(' ') || '—';
     if (elTel) elTel.textContent = s.telephone || '—';
     if (elSince) elSince.textContent = s.created_at ? new Date(s.created_at).toLocaleDateString('fr-FR') : 'Aujourd\'hui';
+
+    // Code de parrainage (basé sur l'email)
+    var refEl = document.getElementById('ref-code');
+    if (refEl && s.email) {
+      var code = 'DESPY-' + s.email.split('@')[0].substring(0,4).toUpperCase() + '-2026';
+      refEl.textContent = code;
+    }
 
     // Status badge
     var badge = document.getElementById('client-status-badge');
@@ -3554,6 +3667,83 @@ showPage = function(id) {
   _origShowPage(id);
   if (id === 'client') { setTimeout(function(){ try{ initClientSpace(); }catch(e){} }, 80); }
 };
+
+
+
+
+// ========================================
+// QUOTA QUIZ GRATUIT — 5 questions / mois
+// ========================================
+function getFreeQuizQuota() {
+  try {
+    var key = 'despy_free_quiz_quota';
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : { used: 0, month: '' };
+    var now = new Date();
+    var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+
+    // Reset si nouveau mois
+    if (data.month !== currentMonth) {
+      data = { used: 0, month: currentMonth };
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // Date du prochain reset
+    var nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    var nextResetStr = nextMonth.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+
+    return { used: data.used || 0, nextReset: nextResetStr };
+  } catch(e) {
+    return { used: 0, nextReset: 'le 1er du mois prochain' };
+  }
+}
+
+function incrementFreeQuizQuota() {
+  try {
+    var key = 'despy_free_quiz_quota';
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : { used: 0, month: '' };
+    var now = new Date();
+    var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+    if (data.month !== currentMonth) {
+      data = { used: 0, month: currentMonth };
+    }
+    data.used = (data.used || 0) + 1;
+    localStorage.setItem(key, JSON.stringify(data));
+    return data.used;
+  } catch(e) { return 0; }
+}
+
+function showQuizPaywall() {
+  // Éviter doublon
+  if (document.getElementById('quiz-paywall')) return;
+
+  var modal = document.createElement('div');
+  modal.id = 'quiz-paywall';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .25s';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative';
+
+  box.innerHTML = '<button onclick="document.getElementById(&quot;quiz-paywall&quot;).remove()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg2);border:none;font-size:18px;cursor:pointer;color:var(--text3)">×</button>' +
+    '<div style="font-size:64px;margin-bottom:14px">🔒</div>' +
+    '<div style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px">Vous avez terminé vos 5 questions découverte</div>' +
+    '<div style="font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:24px">Pour continuer à apprendre, débloquez l\'accès complet à <strong>40 questions</strong>, <strong>8 modules</strong>, <strong>Défi Chrono</strong>, <strong>Simulateur d\'arnaque</strong> et bien plus.</div>' +
+    '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:20px;margin-bottom:14px;color:#fff">' +
+      '<div style="font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Recommandé</div>' +
+      '<div style="font-size:24px;font-weight:900;margin-bottom:4px">9,99€<span style="font-size:14px;opacity:.7">/mois</span></div>' +
+      '<div style="font-size:12px;opacity:.85;margin-bottom:14px">Sans engagement · Résiliation 1 clic</div>' +
+      '<button onclick="document.getElementById(&quot;quiz-paywall&quot;).remove();siteSubscribe(&quot;monthly&quot;)" style="width:100%;padding:13px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-weight:900;font-size:14px;cursor:pointer;font-family:inherit">Débloquer maintenant →</button>' +
+    '</div>' +
+    '<button onclick="document.getElementById(&quot;quiz-paywall&quot;).remove();siteSubscribe(&quot;annual&quot;)" style="width:100%;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);margin-bottom:10px">89€/an (2 mois offerts) →</button>' +
+    '<button onclick="document.getElementById(&quot;quiz-paywall&quot;).remove()" style="background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit">Plus tard</button>';
+
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+
+  // Fermer au clic extérieur
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+}
 
 
 // === COMPTE GRATUIT (FREEMIUM) ===
@@ -4461,19 +4651,49 @@ function renderQuiz() {
   var zone = document.getElementById('quiz-zone');
   if (!zone) return;
 
-  // Verifier abonnement
   var session = siteSession.get();
-  if (!session || !session.subscribed) {
+
+  // Pas connecté
+  if (!session || !session.email) {
     zone.innerHTML = '<div style="text-align:center;padding:20px">' +
-      '<div style="font-size:36px;margin-bottom:10px">🔒</div>' +
-      '<div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:8px">Quiz reservé aux abonnés</div>' +
-      '<div style="font-size:13px;color:var(--text3);margin-bottom:16px">Accédez aux 8 modules et 40 questions avec l’abonnement Despy.</div>' +
-      '<button onclick="siteSubscribe(&quot;monthly&quot;)" class="sub-btn" style="margin-bottom:8px">S’abonner — des 9,99€/mois →</button>' +
-      ((!session || !session.email) ? '<button onclick="showFreeSignup()" class="sub-cancel">Créer un compte gratuit</button>' : '') +
+      '<div style="font-size:36px;margin-bottom:10px">🎯</div>' +
+      '<div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:8px">Découvrez le quiz Despy</div>' +
+      '<div style="font-size:13px;color:var(--text3);margin-bottom:16px">5 questions découverte gratuites chaque mois. Créez votre compte pour commencer.</div>' +
+      '<button onclick="showFreeSignup()" class="sub-btn" style="margin-bottom:8px">Créer mon compte gratuit →</button>' +
       '</div>';
     var optsZone = document.getElementById('quiz-opts');
     if (optsZone) optsZone.innerHTML = '';
     return;
+  }
+
+  // Compte gratuit — vérifier le quota mensuel (5 questions/mois)
+  if (!session.subscribed) {
+    var quota = getFreeQuizQuota();
+    if (quota.used >= 5) {
+      // Quota épuisé — afficher popup d'upgrade
+      showQuizPaywall();
+      zone.innerHTML = '<div style="text-align:center;padding:20px">' +
+        '<div style="font-size:48px;margin-bottom:10px">🔒</div>' +
+        '<div style="font-weight:800;font-size:16px;color:var(--text);margin-bottom:8px">Vous avez utilisé vos 5 questions découverte du mois</div>' +
+        '<div style="font-size:13px;color:var(--text3);margin-bottom:16px">Prochaines questions disponibles le ' + quota.nextReset + '. Pour continuer dès maintenant, passez à l\'abonnement.</div>' +
+        '<button onclick="siteSubscribe(&quot;monthly&quot;)" class="sub-btn" style="margin-bottom:8px">Débloquer tout — 9,99€/mois →</button>' +
+        '<button onclick="siteSubscribe(&quot;annual&quot;)" class="sub-cancel">89€/an (2 mois offerts)</button>' +
+        '</div>';
+      return;
+    }
+    // Afficher un compteur en haut
+    var counter = document.getElementById('quiz-counter');
+    if (!counter) {
+      counter = document.createElement('div');
+      counter.id = 'quiz-counter';
+      counter.style.cssText = 'background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fbbf24;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400e;font-weight:700;display:flex;align-items:center;gap:8px';
+      zone.parentNode.insertBefore(counter, zone);
+    }
+    counter.innerHTML = '⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci · <span style="font-weight:400;opacity:.85">' + (5 - quota.used - 1) + ' restante' + (5 - quota.used - 1 > 1 ? 's' : '') + ' après celle-ci</span>';
+  } else {
+    // Abonné — masquer le compteur s'il existe
+    var oldCounter = document.getElementById('quiz-counter');
+    if (oldCounter) oldCounter.remove();
   }
   
   // Afficher le module actif de la semaine
@@ -4498,6 +4718,13 @@ function renderQuiz() {
 function answerQuiz(idx) {
   if (window._quizAnswered) return;
   window._quizAnswered = true;
+
+  // Incrémenter le quota gratuit si compte gratuit
+  var session = siteSession.get();
+  if (session && session.email && !session.subscribed) {
+    incrementFreeQuizQuota();
+  }
+
   var q = QUIZZES[_quizIdx];
   var opts = document.querySelectorAll('#quiz-opts button');
   for (var i = 0; i < opts.length; i++) {
@@ -4591,20 +4818,94 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
-  <!-- Bouton flottant Despy -->
-  <div id="despy-fab" style="position:fixed;bottom:28px;right:24px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-    <div id="fab-menu" style="display:none;flex-direction:column;gap:8px;align-items:flex-end">
-      <button onclick="toggleFab();showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">💬 Conseiller IA</button>
-      <button onclick="toggleFab();showSOS()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border:none;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;color:#dc2626;white-space:nowrap">🚨 SOS Urgence</button>
-      <a href="https://wa.me/33689148395" target="_blank" onclick="toggleFab()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);font-size:13px;font-weight:700;color:#25D366;text-decoration:none;white-space:nowrap">📱 WhatsApp</a>
+  <!-- Bouton flottant Despy — Style Apple/Stripe -->
+  <style>
+    #despy-fab{position:fixed;bottom:24px;right:20px;z-index:999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:inherit}
+    #fab-menu{display:none;flex-direction:column;gap:6px;align-items:stretch;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:6px;box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 8px rgba(0,0,0,.06);min-width:220px;animation:fabSlide .25s cubic-bezier(.16,1,.3,1)}
+    @keyframes fabSlide{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .fab-item{display:flex;align-items:center;gap:12px;padding:11px 14px;background:transparent;border:none;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;text-align:left;width:100%;transition:background .15s ease;-webkit-tap-highlight-color:transparent}
+    .fab-item:hover,.fab-item:active{background:var(--bg2)}
+    .fab-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg2)}
+    .fab-item-icon svg{width:16px;height:16px}
+    .fab-item-text{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+    .fab-item-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.2}
+    .fab-item-sub{font-size:11px;font-weight:400;color:var(--text3);line-height:1.2}
+    .fab-item-chevron{color:var(--text3);flex-shrink:0;opacity:.5;transition:opacity .15s,transform .15s}
+    .fab-item:hover .fab-item-chevron{opacity:1;transform:translateX(2px)}
+    #fab-toggle{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(45,91,255,.4),0 2px 6px rgba(45,91,255,.2);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+    #fab-toggle:hover{transform:scale(1.05)}
+    #fab-toggle:active{transform:scale(.95)}
+    #fab-toggle.fab-open{transform:rotate(45deg)}
+    #fab-toggle svg{transition:opacity .2s}
+    #fab-toggle.fab-open svg{opacity:0}
+    #fab-toggle.fab-open::after{content:'';position:absolute;width:18px;height:2px;background:#fff;border-radius:2px}
+    #fab-toggle.fab-open::before{content:'';position:absolute;width:18px;height:2px;background:#fff;border-radius:2px;transform:rotate(90deg)}
+  </style>
+
+  <div id="despy-fab">
+    <div id="fab-menu">
+
+      <button class="fab-item" onclick="toggleFab();showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">
+        <div class="fab-item-icon" style="background:#eff6ff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <div class="fab-item-text">
+          <span class="fab-item-title">Conseiller Despy</span>
+          <span class="fab-item-sub">Posez votre question</span>
+        </div>
+        <svg class="fab-item-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <button class="fab-item" onclick="toggleFab();showSOS()">
+        <div class="fab-item-icon" style="background:#fef2f2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div class="fab-item-text">
+          <span class="fab-item-title" style="color:#dc2626">SOS Urgence</span>
+          <span class="fab-item-sub">Plan d'action immédiat</span>
+        </div>
+        <svg class="fab-item-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <a class="fab-item" href="https://wa.me/33689148395?text=Bonjour%20Despy%2C%20j%27ai%20une%20question" target="_blank" rel="noopener" onclick="toggleFab()">
+        <div class="fab-item-icon" style="background:#f0fdf4">
+          <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div class="fab-item-text">
+          <span class="fab-item-title">WhatsApp</span>
+          <span class="fab-item-sub">Réponse rapide</span>
+        </div>
+        <svg class="fab-item-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+
     </div>
-    <button onclick="toggleFab()" title="Aide Despy" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(45,91,255,.5);position:relative">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+
+    <button id="fab-toggle" onclick="toggleFab()" aria-label="Ouvrir le menu d'aide Despy">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
     </button>
   </div>
+
   <script>
-  function toggleFab(){var m=document.getElementById('fab-menu');if(!m)return;m.style.display=m.style.display==='flex'?'none':'flex';}
-  document.addEventListener('DOMContentLoaded',function(){document.addEventListener('click',function(e){var f=document.getElementById('despy-fab');if(f&&!f.contains(e.target)){var m=document.getElementById('fab-menu');if(m)m.style.display='none';}});});
+  function toggleFab(){
+    var m=document.getElementById('fab-menu');
+    var t=document.getElementById('fab-toggle');
+    if(!m||!t)return;
+    var isOpen = m.style.display==='flex';
+    m.style.display = isOpen ? 'none' : 'flex';
+    if (isOpen) { t.classList.remove('fab-open'); }
+    else { t.classList.add('fab-open'); }
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    document.addEventListener('click',function(e){
+      var f=document.getElementById('despy-fab');
+      if(f&&!f.contains(e.target)){
+        var m=document.getElementById('fab-menu');
+        var t=document.getElementById('fab-toggle');
+        if(m){m.style.display='none';}
+        if(t){t.classList.remove('fab-open');}
+      }
+    });
+  });
   </script>
 
 </body>
