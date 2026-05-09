@@ -2141,18 +2141,13 @@ function siteLogin() {
   var email = (emailEl.value || '').trim().toLowerCase();
   var pwd = pwdEl ? (pwdEl.value || '').trim() : '';
 
-  if (!pwd || pwd.length < 8) {
-      errDiv.textContent = 'Mot de passe trop court (8 caractères minimum)';
-      errDiv.style.display = 'block';
-      return;
-    }
-    if (!email || !email.includes('@')) {
-    alert('Veuillez saisir un email valide');
+  if (!email || !email.includes('@')) {
+    alert('Veuillez saisir un email valide.');
     emailEl.focus();
     return;
   }
   if (!pwd) {
-    alert('Veuillez saisir votre mot de passe');
+    alert('Veuillez saisir votre mot de passe.');
     if (pwdEl) pwdEl.focus();
     return;
   }
@@ -2162,7 +2157,7 @@ function siteLogin() {
   try { stored = JSON.parse(localStorage.getItem('despy_account_' + email) || 'null'); } catch(e) {}
 
   if (!stored) {
-    alert('Aucun compte trouvé avec cet email.\n\nCréez votre compte gratuit depuis la page d\'accueil.');
+    alert('Aucun compte trouvé avec cet email.\n\nCréez votre compte gratuit en cliquant sur "Compte gratuit" dans le menu.');
     return;
   }
 
@@ -2172,16 +2167,19 @@ function siteLogin() {
     return;
   }
 
+  // Connexion réussie
   siteSession.set({
     email: email,
     name: stored.name || email.split('@')[0],
     prenom: stored.prenom || '',
     nom: stored.nom || '',
-    telephone: stored.telephone || '',
+    telephone: stored.telephone || stored.tel || '',
     subscribed: stored.subscribed || false,
-    planType: stored.planType || null
+    plan: stored.plan || 'free',
+    created_at: stored.created_at
   });
   showPage('client');
+  updateNavForSession();
 }
 
 
@@ -2766,7 +2764,7 @@ function showLoginModal() {
   modal.id = 'login-modal';
   var box = document.createElement('div');
   box.className = 'sub-modal';
-  box.style.maxWidth = '400px';
+  box.style.cssText = 'max-width:400px;max-height:90vh;overflow-y:auto';
 
   var title = document.createElement('div');
   title.className = 'sub-modal-title';
@@ -2774,41 +2772,60 @@ function showLoginModal() {
 
   var sub = document.createElement('div');
   sub.className = 'sub-modal-sub';
-  sub.textContent = 'Entrez votre email pour retrouver votre compte';
+  sub.textContent = 'Entrez votre email et mot de passe';
 
+  // Email
   var emailWrap = document.createElement('div');
   emailWrap.className = 'field';
   var emailLbl = document.createElement('label');
-  emailLbl.textContent = 'Votre email *';
+  emailLbl.textContent = 'Email *';
   var emailInp = document.createElement('input');
   emailInp.type = 'email'; emailInp.id = 'login-email';
   emailInp.placeholder = 'votre@email.fr';
   emailInp.autocomplete = 'email';
   emailWrap.appendChild(emailLbl); emailWrap.appendChild(emailInp);
 
+  // Mot de passe
+  var pwdWrap = document.createElement('div');
+  pwdWrap.className = 'field';
+  pwdWrap.style.marginTop = '12px';
+  var pwdLbl = document.createElement('label');
+  pwdLbl.textContent = 'Mot de passe *';
+  var pwdInp = document.createElement('input');
+  pwdInp.type = 'password'; pwdInp.id = 'login-password';
+  pwdInp.placeholder = 'Votre mot de passe';
+  pwdInp.autocomplete = 'current-password';
+  pwdWrap.appendChild(pwdLbl); pwdWrap.appendChild(pwdInp);
+
   var errDiv = document.createElement('div');
   errDiv.id = 'login-err'; errDiv.className = 'sub-error';
 
   var btn = document.createElement('button');
   btn.className = 'sub-btn'; btn.id = 'login-btn';
-  btn.textContent = 'Accéder à mon espace →';
-  btn.onclick = doLogin;
+  btn.textContent = 'Se connecter →';
+  btn.onclick = function() { siteLogin(); };
 
   var backBtn = document.createElement('button');
   backBtn.className = 'sub-cancel';
-  backBtn.textContent = 'Créer un compte gratuit';
+  backBtn.textContent = 'Pas de compte ? Créer un compte gratuit';
   backBtn.onclick = function(){ modal.remove(); showFreeSignup(); };
 
   var trust = document.createElement('div');
   trust.className = 'sub-trust';
-  trust.textContent = 'Aucun mot de passe · Accès instantané';
+  trust.textContent = '🔒 Connexion sécurisée';
 
   box.appendChild(title); box.appendChild(sub);
-  box.appendChild(emailWrap); box.appendChild(errDiv);
+  box.appendChild(emailWrap); box.appendChild(pwdWrap);
+  box.appendChild(errDiv);
   box.appendChild(btn); box.appendChild(backBtn); box.appendChild(trust);
   modal.appendChild(box);
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
   document.body.appendChild(modal);
+
+  // Permettre Entrée pour valider
+  pwdInp.onkeypress = function(e){ if(e.key==='Enter') siteLogin(); };
+  emailInp.onkeypress = function(e){ if(e.key==='Enter') pwdInp.focus(); };
+
   setTimeout(function(){ emailInp.focus(); }, 100);
 }
 
@@ -3085,23 +3102,37 @@ async function checkDarkWebNow() {
 
 
 function switchTab(tabName) {
-  document.querySelectorAll('.cpanel').forEach(function(p){ p.style.display = 'none'; });
-  document.querySelectorAll('.ctab').forEach(function(b){
-    b.classList.remove('ctab-active');
+  // Masquer tous les panels (cpanel ET client-panel pour compatibilité)
+  document.querySelectorAll('.cpanel, .client-panel').forEach(function(p){ p.style.display = 'none'; });
+  // Cacher aussi par id direct au cas où
+  ['dashboard','protection','formation','compte'].forEach(function(t){
+    var p = document.getElementById('panel-' + t);
+    if (p) p.style.display = 'none';
+  });
+
+  // Reset tous les boutons d'onglets (client-tab ET ctab)
+  document.querySelectorAll('.client-tab, .ctab').forEach(function(b){
     b.style.background = 'transparent';
     b.style.color = 'var(--text2)';
+    b.classList.remove('ctab-active');
   });
+
+  // Afficher le panel cible
   var panel = document.getElementById('panel-' + tabName);
   if (panel) panel.style.display = 'block';
-  var btn = document.querySelector('[data-tab="' + tabName + '"]');
+
+  // Activer le bouton (par id tab-X)
+  var btn = document.getElementById('tab-' + tabName);
   if (btn) {
-    btn.classList.add('ctab-active');
     btn.style.background = 'var(--blue)';
     btn.style.color = '#fff';
+    btn.classList.add('ctab-active');
   }
+
   // Charger le contenu spécifique
-  if (tabName === 'dashboard') { try { renderJournal(); } catch(e) {} }
-  if (tabName === 'compte') { fillCompteInfo(); }
+  if (tabName === 'dashboard') { try { renderJournal(); } catch(e){} try { refreshSecurityScore(); } catch(e){} }
+  if (tabName === 'compte') { try { fillCompteInfo(); } catch(e){} }
+  if (tabName === 'formation') { try { renderQuiz(); } catch(e){} }
 }
 
 function fillCompteInfo() {
@@ -3884,67 +3915,70 @@ async function createFreeAccount() {
   var prenom = (document.getElementById('free-prenom')||{}).value||'';
   var email  = (document.getElementById('free-email')||{}).value||'';
   var tel    = (document.getElementById('free-tel')||{}).value||'';
+  var pwd    = (document.getElementById('free-password')||{}).value||'';
   var dob    = (document.getElementById('free-dob')||{}).value||'';
   var cgu    = document.getElementById('free-cgu');
   var errEl  = document.getElementById('free-err');
   var btn    = document.getElementById('free-btn');
 
-  nom = nom.trim(); prenom = prenom.trim(); email = email.trim(); tel = tel.trim();
+  nom = nom.trim(); prenom = prenom.trim();
+  email = email.trim().toLowerCase();
+  tel = tel.trim();
+
+  function showErr(msg) {
+    if(errEl){ errEl.textContent = msg; errEl.style.display='block'; }
+  }
 
   // Validations
-  if (!nom || !prenom) {
-    if(errEl){ errEl.textContent='Veuillez entrer votre nom et prénom.'; errEl.style.display='block'; } return;
-  }
-  if (!email || !email.includes('@')) {
-    if(errEl){ errEl.textContent='Email invalide.'; errEl.style.display='block'; } return;
-  }
-  if (!tel || tel.replace(/\s/g,'').length < 10) {
-    if(errEl){ errEl.textContent='Numéro de téléphone invalide.'; errEl.style.display='block'; } return;
-  }
-  if (!dob) {
-    if(errEl){ errEl.textContent='Veuillez entrer votre date de naissance.'; errEl.style.display='block'; } return;
-  }
-  if (!cgu || !cgu.checked) {
-    if(errEl){ errEl.textContent='Veuillez accepter les conditions.'; errEl.style.display='block'; } return;
+  if (!nom || !prenom) { showErr('Veuillez entrer votre nom et prénom.'); return; }
+  if (!email || !email.includes('@')) { showErr('Email invalide.'); return; }
+  if (!pwd || pwd.length < 8) { showErr('Mot de passe : minimum 8 caractères.'); return; }
+  if (!tel || tel.replace(/\s/g,'').length < 10) { showErr('Numéro de téléphone invalide.'); return; }
+  if (!dob) { showErr('Veuillez entrer votre date de naissance.'); return; }
+  if (!cgu || !cgu.checked) { showErr('Veuillez accepter les conditions.'); return; }
+
+  // Vérifier si compte existe déjà
+  var existing = null;
+  try { existing = JSON.parse(localStorage.getItem('despy_account_' + email) || 'null'); } catch(e){}
+  if (existing) {
+    showErr('Un compte existe déjà avec cet email. Connectez-vous.');
+    return;
   }
 
   if(errEl) errEl.style.display='none';
   if(btn){ btn.textContent='Création...'; btn.disabled=true; }
 
   var fullName = prenom + ' ' + nom;
+  var account = {
+    email: email, name: fullName, prenom: prenom, nom: nom,
+    telephone: tel, tel: tel, password: pwd, dob: dob,
+    subscribed: false, plan: 'free',
+    created_at: new Date().toISOString()
+  };
 
-  // Sauvegarder en session persistante
-  try {
-    localStorage.setItem('despy_session', JSON.stringify({
-      email: email, name: fullName, prenom: prenom, nom: nom,
-      tel: tel, dob: dob, subscribed: false, plan: 'free',
-      createdAt: new Date().toISOString()
-    }));
-  } catch(e) {}
+  // 1. Stocker compte (avec password pour login futur)
+  try { localStorage.setItem('despy_account_' + email, JSON.stringify(account)); } catch(e){}
 
-  // Enregistrer dans Supabase
+  // 2. Créer la session
+  siteSession.set({
+    email: email, name: fullName, prenom: prenom, nom: nom,
+    telephone: tel, subscribed: false, plan: 'free',
+    created_at: account.created_at
+  });
+
+  // 3. Notifier Supabase (best effort, ne bloque pas)
   try {
-    await fetch('/.netlify/functions/register-free', {
+    fetch('/.netlify/functions/register-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, nom, prenom, tel, dob, name: fullName })
-    });
+      body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob })
+    }).catch(function(){});
   } catch(e) {}
 
-  // Fermer modal et afficher espace client
+  // 4. Fermer modal et afficher espace client
   var modal = document.getElementById('free-signup-modal');
   if(modal) modal.remove();
-
-  // Stocker le compte avec mot de passe pour login futur
-  try {
-    localStorage.setItem('despy_account_' + email, JSON.stringify({
-      email: email, name: fullName, prenom: prenom, nom: nom,
-      telephone: tel, password: pwd, subscribed: false, plan: 'free',
-      created_at: new Date().toISOString()
-    }));
-  } catch(e) {}
-  siteSession.set({ email, name: fullName, prenom, nom, telephone: tel, subscribed: false, plan: 'free' });
-  showClientArea();
+  showPage('client');
   updateNavForSession();
 }
 
@@ -4646,6 +4680,87 @@ function showChronoResult() {
 
   zone.innerHTML = resultHTML;
 }
+
+
+// ========================================
+// QUIZ MODAL — Ouvre le quiz dans une popup plein écran
+// ========================================
+function showQuizModal() {
+  // Vérifier la session
+  var session = siteSession.get();
+  if (!session || !session.email) {
+    alert('Connectez-vous ou créez un compte gratuit pour accéder au quiz.');
+    showFreeSignup();
+    return;
+  }
+
+  // Compte gratuit — vérifier le quota
+  if (!session.subscribed) {
+    var quota = getFreeQuizQuota();
+    if (quota.used >= 5) {
+      showQuizPaywall();
+      return;
+    }
+  }
+
+  // Créer le modal quiz
+  var existing = document.getElementById('quiz-modal-overlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'quiz-modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .25s;overflow-y:auto';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+
+  // Bouton fermer
+  var closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '×';
+  closeBtn.style.cssText = 'position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--bg2);border:none;font-size:22px;cursor:pointer;color:var(--text3);font-family:inherit;line-height:1;z-index:10';
+  closeBtn.onclick = function(){ overlay.remove(); };
+
+  // Header avec module
+  var header = document.createElement('div');
+  header.id = 'quiz-module-header';
+  header.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:14px;font-size:14px;color:var(--text2);margin-top:8px;margin-right:40px';
+
+  // Compteur (sera ajouté par renderQuiz si gratuit)
+  var counterPlace = document.createElement('div');
+  counterPlace.id = 'quiz-counter-placeholder';
+
+  // Zone du quiz
+  var zone = document.createElement('div');
+  zone.id = 'quiz-zone';
+
+  // Zone réponse explication (utilisée par answerQuiz)
+  var explZone = document.createElement('div');
+  explZone.id = 'quiz-expl';
+  explZone.style.cssText = 'margin-top:14px';
+
+  box.appendChild(closeBtn);
+  box.appendChild(header);
+  box.appendChild(counterPlace);
+  box.appendChild(zone);
+  box.appendChild(explZone);
+  overlay.appendChild(box);
+
+  // Fermer au clic sur fond
+  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+
+  document.body.appendChild(overlay);
+
+  // Initialiser et rendre le quiz
+  if (typeof QUIZZES === 'undefined' || !QUIZZES || !QUIZZES.length) {
+    try { QUIZZES = getCurrentModule().questions; } catch(e){}
+  }
+  if (typeof _quizIdx === 'undefined' || _quizIdx >= QUIZZES.length) {
+    window._quizIdx = 0;
+  }
+  window._quizAnswered = false;
+  renderQuiz();
+}
+
 
 function renderQuiz() {
   var zone = document.getElementById('quiz-zone');
