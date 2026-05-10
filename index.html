@@ -2700,9 +2700,7 @@ async function sendChat() {
 
   } catch(err) {
     removeTyping(typingId);
-    addMsg("conseiller", "Désolé, une erreur est survenue. Réessayez dans quelques instants.");
-  }
-}ésolé, une erreur est survenue. Réessayez dans quelques instants ou écrivez-nous à contact.despy@gmail.com");
+    addMsg("conseiller", "Désolé, une erreur est survenue. Réessayez dans quelques instants ou écrivez-nous à contact.despy@gmail.com");
   }
 }
 
@@ -5137,7 +5135,7 @@ async function checkHIBP() {
       result.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">' +
         '<div style="font-size:28px;margin-bottom:6px">✅</div>' +
         '<div style="font-weight:700;color:#16a34a;font-size:15px">Bonne nouvelle !</div>' +
-        '<div style="font-size:13px;color:#555;margin-top:4px">Votre email n'a été trouvé dans aucune fuite de données connue.</div>' +
+        '<div style="font-size:13px;color:#555;margin-top:4px">Votre email n\'a été trouvé dans aucune fuite de données connue.</div>' +
         '<button onclick="showFreeSignup()" style="margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
         '</div>';
     } else {
@@ -5148,7 +5146,7 @@ async function checkHIBP() {
         '<div style="font-size:22px;margin-bottom:6px">🚨</div>' +
         '<div style="font-weight:700;color:#dc2626;font-size:15px">' + data.message + '</div>' +
         previewHtml +
-        '<div style="font-size:12px;color:#555;margin-top:8px">Créez votre compte Despy pour voir toutes les fuites en détail et recevoir une alerte dès qu'une nouvelle apparaît.</div>' +
+        '<div style="font-size:12px;color:#555;margin-top:8px">Créez votre compte Despy pour voir toutes les fuites en détail et recevoir une alerte dès qu\'une nouvelle apparaît.</div>' +
         '<button onclick="showFreeSignup()" style="margin-top:12px;width:100%;padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Voir mes fuites en détail →</button>' +
         '</div>';
     }
@@ -5234,10 +5232,10 @@ async function startDefiChrono() {
       '<div style="font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px;line-height:1.5">' + q.q + '</div>' +
       '<div style="display:flex;flex-direction:column;gap:8px">' +
         q.choices.map(function(c, i){
-          return '<button onclick="window._defiAnswer(' + i + ')" style="padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.background='#eef1ff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg2)'">' + c + '</button>';
+          return '<button onclick="window._defiAnswer(' + i + ')" style="padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);transition:all .2s" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.background=\'#eef1ff\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--bg2)\'">' + c + '</button>';
         }).join('') +
       '</div>' +
-      '<button onclick="document.getElementById('defi-overlay').remove()" style="margin-top:14px;width:100%;padding:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer">Abandonner</button>' +
+      '<button onclick="document.getElementById(\'defi-overlay\').remove()" style="margin-top:14px;width:100%;padding:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer">Abandonner</button>' +
     '</div>';
 
     if (!document.getElementById('defi-overlay')) document.body.appendChild(overlay);
@@ -5270,7 +5268,7 @@ async function submitDefi(email) {
       '<div style="font-weight:900;font-size:22px;color:var(--text);margin-bottom:6px">' + result.score + '/' + result.total + '</div>' +
       '<div style="font-size:14px;color:var(--text2);margin-bottom:8px">' + result.message + '</div>' +
       '<div style="background:var(--blue-light);border-radius:10px;padding:10px;font-size:13px;color:var(--blue);font-weight:700;margin-bottom:16px">+' + result.xp + ' XP gagnés !</div>' +
-      '<button onclick="document.getElementById('defi-overlay').remove();loadSecurityScore(siteSession.get()&&siteSession.get().email)" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit">Voir mon score →</button>' +
+      '<button onclick="document.getElementById(\'defi-overlay\').remove();loadSecurityScore(siteSession.get()&&siteSession.get().email)" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit">Voir mon score →</button>' +
     '</div>';
   } catch(e) {
     if (overlay) overlay.remove();
