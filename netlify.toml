@@ -29,26 +29,23 @@
 
 # ── Crons automatiques ──
 
-# Rapport hebdomadaire — chaque lundi à 9h
 [functions.weekly-report]
   schedule = "0 9 * * 1"
 
-# Rapport mensuel personnalisé — 1er du mois à 9h
 [functions.monthly-report]
   schedule = "0 9 1 * *"
 
-# Alertes cybermenaces — tous les jours à 8h
 [functions.cyber-alerts]
   schedule = "0 8 * * *"
 
-# Relance leads J+3 — tous les jours à 10h
 [functions.relance-leads]
   schedule = "0 10 * * *"
 
-# Vérification HIBP dark web — 1er du mois à 7h
+[functions.onboarding-sequence]
+  schedule = "0 11 * * *"
+
 [functions.hibp-check]
   schedule = "0 7 1 * *"
 
-# Bilan trimestriel — 1er jan/avr/juil/oct à 10h
 [functions.quarterly-report]
   schedule = "0 10 1 1,4,7,10 *"
