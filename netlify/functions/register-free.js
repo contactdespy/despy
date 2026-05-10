@@ -1,10 +1,17 @@
 // ════════════════════════════════════════════
 // DESPY — Inscription compte gratuit
-// Crée un compte avec email + password (hashé)
+// Crée un compte avec email + password (scrypt + sel)
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+
+// Hachage sécurisé avec sel (scrypt)
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `scrypt$${salt}$${hash}`;
+}
 
 exports.handler = async (event) => {
   const headers = {
@@ -12,6 +19,7 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Origin': '*'
   };
 
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
@@ -23,8 +31,8 @@ exports.handler = async (event) => {
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email invalide' }) };
     }
-    if (!password || password.length < 4) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Mot de passe minimum 4 caractères' }) };
+    if (!password || password.length < 8) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Mot de passe minimum 8 caractères' }) };
     }
     if (!prenom || !nom) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Nom et prénom requis' }) };
@@ -50,17 +58,15 @@ exports.handler = async (event) => {
       };
     }
 
-    // Hash du password
-    const password_hash = crypto.createHash('sha256').update(password).digest('hex');
+    const password_hash = hashPassword(password);
 
-    // Créer le compte
     const { data: newClient, error } = await supabase
       .from('clients')
       .insert([{
         email: email.toLowerCase().trim(),
-        password_hash: password_hash,
-        prenom: prenom,
-        nom: nom,
+        password_hash,
+        prenom,
+        nom,
         name: prenom + ' ' + nom,
         telephone: telephone || null,
         date_naissance: dob || null,
@@ -82,13 +88,16 @@ exports.handler = async (event) => {
 
     // Envoyer email de bienvenue
     try {
-      await fetch(`${process.env.URL || 'https://despy.fr'}/.netlify/functions/send-email`, {
+      const baseUrl = process.env.URL || 'https://despy.fr';
+      await fetch(`${baseUrl}/.netlify/functions/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_SECRET || ''
+        },
         body: JSON.stringify({
-          to: email,
-          template: 'welcome_free',
-          data: { prenom: prenom }
+          type: 'welcome_free',
+          data: { email, prenom, name: prenom + ' ' + nom }
         })
       });
     } catch (e) {
@@ -100,10 +109,10 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: true,
-        email: email,
+        email,
         name: prenom + ' ' + nom,
-        prenom: prenom,
-        nom: nom,
+        prenom,
+        nom,
         plan: 'free'
       })
     };
