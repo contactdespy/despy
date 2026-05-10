@@ -1,78 +1,78 @@
 // ════════════════════════════════════════════
-// DESPY — Rapport hebdomadaire automatique
-// Netlify Function : /.netlify/functions/weekly-report
-// Déclenché chaque lundi à 9h par Netlify Scheduled Functions
+// DESPY — Rapport hebdomadaire
+// Cron : chaque lundi à 9h → 0 9 * * 1
 // ════════════════════════════════════════════
-// Dans netlify.toml, ajouter :
-// [functions.weekly-report]
-//   schedule = "0 9 * * 1"   ← chaque lundi à 9h
 
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-);
-
-// Menaces de la semaine — à mettre à jour manuellement ou automatiser
-const THREATS_OF_WEEK = [
-  "Arnaque au faux conseiller bancaire en hausse — ils se font passer pour le Crédit Agricole et demandent un virement 'de sécurité'. Ne raccrochez pas poliment, raccrochez directement.",
-  "Faux SMS de La Poste — lien de suivi de colis qui vole vos données bancaires. Passez votre curseur sur le lien avant de cliquer.",
-  "Phishing Netflix en hausse — email 'Votre compte va être suspendu' avec fausse page de paiement. Netflix ne demande jamais ça par email.",
-  "Arnaque CPF — démarchage téléphonique proposant une formation gratuite. Votre CPF peut être vidé sans votre accord explicite.",
-  "Faux support Microsoft — pop-up qui dit que votre PC est infecté. Fermez simplement la fenêtre, ne rappelez pas le numéro affiché.",
+const WEEKLY_TIPS = [
+  "Vérifiez les SMS suspects : aucun organisme officiel (impôts, CAF, Ameli) ne vous demande de cliquer sur un lien pour saisir vos identifiants.",
+  "Activez la double authentification sur votre email — c'est la mesure la plus efficace contre le piratage.",
+  "Ne partagez jamais votre mot de passe par téléphone, même si l'interlocuteur prétend être votre banque.",
+  "Mettez à jour vos applications régulièrement — les mises à jour corrigent souvent des failles de sécurité.",
+  "Vérifiez l'URL avant de saisir votre mot de passe : assurez-vous d'être sur le bon site (cadenas + adresse exacte)."
 ];
 
 exports.handler = async (event) => {
-  console.log('🔄 Démarrage rapport hebdomadaire...');
+  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    // Récupérer tous les abonnés actifs
-    const { data: subscribers, error } = await supabase
+    const { data: clients } = await supabase
       .from('clients')
-      .select('email, name, xp, level, security_score, badges, streak, subscribed')
+      .select('email, name, prenom')
       .eq('subscribed', true);
 
-    if (error) throw error;
-    if (!subscribers || subscribers.length === 0) {
-      console.log('Aucun abonné actif trouvé');
+    if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ sent: 0 }) };
     }
 
-    const threat = THREATS_OF_WEEK[Math.floor(Math.random() * THREATS_OF_WEEK.length)];
-    const baseUrl = process.env.URL || 'https://despy.fr';
+    const tip = WEEKLY_TIPS[new Date().getDay() % WEEKLY_TIPS.length];
+    const weekNum = Math.ceil(new Date().getDate() / 7);
     let sent = 0;
-    let errors = 0;
 
-    // Envoyer les rapports en série (Resend limite à 10/sec)
-    for (const sub of subscribers) {
+    for (const client of clients) {
+      const prenom = client.prenom || client.name?.split(' ')[0] || 'cher membre';
       try {
-        await fetch(`${baseUrl}/.netlify/functions/send-email`, {
+        await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_SECRET || ''
+          },
           body: JSON.stringify({
-            type: 'weekly',
+            type: 'custom',
             data: {
-              name:    sub.name || 'vous',
-              email:   sub.email,
-              score:   sub.security_score || 25,
-              streak:  sub.streak || 0,
-              badges:  (sub.badges || []).length,
-              topThreat: threat,
+              email: client.email,
+              subject: `🛡️ Votre conseil Despy de la semaine`,
+              html: `<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+                <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:28px;color:#fff;text-align:center">
+                  <div style="font-size:11px;font-weight:700;opacity:.7;letter-spacing:2px">DESPY — CONSEIL HEBDOMADAIRE</div>
+                  <div style="font-size:20px;font-weight:900;margin-top:8px">Semaine ${weekNum}</div>
+                </div>
+                <div style="padding:28px">
+                  <p style="font-size:16px;color:#111">Bonjour <strong>${prenom}</strong> 👋</p>
+                  <div style="background:#f0f3ff;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:18px;margin:20px 0">
+                    <p style="font-weight:700;color:#2D5BFF;margin:0 0 8px;font-size:14px">💡 Conseil de la semaine</p>
+                    <p style="font-size:14px;color:#333;line-height:1.7;margin:0">${tip}</p>
+                  </div>
+                  <div style="text-align:center;margin:24px 0">
+                    <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">
+                      Poser une question au Conseiller →
+                    </a>
+                  </div>
+                  <p style="font-size:11px;color:#aaa;text-align:center">Despy · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                </div>
+              </div>`
             }
           })
         });
         sent++;
-        // Petit délai pour respecter les limites d'API
-        await new Promise(r => setTimeout(r, 120));
-      } catch (err) {
-        console.error(`Erreur email ${sub.email}:`, err.message);
-        errors++;
-      }
+      } catch (e) { console.error('Email error:', client.email, e); }
+      await new Promise(r => setTimeout(r, 200));
     }
 
-    console.log(`✅ Rapports envoyés: ${sent}/${subscribers.length} (${errors} erreurs)`);
-    return { statusCode: 200, body: JSON.stringify({ sent, errors, total: subscribers.length }) };
+    console.log(`Rapports hebdomadaires envoyés: ${sent}`);
+    return { statusCode: 200, body: JSON.stringify({ sent }) };
 
   } catch (err) {
     console.error('Weekly report error:', err);
