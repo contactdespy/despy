@@ -4,6 +4,19 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
+
+// Vérifie le mot de passe — compatible scrypt (nouveau) et SHA-256 (legacy)
+function verifyPassword(password, stored) {
+  if (!stored) return false;
+  if (stored.startsWith('scrypt$')) {
+    const [, salt, hash] = stored.split('$');
+    const derived = crypto.scryptSync(password, salt, 64).toString('hex');
+    return derived === hash;
+  }
+  // Fallback legacy SHA-256 sans sel
+  return crypto.createHash('sha256').update(password).digest('hex') === stored;
+}
 
 exports.handler = async (event) => {
   const headers = {
@@ -11,6 +24,7 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Origin': '*'
   };
 
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
@@ -27,7 +41,6 @@ exports.handler = async (event) => {
       process.env.SUPABASE_SERVICE_KEY
     );
 
-    // Chercher le compte
     const { data: client, error } = await supabase
       .from('clients')
       .select('email, name, prenom, nom, telephone, plan, subscribed, password_hash, created_at')
@@ -39,31 +52,15 @@ exports.handler = async (event) => {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erreur serveur' }) };
     }
 
-    // Compte n'existe pas
-    if (!client) {
+    // Réponse identique que le compte existe ou non (anti-énumération)
+    if (!client || (password && !verifyPassword(password, client.password_hash))) {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ exists: false })
+        body: JSON.stringify({ exists: false, error: 'Email ou mot de passe incorrect' })
       };
     }
 
-    // Si password fourni → vérifier
-    if (password && client.password_hash) {
-      // Hash simple (à remplacer par bcrypt en prod si besoin)
-      const crypto = require('crypto');
-      const hash = crypto.createHash('sha256').update(password).digest('hex');
-
-      if (hash !== client.password_hash) {
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ exists: true, error: 'Mot de passe incorrect' })
-        };
-      }
-    }
-
-    // Retourner les infos du compte
     return {
       statusCode: 200,
       headers,
