@@ -158,7 +158,10 @@ exports.handler = async (event) => {
         const html = buildQuarterlyHTML(prenom, client.email, quarter, year);
         await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_SECRET || ''
+          },
           body: JSON.stringify({
             type: 'custom',
             data: {
