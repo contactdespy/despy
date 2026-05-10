@@ -81,7 +81,10 @@ async function sendAlertToSubscribers(supabase, alert) {
     try {
       await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_SECRET || ''
+        },
         body: JSON.stringify({
           type: 'cyber_alert',
           data: {
