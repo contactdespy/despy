@@ -827,6 +827,65 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
+<!-- ── ANNUAIRE INVERSÉ D'ARNAQUEURS ── -->
+<section id="annuaire" style="background:#fff;padding:4rem 0;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag" style="background:#fef3c7;color:#92400e;border-color:#fde68a">📞 Annuaire communautaire</div>
+      <h2 class="sh2">Ce numéro qui vous appelle…<br><span>est-il signalé ?</span></h2>
+      <p class="sdesc">Tapez un numéro, on vous dit s'il a été signalé par d'autres membres Despy. Et signalez en 5 secondes les arnaqueurs que vous croisez.</p>
+    </div>
+    <div class="reveal" style="max-width:580px;margin:0 auto">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input type="tel" id="phone-input" placeholder="06 XX XX XX XX" maxlength="20" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')lookupPhone()">
+          <button onclick="lookupPhone()" id="phone-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Vérifier</button>
+        </div>
+        <div id="phone-result" style="display:none"></div>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">Base communautaire · Aucun numéro vendu · Anonymisé</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VÉRIFICATEUR DE SITE MARCHAND ── -->
+<section id="site-checker" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag" style="background:#eff6ff;color:#1e40af;border-color:#bfdbfe">🛒 Avant d'acheter</div>
+      <h2 class="sh2">Ce site marchand…<br><span>est-il fiable ?</span></h2>
+      <p class="sdesc">Avant de payer, vérifiez l'âge du domaine, le certificat SSL et les signaux d'arnaque. Gratuit et instantané.</p>
+    </div>
+    <div class="reveal" style="max-width:580px;margin:0 auto">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <input type="url" id="site-input" placeholder="https://exemple-boutique.com" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkSite()">
+          <button onclick="checkSite()" id="site-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Analyser</button>
+        </div>
+        <div id="site-result" style="display:none"></div>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">Vérifications RDAP officielles + analyse IA · Aucune donnée conservée</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ALERTES PUSH NATIONALES ── -->
+<section id="push-alerts" style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:4rem 0;color:#fff">
+  <div class="wrap">
+    <div class="text-center reveal" style="max-width:620px;margin:0 auto">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">🔔 Alertes en temps réel</div>
+      <h2 style="font-size:2rem;font-weight:900;letter-spacing:-1px;margin:0 0 12px;color:#fff">Soyez prévenu en premier</h2>
+      <p style="font-size:15px;color:rgba(255,255,255,.8);line-height:1.7;margin:0 0 24px">Recevez une notification dès qu'une nouvelle vague d'arnaque frappe la France : SMS, faux livreurs, faux supports, fraudes en cours. Sources officielles + détection automatique sur la base communautaire.</p>
+      <div id="push-status" style="margin-bottom:18px"></div>
+      <button onclick="subscribePush()" id="push-btn" style="padding:14px 28px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(0,0,0,.2);display:inline-flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Activer les alertes nationales
+      </button>
+      <p style="font-size:11px;color:rgba(255,255,255,.5);margin:14px 0 0">Gratuit · Désactivable à tout moment depuis votre navigateur · 1 à 3 alertes/semaine maximum</p>
+    </div>
+  </div>
+</section>
+
 <!-- ── CONSEILLER IA ── -->
 <section id="conseiller-ia" style="background:var(--bg2)">
   <div class="wrap">
@@ -5544,6 +5603,243 @@ function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, function(c){
     return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
   });
+}
+
+// ── Annuaire inversé ──
+var PHONE_CATEGORIES = [
+  { key: 'faux_microsoft', label: 'Faux support Microsoft / Apple' },
+  { key: 'faux_cpf',       label: 'Arnaque CPF / formation' },
+  { key: 'faux_ameli',     label: 'Faux Ameli / Sécu' },
+  { key: 'faux_caf',       label: 'Faux CAF' },
+  { key: 'faux_impots',    label: 'Faux impôts / DGFiP' },
+  { key: 'faux_banque',    label: 'Usurpation banque' },
+  { key: 'faux_livraison', label: 'Faux colis / livraison' },
+  { key: 'vente_forcee',   label: 'Démarchage / vente forcée' },
+  { key: 'spam',           label: 'Spam / appels masqués' },
+  { key: 'autre',          label: 'Autre arnaque' }
+];
+
+async function lookupPhone() {
+  var input = document.getElementById('phone-input');
+  var result = document.getElementById('phone-result');
+  var btn = document.getElementById('phone-btn');
+  if (!input || !result) return;
+  var phone = (input.value || '').trim();
+  if (!phone) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    var res = await fetch('/.netlify/functions/phone-lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone })
+    });
+    var data = await res.json();
+    result.style.display = 'block';
+    if (!res.ok) {
+      result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:13px">' + (data.error || 'Erreur') + '</div>';
+      return;
+    }
+    var verdictMap = {
+      unknown:    { color: '#6b7280', bg: '#f9fafb', border: '#e5e7eb', icon: '🔍', label: 'Inconnu' },
+      suspicious: { color: '#d97706', bg: '#fef3c7', border: '#fde68a', icon: '⚠️', label: 'Suspect' },
+      scam:       { color: '#dc2626', bg: '#fef2f2', border: '#fca5a5', icon: '🚨', label: 'Arnaqueur connu' }
+    };
+    var v = verdictMap[data.verdict] || verdictMap.unknown;
+    var subtitle = data.total === 0
+      ? 'Aucun signalement pour ce numéro dans notre base.'
+      : data.total + ' signalement' + (data.total > 1 ? 's' : '') + (data.top_category ? ' · principalement « ' + escapeHtml(data.top_category) + ' »' : '');
+    var catsHtml = (data.categories || []).slice(0, 5).map(function(c){
+      return '<div style="display:flex;justify-content:space-between;padding:8px 12px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;font-size:13px"><span style="color:#444">' + escapeHtml(c.label) + '</span><strong style="color:#dc2626">×' + c.count + '</strong></div>';
+    }).join('');
+    var commentsHtml = (data.recent_comments || []).slice(0, 3).map(function(c){
+      return '<div style="background:#fff;border-left:3px solid #dc2626;padding:8px 12px;font-size:12px;color:#555;font-style:italic;margin-top:4px">« ' + escapeHtml(c.comment) + ' »</div>';
+    }).join('');
+
+    result.innerHTML =
+      '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
+        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">' +
+          '<div style="font-size:36px">' + v.icon + '</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:' + v.color + ';font-weight:800">' + v.label + '</div>' +
+            '<div style="font-size:18px;font-weight:800;color:#111;margin:2px 0;font-family:monospace">' + escapeHtml(data.phone) + '</div>' +
+            '<div style="font-size:12px;color:#555">' + subtitle + '</div>' +
+          '</div>' +
+        '</div>' +
+        (catsHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">' + catsHtml + '</div>' : '') +
+        commentsHtml +
+        '<div style="margin-top:14px;padding-top:14px;border-top:1px solid ' + v.border + ';display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button onclick="openPhoneReport(\'' + escapeHtml(data.phone) + '\')" style="flex:1;min-width:140px;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">🚩 Signaler ce numéro</button>' +
+          '<a href="tel:33700" style="flex:1;min-width:140px;padding:11px;background:#1f2937;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;text-align:center;font-family:inherit">Appeler 33700</a>' +
+        '</div>' +
+      '</div>';
+  } catch(e) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:13px">Erreur réseau.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Vérifier';
+  }
+}
+
+function openPhoneReport(phone) {
+  var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+  var modal = document.createElement('div');
+  modal.id = 'phone-report-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px';
+  var optsHtml = PHONE_CATEGORIES.map(function(c){ return '<option value="' + c.key + '">' + c.label + '</option>'; }).join('');
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:24px;max-width:440px;width:100%;max-height:90vh;overflow:auto">' +
+      '<div style="font-size:18px;font-weight:900;color:#111;margin-bottom:6px">🚩 Signaler ce numéro</div>' +
+      '<div style="font-size:13px;color:#555;margin-bottom:16px">Numéro : <strong style="font-family:monospace">' + escapeHtml(phone) + '</strong></div>' +
+      '<label style="font-size:12px;font-weight:700;color:#444;display:block;margin-bottom:6px">Type d\'arnaque *</label>' +
+      '<select id="report-cat" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;margin-bottom:14px">' + optsHtml + '</select>' +
+      '<label style="font-size:12px;font-weight:700;color:#444;display:block;margin-bottom:6px">Commentaire (optionnel, max 240 car)</label>' +
+      '<textarea id="report-comment" rows="3" maxlength="240" placeholder="Ex: A appelé en se faisant passer pour Microsoft, demandait l\'accès à mon ordinateur." style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box;margin-bottom:14px"></textarea>' +
+      '<div id="report-err" style="display:none;color:#dc2626;font-size:12px;margin-bottom:10px"></div>' +
+      '<div style="display:flex;gap:10px">' +
+        '<button onclick="document.getElementById(\'phone-report-modal\').remove()" style="flex:1;padding:11px;background:none;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer">Annuler</button>' +
+        '<button onclick="submitPhoneReport(\'' + escapeHtml(phone) + '\')" id="report-submit-btn" style="flex:1;padding:11px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-family:inherit;font-weight:700;cursor:pointer">Confirmer</button>' +
+      '</div>' +
+    '</div>';
+  modal.onclick = function(e){ if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+  modal._email = session ? session.email : null;
+}
+
+async function submitPhoneReport(phone) {
+  var modal = document.getElementById('phone-report-modal');
+  var cat = (document.getElementById('report-cat')||{}).value;
+  var comment = (document.getElementById('report-comment')||{}).value || '';
+  var err = document.getElementById('report-err');
+  var btn = document.getElementById('report-submit-btn');
+  if (!cat) { if(err){ err.style.display='block'; err.textContent='Choisissez une catégorie'; } return; }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    var res = await fetch('/.netlify/functions/phone-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, category: cat, comment: comment, email: (modal && modal._email) || null })
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      err.style.display='block'; err.textContent = data.error || 'Erreur';
+      btn.disabled = false; btn.textContent = 'Confirmer';
+      return;
+    }
+    modal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:30px;max-width:380px;text-align:center"><div style="font-size:42px">✅</div><div style="font-size:16px;font-weight:800;color:#16a34a;margin:8px 0">Merci !</div><div style="font-size:13px;color:#555;line-height:1.6">Votre signalement protège la communauté Despy.</div><button onclick="document.getElementById(\'phone-report-modal\').remove();lookupPhone();" style="margin-top:16px;padding:11px 22px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-family:inherit;cursor:pointer">Fermer</button></div>';
+  } catch(e) {
+    err.style.display='block'; err.textContent = 'Erreur réseau';
+    btn.disabled = false; btn.textContent = 'Confirmer';
+  }
+}
+
+// ── Vérificateur de site marchand ──
+async function checkSite() {
+  var input = document.getElementById('site-input');
+  var result = document.getElementById('site-result');
+  var btn = document.getElementById('site-btn');
+  if (!input || !result) return;
+  var url = (input.value || '').trim();
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  btn.disabled = true; btn.textContent = '…';
+  result.style.display = 'block';
+  result.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">Analyse en cours… (5-10s)</div>';
+  try {
+    var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+    var res = await fetch('/.netlify/functions/site-check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: url, email: session ? session.email : null })
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:13px">' + (data.error || 'Erreur') + '</div>';
+      return;
+    }
+    var verdictMap = {
+      safe:       { color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', icon: '✅', label: 'Site fiable' },
+      caution:    { color: '#d97706', bg: '#fef3c7', border: '#fde68a', icon: '⚠️', label: 'Prudence' },
+      dangerous:  { color: '#dc2626', bg: '#fef2f2', border: '#fca5a5', icon: '🚨', label: 'Site dangereux' }
+    };
+    var v = verdictMap[data.verdict] || verdictMap.caution;
+    var checksHtml = (data.checks || []).map(function(c){
+      var iconC = c.ok ? '✓' : '✗';
+      var clr = c.ok ? '#16a34a' : '#dc2626';
+      return '<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;font-size:13px"><span style="color:' + clr + ';font-weight:900;flex-shrink:0;width:14px">' + iconC + '</span><span style="color:#444">' + escapeHtml(c.label) + '</span></div>';
+    }).join('');
+    var signalsHtml = (data.signals || []).map(function(s){
+      var lvlColor = s.level === 'danger' ? '#dc2626' : s.level === 'warn' ? '#d97706' : '#2D5BFF';
+      var lvlBg = s.level === 'danger' ? '#fef2f2' : s.level === 'warn' ? '#fef3c7' : '#eff6ff';
+      return '<div style="display:flex;gap:10px;padding:10px 12px;background:' + lvlBg + ';border-radius:10px;font-size:13px;color:#333;line-height:1.5"><span style="color:' + lvlColor + ';font-weight:900;flex-shrink:0">•</span><span>' + escapeHtml(s.text) + '</span></div>';
+    }).join('');
+
+    result.innerHTML =
+      '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
+        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">' +
+          '<div style="font-size:36px">' + v.icon + '</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:' + v.color + ';font-weight:800">' + v.label + ' · ' + (data.score || 0) + '/100</div>' +
+            '<div style="font-size:14px;font-weight:800;color:#111;margin-top:2px;word-break:break-all">' + escapeHtml(data.domain || url) + '</div>' +
+            (data.domain_age_days ? '<div style="font-size:12px;color:#555">Domaine créé il y a ' + data.domain_age_days + ' jour' + (data.domain_age_days > 1 ? 's' : '') + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        (checksHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">' + checksHtml + '</div>' : '') +
+        (signalsHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">' + signalsHtml + '</div>' : '') +
+        (data.recommendation ? '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:13px;color:#111;line-height:1.5"><strong>👉 Conseil :</strong> ' + escapeHtml(data.recommendation) + '</div>' : '') +
+      '</div>';
+  } catch(e) {
+    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;color:#dc2626;font-size:13px">Erreur réseau.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Analyser';
+  }
+}
+
+// ── Push notifications nationales ──
+async function subscribePush() {
+  var btn = document.getElementById('push-btn');
+  var status = document.getElementById('push-status');
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (status) status.innerHTML = '<div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.85)">Votre navigateur ne supporte pas les notifications push. Utilisez Chrome, Firefox ou Edge.</div>';
+    return;
+  }
+  btn.disabled = true; var orig = btn.innerHTML; btn.innerHTML = 'Activation…';
+  try {
+    var perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      if (status) status.innerHTML = '<div style="background:rgba(220,38,38,.15);border:1px solid rgba(252,165,165,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#fecaca">Vous avez refusé les notifications. Réactivez-les dans les paramètres du navigateur.</div>';
+      btn.disabled = false; btn.innerHTML = orig; return;
+    }
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    var keyRes = await fetch('/.netlify/functions/push-key');
+    var keyData = await keyRes.json();
+    if (!keyData.publicKey) throw new Error('Service indisponible');
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+    });
+    var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+    await fetch('/.netlify/functions/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, email: session ? session.email : null })
+    });
+    if (status) status.innerHTML = '<div style="background:rgba(34,197,94,.15);border:1px solid rgba(187,247,208,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#bbf7d0;font-weight:700">✓ Alertes activées sur ce navigateur</div>';
+    btn.innerHTML = '✓ Alertes activées'; btn.style.background = 'rgba(34,197,94,.2)'; btn.style.color = '#bbf7d0';
+  } catch(e) {
+    console.error('push:', e);
+    if (status) status.innerHTML = '<div style="background:rgba(220,38,38,.15);border:1px solid rgba(252,165,165,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#fecaca">Erreur d\'activation : ' + (e.message || 'inconnue') + '</div>';
+    btn.disabled = false; btn.innerHTML = orig;
+  }
+}
+
+function urlBase64ToUint8Array(b64) {
+  var padding = '='.repeat((4 - b64.length % 4) % 4);
+  var base64 = (b64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var raw = atob(base64);
+  var arr = new Uint8Array(raw.length);
+  for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+  return arr;
 }
 
 // ── Vérificateur HIBP public ──

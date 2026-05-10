@@ -49,3 +49,6 @@
 
 [functions.quarterly-report]
   schedule = "0 10 1 1,4,7,10 *"
+
+[functions.national-alerts]
+  schedule = "0 8,12,17,21 * * *"

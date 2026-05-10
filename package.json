@@ -5,6 +5,7 @@
     "stripe": "^14.0.0",
     "resend": "^2.0.0",
     "node-fetch": "^2.6.9",
-    "@supabase/supabase-js": "^2.0.0"
+    "@supabase/supabase-js": "^2.0.0",
+    "web-push": "^3.6.7"
   }
 }
