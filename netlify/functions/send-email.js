@@ -47,10 +47,68 @@ const templates = {
     html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><p>Bonjour ${prenom || name},</p><p>504 000 Français victimes de cyberattaque l'an dernier. Avec Despy, vous êtes guidé.</p><p><strong>Offre spéciale : 89€/an — 2 mois offerts</strong></p><a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Je me protège maintenant</a></div>`
   }),
 
-  monthly_report: ({ name, prenom, monthName }) => ({
-    subject: `Votre bilan Despy — ${monthName}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:32px;color:#fff;text-align:center"><h1>Votre bilan Despy</h1><p>${monthName}</p></div><div style="padding:28px"><p>Bonjour ${prenom || name},</p><p>Voici votre bilan de sécurité numérique du mois. Chaque quiz complété renforce votre protection.</p><div style="background:#fef2f2;border-left:4px solid #dc2626;padding:16px;margin:16px 0"><strong>Arnaque du mois :</strong> Les SMS imitant La Poste sont en hausse. Ne cliquez jamais — seul laposte.fr est officiel.</div><div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin:16px 0"><strong>Conseil du mois :</strong> Vérifiez que vos mots de passe importants sont uniques.</div><div style="text-align:center;margin:24px 0"><a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Continuer ma formation</a></div></div></div>`
-  }),
+  monthly_report: ({ name, prenom, monthName, stats }) => {
+    const s = stats || {};
+    const analyses = s.analyses || 0;
+    const scams = s.scams_blocked || 0;
+    const quizzes = s.quizzes || 0;
+    const breaches = s.breaches || 0;
+    const bonusMonths = s.bonus_months || 0;
+    const refCode = s.referral_code || '';
+    const intro = scams > 0
+      ? `Ce mois-ci, Despy a détecté <strong>${scams} arnaque${scams > 1 ? 's' : ''}</strong> avant qu'elle${scams > 1 ? 's' : ''} ne vous touche${scams > 1 ? 'nt' : ''}. Bravo d'avoir le réflexe de vérifier !`
+      : analyses > 0
+        ? `Vous avez analysé <strong>${analyses} message${analyses > 1 ? 's' : ''}</strong> ce mois-ci. C'est ce réflexe qui vous protège.`
+        : `Ce mois-ci a été calme — aucune analyse demandée. Pensez à utiliser l'analyseur dès qu'un message vous semble suspect.`;
+    return {
+      subject: `Votre bilan Despy — ${monthName}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:36px 24px;color:#fff;text-align:center">
+          <div style="font-size:11px;letter-spacing:.18em;opacity:.7;text-transform:uppercase;margin-bottom:6px">Bilan mensuel</div>
+          <h1 style="margin:0;font-size:26px">Votre mois Despy</h1>
+          <p style="margin:6px 0 0;opacity:.8">${monthName}</p>
+        </div>
+        <div style="background:#fff;padding:28px 24px">
+          <p>Bonjour ${prenom || name},</p>
+          <p>${intro}</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0">
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:#16a34a">${scams}</div>
+              <div style="font-size:12px;color:#555">arnaque${scams > 1 ? 's' : ''} bloquée${scams > 1 ? 's' : ''}</div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:#2D5BFF">${analyses}</div>
+              <div style="font-size:12px;color:#555">analyse${analyses > 1 ? 's' : ''} effectuée${analyses > 1 ? 's' : ''}</div>
+            </div>
+            <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:#d97706">${quizzes}</div>
+              <div style="font-size:12px;color:#555">quiz complété${quizzes > 1 ? 's' : ''}</div>
+            </div>
+            <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:${breaches > 0 ? '#dc2626' : '#16a34a'}">${breaches}</div>
+              <div style="font-size:12px;color:#555">fuite${breaches > 1 ? 's' : ''} dark web</div>
+            </div>
+          </div>
+
+          ${refCode ? `<div style="background:linear-gradient(135deg,#eff6ff,#fff);border:1.5px dashed #2D5BFF;border-radius:14px;padding:18px;margin:18px 0;text-align:center">
+            <div style="font-size:13px;color:#555;margin-bottom:6px">🎁 <strong>Parrainez vos proches</strong> · 1 mois offert pour chacun</div>
+            <div style="font-size:24px;font-weight:900;color:#2D5BFF;letter-spacing:3px;font-family:monospace">${refCode}</div>
+            ${bonusMonths > 0 ? `<div style="font-size:12px;color:#16a34a;margin-top:6px"><strong>${bonusMonths} mois bonus</strong> déjà gagné${bonusMonths > 1 ? 's' : ''}</div>` : ''}
+          </div>` : ''}
+
+          <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px;border-radius:0 10px 10px 0;margin:16px 0;font-size:14px">
+            <strong>Arnaque du mois :</strong> Les SMS imitant La Poste, Chronopost et Ameli sont en hausse. Ne cliquez jamais sur un lien — passez par l'app officielle ou tapez l'adresse à la main.
+          </div>
+
+          <div style="text-align:center;margin:24px 0">
+            <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Ouvrir mon espace</a>
+          </div>
+          <p style="font-size:11px;color:#aaa;text-align:center">Despy · cybersécurité simple · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+        </div>
+      </div>`
+    };
+  },
 
   cyber_alert: ({ prenom, alertTitle, alertDesc, alertLink, alertSource }) => ({
     subject: `Alerte Despy — ${(alertTitle || "").substring(0, 50)}`,

@@ -795,6 +795,38 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
+<!-- ── ANALYSEUR SMS / EMAIL / LIEN — PUBLIC ── -->
+<section id="analyseur" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag" style="background:#fef2f2;color:#dc2626;border-color:#fca5a5">Vérification instantanée</div>
+      <h2 class="sh2">Ce SMS, ce mail, ce lien…<br><span>est-ce une arnaque ?</span></h2>
+      <p class="sdesc">Collez le message ou le lien suspect. Notre IA détecte les signes d'arnaque en 5 secondes. Gratuit, 3 analyses par jour.</p>
+    </div>
+
+    <div class="reveal" style="max-width:680px;margin:0 auto">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
+
+        <textarea id="analyse-input" rows="5" maxlength="4000" placeholder="Exemple : « Votre colis est en attente. Cliquez ici pour le récupérer : lapost-suivi.com »&#10;&#10;Vous pouvez coller un SMS, un email entier, ou simplement un lien." style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:110px;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px">
+          <div style="font-size:12px;color:var(--text3)">
+            <span id="analyse-charcount">0</span>/4000 caractères
+          </div>
+          <button onclick="runAnalyse()" id="analyse-btn" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Analyser
+          </button>
+        </div>
+
+        <div id="analyse-result" style="display:none;margin-top:18px"></div>
+
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">⚡ Analyse propulsée par IA · Aucune donnée vendue · <span id="analyse-quota-display">3 analyses gratuites/jour</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── CONSEILLER IA ── -->
 <section id="conseiller-ia" style="background:var(--bg2)">
   <div class="wrap">
@@ -1800,6 +1832,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <button onclick="switchTab('dashboard')" id="tab-dashboard" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;white-space:nowrap;transition:all .2s">🏠 Accueil</button>
       <button onclick="switchTab('protection')" id="tab-protection" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s">🛡 Protection</button>
       <button onclick="switchTab('formation')" id="tab-formation" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s">🎓 Formation</button>
+      <button onclick="switchTab('parrainage')" id="tab-parrainage" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s">🎁 Parrainage</button>
       <button onclick="switchTab('compte')" id="tab-compte" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s">⚙️ Mon compte</button>
     </div>
 
@@ -1911,6 +1944,65 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <div style="text-align:center;padding:10px;background:var(--bg2);border-radius:10px;opacity:.5"><div style="font-size:24px;margin-bottom:4px">🏅</div><div style="font-size:10px;color:var(--text3);font-weight:600">À débloquer</div></div>
         </div>
       </div>
+    <!-- PANEL PARRAINAGE -->
+    <div id="panel-parrainage" style="display:none">
+
+      <!-- Hero parrainage -->
+      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:18px;padding:24px;margin-bottom:1rem;text-align:center">
+        <div style="font-size:32px;margin-bottom:6px">🎁</div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:6px">Parrainez vos proches</div>
+        <div style="font-size:13px;opacity:.85;line-height:1.5">Pour chaque ami inscrit avec votre code, <strong>vous gagnez 1 mois</strong> et lui aussi.</div>
+      </div>
+
+      <!-- Code de parrainage -->
+      <div style="background:#fff;border:2px dashed var(--blue);border-radius:16px;padding:20px;margin-bottom:1rem;text-align:center">
+        <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);font-weight:700;margin-bottom:8px">Votre code de parrainage</div>
+        <div id="parrainage-code-display" style="font-size:32px;font-weight:900;color:var(--blue);letter-spacing:5px;font-family:monospace;margin-bottom:12px;user-select:all">———</div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button onclick="copyReferralCode()" id="parrainage-copy-btn" style="padding:10px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier le code
+          </button>
+          <button onclick="shareReferral()" style="padding:10px 16px;background:#22c55e;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Partager
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats parrainage -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center">
+          <div id="parrainage-count" style="font-size:28px;font-weight:900;color:var(--text)">0</div>
+          <div style="font-size:11px;color:var(--text3);font-weight:600;margin-top:2px">Filleuls inscrits</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0fdf4,#fff);border:1px solid #bbf7d0;border-radius:14px;padding:18px;text-align:center">
+          <div id="parrainage-bonus" style="font-size:28px;font-weight:900;color:#16a34a">0</div>
+          <div style="font-size:11px;color:#16a34a;font-weight:600;margin-top:2px">Mois bonus gagnés</div>
+        </div>
+      </div>
+
+      <!-- Saisir un code -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:8px">🎟 Vous avez un code de parrainage ou un code promo ?</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Saisissez le code reçu d'un ami ou d'une promotion. <strong>1 seul code par compte</strong>, à utiliser dans les premiers jours.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="text" id="apply-code-input" placeholder="EX: ABC123" maxlength="12" style="flex:1;min-width:140px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:monospace;text-transform:uppercase;letter-spacing:2px;outline:none" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" oninput="this.value=this.value.toUpperCase()">
+          <button onclick="applyReferralCode()" id="apply-code-btn" style="padding:11px 20px;background:var(--text);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap">Valider</button>
+        </div>
+        <div id="apply-code-result" style="margin-top:10px;font-size:13px;display:none"></div>
+      </div>
+
+      <!-- Comment ça marche -->
+      <div style="background:var(--bg2);border-radius:14px;padding:18px;font-size:13px;color:var(--text2);line-height:1.7">
+        <div style="font-weight:800;font-size:13px;color:var(--text);margin-bottom:8px">Comment ça marche ?</div>
+        <div>1. Partagez votre code aux personnes qui pourraient être intéressées par Despy</div>
+        <div>2. Quand elles s'inscrivent en saisissant votre code, vous gagnez tous les deux <strong>1 mois offert</strong></div>
+        <div>3. Aucune limite : vous pouvez parrainer autant de personnes que vous voulez</div>
+      </div>
+
+    </div>
+
     <!-- PANEL MON COMPTE -->
     <div id="panel-compte" style="display:none">
 
@@ -3747,7 +3839,7 @@ function renderJournal() {
 // ESPACE CLIENT — Onglets + Mon compte
 // ========================================
 function switchTab(tabName) {
-  ['dashboard','protection','formation','compte'].forEach(function(t) {
+  ['dashboard','protection','formation','parrainage','compte'].forEach(function(t) {
     var panel = document.getElementById('panel-' + t);
     var tab = document.getElementById('tab-' + t);
     if (panel) panel.style.display = 'none';
@@ -3763,8 +3855,116 @@ function switchTab(tabName) {
     activeTab.style.background = 'var(--blue)';
     activeTab.style.color = '#fff';
   }
-  if (tabName === 'dashboard') { try { renderJournal(); } catch(e){} }
+  if (tabName === 'dashboard') {
+    try { renderJournal(); } catch(e){}
+    try { var s = siteSession.get(); if (s && s.email) loadSecurityScore(s.email); } catch(e){}
+  }
   if (tabName === 'compte') { try { renderAccountPanel(); } catch(e){} }
+  if (tabName === 'parrainage') { try { loadReferralStatus(); } catch(e){} }
+}
+
+// ── Parrainage ──
+async function loadReferralStatus() {
+  var s = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+  if (!s || !s.email) return;
+  try {
+    var res = await fetch('/.netlify/functions/referral-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email })
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    var codeEl = document.getElementById('parrainage-code-display');
+    var countEl = document.getElementById('parrainage-count');
+    var bonusEl = document.getElementById('parrainage-bonus');
+    if (codeEl && data.referral_code) codeEl.textContent = data.referral_code;
+    if (countEl) countEl.textContent = data.referral_count || 0;
+    if (bonusEl) bonusEl.textContent = data.bonus_months || 0;
+  } catch(e) { console.error('referral-status:', e); }
+}
+
+function copyReferralCode() {
+  var el = document.getElementById('parrainage-code-display');
+  var btn = document.getElementById('parrainage-copy-btn');
+  if (!el) return;
+  var code = el.textContent.trim();
+  if (!code || code === '———') return;
+  var url = 'https://despy.fr/?ref=' + code;
+  try {
+    navigator.clipboard.writeText(url).then(function(){
+      if (btn) {
+        var orig = btn.innerHTML;
+        btn.innerHTML = '✓ Lien copié !';
+        btn.style.background = '#16a34a';
+        setTimeout(function(){ btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+      }
+    });
+  } catch(e) {
+    var ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(_){}
+    ta.remove();
+  }
+}
+
+function shareReferral() {
+  var el = document.getElementById('parrainage-code-display');
+  if (!el) return;
+  var code = el.textContent.trim();
+  if (!code || code === '———') return;
+  var url = 'https://despy.fr/?ref=' + code;
+  var text = 'Je suis sur Despy, un service qui me protège des arnaques en ligne. Avec mon code ' + code + ' on a 1 mois offert chacun : ' + url;
+  if (navigator.share) {
+    navigator.share({ title: 'Despy — Protection numérique', text: text, url: url }).catch(function(){});
+  } else {
+    var enc = encodeURIComponent(text);
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px;max-width:400px;width:100%"><div style="font-weight:800;font-size:16px;margin-bottom:14px;color:var(--text)">Partager via</div><div style="display:flex;flex-direction:column;gap:10px"><a href="https://wa.me/?text=' + enc + '" target="_blank" rel="noopener" style="padding:12px 14px;background:#25d366;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;text-align:center">WhatsApp</a><a href="sms:?body=' + enc + '" style="padding:12px 14px;background:#2D5BFF;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;text-align:center">SMS</a><a href="mailto:?subject=Despy%20-%201%20mois%20offert&body=' + enc + '" style="padding:12px 14px;background:var(--text);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;text-align:center">Email</a><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:10px;background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit">Fermer</button></div></div>';
+    modal.onclick = function(e){ if (e.target === modal) modal.remove(); };
+    document.body.appendChild(modal);
+  }
+}
+
+async function applyReferralCode() {
+  var input = document.getElementById('apply-code-input');
+  var btn = document.getElementById('apply-code-btn');
+  var result = document.getElementById('apply-code-result');
+  var s = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+  if (!input || !s || !s.email) return;
+  var code = (input.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
+  if (code.length < 4) {
+    result.style.display = 'block';
+    result.style.color = '#dc2626';
+    result.textContent = 'Code invalide.';
+    return;
+  }
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    var res = await fetch('/.netlify/functions/apply-referral', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email, code: code })
+    });
+    var data = await res.json();
+    result.style.display = 'block';
+    if (res.ok && data.success) {
+      result.style.color = '#16a34a';
+      result.innerHTML = '✓ ' + data.message;
+      input.value = '';
+      loadReferralStatus();
+    } else {
+      result.style.color = '#dc2626';
+      result.textContent = data.error || 'Erreur';
+    }
+  } catch(e) {
+    result.style.display = 'block';
+    result.style.color = '#dc2626';
+    result.textContent = 'Erreur réseau.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Valider';
+  }
 }
 
 function doLogout() {
@@ -3987,6 +4187,25 @@ function showFreeSignup() {
   dobInp.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit;transition:border-color .2s';
   dobWrap.appendChild(dobLbl); dobWrap.appendChild(dobInp);
 
+  // Code de parrainage / promo (optionnel)
+  var refWrap = document.createElement('div');
+  refWrap.className = 'field';
+  var refLbl = document.createElement('label');
+  refLbl.textContent = 'Code de parrainage ou promo (optionnel)';
+  refLbl.style.fontSize = '12px';
+  var refInp = document.createElement('input');
+  refInp.type = 'text'; refInp.id = 'free-ref'; refInp.maxLength = 12;
+  refInp.placeholder = 'EX: ABC123 — 1 mois offert';
+  refInp.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);outline:none;font-family:monospace;letter-spacing:2px;text-transform:uppercase;transition:border-color .2s';
+  refInp.addEventListener('input', function(){ refInp.value = refInp.value.toUpperCase(); });
+  // Pré-remplir si ?ref=XXX dans l'URL
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var r = p.get('ref');
+    if (r) refInp.value = r.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
+  } catch(e){}
+  refWrap.appendChild(refLbl); refWrap.appendChild(refInp);
+
   // Erreur
   var errDiv = document.createElement('div');
   errDiv.id = 'free-err'; errDiv.className = 'sub-error';
@@ -4057,6 +4276,7 @@ function showFreeSignup() {
   box.appendChild(grid);
   box.appendChild(emailField); box.appendChild(telField);
   box.appendChild(pwdField); box.appendChild(dobWrap);
+  box.appendChild(refWrap);
   box.appendChild(errDiv); box.appendChild(cguWrap);
   box.appendChild(btn); box.appendChild(loginLink); box.appendChild(sep);
   box.appendChild(paidBtn); box.appendChild(cancel); box.appendChild(trust);
@@ -4123,11 +4343,22 @@ async function createFreeAccount() {
   });
 
   // 3. Notifier Supabase (best effort, ne bloque pas)
+  var referralCode = ((document.getElementById('free-ref')||{}).value||'').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
   try {
     fetch('/.netlify/functions/register-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob })
+      body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob, referralCode: referralCode || undefined })
+    }).then(function(r){ return r.json(); }).then(function(data){
+      if (data && data.referralBonusApplied) {
+        try {
+          var t = document.createElement('div');
+          t.style.cssText = 'position:fixed;top:20px;right:20px;background:#16a34a;color:#fff;padding:14px 20px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:99999';
+          t.textContent = '🎁 Code accepté ! 1 mois offert ajouté à votre compte.';
+          document.body.appendChild(t);
+          setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 400); }, 4000);
+        } catch(e){}
+      }
     }).catch(function(){});
   } catch(e) {}
 
@@ -5219,6 +5450,101 @@ function updateChatQuotaDisplay(remaining) {
     if (el) { el.textContent = 'Accès illimité ✓'; el.style.color = 'var(--ok)'; }
   }
 })();
+
+// ── Analyseur SMS / email / lien public ──
+(function(){
+  var ta = document.getElementById('analyse-input');
+  var cc = document.getElementById('analyse-charcount');
+  if (ta && cc) ta.addEventListener('input', function(){ cc.textContent = ta.value.length; });
+})();
+
+async function runAnalyse() {
+  var input = document.getElementById('analyse-input');
+  var result = document.getElementById('analyse-result');
+  var btn = document.getElementById('analyse-btn');
+  if (!input || !result) return;
+  var content = (input.value || '').trim();
+  if (content.length < 5) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;font-size:13px;color:#dc2626">Collez au moins 5 caractères à analyser.</div>';
+    return;
+  }
+  btn.disabled = true;
+  var originalLabel = btn.innerHTML;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle"></span> Analyse en cours…';
+
+  try {
+    var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+    var res = await fetch('/.netlify/functions/analyse-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: content, email: session ? session.email : null })
+    });
+    var data = await res.json();
+    result.style.display = 'block';
+
+    if (res.status === 429 || data.limit_reached) {
+      result.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center">' +
+        '<div style="font-size:28px;margin-bottom:6px">⏱</div>' +
+        '<div style="font-weight:700;color:#92400e;font-size:15px;margin-bottom:6px">Limite atteinte</div>' +
+        '<div style="font-size:13px;color:#555;margin-bottom:12px">Vous avez utilisé vos 3 analyses gratuites aujourd\'hui. Créez un compte pour continuer.</div>' +
+        '<button onclick="showFreeSignup()" style="padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
+        '</div>';
+      return;
+    }
+    if (!res.ok) {
+      result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;font-size:13px;color:#dc2626">' + (data.error || 'Erreur d\'analyse, réessayez.') + '</div>';
+      return;
+    }
+
+    var verdictMap = {
+      safe:       { color: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0', icon: '✅', label: 'Sûr' },
+      suspicious: { color: '#d97706', bg: '#fef3c7', border: '#fde68a', icon: '⚠️', label: 'Douteux' },
+      scam:       { color: '#dc2626', bg: '#fef2f2', border: '#fca5a5', icon: '🚨', label: 'Arnaque' }
+    };
+    var v = verdictMap[data.verdict] || verdictMap.suspicious;
+
+    var signalsHtml = (data.signals || []).map(function(s){
+      var lvlColor = s.level === 'danger' ? '#dc2626' : s.level === 'warn' ? '#d97706' : '#2D5BFF';
+      var lvlBg = s.level === 'danger' ? '#fef2f2' : s.level === 'warn' ? '#fef3c7' : '#eff6ff';
+      return '<div style="display:flex;gap:10px;padding:10px 12px;background:' + lvlBg + ';border-radius:10px;font-size:13px;color:#333;line-height:1.5"><span style="color:' + lvlColor + ';font-weight:900;flex-shrink:0">•</span><span>' + escapeHtml(s.text || '') + '</span></div>';
+    }).join('');
+
+    var reportLine = '';
+    if (data.reportTo) {
+      var reportMap = { '33700': 'Signalez ce SMS au <strong>33700</strong> (gratuit)', 'signal-spam.fr': 'Signalez cet email sur <strong>signal-spam.fr</strong>', 'Pharos': 'Signalez sur <strong>Pharos</strong> (internet-signalement.gouv.fr)' };
+      reportLine = '<div style="background:#1f2937;color:#fff;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:10px">📢 ' + (reportMap[data.reportTo] || 'À signaler aux autorités') + '</div>';
+    }
+
+    result.innerHTML =
+      '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
+        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
+          '<div style="font-size:36px">' + v.icon + '</div>' +
+          '<div style="flex:1">' +
+            '<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:' + v.color + ';font-weight:800">' + v.label + ' · ' + data.score + '/100</div>' +
+            '<div style="font-size:16px;font-weight:800;color:#111;margin-top:2px">' + escapeHtml(data.title || '') + '</div>' +
+          '</div>' +
+        '</div>' +
+        (signalsHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">' + signalsHtml + '</div>' : '') +
+        (data.recommendation ? '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:13px;color:#111;line-height:1.5"><strong>👉 Que faire :</strong> ' + escapeHtml(data.recommendation) + '</div>' : '') +
+        reportLine +
+        (!data.is_subscribed ? '<div style="margin-top:14px;padding:12px;background:#fff;border:1px dashed var(--blue-mid);border-radius:10px;font-size:12px;color:#555;text-align:center">💡 Avec un abonnement Despy, analyses <strong>illimitées</strong> + alerte si le même domaine arnaque réapparaît. <a onclick="showPage(\'tarifs\')" style="color:var(--blue);font-weight:700;cursor:pointer">Découvrir →</a></div>' : '') +
+      '</div>';
+
+  } catch(e) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:14px;font-size:13px;color:#dc2626">Erreur réseau. Réessayez.</div>';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
 
 // ── Vérificateur HIBP public ──
 async function checkHIBP() {
