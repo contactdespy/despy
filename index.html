@@ -734,6 +734,27 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </section>
 
 
+<!-- ── HIBP PUBLIC — MON EMAIL EST-IL COMPROMIS ? ── -->
+<section id="hibp-checker" style="background:#fff;padding:4rem 0;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag">Vérification gratuite</div>
+      <h2 class="sh2">Mon email est-il<br><span>dans une fuite de données ?</span></h2>
+      <p class="sdesc">Vérifiez en 5 secondes si votre adresse email a été compromise dans un piratage. Gratuit, sans inscription.</p>
+    </div>
+    <div class="reveal" style="max-width:520px;margin:0 auto">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:var(--shadow)">
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <input type="email" id="hibp-email-input" placeholder="votre@email.fr" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkHIBP()">
+          <button onclick="checkHIBP()" id="hibp-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s">Vérifier</button>
+        </div>
+        <div id="hibp-result" style="display:none"></div>
+        <p style="font-size:11px;color:var(--text3);text-align:center;margin:0">Source : HaveIBeenPwned.com · Aucune donnée conservée</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── CONSEILLER IA ── -->
 <section id="conseiller-ia" style="background:var(--bg2)">
   <div class="wrap">
@@ -767,7 +788,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
               En ligne · Répond en quelques secondes
             </div>
           </div>
-          <div style="margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg2);border-radius:20px;padding:4px 10px;border:1px solid var(--border)">3 questions gratuites</div>
+          <div id="chat-quota-display" style="margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg2);border-radius:20px;padding:4px 10px;border:1px solid var(--border)">3 questions gratuites</div>
         </div>
 
         <!-- Messages -->
@@ -1739,8 +1760,9 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <!-- Score de sécurité -->
       <div style="background:linear-gradient(135deg,#0a1f3a,#2D5BFF);border-radius:16px;padding:24px;margin-bottom:1.5rem;color:#fff;box-shadow:0 8px 24px rgba(45,91,255,.2)">
         <div style="font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Votre score de sécurité</div>
-        <div style="font-size:42px;font-weight:900;margin-bottom:4px"><span id="security-score">65</span>/100</div>
-        <div id="security-msg" style="font-size:13px;opacity:.85">Bon début ! Continuez vos quiz pour progresser.</div>
+        <div style="font-size:42px;font-weight:900;margin-bottom:4px"><span id="security-score">—</span>/100</div>
+        <div id="security-msg" style="font-size:13px;opacity:.85">Chargement de votre score...</div>
+        <div id="security-tips" style="margin-top:12px;display:flex;flex-direction:column;gap:6px"></div>
       </div>
 
       <!-- Actions rapides -->
@@ -1826,10 +1848,10 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     <div id="panel-formation" style="display:none">
       <div style="background:linear-gradient(135deg,#0a1f3a,#2D5BFF);border-radius:14px;padding:20px;margin-bottom:1.5rem;color:#fff">
         <div style="font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Module de la semaine</div>
-        <div style="font-size:18px;font-weight:900;margin-bottom:10px">Reconnaître les arnaques par SMS</div>
+        <div id="defi-titre" style="font-size:18px;font-weight:900;margin-bottom:10px">Chargement...</div>
         <button onclick="renderQuiz();showQuizModal()" style="width:100%;padding:11px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px">▶ Commencer le quiz</button>
         <button onclick="showSimulator()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit">🎭 Simulateur d'arnaque</button>
-        <button onclick="startChrono()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">⏱ Défi Chrono · 30s</button>
+        <button onclick="startDefiChrono()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">⏱ Défi Chrono · API</button>
       </div>
 
       <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
@@ -2130,7 +2152,7 @@ function updateNavForSession() {
 }
 
 function showClientArea() {
-  if (siteSession.get()) { showPage('client'); updateNavForSession(); }
+  if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); }
   else { showPage('login'); }
 }
 
@@ -2645,27 +2667,42 @@ async function sendChat() {
     var response = await fetch('/.netlify/functions/despy-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: _chatHistory })
+      body: JSON.stringify({ messages: _chatHistory, email: session ? session.email : null })
     });
 
     removeTyping(typingId);
 
     if (!response.ok) { throw new Error('Erreur API'); }
     var data = await response.json();
-    var reply = data.reply || (data.content && data.content[0] ? data.content[0].text : "Je n\u2019ai pas pu r\u00e9pondre. R\u00e9essayez.");
+
+    // Quota atteint côté serveur
+    if (data.limit_reached) {
+      _chatFreeCount = 3;
+      updateChatQuotaDisplay(0);
+      addMsg('conseiller', data.reply, true);
+      showSubscribePrompt();
+      return;
+    }
+
+    var reply = data.reply || "Je n’ai pas pu répondre. Réessayez.";
     _chatHistory.push({ role: 'assistant', content: reply });
     addMsg('conseiller', reply);
+
+    // Mettre à jour le compteur affiché
+    if (session && !session.subscribed) updateChatQuotaDisplay(Math.max(0, 3 - _chatFreeCount));
 
     // Après 2 questions, suggérer l'abonnement
     if (_chatFreeCount === 2) {
       setTimeout(function(){
-        addMsg('conseiller', 'Vous avez encore 1 question gratuite. Abonnez-vous à Despy pour poser toutes vos questions, à tout moment.');
+        addMsg('conseiller', 'Vous avez encore 1 question gratuite. Abonnez-vous à Despy pour un accès illimité.');
       }, 1000);
     }
 
   } catch(err) {
     removeTyping(typingId);
-    addMsg("conseiller", "Désolé, une erreur est survenue. Réessayez dans quelques instants ou écrivez-nous à contact.despy@gmail.com");
+    addMsg("conseiller", "Désolé, une erreur est survenue. Réessayez dans quelques instants.");
+  }
+}ésolé, une erreur est survenue. Réessayez dans quelques instants ou écrivez-nous à contact.despy@gmail.com");
   }
 }
 
@@ -3120,6 +3157,12 @@ function switchTab(tabName) {
   // Afficher le panel cible
   var panel = document.getElementById('panel-' + tabName);
   if (panel) panel.style.display = 'block';
+
+  // Charger le score de sécurité réel quand on ouvre l'accueil
+  if (tabName === 'dashboard') {
+    var s = siteSession.get();
+    if (s && s.email && typeof loadSecurityScore === 'function') loadSecurityScore(s.email);
+  }
 
   // Activer le bouton (par id tab-X)
   var btn = document.getElementById('tab-' + tabName);
@@ -5023,5 +5066,229 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   </script>
 
+<script>
+// ═══════════════════════════════════════════════════
+// DESPY — Nouvelles fonctions frontend
+// ═══════════════════════════════════════════════════
+
+// ── Compteur questions chat ──
+function updateChatQuotaDisplay(remaining) {
+  var el = document.getElementById('chat-quota-display');
+  if (!el) return;
+  if (remaining <= 0) {
+    el.textContent = 'Quota épuisé';
+    el.style.background = '#fef2f2';
+    el.style.color = '#dc2626';
+    el.style.borderColor = '#fca5a5';
+  } else {
+    el.textContent = remaining + ' question' + (remaining > 1 ? 's' : '') + ' gratuite' + (remaining > 1 ? 's' : '');
+    el.style.color = remaining === 1 ? '#d97706' : '';
+  }
+}
+
+// Initialiser le compteur quand la session est disponible
+(function() {
+  var s = siteSession.get();
+  if (s && !s.subscribed) {
+    // On lit le compteur depuis le backend au chargement
+    fetch('/.netlify/functions/check-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email })
+    }).then(function(r){ return r.json(); }).then(function(d){
+      if (d.exists) {
+        var used = d.questions_used || 0;
+        updateChatQuotaDisplay(Math.max(0, 3 - used));
+      }
+    }).catch(function(){});
+  } else if (s && s.subscribed) {
+    var el = document.getElementById('chat-quota-display');
+    if (el) { el.textContent = 'Accès illimité ✓'; el.style.color = 'var(--ok)'; }
+  }
+})();
+
+// ── Vérificateur HIBP public ──
+async function checkHIBP() {
+  var input = document.getElementById('hibp-email-input');
+  var result = document.getElementById('hibp-result');
+  var btn = document.getElementById('hibp-btn');
+  if (!input || !result) return;
+
+  var email = input.value.trim();
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = '#dc2626';
+    setTimeout(function(){ input.style.borderColor = ''; }, 1500);
+    return;
+  }
+
+  btn.textContent = '...';
+  btn.disabled = true;
+  result.style.display = 'none';
+
+  try {
+    var res = await fetch('/.netlify/functions/hibp-public', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await res.json();
+
+    if (data.safe) {
+      result.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">' +
+        '<div style="font-size:28px;margin-bottom:6px">✅</div>' +
+        '<div style="font-weight:700;color:#16a34a;font-size:15px">Bonne nouvelle !</div>' +
+        '<div style="font-size:13px;color:#555;margin-top:4px">Votre email n'a été trouvé dans aucune fuite de données connue.</div>' +
+        '<button onclick="showFreeSignup()" style="margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
+        '</div>';
+    } else {
+      var previewHtml = data.preview && data.preview.length
+        ? '<div style="font-size:12px;color:#dc2626;margin-top:6px">Fuites détectées : <strong>' + data.preview.join(', ') + (data.count > 3 ? '...' : '') + '</strong></div>'
+        : '';
+      result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px">' +
+        '<div style="font-size:22px;margin-bottom:6px">🚨</div>' +
+        '<div style="font-weight:700;color:#dc2626;font-size:15px">' + data.message + '</div>' +
+        previewHtml +
+        '<div style="font-size:12px;color:#555;margin-top:8px">Créez votre compte Despy pour voir toutes les fuites en détail et recevoir une alerte dès qu'une nouvelle apparaît.</div>' +
+        '<button onclick="showFreeSignup()" style="margin-top:12px;width:100%;padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Voir mes fuites en détail →</button>' +
+        '</div>';
+    }
+  } catch(e) {
+    result.innerHTML = '<div style="background:#fef2f2;border-radius:12px;padding:12px;font-size:13px;color:#dc2626">Erreur de vérification. Réessayez.</div>';
+  }
+
+  result.style.display = 'block';
+  btn.textContent = 'Vérifier';
+  btn.disabled = false;
+}
+
+// ── Score de sécurité — chargement depuis l'API ──
+async function loadSecurityScore(email) {
+  var scoreEl = document.getElementById('security-score');
+  var msgEl   = document.getElementById('security-msg');
+  var tipsEl  = document.getElementById('security-tips');
+  if (!scoreEl || !email) return;
+
+  try {
+    var res = await fetch('/.netlify/functions/security-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    if (!res.ok) return;
+    var d = await res.json();
+
+    scoreEl.textContent = d.score;
+    if (msgEl) msgEl.textContent = d.emoji + ' ' + d.label;
+
+    if (tipsEl && d.tips && d.tips.length) {
+      tipsEl.innerHTML = d.tips.map(function(t){
+        var bg = t.priority === 'high' ? '#fef2f2' : t.priority === 'medium' ? '#fff7ed' : '#f0fdf4';
+        var color = t.priority === 'high' ? '#dc2626' : t.priority === 'medium' ? '#d97706' : '#16a34a';
+        return '<div style="background:' + bg + ';border-radius:8px;padding:8px 12px;font-size:12px;color:' + color + '">' + t.text + '</div>';
+      }).join('');
+    }
+  } catch(e) {
+    if (scoreEl) scoreEl.textContent = '—';
+  }
+}
+
+// ── Défi Chrono — connecté à l'API ──
+var _defiQuiz = null;
+var _defiStart = 0;
+
+async function startDefiChrono() {
+  var session = siteSession.get();
+  if (!session || !session.email) {
+    alert('Connectez-vous pour accéder au Défi Chrono.');
+    return;
+  }
+
+  try {
+    var res = await fetch('/.netlify/functions/defi-chrono');
+    _defiQuiz = await res.json();
+  } catch(e) {
+    alert('Impossible de charger le quiz. Réessayez.');
+    return;
+  }
+
+  _defiStart = Date.now();
+  var qIdx = 0;
+
+  function renderDefiQ() {
+    if (qIdx >= _defiQuiz.questions.length) {
+      submitDefi(session.email);
+      return;
+    }
+    var q = _defiQuiz.questions[qIdx];
+    var elapsed = Math.round((Date.now() - _defiStart) / 1000);
+    var remaining = Math.max(0, 90 - elapsed);
+
+    var overlay = document.getElementById('defi-overlay') || document.createElement('div');
+    overlay.id = 'defi-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+    overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:28px;max-width:500px;width:100%">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:16px">' +
+        '<span style="font-size:13px;color:var(--text3);font-weight:700">Question ' + (qIdx+1) + '/' + _defiQuiz.questions.length + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:#d97706">⏱ ' + remaining + 's</span>' +
+      '</div>' +
+      '<div style="font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px;line-height:1.5">' + q.q + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">' +
+        q.choices.map(function(c, i){
+          return '<button onclick="window._defiAnswer(' + i + ')" style="padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;text-align:left;cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.background='#eef1ff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg2)'">' + c + '</button>';
+        }).join('') +
+      '</div>' +
+      '<button onclick="document.getElementById('defi-overlay').remove()" style="margin-top:14px;width:100%;padding:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer">Abandonner</button>' +
+    '</div>';
+
+    if (!document.getElementById('defi-overlay')) document.body.appendChild(overlay);
+    window._defiAnswer = function(idx) {
+      window._defiAnswers = window._defiAnswers || [];
+      window._defiAnswers.push(idx);
+      qIdx++;
+      renderDefiQ();
+    };
+  }
+
+  window._defiAnswers = [];
+  renderDefiQ();
+}
+
+async function submitDefi(email) {
+  var overlay = document.getElementById('defi-overlay');
+  var elapsed = Math.round((Date.now() - _defiStart) / 1000);
+
+  try {
+    var res = await fetch('/.netlify/functions/defi-chrono', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, answers: window._defiAnswers, timeSeconds: elapsed })
+    });
+    var result = await res.json();
+
+    if (overlay) overlay.innerHTML = '<div style="background:#fff;border-radius:20px;padding:32px;max-width:400px;width:100%;text-align:center">' +
+      '<div style="font-size:48px;margin-bottom:12px">' + (result.score === result.total ? '🏆' : result.score >= result.total/2 ? '🎯' : '📚') + '</div>' +
+      '<div style="font-weight:900;font-size:22px;color:var(--text);margin-bottom:6px">' + result.score + '/' + result.total + '</div>' +
+      '<div style="font-size:14px;color:var(--text2);margin-bottom:8px">' + result.message + '</div>' +
+      '<div style="background:var(--blue-light);border-radius:10px;padding:10px;font-size:13px;color:var(--blue);font-weight:700;margin-bottom:16px">+' + result.xp + ' XP gagnés !</div>' +
+      '<button onclick="document.getElementById('defi-overlay').remove();loadSecurityScore(siteSession.get()&&siteSession.get().email)" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:inherit">Voir mon score →</button>' +
+    '</div>';
+  } catch(e) {
+    if (overlay) overlay.remove();
+  }
+}
+
+// ── Charger le titre du Défi Chrono depuis l'API ──
+(function() {
+  fetch('/.netlify/functions/defi-chrono')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var el = document.getElementById('defi-titre');
+      if (el && d.titre) el.textContent = d.titre;
+    }).catch(function(){
+      var el = document.getElementById('defi-titre');
+      if (el) el.textContent = 'Quiz de la semaine';
+    });
+})();
+</script>
 </body>
 </html>
