@@ -774,96 +774,95 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </section>
 
 
-<!-- ── HIBP PUBLIC — MON EMAIL EST-IL COMPROMIS ? ── -->
-<section id="hibp-checker" style="background:#fff;padding:4rem 0;border-top:1px solid var(--border)">
+<!-- ════════════════════════════════════════ -->
+<!-- CENTRE D'OUTILS DESPY — 4 outils dans 1 -->
+<!-- ════════════════════════════════════════ -->
+<section id="centre-outils" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="wrap">
     <div class="text-center reveal" style="margin-bottom:2rem">
-      <div class="section-tag">Vérification gratuite</div>
-      <h2 class="sh2">Mon email est-il<br><span>dans une fuite de données ?</span></h2>
-      <p class="sdesc">Vérifiez en 5 secondes si votre adresse email a été compromise dans un piratage. Gratuit, sans inscription.</p>
-    </div>
-    <div class="reveal" style="max-width:520px;margin:0 auto">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;box-shadow:var(--shadow)">
-        <div style="display:flex;gap:10px;margin-bottom:16px">
-          <input type="email" id="hibp-email-input" placeholder="votre@email.fr" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkHIBP()">
-          <button onclick="checkHIBP()" id="hibp-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s">Vérifier</button>
-        </div>
-        <div id="hibp-result" style="display:none"></div>
-        <p style="font-size:11px;color:var(--text3);text-align:center;margin:0">Source : HaveIBeenPwned.com · Aucune donnée conservée</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── ANALYSEUR SMS / EMAIL / LIEN — PUBLIC ── -->
-<section id="analyseur" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border)">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:2rem">
-      <div class="section-tag" style="background:#fef2f2;color:#dc2626;border-color:#fca5a5">Vérification instantanée</div>
-      <h2 class="sh2">Ce SMS, ce mail, ce lien…<br><span>est-ce une arnaque ?</span></h2>
-      <p class="sdesc">Collez le message ou le lien suspect. Notre IA détecte les signes d'arnaque en 5 secondes. Gratuit, 3 analyses par jour.</p>
+      <div class="section-tag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">⚡ Centre d'outils gratuits</div>
+      <h2 class="sh2">Vérifiez tout, en 1 clic</h2>
+      <p class="sdesc">Un SMS, un site, un numéro, votre email : choisissez ce que vous voulez vérifier. C'est gratuit, sans inscription, et ça prend 5 secondes.</p>
     </div>
 
-    <div class="reveal" style="max-width:680px;margin:0 auto">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
+    <div class="reveal" style="max-width:780px;margin:0 auto">
+      <div style="background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden">
 
-        <textarea id="analyse-input" rows="5" maxlength="4000" placeholder="Exemple : « Votre colis est en attente. Cliquez ici pour le récupérer : lapost-suivi.com »&#10;&#10;Vous pouvez coller un SMS, un email entier, ou simplement un lien." style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:110px;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px">
-          <div style="font-size:12px;color:var(--text3)">
-            <span id="analyse-charcount">0</span>/4000 caractères
-          </div>
-          <button onclick="runAnalyse()" id="analyse-btn" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Analyser
+        <!-- Onglets -->
+        <div role="tablist" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);background:var(--bg2)">
+          <button onclick="switchTool('analyse')" id="tool-tab-analyse" class="tool-tab tool-tab-active" style="padding:16px 8px;background:#fff;border:none;border-bottom:3px solid var(--blue);font-family:inherit;font-weight:800;font-size:13px;color:var(--blue);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
+            <span style="font-size:22px">🔍</span>
+            <span>SMS / Email</span>
+          </button>
+          <button onclick="switchTool('hibp')" id="tool-tab-hibp" class="tool-tab" style="padding:16px 8px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
+            <span style="font-size:22px">📧</span>
+            <span>Email piraté</span>
+          </button>
+          <button onclick="switchTool('phone')" id="tool-tab-phone" class="tool-tab" style="padding:16px 8px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
+            <span style="font-size:22px">📞</span>
+            <span>Numéro</span>
+          </button>
+          <button onclick="switchTool('site')" id="tool-tab-site" class="tool-tab" style="padding:16px 8px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
+            <span style="font-size:22px">🛒</span>
+            <span>Site marchand</span>
           </button>
         </div>
 
-        <div id="analyse-result" style="display:none;margin-top:18px"></div>
+        <!-- Contenu actif -->
+        <div style="padding:26px 24px">
 
-        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">⚡ Analyse propulsée par IA · Aucune donnée vendue · <span id="analyse-quota-display">3 analyses gratuites/jour</span></p>
-      </div>
-    </div>
-  </div>
-</section>
+          <!-- TOOL 1 : ANALYSEUR SMS / EMAIL -->
+          <div id="tool-panel-analyse" class="tool-panel">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Collez un SMS, un email ou un lien suspect. Notre IA détecte les arnaques en 5 secondes.</div>
+            <textarea id="analyse-input" rows="5" maxlength="4000" placeholder="Exemple : « Votre colis est en attente. Cliquez ici pour le récupérer : lapost-suivi.com »" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:110px;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px">
+              <div style="font-size:11px;color:var(--text3)"><span id="analyse-charcount">0</span>/4000 caractères · <span id="analyse-quota-display">3 analyses gratuites/jour</span></div>
+              <button onclick="runAnalyse()" id="analyse-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Analyser
+              </button>
+            </div>
+            <div id="analyse-result" style="display:none;margin-top:16px"></div>
+          </div>
 
-<!-- ── ANNUAIRE INVERSÉ D'ARNAQUEURS ── -->
-<section id="annuaire" style="background:#fff;padding:4rem 0;border-top:1px solid var(--border)">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:2rem">
-      <div class="section-tag" style="background:#fef3c7;color:#92400e;border-color:#fde68a">📞 Annuaire communautaire</div>
-      <h2 class="sh2">Ce numéro qui vous appelle…<br><span>est-il signalé ?</span></h2>
-      <p class="sdesc">Tapez un numéro, on vous dit s'il a été signalé par d'autres membres Despy. Et signalez en 5 secondes les arnaqueurs que vous croisez.</p>
-    </div>
-    <div class="reveal" style="max-width:580px;margin:0 auto">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <input type="tel" id="phone-input" placeholder="06 XX XX XX XX" maxlength="20" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')lookupPhone()">
-          <button onclick="lookupPhone()" id="phone-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Vérifier</button>
+          <!-- TOOL 2 : HIBP -->
+          <div id="tool-panel-hibp" class="tool-panel" style="display:none">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Vérifiez si votre adresse email a été compromise dans une fuite de données.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input type="email" id="hibp-email-input" placeholder="votre@email.fr" style="flex:1;min-width:200px;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkHIBP()">
+              <button onclick="checkHIBP()" id="hibp-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Vérifier</button>
+            </div>
+            <div id="hibp-result" style="display:none;margin-top:16px"></div>
+            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Source : HaveIBeenPwned.com · Aucune donnée conservée</p>
+          </div>
+
+          <!-- TOOL 3 : ANNUAIRE INVERSÉ -->
+          <div id="tool-panel-phone" class="tool-panel" style="display:none">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Un numéro vous appelle ? Vérifiez s'il a déjà été signalé par la communauté Despy.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input type="tel" id="phone-input" placeholder="06 XX XX XX XX" maxlength="20" style="flex:1;min-width:200px;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')lookupPhone()">
+              <button onclick="lookupPhone()" id="phone-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Vérifier</button>
+            </div>
+            <div id="phone-result" style="display:none;margin-top:16px"></div>
+            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Base communautaire · Anonymisé · Aucun numéro vendu</p>
+          </div>
+
+          <!-- TOOL 4 : VÉRIFICATEUR DE SITE -->
+          <div id="tool-panel-site" class="tool-panel" style="display:none">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Avant d'acheter, vérifiez l'âge du domaine, le HTTPS et les signaux d'arnaque.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <input type="url" id="site-input" placeholder="https://exemple-boutique.com" style="flex:1;min-width:200px;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkSite()">
+              <button onclick="checkSite()" id="site-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Analyser</button>
+            </div>
+            <div id="site-result" style="display:none;margin-top:16px"></div>
+            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Vérifications RDAP officielles + IA · Aucune donnée conservée</p>
+          </div>
+
         </div>
-        <div id="phone-result" style="display:none"></div>
-        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">Base communautaire · Aucun numéro vendu · Anonymisé</p>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- ── VÉRIFICATEUR DE SITE MARCHAND ── -->
-<section id="site-checker" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border)">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:2rem">
-      <div class="section-tag" style="background:#eff6ff;color:#1e40af;border-color:#bfdbfe">🛒 Avant d'acheter</div>
-      <h2 class="sh2">Ce site marchand…<br><span>est-il fiable ?</span></h2>
-      <p class="sdesc">Avant de payer, vérifiez l'âge du domaine, le certificat SSL et les signaux d'arnaque. Gratuit et instantané.</p>
-    </div>
-    <div class="reveal" style="max-width:580px;margin:0 auto">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:24px;box-shadow:var(--shadow)">
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <input type="url" id="site-input" placeholder="https://exemple-boutique.com" style="flex:1;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkSite()">
-          <button onclick="checkSite()" id="site-btn" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Analyser</button>
-        </div>
-        <div id="site-result" style="display:none"></div>
-        <p style="font-size:11px;color:var(--text3);text-align:center;margin:14px 0 0">Vérifications RDAP officielles + analyse IA · Aucune donnée conservée</p>
+      <div style="text-align:center;margin-top:18px;font-size:12px;color:var(--text3)">
+        Vous appréciez ces outils ? <a onclick="showPage('tarifs')" style="color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline">Découvrez Despy en illimité →</a>
       </div>
     </div>
   </div>
@@ -5509,6 +5508,30 @@ function updateChatQuotaDisplay(remaining) {
     if (el) { el.textContent = 'Accès illimité ✓'; el.style.color = 'var(--ok)'; }
   }
 })();
+
+// ── Centre d'outils : navigation onglets ──
+function switchTool(name) {
+  ['analyse','hibp','phone','site'].forEach(function(t){
+    var tab = document.getElementById('tool-tab-' + t);
+    var panel = document.getElementById('tool-panel-' + t);
+    if (tab) {
+      tab.style.background = 'transparent';
+      tab.style.color = 'var(--text2)';
+      tab.style.borderBottomColor = 'transparent';
+      tab.style.fontWeight = '700';
+    }
+    if (panel) panel.style.display = 'none';
+  });
+  var activeTab = document.getElementById('tool-tab-' + name);
+  var activePanel = document.getElementById('tool-panel-' + name);
+  if (activeTab) {
+    activeTab.style.background = '#fff';
+    activeTab.style.color = 'var(--blue)';
+    activeTab.style.borderBottomColor = 'var(--blue)';
+    activeTab.style.fontWeight = '800';
+  }
+  if (activePanel) activePanel.style.display = 'block';
+}
 
 // ── Analyseur SMS / email / lien public ──
 (function(){
