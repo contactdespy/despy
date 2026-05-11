@@ -174,7 +174,8 @@ section{padding:5rem clamp(1rem,6vw,6rem)}
 .tarifs-trust{background:linear-gradient(135deg,var(--ok-bg),#fff);border:1px solid #bbf7d0;border-radius:var(--radius);padding:18px 24px;margin-bottom:2.5rem;display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
 .trust-pill{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text2)}
 .trust-divider{width:1px;height:20px;background:var(--border)}
-.plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:24px}
+@media(max-width:980px){.plans-grid{grid-template-columns:1fr}}
 .plan-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:32px;transition:all .3s;position:relative}
 .plan-card:hover{border-color:rgba(45,91,255,.3);box-shadow:0 8px 32px rgba(45,91,255,.1)}
 .plan-card.featured{border-color:var(--blue);box-shadow:0 8px 40px rgba(45,91,255,.15)}
@@ -1534,24 +1535,45 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
   <!-- Plans -->
   <div class="plans-grid">
-    <!-- Mensuel -->
+
+    <!-- GRATUIT -->
+    <div class="plan-card" style="background:linear-gradient(180deg,#fff,#f9fafb)">
+      <div class="plan-name">Gratuit</div>
+      <div class="plan-price" style="font-size:42px">0€<span>/à vie</span></div>
+      <div style="font-size:13px;color:var(--text3);margin:4px 0 16px">Sans carte bancaire · Pour découvrir Despy</div>
+      <div class="plan-features">
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>3 analyses SMS/email/lien <strong>par jour</strong></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Annuaire inversé arnaqueurs <strong>illimité</strong></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérificateur de site marchand</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérification email piraté (HIBP)</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Alertes push nationales</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>3 questions au Conseiller IA</div>
+        <div class="plan-feat" style="opacity:.4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Surveillance dark web</div>
+        <div class="plan-feat" style="opacity:.4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Formation + badges XP</div>
+        <div class="plan-feat" style="opacity:.4"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Bilan mensuel personnalisé</div>
+      </div>
+      <button class="plan-btn outline" onclick="showFreeSignup()">Créer mon compte gratuit</button>
+    </div>
+
+    <!-- MENSUEL -->
     <div class="plan-card">
       <div class="plan-name">Mensuel</div>
       <div class="plan-price">9,99€<span>/mois</span></div>
-      <div style="font-size:13px;color:var(--text3);margin:4px 0 16px">soit 119,88€/an · Sans engagement</div>
+      <div style="font-size:13px;color:var(--text3);margin:4px 0 16px">Sans engagement · Résiliable en 1 clic</div>
       <div class="plan-features">
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Audit de sécurité illimité</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Conseiller Despy 24h/24</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>SOS Urgence guidé</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Analyseur anti-arnaque</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérification dark web</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Formation + badges XP</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Rapport hebdomadaire</div>
+        <div class="plan-feat" style="font-weight:700;color:var(--blue)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Tout du gratuit, inclus</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Analyseur SMS/email <strong>illimité</strong></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Conseiller IA <strong>illimité 24h/24</strong></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Surveillance dark web mensuelle</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Score sécurité + conseils perso</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Formation complète + badges XP</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Bilan mensuel personnalisé</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Code parrainage · 1 mois offert/filleul</div>
       </div>
       <button class="plan-btn outline" onclick="siteSubscribe('monthly')">Choisir le mensuel</button>
     </div>
 
-    <!-- Annuel -->
+    <!-- ANNUEL -->
     <div class="plan-card featured">
       <div class="plan-badge">⭐ Meilleure offre — 2 mois offerts</div>
       <div class="plan-name" style="margin-top:8px">Annuel</div>
@@ -1560,11 +1582,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <div class="plan-save" style="margin-bottom:4px">Économisez 30€ · soit 7,42€/mois</div>
       <div style="font-size:13px;color:var(--text3);margin:0 0 16px">Un seul paiement · 2 mois offerts</div>
       <div class="plan-features">
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Tout du mensuel, inclus</div>
+        <div class="plan-feat" style="font-weight:700;color:var(--blue)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Tout du mensuel, inclus</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><strong>2 mois offerts</strong> vs mensuel</div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Prix bloqué 12 mois</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Priorité support email</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Rapport hebdo personnalisé</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Garantie remboursement 30 jours</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Priorité support email (réponse &lt;24h)</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Garantie satisfait ou remboursé 30 jours</div>
       </div>
       <button class="plan-btn primary" onclick="siteSubscribe('annual')">Souscrire — 89€/an →</button>
     </div>
