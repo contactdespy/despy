@@ -1887,7 +1887,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <div style="background:linear-gradient(135deg,#0a1f3a,#2D5BFF);border-radius:14px;padding:20px;margin-bottom:1.5rem;color:#fff">
         <div style="font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Module de la semaine</div>
         <div id="defi-titre" style="font-size:18px;font-weight:900;margin-bottom:10px">Chargement...</div>
-        <button onclick="renderQuiz();showQuizModal()" style="width:100%;padding:11px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px">▶ Commencer le quiz</button>
+        <button onclick="showQuizModal()" style="width:100%;padding:11px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px">▶ Commencer le quiz</button>
         <button onclick="showSimulator()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit">🎭 Simulateur d'arnaque</button>
         <button onclick="startDefiChrono()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">⏱ Défi Chrono · API</button>
       </div>
@@ -2285,26 +2285,93 @@ var siteSession = {
 function updateNavForSession() {
   var s = siteSession.get();
   var navRight = document.querySelector('.nav-links');
+  if (!navRight) return;
+
+  // Repérer les boutons par leur texte
+  function findBtnByText(txt) {
+    var all = navRight.querySelectorAll('button');
+    for (var i = 0; i < all.length; i++) {
+      var t = (all[i].textContent || '').trim();
+      if (t.indexOf(txt) !== -1) return all[i];
+    }
+    return null;
+  }
+  var btnLogin   = findBtnByText('Connexion');
+  var btnSignup  = findBtnByText('Compte gratuit');
+  var btnSub     = findBtnByText('Commencer');
+  var existing   = document.getElementById('nav-space-btn');
+  var existingWrap = document.getElementById('nav-user-wrap');
+
   if (s && s.email) {
-    var initial = (s.name||s.email)[0].toUpperCase();
-    // Remplacer le bouton connexion par avatar
-    var existing = document.getElementById('nav-space-btn');
-    if (!existing && navRight) {
+    // === CONNECTÉ ===
+    // Cacher les boutons connexion/inscription
+    if (btnLogin)  btnLogin.style.display  = 'none';
+    if (btnSignup) btnSignup.style.display = 'none';
+    // Le bouton "Commencer 9,99€" reste si pas abonné (call-to-action)
+    if (btnSub) btnSub.style.display = s.subscribed ? 'none' : '';
+
+    // Créer le wrap avatar + dropdown s'il n'existe pas
+    if (!existingWrap) {
+      var initial = (s.name || s.email)[0].toUpperCase();
+      var wrap = document.createElement('div');
+      wrap.id = 'nav-user-wrap';
+      wrap.style.cssText = 'position:relative;display:inline-flex;align-items:center';
+
       var btn = document.createElement('button');
       btn.id = 'nav-space-btn';
-      btn.style.cssText = 'width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-weight:800;font-size:14px;cursor:pointer';
+      btn.style.cssText = 'width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;border:none;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center';
       btn.textContent = initial;
-      btn.onclick = function(){ showClientArea(); };
-      navRight.appendChild(btn);
+      btn.title = s.email;
+
+      var menu = document.createElement('div');
+      menu.id = 'nav-user-menu';
+      menu.style.cssText = 'position:absolute;top:46px;right:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:8px;min-width:220px;display:none;z-index:1000';
+
+      // Header email
+      var hdr = document.createElement('div');
+      hdr.style.cssText = 'padding:10px 12px;border-bottom:1px solid var(--border);margin-bottom:6px';
+      hdr.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text)">' + (s.name || 'Mon compte') + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + s.email + '</div>';
+      menu.appendChild(hdr);
+
+      function mkItem(label, icon, fn) {
+        var b = document.createElement('button');
+        b.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text);text-align:left;font-family:inherit';
+        b.onmouseover = function(){ b.style.background = 'var(--bg2)'; };
+        b.onmouseout  = function(){ b.style.background = 'none'; };
+        b.innerHTML = '<span style="font-size:16px">' + icon + '</span> ' + label;
+        b.onclick = function(e){ e.stopPropagation(); menu.style.display = 'none'; fn(); };
+        return b;
+      }
+      menu.appendChild(mkItem('Mon espace', '👤', function(){ showPage('client'); }));
+      menu.appendChild(mkItem('Tarifs', '💳', function(){ showPage('tarifs'); }));
+      var divider = document.createElement('div');
+      divider.style.cssText = 'height:1px;background:var(--border);margin:6px 4px';
+      menu.appendChild(divider);
+      var logoutBtn = mkItem('Se déconnecter', '🚪', function(){ siteLogout(); });
+      logoutBtn.style.color = '#dc2626';
+      menu.appendChild(logoutBtn);
+
+      btn.onclick = function(e){
+        e.stopPropagation();
+        var visible = menu.style.display === 'block';
+        menu.style.display = visible ? 'none' : 'block';
+      };
+      // Fermer le menu si on clique ailleurs
+      document.addEventListener('click', function(){ menu.style.display = 'none'; });
+
+      wrap.appendChild(btn);
+      wrap.appendChild(menu);
+      navRight.appendChild(wrap);
     }
-    // Charger le client
-    var nameEl = document.getElementById('client-name');
+
+    // Charger le client area
+    var nameEl  = document.getElementById('client-name');
     var emailEl = document.getElementById('client-email');
-    if (nameEl) nameEl.textContent = s.name || 'Mon compte';
+    if (nameEl)  nameEl.textContent  = s.name || 'Mon compte';
     if (emailEl) emailEl.textContent = s.email;
     var refEl = document.getElementById('ref-code');
     if (refEl) refEl.textContent = 'DESPY-' + s.email.substring(0,4).toUpperCase() + '-2026';
-    // Abonnement
     var subEl = document.getElementById('client-sub-content');
     if (subEl && s.subscribed) {
       subEl.innerHTML = '<div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px">' +
@@ -2312,6 +2379,12 @@ function updateNavForSession() {
         '<div style="font-size:13px;color:var(--text2);margin-top:4px">Plan ' + (s.plan||'mensuel') + ' · Toutes fonctionnalités incluses</div>' +
         '</div>';
     }
+  } else {
+    // === NON CONNECTÉ === réafficher les boutons + retirer avatar
+    if (btnLogin)  btnLogin.style.display  = '';
+    if (btnSignup) btnSignup.style.display = '';
+    if (btnSub)    btnSub.style.display    = '';
+    if (existingWrap) existingWrap.remove();
   }
 }
 
@@ -2371,7 +2444,17 @@ function siteLogin() {
 
 function siteLogout() {
   siteSession.clear();
+  // Déconnecter aussi Google (pour permettre choix de compte au prochain login)
+  try {
+    if (window.google && window.google.accounts && window.google.accounts.id) {
+      window.google.accounts.id.disableAutoSelect();
+    }
+  } catch(e){}
+  // Retirer l'avatar
+  var wrap = document.getElementById('nav-user-wrap');
+  if (wrap) wrap.remove();
   showPage('home');
+  updateNavForSession();
 }
 
 function siteDeleteAccount() {
