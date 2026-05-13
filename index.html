@@ -7,6 +7,9 @@
 <meta name="description" content="Despy protège votre vie numérique : audit, détection d'arnaques, conseiller expert. Simple, sans jargon. 9,99€/mois. France métropolitaine.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<!-- Google Identity Services (Sign in with Google) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<meta name="google-signin-client_id" content="748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com">
 <!-- SEO & Social -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Despy — Cybersécurité pour particuliers">
@@ -3010,7 +3013,11 @@ function showLoginModal() {
   trust.className = 'sub-trust';
   trust.textContent = '🔒 Connexion sécurisée';
 
+  // Bloc Google en haut
+  var googleSection = buildGoogleSection('login');
+
   box.appendChild(title); box.appendChild(sub);
+  box.appendChild(googleSection);
   box.appendChild(emailWrap); box.appendChild(pwdWrap);
   box.appendChild(errDiv);
   box.appendChild(btn); box.appendChild(backBtn); box.appendChild(trust);
@@ -4088,6 +4095,154 @@ function showQuizPaywall() {
 
 
 // === COMPTE GRATUIT (FREEMIUM) ===
+// ════════════════════════════════════════════
+// AUTH GOOGLE — Sign in with Google
+// ════════════════════════════════════════════
+var GOOGLE_CLIENT_ID = '748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com';
+
+function renderGoogleButton(containerId, mode) {
+  // mode: 'signup' ou 'login' — pour le texte du bouton
+  function tryRender() {
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+      setTimeout(tryRender, 200);
+      return;
+    }
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: function(resp){ handleGoogleAuth(resp, mode); },
+        auto_select: false,
+        cancel_on_tap_outside: true
+      });
+      window.google.accounts.id.renderButton(el, {
+        theme: 'outline',
+        size: 'large',
+        text: mode === 'login' ? 'signin_with' : 'continue_with',
+        shape: 'rectangular',
+        logo_alignment: 'left',
+        width: Math.min(el.offsetWidth || 380, 380)
+      });
+    } catch(e) {
+      console.error('Google button render error:', e);
+    }
+  }
+  tryRender();
+}
+
+async function handleGoogleAuth(response, mode) {
+  if (!response || !response.credential) {
+    alert('Connexion Google annulée.');
+    return;
+  }
+
+  // Récupérer code parrainage si présent dans le modal signup
+  var refCode = '';
+  var refEl = document.getElementById('free-ref');
+  if (refEl) refCode = (refEl.value || '').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
+
+  // Loader visuel
+  var loader = document.createElement('div');
+  loader.id = 'google-auth-loader';
+  loader.style.cssText = 'position:fixed;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:99999;font-weight:700;color:var(--blue);font-size:15px';
+  loader.textContent = 'Connexion en cours...';
+  document.body.appendChild(loader);
+
+  try {
+    var r = await fetch('/.netlify/functions/auth-google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential, referralCode: refCode || undefined })
+    });
+    var data = await r.json();
+
+    if (!r.ok || data.error) {
+      loader.remove();
+      alert(data.error || 'Erreur lors de la connexion Google.');
+      return;
+    }
+
+    // Stocker localement (offline-first, comme l'inscription email)
+    try {
+      localStorage.setItem('despy_account_' + data.email, JSON.stringify({
+        email: data.email,
+        name: data.name,
+        prenom: data.prenom,
+        nom: data.nom,
+        telephone: data.telephone || '',
+        tel: data.telephone || '',
+        subscribed: data.subscribed,
+        plan: data.plan,
+        google: true,
+        created_at: data.created_at
+      }));
+    } catch(e){}
+
+    // Créer la session
+    siteSession.set({
+      email: data.email,
+      name: data.name,
+      prenom: data.prenom,
+      nom: data.nom,
+      telephone: data.telephone || '',
+      subscribed: data.subscribed,
+      plan: data.plan,
+      created_at: data.created_at
+    });
+
+    // Fermer modals
+    var m1 = document.getElementById('free-signup-modal'); if (m1) m1.remove();
+    var m2 = document.getElementById('login-modal'); if (m2) m2.remove();
+    loader.remove();
+
+    // Toast bonus parrainage
+    if (data.referralBonusApplied) {
+      try {
+        var t = document.createElement('div');
+        t.style.cssText = 'position:fixed;top:20px;right:20px;background:#16a34a;color:#fff;padding:14px 20px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:99999';
+        t.textContent = '🎁 Code accepté ! 1 mois offert ajouté à votre compte.';
+        document.body.appendChild(t);
+        setTimeout(function(){ t.style.transition='opacity .4s'; t.style.opacity='0'; setTimeout(function(){ t.remove(); }, 400); }, 4000);
+      } catch(e){}
+    }
+
+    showPage('client');
+    updateNavForSession();
+
+  } catch(e) {
+    loader.remove();
+    alert('Erreur réseau. Réessayez.');
+  }
+}
+
+function buildGoogleSection(mode) {
+  // Bloc "Continuer avec Google" + séparateur "ou avec un email"
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'margin:8px 0 16px';
+
+  var btnHolder = document.createElement('div');
+  btnHolder.id = 'google-btn-' + mode;
+  btnHolder.style.cssText = 'display:flex;justify-content:center;min-height:42px';
+  wrap.appendChild(btnHolder);
+
+  var sep = document.createElement('div');
+  sep.style.cssText = 'display:flex;align-items:center;gap:10px;margin:16px 0 8px;color:var(--text3);font-size:12px;font-weight:600';
+  var line1 = document.createElement('div');
+  line1.style.cssText = 'flex:1;height:1px;background:var(--border)';
+  var label = document.createElement('div');
+  label.textContent = mode === 'login' ? 'ou connexion par email' : 'ou avec un email';
+  var line2 = document.createElement('div');
+  line2.style.cssText = 'flex:1;height:1px;background:var(--border)';
+  sep.appendChild(line1); sep.appendChild(label); sep.appendChild(line2);
+  wrap.appendChild(sep);
+
+  // Rendu différé pour laisser le DOM s'attacher
+  setTimeout(function(){ renderGoogleButton('google-btn-' + mode, mode); }, 50);
+
+  return wrap;
+}
+
 function showFreeSignup() {
   var modal = document.createElement('div');
   modal.className = 'sub-modal-overlay';
@@ -4225,8 +4380,12 @@ function showFreeSignup() {
   trust.className = 'sub-trust';
   trust.textContent = 'Données sécurisées · Conformément au RGPD · Jamais revendues';
 
+  // Bloc Google (en haut, le plus visible)
+  var googleSection = buildGoogleSection('signup');
+
   // Assembler
   box.appendChild(title); box.appendChild(sub);
+  box.appendChild(googleSection);
   box.appendChild(grid);
   box.appendChild(emailField); box.appendChild(telField);
   box.appendChild(pwdField); box.appendChild(dobWrap);
