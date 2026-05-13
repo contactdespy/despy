@@ -5337,6 +5337,23 @@ function showQuizModal() {
     }
   }
 
+  // S'assurer que QUIZZES est bien chargé AVANT d'ouvrir le modal
+  try {
+    if (typeof QUIZZES === 'undefined' || !QUIZZES || !QUIZZES.length) {
+      QUIZZES = getCurrentModule().questions;
+    }
+  } catch(e) {
+    console.error('Quiz init error:', e);
+    alert('Erreur de chargement du quiz : ' + e.message);
+    return;
+  }
+  if (!QUIZZES || !QUIZZES.length) {
+    alert('Aucune question disponible pour ce module. Réessayez plus tard.');
+    return;
+  }
+  window._quizIdx = 0;
+  window._quizAnswered = false;
+
   // Créer le modal quiz
   var existing = document.getElementById('quiz-modal-overlay');
   if (existing) existing.remove();
@@ -5384,15 +5401,13 @@ function showQuizModal() {
 
   document.body.appendChild(overlay);
 
-  // Initialiser et rendre le quiz
-  if (typeof QUIZZES === 'undefined' || !QUIZZES || !QUIZZES.length) {
-    try { QUIZZES = getCurrentModule().questions; } catch(e){}
+  // Render (QUIZZES et _quizIdx déjà initialisés en début de fonction)
+  try {
+    renderQuiz();
+  } catch(e) {
+    console.error('renderQuiz error:', e);
+    zone.innerHTML = '<div style="padding:20px;color:#dc2626;text-align:center"><div style="font-size:32px;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:6px">Erreur d\'affichage du quiz</div><div style="font-size:13px;color:var(--text3)">' + (e.message || 'Erreur inconnue') + '</div></div>';
   }
-  if (typeof _quizIdx === 'undefined' || _quizIdx >= QUIZZES.length) {
-    window._quizIdx = 0;
-  }
-  window._quizAnswered = false;
-  renderQuiz();
 }
 
 
