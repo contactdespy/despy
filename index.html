@@ -5401,12 +5401,39 @@ function showQuizModal() {
 
   document.body.appendChild(overlay);
 
-  // Render (QUIZZES et _quizIdx déjà initialisés en début de fonction)
+  // ─── Rendu INLINE de la première question (plus de dépendance à renderQuiz) ───
   try {
-    renderQuiz();
+    // En-tête module
+    var mod = getCurrentModule();
+    header.innerHTML = '<span style="font-size:20px">' + (mod.icon || '🎓') + '</span> <span>Module ' + (mod.id || 1) + '/8 — <strong>' + (mod.title || 'Quiz') + '</strong></span>';
+    if (mod.color) {
+      header.style.background = mod.color + '15';
+      header.style.borderColor = mod.color + '40';
+    }
+
+    // Compteur (compte gratuit)
+    if (!session.subscribed) {
+      var q2 = getFreeQuizQuota();
+      var remaining = 5 - q2.used - 1;
+      counterPlace.innerHTML = '<div id="quiz-counter" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fbbf24;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400e;font-weight:700">⭐ Question découverte ' + (q2.used + 1) + '/5 ce mois-ci · <span style="font-weight:400">' + (remaining > 0 ? remaining + ' restante' + (remaining > 1 ? 's' : '') + ' après celle-ci' : 'dernière question gratuite') + '</span></div>';
+    }
+
+    // Question
+    var q = QUIZZES[window._quizIdx || 0];
+    if (!q || !q.q || !q.opts || !q.opts.length) {
+      throw new Error('Question invalide à l\'index ' + (window._quizIdx || 0));
+    }
+    var html = '<div style="background:var(--bg2);border-radius:14px;padding:20px">';
+    html += '<div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:16px">' + q.q + '</div>';
+    html += '<div id="quiz-opts" style="display:flex;flex-direction:column;gap:10px">';
+    for (var i = 0; i < q.opts.length; i++) {
+      html += '<button onclick="answerQuiz(' + i + ')" style="text-align:left;padding:13px 16px;background:#fff;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;font-family:inherit;transition:all .2s;width:100%">' + q.opts[i] + '</button>';
+    }
+    html += '</div></div>';
+    zone.innerHTML = html;
   } catch(e) {
-    console.error('renderQuiz error:', e);
-    zone.innerHTML = '<div style="padding:20px;color:#dc2626;text-align:center"><div style="font-size:32px;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:6px">Erreur d\'affichage du quiz</div><div style="font-size:13px;color:var(--text3)">' + (e.message || 'Erreur inconnue') + '</div></div>';
+    console.error('Quiz render error:', e);
+    zone.innerHTML = '<div style="padding:20px;color:#dc2626;text-align:center"><div style="font-size:32px;margin-bottom:10px">⚠️</div><div style="font-weight:700;margin-bottom:6px">Erreur d\'affichage du quiz</div><div style="font-size:13px;color:var(--text3)">' + (e.message || 'Erreur inconnue') + '</div><button onclick="document.getElementById(\'quiz-modal-overlay\').remove()" style="margin-top:14px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer">Fermer</button></div>';
   }
 }
 
