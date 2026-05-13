@@ -5279,10 +5279,13 @@ function showQuizModal() {
     return;
   }
 
-  // Compte gratuit → paywall (la formation est réservée à l'abonnement)
+  // Compte gratuit → 5 questions découverte par mois, puis paywall
   if (!session.subscribed) {
-    showQuizPaywall();
-    return;
+    var quota = getFreeQuizQuota();
+    if (quota.used >= 5) {
+      showQuizPaywall();
+      return;
+    }
   }
 
   // Créer le modal quiz
