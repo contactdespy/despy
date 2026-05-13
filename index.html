@@ -1901,6 +1901,8 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <div style="text-align:center;padding:10px;background:var(--bg2);border-radius:10px;opacity:.5"><div style="font-size:24px;margin-bottom:4px">🏅</div><div style="font-size:10px;color:var(--text3);font-weight:600">À débloquer</div></div>
         </div>
       </div>
+    </div><!-- /panel-formation -->
+
     <!-- PANEL PARRAINAGE -->
     <div id="panel-parrainage" style="display:none">
 
@@ -5277,13 +5279,10 @@ function showQuizModal() {
     return;
   }
 
-  // Compte gratuit — vérifier le quota
+  // Compte gratuit → paywall (la formation est réservée à l'abonnement)
   if (!session.subscribed) {
-    var quota = getFreeQuizQuota();
-    if (quota.used >= 5) {
-      showQuizPaywall();
-      return;
-    }
+    showQuizPaywall();
+    return;
   }
 
   // Créer le modal quiz
@@ -6098,6 +6097,8 @@ async function startDefiChrono() {
     alert('Connectez-vous pour accéder au Défi Chrono.');
     return;
   }
+  // Réservé aux abonnés
+  if (!session.subscribed) { showQuizPaywall(); return; }
 
   try {
     var res = await fetch('/.netlify/functions/defi-chrono');
