@@ -4,6 +4,7 @@
 // ════════════════════════════════════════════
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { createClient } = require('@supabase/supabase-js');
 
 // IDs des produits Stripe (à créer dans le dashboard Stripe)
 // stripe.com/dashboard → Products → Add product
@@ -54,6 +55,23 @@ exports.handler = async (event, context) => {
       ? `${baseUrl}/despy_app_v21.html?payment=cancel`
       : `${baseUrl}?payment=cancel`;
 
+    // Lire les bonus_months du compte (parrainage)
+    let bonusMonths = 0;
+    try {
+      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
+        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+        const { data: client } = await supabase
+          .from('clients')
+          .select('bonus_months')
+          .eq('email', email.toLowerCase().trim())
+          .maybeSingle();
+        bonusMonths = Math.min(parseInt(client?.bonus_months || 0, 10) || 0, 24); // cap à 24 mois
+      }
+    } catch (e) {
+      console.error('bonus_months lookup error:', e.message);
+    }
+    const trialDays = bonusMonths * 30;
+
     // Créer ou récupérer le customer Stripe
     let customerId;
     const existingCustomers = await stripe.customers.list({ email, limit: 1 });
@@ -94,17 +112,22 @@ exports.handler = async (event, context) => {
       allow_promotion_codes: true,
       // Activer les wallets (Apple Pay, Google Pay)
       payment_method_configuration: null, // Utilise la config par défaut du compte
-      subscription_data: {
-        metadata: {
-          despy_email: email,
-          despy_name: name || '',
-          despy_source: source || 'site',
-          despy_plan: plan
-        }
-      },
+      subscription_data: Object.assign(
+        {
+          metadata: {
+            despy_email: email,
+            despy_name: name || '',
+            despy_source: source || 'site',
+            despy_plan: plan,
+            despy_bonus_months_used: String(bonusMonths)
+          }
+        },
+        trialDays > 0 ? { trial_period_days: trialDays } : {}
+      ),
       metadata: {
         despy_email: email,
-        despy_source: source || 'site'
+        despy_source: source || 'site',
+        despy_bonus_months_used: String(bonusMonths)
       }
     });
 
@@ -113,7 +136,9 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         url: session.url,
-        sessionId: session.id
+        sessionId: session.id,
+        bonusMonthsApplied: bonusMonths,
+        trialDays
       })
     };
 

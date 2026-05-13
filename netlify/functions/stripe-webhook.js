@@ -54,9 +54,9 @@ exports.handler = async (event) => {
     const plan    = session.subscription_data?.metadata?.despy_plan || 'monthly';
 
     if (email) {
-      const endDate = plan === 'annual'
-        ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        : new Date(Date.now() +  30 * 24 * 60 * 60 * 1000).toISOString();
+      const bonusUsed = parseInt(session.metadata?.despy_bonus_months_used || '0', 10) || 0;
+      const baseDays = plan === 'annual' ? 365 : 30;
+      const endDate = new Date(Date.now() + (baseDays + bonusUsed * 30) * 24 * 60 * 60 * 1000).toISOString();
 
       await supabase.from('clients').upsert({
         email,
@@ -65,6 +65,7 @@ exports.handler = async (event) => {
         plan,
         subscribed: true,
         questions_used: 0,
+        bonus_months: 0, // consommé par le trial Stripe
         stripe_customer_id: session.customer,
         stripe_subscription_id: session.subscription,
         updated_at: new Date().toISOString(),
