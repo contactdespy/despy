@@ -27,28 +27,31 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://*.googleusercontent.com; connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.stripe.com https://accounts.google.com; frame-src https://js.stripe.com https://accounts.google.com"
 
-# ── Crons automatiques ──
+# ── Crons automatiques (optimisés pour limiter la consommation Netlify) ──
 
+# Rapports périodiques — peu fréquents
 [functions.weekly-report]
-  schedule = "0 9 * * 1"
+  schedule = "0 9 * * 1"           # Lundi 9h
 
 [functions.monthly-report]
-  schedule = "0 9 1 * *"
-
-[functions.cyber-alerts]
-  schedule = "0 8 * * *"
-
-[functions.relance-leads]
-  schedule = "0 10 * * *"
-
-[functions.onboarding-sequence]
-  schedule = "0 11 * * *"
-
-[functions.hibp-check]
-  schedule = "0 7 1 * *"
+  schedule = "0 9 1 * *"           # 1er du mois 9h
 
 [functions.quarterly-report]
-  schedule = "0 10 1 1,4,7,10 *"
+  schedule = "0 10 1 1,4,7,10 *"   # 1er janvier/avril/juillet/octobre
+
+# Surveillance & alertes — fréquence réduite
+[functions.cyber-alerts]
+  schedule = "0 8 */2 * *"         # Tous les 2 jours à 8h (au lieu de chaque jour)
 
 [functions.national-alerts]
-  schedule = "0 8,12,17,21 * * *"
+  schedule = "0 9,18 * * *"        # 2×/jour (matin + soir) au lieu de 4×/jour
+
+[functions.hibp-check]
+  schedule = "0 7 1 * *"           # 1er du mois 7h
+
+# Marketing — fréquence réduite
+[functions.relance-leads]
+  schedule = "0 10 * * 2,5"        # Mardi + vendredi 10h (au lieu de chaque jour)
+
+[functions.onboarding-sequence]
+  schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
