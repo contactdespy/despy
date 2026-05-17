@@ -182,23 +182,48 @@ function buildPrompt(postType, ctx) {
   const baseRules = `RÈGLES STRICTES (à respecter sans exception) :
 - Écris en français impeccable, sans anglicismes inutiles
 - Public cible : seniors (60+ ans), peu à l'aise avec la technologie
-- Ton : expert rassurant, pédagogique, jamais alarmiste ni condescendant
+- Ton : expert rassurant ET PERSUASIF. Joue sur la peur saine (conséquences réelles) puis rassure avec la solution (Despy)
 - Phrases courtes (max 15 mots)
 - Pas de jargon technique non expliqué (toujours définir entre parenthèses si besoin)
 - Maximum 4 emojis bien placés dans tout le post (pas plus)
-- Longueur totale : 600 à 1200 caractères (environ 80 à 180 mots)
-- Termine TOUJOURS par un appel à l'action vers despy.fr
+- Longueur totale : 700 à 1300 caractères (environ 100 à 200 mots)
 - N'invente JAMAIS de chiffres, dates, ou faits non fournis dans les données
 - Tutoiement INTERDIT — vouvoiement uniquement
 - Pas de mention "Despy" plus de 2 fois dans le post
 
-STRUCTURE OBLIGATOIRE :
-1. Accroche forte (1 phrase qui interpelle)
-2. Corps explicatif (3 à 6 phrases avec conseils concrets)
-3. Action concrète à faire (impératif)
-4. Appel vers despy.fr
+🎯 MISE EN FORME — GRAS UNICODE OBLIGATOIRE :
+Facebook ne supporte pas le markdown. Pour mettre en valeur les mots/phrases importants, utilise les caractères Unicode mathématiques bold sans sérif :
+- A→𝗔 B→𝗕 C→𝗖 D→𝗗 E→𝗘 F→𝗙 G→𝗚 H→𝗛 I→𝗜 J→𝗝 K→𝗞 L→𝗟 M→𝗠 N→𝗡 O→𝗢 P→𝗣 Q→𝗤 R→𝗥 S→𝗦 T→𝗧 U→𝗨 V→𝗩 W→𝗪 X→𝗫 Y→𝗬 Z→𝗭
+- a→𝗮 b→𝗯 c→𝗰 d→𝗱 e→𝗲 f→𝗳 g→𝗴 h→𝗵 i→𝗶 j→𝗷 k→𝗸 l→𝗹 m→𝗺 n→𝗻 o→𝗼 p→𝗽 q→𝗾 r→𝗿 s→𝘀 t→𝘁 u→𝘂 v→𝘃 w→𝘄 x→𝘅 y→𝘆 z→𝘇
+- 0→𝟬 1→𝟭 2→𝟮 3→𝟯 4→𝟰 5→𝟱 6→𝟲 7→𝟳 8→𝟴 9→𝟵
+- Caractères accentués : à→à é→é è→è ê→ê ô→ô ç→ç (LAISSE-LES TELS QUELS, pas de gras pour eux)
+- Mets EN GRAS UNICODE :
+  • L'accroche d'ouverture (1ère phrase ou question d'accroche)
+  • Les chiffres marquants (€, %, nombre de victimes…)
+  • Les mots-clés d'urgence (𝗔𝘁𝘁𝗲𝗻𝘁𝗶𝗼𝗻, 𝗔𝗿𝗻𝗮𝗾𝘂𝗲, 𝗨𝗿𝗴𝗲𝗻𝘁…)
+  • Le lien d'appel à l'action 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
+- Maximum 3-4 zones en gras par post (sinon ça perd son impact)
 
-Renvoie UNIQUEMENT le texte du post Facebook, prêt à publier. Pas de balises, pas de markdown, pas d'introduction de ta part.`;
+⚠️ LEVIER ÉMOTIONNEL ET CONVERSION :
+Le but est de convertir les lecteurs en visiteurs de despy.fr. Pour chaque post :
+1. Commence par une 𝗽𝗲𝘂𝗿 𝗰𝗼𝗻𝗰𝗿𝗲̀𝘁𝗲 (perte d'argent, compte piraté, identité volée, isolement après arnaque)
+2. Donne UN exemple parlant (un retraité a perdu 3500€, un compte vidé en 10 minutes…)
+3. Apporte LA solution simple = utiliser Despy
+4. CTA puissant et urgent vers despy.fr
+
+STRUCTURE OBLIGATOIRE :
+1. 𝗔𝗰𝗰𝗿𝗼𝗰𝗵𝗲 𝗳𝗼𝗿𝘁𝗲 en gras Unicode (question + chiffre choc OU avertissement direct)
+2. Mise en contexte qui suscite l'inquiétude (3-4 phrases — conséquences réelles)
+3. Rassurance + solution Despy (2-3 phrases — "vous n'êtes pas seul·e", "Despy vous protège")
+4. 𝗖𝗧𝗔 𝗳𝗶𝗻𝗮𝗹 𝗲𝗻 𝗴𝗿𝗮𝘀 vers despy.fr (urgent, bénéfice clair, gratuit)
+
+Exemples de CTA finaux à varier :
+- 👉 𝗩𝗲́𝗿𝗶𝗳𝗶𝗲𝘇 𝘃𝗼𝘁𝗿𝗲 𝘀𝗲́𝗰𝘂𝗿𝗶𝘁𝗲́ 𝗴𝗿𝗮𝘁𝘂𝗶𝘁𝗲𝗺𝗲𝗻𝘁 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
+- 👉 𝗡𝗲 𝘀𝗼𝘆𝗲𝘇 𝗽𝗮𝘀 𝗹𝗮 𝗽𝗿𝗼𝗰𝗵𝗮𝗶𝗻𝗲 𝘃𝗶𝗰𝘁𝗶𝗺𝗲. 𝗥𝗲𝗻𝗱𝗲𝘇-𝘃𝗼𝘂𝘀 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
+- 👉 𝗣𝗿𝗼𝘁𝗲́𝗴𝗲𝘇-𝘃𝗼𝘂𝘀 𝗲𝗻 𝟯 𝗺𝗶𝗻𝘂𝘁𝗲𝘀 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
+- 👉 𝗧𝗲𝘀𝘁𝗲𝘇 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿 𝗮𝘃𝗮𝗻𝘁 𝗾𝘂𝗲 𝗰̧𝗮 𝗻𝗲 𝘃𝗼𝘂𝘀 𝗮𝗿𝗿𝗶𝘃𝗲
+
+Renvoie UNIQUEMENT le texte du post Facebook avec les caractères Unicode bold correctement appliqués, prêt à publier. Pas de balises markdown, pas d'introduction de ta part.`;
 
   let topic = '';
   let dataBlock = '';
