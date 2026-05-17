@@ -16,6 +16,35 @@ const FB_GRAPH = `https://graph.facebook.com/${FB_API_VERSION}`;
 
 // ── Helpers ──────────────────────────────────
 
+// Convertit le markdown **gras** en caractères Unicode bold sans sérif
+// Fiable à 100% — pas de typos comme avec un LLM
+const BOLD_MAP = (() => {
+  const map = {};
+  // Lettres majuscules A-Z → 𝗔-𝗭
+  for (let i = 0; i < 26; i++) {
+    map[String.fromCharCode(65 + i)] = String.fromCodePoint(0x1D5D4 + i);
+    map[String.fromCharCode(97 + i)] = String.fromCodePoint(0x1D5EE + i);
+  }
+  // Chiffres 0-9 → 𝟬-𝟵
+  for (let i = 0; i < 10; i++) {
+    map[String(i)] = String.fromCodePoint(0x1D7EC + i);
+  }
+  return map;
+})();
+
+function toBoldUnicode(text) {
+  let result = '';
+  for (const ch of text) {
+    result += BOLD_MAP[ch] || ch;
+  }
+  return result;
+}
+
+// Remplace **texte** par sa version Unicode bold
+function markdownBoldToUnicode(text) {
+  return text.replace(/\*\*([^*]+)\*\*/g, (_, inner) => toBoldUnicode(inner));
+}
+
 async function fetchJson(url, options = {}) {
   const res = await fetch(url, options);
   const text = await res.text();
@@ -191,18 +220,17 @@ function buildPrompt(postType, ctx) {
 - Tutoiement INTERDIT — vouvoiement uniquement
 - Pas de mention "Despy" plus de 2 fois dans le post
 
-🎯 MISE EN FORME — GRAS UNICODE OBLIGATOIRE :
-Facebook ne supporte pas le markdown. Pour mettre en valeur les mots/phrases importants, utilise les caractères Unicode mathématiques bold sans sérif :
-- A→𝗔 B→𝗕 C→𝗖 D→𝗗 E→𝗘 F→𝗙 G→𝗚 H→𝗛 I→𝗜 J→𝗝 K→𝗞 L→𝗟 M→𝗠 N→𝗡 O→𝗢 P→𝗣 Q→𝗤 R→𝗥 S→𝗦 T→𝗧 U→𝗨 V→𝗩 W→𝗪 X→𝗫 Y→𝗬 Z→𝗭
-- a→𝗮 b→𝗯 c→𝗰 d→𝗱 e→𝗲 f→𝗳 g→𝗴 h→𝗵 i→𝗶 j→𝗷 k→𝗸 l→𝗹 m→𝗺 n→𝗻 o→𝗼 p→𝗽 q→𝗾 r→𝗿 s→𝘀 t→𝘁 u→𝘂 v→𝘃 w→𝘄 x→𝘅 y→𝘆 z→𝘇
-- 0→𝟬 1→𝟭 2→𝟮 3→𝟯 4→𝟰 5→𝟱 6→𝟲 7→𝟳 8→𝟴 9→𝟵
-- Caractères accentués : à→à é→é è→è ê→ê ô→ô ç→ç (LAISSE-LES TELS QUELS, pas de gras pour eux)
-- Mets EN GRAS UNICODE :
+🎯 MISE EN FORME — GRAS EN MARKDOWN :
+Pour mettre en valeur les éléments clés, encadre-les avec **double astérisques** (notation markdown).
+Notre système convertira automatiquement **texte** en caractères Unicode bold visibles sur Facebook.
+- Mets en **gras** :
   • L'accroche d'ouverture (1ère phrase ou question d'accroche)
   • Les chiffres marquants (€, %, nombre de victimes…)
-  • Les mots-clés d'urgence (𝗔𝘁𝘁𝗲𝗻𝘁𝗶𝗼𝗻, 𝗔𝗿𝗻𝗮𝗾𝘂𝗲, 𝗨𝗿𝗴𝗲𝗻𝘁…)
-  • Le lien d'appel à l'action 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
+  • Les mots-clés d'urgence (**Attention**, **Arnaque**, **Urgent**, **Danger**…)
+  • Le CTA final complet (ligne entière avec le lien despy.fr)
 - Maximum 3-4 zones en gras par post (sinon ça perd son impact)
+- N'utilise PAS d'italique, ni de souligné, ni d'autre balise markdown
+- Garde les accents normaux (à, é, è, ê, ô, ç) même dans le gras
 
 ⚠️ LEVIER ÉMOTIONNEL ET CONVERSION :
 Le but est de convertir les lecteurs en visiteurs de despy.fr. Pour chaque post :
@@ -212,18 +240,18 @@ Le but est de convertir les lecteurs en visiteurs de despy.fr. Pour chaque post 
 4. CTA puissant et urgent vers despy.fr
 
 STRUCTURE OBLIGATOIRE :
-1. 𝗔𝗰𝗰𝗿𝗼𝗰𝗵𝗲 𝗳𝗼𝗿𝘁𝗲 en gras Unicode (question + chiffre choc OU avertissement direct)
+1. **Accroche forte** en gras markdown (question + chiffre choc OU avertissement direct)
 2. Mise en contexte qui suscite l'inquiétude (3-4 phrases — conséquences réelles)
 3. Rassurance + solution Despy (2-3 phrases — "vous n'êtes pas seul·e", "Despy vous protège")
-4. 𝗖𝗧𝗔 𝗳𝗶𝗻𝗮𝗹 𝗲𝗻 𝗴𝗿𝗮𝘀 vers despy.fr (urgent, bénéfice clair, gratuit)
+4. **CTA final en gras** vers despy.fr (urgent, bénéfice clair, gratuit)
 
 Exemples de CTA finaux à varier :
-- 👉 𝗩𝗲́𝗿𝗶𝗳𝗶𝗲𝘇 𝘃𝗼𝘁𝗿𝗲 𝘀𝗲́𝗰𝘂𝗿𝗶𝘁𝗲́ 𝗴𝗿𝗮𝘁𝘂𝗶𝘁𝗲𝗺𝗲𝗻𝘁 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
-- 👉 𝗡𝗲 𝘀𝗼𝘆𝗲𝘇 𝗽𝗮𝘀 𝗹𝗮 𝗽𝗿𝗼𝗰𝗵𝗮𝗶𝗻𝗲 𝘃𝗶𝗰𝘁𝗶𝗺𝗲. 𝗥𝗲𝗻𝗱𝗲𝘇-𝘃𝗼𝘂𝘀 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
-- 👉 𝗣𝗿𝗼𝘁𝗲́𝗴𝗲𝘇-𝘃𝗼𝘂𝘀 𝗲𝗻 𝟯 𝗺𝗶𝗻𝘂𝘁𝗲𝘀 𝘀𝘂𝗿 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿
-- 👉 𝗧𝗲𝘀𝘁𝗲𝘇 𝗱𝗲𝘀𝗽𝘆.𝗳𝗿 𝗮𝘃𝗮𝗻𝘁 𝗾𝘂𝗲 𝗰̧𝗮 𝗻𝗲 𝘃𝗼𝘂𝘀 𝗮𝗿𝗿𝗶𝘃𝗲
+- 👉 **Vérifiez votre sécurité gratuitement sur despy.fr**
+- 👉 **Ne soyez pas la prochaine victime. Rendez-vous sur despy.fr**
+- 👉 **Protégez-vous en 3 minutes sur despy.fr**
+- 👉 **Testez despy.fr avant que ça ne vous arrive**
 
-Renvoie UNIQUEMENT le texte du post Facebook avec les caractères Unicode bold correctement appliqués, prêt à publier. Pas de balises markdown, pas d'introduction de ta part.`;
+Renvoie UNIQUEMENT le texte du post Facebook avec les **gras markdown**, prêt à publier. Pas d'introduction de ta part.`;
 
   let topic = '';
   let dataBlock = '';
@@ -377,8 +405,9 @@ exports.handler = async (event) => {
     // 2. Construit le prompt
     const prompt = buildPrompt(postType, ctx);
 
-    // 3. Génère le post
-    const postContent = await generatePostContent(prompt);
+    // 3. Génère le post (Claude écrit en **markdown**, on convertit en Unicode bold)
+    const rawContent = await generatePostContent(prompt);
+    const postContent = markdownBoldToUnicode(rawContent);
 
     // 4. Mode preview : on génère mais on ne publie pas
     if (isPreview) {
