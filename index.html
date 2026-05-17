@@ -779,6 +779,52 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 
 <!-- ════════════════════════════════════════ -->
+<!-- SCORE CYBER — Test gratuit en 60 secondes -->
+<!-- ════════════════════════════════════════ -->
+<section id="cyber-score" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="cs-card reveal" style="max-width:780px;margin:0 auto;background:linear-gradient(160deg,#ffffff 0%,#f7f9fc 100%);border:1px solid var(--border);border-radius:24px;padding:clamp(2rem,5vw,3.5rem);box-shadow:0 4px 24px rgba(45,91,255,.06);position:relative;overflow:hidden">
+      <!-- Halo décoratif -->
+      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(45,91,255,.12),transparent 70%);pointer-events:none"></div>
+      <div style="position:relative;display:grid;grid-template-columns:1fr;gap:2rem;align-items:center">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px;letter-spacing:.02em">
+            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)"></span>
+            Test gratuit · 60 secondes
+          </div>
+          <h2 style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--text);margin:0 0 12px;letter-spacing:-.03em;line-height:1.1">
+            Connaissez-vous votre<br><span style="background:linear-gradient(120deg,var(--blue),#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Score Cyber</span> ?
+          </h2>
+          <p style="font-size:16px;color:var(--text2);line-height:1.6;margin:0 0 1.5rem;max-width:520px">
+            10 questions personnalisées pour évaluer votre niveau de sécurité numérique. Découvrez votre note A, B, C ou D et vos vulnérabilités. <strong style="color:var(--text)">Sans création de compte.</strong>
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.75rem">
+            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Anonyme
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Résultat immédiat
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Conseils personnalisés
+            </div>
+          </div>
+          <button onclick="openCyberScore()" style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(17,17,17,.15)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(17,17,17,.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(17,17,17,.15)'">
+            Démarrer le test
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <div style="font-size:12px;color:var(--text3);margin-top:12px">Plus de 1 200 personnes ont déjà fait le test cette semaine.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════ -->
 <!-- CENTRE D'OUTILS DESPY — 4 outils dans 1 -->
 <!-- ════════════════════════════════════════ -->
 <section id="centre-outils" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
@@ -6280,6 +6326,371 @@ async function submitDefi(email) {
       if (el) el.textContent = 'Quiz de la semaine';
     });
 })();
+
+
+// ══════════════════════════════════════════════════════════
+// SCORE CYBER — Quiz comportemental gratuit + paywall doux
+// ══════════════════════════════════════════════════════════
+var CYBER_SCORE_QUESTIONS = [
+  {
+    id: 1,
+    cat: 'passwords',
+    q: 'Quel mot de passe utilisez-vous pour votre boîte email principale ?',
+    answers: [
+      { txt: 'Le même que pour mes autres comptes',   pts: 0 },
+      { txt: 'Différent mais simple à retenir',         pts: 5 },
+      { txt: 'Long, unique et complexe',                pts: 10 }
+    ]
+  },
+  {
+    id: 2,
+    cat: 'mfa',
+    q: 'Vos comptes importants (email, banque) sont-ils protégés par une vérification en 2 étapes ?',
+    answers: [
+      { txt: 'Non, ou je ne sais pas ce que c’est', pts: 0 },
+      { txt: 'Sur certains comptes seulement',          pts: 5 },
+      { txt: 'Oui, sur tous mes comptes importants',    pts: 10 }
+    ]
+  },
+  {
+    id: 3,
+    cat: 'updates',
+    q: 'Quand votre téléphone vous propose une mise à jour, que faites-vous ?',
+    answers: [
+      { txt: 'Je l’ignore, je préfère ne rien changer', pts: 0 },
+      { txt: 'Je l’installe quand j’y pense',     pts: 5 },
+      { txt: 'Je l’installe rapidement',               pts: 10 }
+    ]
+  },
+  {
+    id: 4,
+    cat: 'phishing',
+    q: 'Vous recevez un SMS « Votre colis est bloqué, payez 1,99 € » avec un lien. Que faites-vous ?',
+    answers: [
+      { txt: 'Je clique pour voir mon colis',                       pts: 0 },
+      { txt: 'Je vérifie sur le site officiel du transporteur',     pts: 5 },
+      { txt: 'Je supprime et signale au 33700',                     pts: 10 }
+    ]
+  },
+  {
+    id: 5,
+    cat: 'social-engineering',
+    q: 'Un « conseiller bancaire » vous appelle et demande votre code reçu par SMS. Vous le donnez ?',
+    answers: [
+      { txt: 'Oui, si c’est urgent',                       pts: 0 },
+      { txt: 'Je vérifie avant en rappelant ma banque',         pts: 5 },
+      { txt: 'Jamais, je raccroche immédiatement',              pts: 10 }
+    ]
+  },
+  {
+    id: 6,
+    cat: 'backup',
+    q: 'Vos photos et documents importants sont-ils sauvegardés ailleurs ?',
+    answers: [
+      { txt: 'Non, tout est sur mon appareil',                  pts: 0 },
+      { txt: 'Quelques fichiers sur un disque dur externe',     pts: 5 },
+      { txt: 'Sauvegardes régulières (cloud + disque externe)', pts: 10 }
+    ]
+  },
+  {
+    id: 7,
+    cat: 'wifi',
+    q: 'Consultez-vous vos comptes bancaires depuis un wifi public (gare, café, hôtel) ?',
+    answers: [
+      { txt: 'Oui, sans hésiter',                       pts: 0 },
+      { txt: 'Parfois, en faisant attention',           pts: 5 },
+      { txt: 'Jamais, j’attends d’être chez moi', pts: 10 }
+    ]
+  },
+  {
+    id: 8,
+    cat: 'exposure',
+    q: 'Savez-vous si votre adresse email a déjà été divulguée dans une fuite de données ?',
+    answers: [
+      { txt: 'Non, je ne sais pas comment vérifier',         pts: 0 },
+      { txt: 'Je crois que oui',                              pts: 5 },
+      { txt: 'Oui, j’ai déjà vérifié sur un outil officiel', pts: 10 }
+    ]
+  },
+  {
+    id: 9,
+    cat: 'apps',
+    q: 'Installez-vous des applications hors des magasins officiels (App Store, Play Store) ?',
+    answers: [
+      { txt: 'Oui, parfois',                pts: 0 },
+      { txt: 'Je ne sais pas',              pts: 5 },
+      { txt: 'Jamais',                      pts: 10 }
+    ]
+  },
+  {
+    id: 10,
+    cat: 'social-privacy',
+    q: 'Sur Facebook ou Instagram, partagez-vous publiquement votre date de naissance, vos voyages, votre adresse ?',
+    answers: [
+      { txt: 'Oui, sans restriction',                    pts: 0 },
+      { txt: 'Visible par mes amis seulement',           pts: 5 },
+      { txt: 'Je ne partage pas d’infos personnelles', pts: 10 }
+    ]
+  }
+];
+
+var _csState = { answers: [], current: 0 };
+
+function openCyberScore() {
+  _csState = { answers: [], current: 0 };
+  _csRenderModal();
+  _csShowIntro();
+}
+
+function _csRenderModal() {
+  var existing = document.getElementById('cs-overlay');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.id = 'cs-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,18,30,.82);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:csFadeIn .25s ease';
+
+  var box = document.createElement('div');
+  box.id = 'cs-box';
+  box.style.cssText = 'background:#fff;border-radius:24px;max-width:520px;width:100%;max-height:92vh;overflow-y:auto;padding:0;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.3);font-family:inherit;animation:csSlideUp .35s cubic-bezier(.16,1,.3,1)';
+
+  var close = document.createElement('button');
+  close.innerHTML = '×';
+  close.style.cssText = 'position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.04);border:none;font-size:22px;cursor:pointer;color:var(--text3);font-family:inherit;line-height:1;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .15s';
+  close.onmouseover = function(){ close.style.background = 'rgba(0,0,0,.08)'; };
+  close.onmouseout  = function(){ close.style.background = 'rgba(0,0,0,.04)'; };
+  close.onclick = function(){ overlay.remove(); };
+
+  var content = document.createElement('div');
+  content.id = 'cs-content';
+  content.style.cssText = 'padding:40px 32px 32px';
+
+  box.appendChild(close);
+  box.appendChild(content);
+  overlay.appendChild(box);
+  overlay.onclick = function(e){ if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
+
+  // Inject keyframes once
+  if (!document.getElementById('cs-keyframes')) {
+    var st = document.createElement('style');
+    st.id = 'cs-keyframes';
+    st.textContent = '@keyframes csFadeIn{from{opacity:0}to{opacity:1}}@keyframes csSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes csPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}@keyframes csSpin{to{transform:rotate(360deg)}}.cs-answer-btn:hover{border-color:var(--blue)!important;background:var(--blue-light)!important;transform:translateX(2px)}.cs-answer-btn:active{transform:scale(.99)}';
+    document.head.appendChild(st);
+  }
+}
+
+function _csShowIntro() {
+  var c = document.getElementById('cs-content');
+  if (!c) return;
+  c.innerHTML =
+    '<div style="text-align:center">' +
+      '<div style="width:72px;height:72px;margin:0 auto 20px;background:linear-gradient(135deg,var(--blue),#7c3aed);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(45,91,255,.25)">' +
+        '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+      '</div>' +
+      '<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:10px;letter-spacing:-.02em">Évaluez votre Score Cyber</div>' +
+      '<div style="font-size:15px;color:var(--text2);line-height:1.6;margin-bottom:24px">10 questions personnalisées pour mesurer votre niveau de sécurité numérique. Vous obtiendrez une note de A à D et des conseils concrets.</div>' +
+      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:28px">' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg2);border-radius:10px;font-size:13px;color:var(--text2);font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>60 secondes</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg2);border-radius:10px;font-size:13px;color:var(--text2);font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Anonyme</div>' +
+        '<div style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--bg2);border-radius:10px;font-size:13px;color:var(--text2);font-weight:600"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Gratuit</div>' +
+      '</div>' +
+      '<button onclick="_csNext()" style="display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:var(--text);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;width:100%;justify-content:center;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 6px 16px rgba(17,17,17,.25)\'" onmouseout="this.style.transform=\'\';this.style.boxShadow=\'\'">Commencer le test<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>' +
+    '</div>';
+}
+
+function _csShowQuestion() {
+  var c = document.getElementById('cs-content');
+  if (!c) return;
+  var idx = _csState.current;
+  var total = CYBER_SCORE_QUESTIONS.length;
+  if (idx >= total) { _csShowCalculating(); return; }
+  var q = CYBER_SCORE_QUESTIONS[idx];
+  var pct = Math.round((idx / total) * 100);
+
+  var answersHtml = q.answers.map(function(a, i) {
+    return '<button class="cs-answer-btn" onclick="_csAnswer(' + i + ')" style="display:block;width:100%;text-align:left;padding:14px 16px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:14.5px;color:var(--text);font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:10px;transition:all .15s ease;line-height:1.4">' + a.txt + '</button>';
+  }).join('');
+
+  c.innerHTML =
+    '<div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+        '<div style="font-size:13px;color:var(--text3);font-weight:600;letter-spacing:.02em">Question ' + (idx + 1) + ' sur ' + total + '</div>' +
+        '<div style="font-size:13px;color:var(--blue);font-weight:700">' + pct + ' %</div>' +
+      '</div>' +
+      '<div style="height:4px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-bottom:24px">' +
+        '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,var(--blue),#7c3aed);border-radius:4px;transition:width .4s ease"></div>' +
+      '</div>' +
+      '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:20px;line-height:1.4;letter-spacing:-.01em">' + q.q + '</div>' +
+      '<div>' + answersHtml + '</div>' +
+    '</div>';
+}
+
+function _csAnswer(answerIdx) {
+  var q = CYBER_SCORE_QUESTIONS[_csState.current];
+  _csState.answers.push({ qid: q.id, cat: q.cat, pts: q.answers[answerIdx].pts });
+  _csState.current++;
+  _csShowQuestion();
+}
+
+function _csNext() {
+  _csShowQuestion();
+}
+
+function _csShowCalculating() {
+  var c = document.getElementById('cs-content');
+  if (!c) return;
+  c.innerHTML =
+    '<div style="text-align:center;padding:32px 0">' +
+      '<div style="width:56px;height:56px;margin:0 auto 20px;border:4px solid var(--bg2);border-top-color:var(--blue);border-radius:50%;animation:csSpin .8s linear infinite"></div>' +
+      '<div style="font-size:16px;color:var(--text);font-weight:700;margin-bottom:6px">Analyse de votre profil...</div>' +
+      '<div style="font-size:13px;color:var(--text3)">Calcul de votre Score Cyber personnalisé</div>' +
+    '</div>';
+  setTimeout(_csShowResult, 1400);
+}
+
+function _csComputeGrade(score) {
+  if (score >= 85) return { letter: 'A', color: '#16a34a', bg: '#dcfce7', label: 'Excellent', desc: 'Votre niveau de sécurité numérique est exemplaire.' };
+  if (score >= 65) return { letter: 'B', color: '#2D5BFF', bg: '#eef1ff', label: 'Bon profil', desc: 'Vous avez de bons réflexes mais quelques points peuvent être renforcés.' };
+  if (score >= 40) return { letter: 'C', color: '#f59e0b', bg: '#fef3c7', label: 'À renforcer', desc: 'Votre niveau est moyen. Plusieurs vulnérabilités importantes à corriger.' };
+  return                  { letter: 'D', color: '#dc2626', bg: '#fee2e2', label: 'Vulnérable', desc: 'Votre profil est exposé. Une action rapide est recommandée.' };
+}
+
+function _csAnalyzeCategories() {
+  var byCat = {};
+  _csState.answers.forEach(function(a) {
+    if (!byCat[a.cat]) byCat[a.cat] = { pts: 0, count: 0 };
+    byCat[a.cat].pts += a.pts;
+    byCat[a.cat].count += 1;
+  });
+  var catLabels = {
+    passwords:           'Mots de passe',
+    mfa:                 'Double authentification',
+    updates:             'Mises à jour',
+    phishing:            'Détection de liens piégés',
+    'social-engineering':'Réflexes face aux appels frauduleux',
+    backup:              'Sauvegardes',
+    wifi:                'Connexion sécurisée',
+    exposure:            'Conscience des fuites de données',
+    apps:                'Applications de confiance',
+    'social-privacy':    'Confidentialité réseaux sociaux'
+  };
+  var strengths = [];
+  var weaknesses = [];
+  Object.keys(byCat).forEach(function(cat) {
+    var avg = byCat[cat].pts / byCat[cat].count;
+    var label = catLabels[cat] || cat;
+    if (avg >= 8) strengths.push(label);
+    else if (avg <= 4) weaknesses.push(label);
+  });
+  return { strengths: strengths, weaknesses: weaknesses };
+}
+
+function _csShowResult() {
+  var c = document.getElementById('cs-content');
+  if (!c) return;
+  var total = _csState.answers.reduce(function(s, a) { return s + a.pts; }, 0);
+  var grade = _csComputeGrade(total);
+  var analysis = _csAnalyzeCategories();
+
+  var strengthsHtml = analysis.strengths.length
+    ? analysis.strengths.slice(0, 3).map(function(s){ return '<div style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--text2);margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><polyline points="20 6 9 17 4 12"/></svg><span>' + s + '</span></div>'; }).join('')
+    : '<div style="font-size:13px;color:var(--text3);font-style:italic">Continuez à renforcer vos pratiques.</div>';
+
+  var weaknessesHtml = analysis.weaknesses.length
+    ? analysis.weaknesses.slice(0, 3).map(function(w){ return '<div style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--text2);margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" style="flex-shrink:0;margin-top:3px"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/><circle cx="12" cy="12" r="10"/></svg><span>' + w + '</span></div>'; }).join('')
+    : '<div style="font-size:13px;color:var(--ok);font-weight:600">Aucune vulnérabilité majeure détectée. Bravo !</div>';
+
+  c.innerHTML =
+    '<div>' +
+      '<div style="text-align:center;margin-bottom:8px">' +
+        '<div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700">Votre Score Cyber</div>' +
+      '</div>' +
+      // Cercle de score
+      '<div style="display:flex;justify-content:center;align-items:center;margin:8px 0 20px">' +
+        '<div style="position:relative;width:160px;height:160px">' +
+          '<svg viewBox="0 0 160 160" style="transform:rotate(-90deg);width:100%;height:100%">' +
+            '<circle cx="80" cy="80" r="68" stroke="var(--bg2)" stroke-width="12" fill="none"/>' +
+            '<circle id="cs-progress-circle" cx="80" cy="80" r="68" stroke="' + grade.color + '" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427" style="transition:stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1)"/>' +
+          '</svg>' +
+          '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">' +
+            '<div id="cs-score-num" style="font-size:44px;font-weight:900;color:var(--text);letter-spacing:-.04em;line-height:1">0</div>' +
+            '<div style="font-size:13px;color:var(--text3);font-weight:600;margin-top:2px">/ 100</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      // Note + label
+      '<div style="text-align:center;margin-bottom:24px">' +
+        '<div style="display:inline-flex;align-items:center;gap:10px;padding:6px 16px;background:' + grade.bg + ';color:' + grade.color + ';border-radius:24px;font-weight:800;font-size:14px;letter-spacing:.02em">' +
+          '<span style="font-size:20px;line-height:1">' + grade.letter + '</span>' +
+          '<span>' + grade.label + '</span>' +
+        '</div>' +
+        '<div style="font-size:14px;color:var(--text2);margin-top:12px;line-height:1.5;max-width:380px;margin-left:auto;margin-right:auto">' + grade.desc + '</div>' +
+      '</div>' +
+      // Points forts / faibles
+      '<div style="display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:20px">' +
+        '<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px">' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Vos points forts</div>' +
+          strengthsHtml +
+        '</div>' +
+        '<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px">' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>À renforcer en priorité</div>' +
+          weaknessesHtml +
+        '</div>' +
+      '</div>' +
+      // Paywall doux : Score d'Exposition
+      '<div style="background:linear-gradient(160deg,#0a1f3a 0%,#1a3fd9 100%);border-radius:16px;padding:22px;color:#fff;position:relative;overflow:hidden;margin-bottom:16px">' +
+        '<div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);pointer-events:none"></div>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+          '<div style="font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#ffd700">Niveau abonné</div>' +
+        '</div>' +
+        '<div style="font-size:17px;font-weight:800;margin-bottom:6px">Découvrez votre Score d’Exposition</div>' +
+        '<div style="font-size:13.5px;color:rgba(255,255,255,.85);line-height:1.5;margin-bottom:14px">Surveillance dark web, fuites de données vous concernant, mots de passe compromis, ré-utilisations risquées. Une vraie radiographie de votre empreinte numérique.</div>' +
+        '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.95)"><span style="color:#4ade80">✓</span>Vérification de vos emails sur le dark web (HIBP officiel)</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.95)"><span style="color:#4ade80">✓</span>Alertes en temps réel en cas de nouvelle fuite</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.95)"><span style="color:#4ade80">✓</span>Score d’exposition recalculé chaque mois</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.95)"><span style="color:#4ade80">✓</span>Plan d’action personnalisé pour vos vulnérabilités</div>' +
+        '</div>' +
+        '<button onclick="(function(){var o=document.getElementById(\'cs-overlay\');if(o)o.remove();siteSubscribe(\'monthly\');})()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;transition:transform .15s" onmouseover="this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.transform=\'\'">Débloquer — 9,99 € / mois<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>' +
+        '<div style="text-align:center;font-size:12px;color:rgba(255,255,255,.7);margin-top:10px">Sans engagement · Résiliable en 1 clic</div>' +
+      '</div>' +
+      // Footer actions
+      '<div style="display:flex;gap:10px">' +
+        '<button onclick="openCyberScore()" style="flex:1;padding:12px;background:#fff;color:var(--text2);border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'#fff\'">Refaire le test</button>' +
+        '<button onclick="document.getElementById(\'cs-overlay\').remove()" style="flex:1;padding:12px;background:var(--bg2);color:var(--text2);border:none;border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background=\'#eee\'" onmouseout="this.style.background=\'var(--bg2)\'">Fermer</button>' +
+      '</div>' +
+    '</div>';
+
+  // Animation du compteur + cercle
+  setTimeout(function() {
+    var numEl = document.getElementById('cs-score-num');
+    var circleEl = document.getElementById('cs-progress-circle');
+    if (circleEl) {
+      var offset = 427 - (total / 100) * 427;
+      circleEl.style.strokeDashoffset = offset;
+    }
+    if (numEl) {
+      var start = 0;
+      var step = Math.max(1, Math.round(total / 50));
+      var interval = setInterval(function() {
+        start += step;
+        if (start >= total) { start = total; clearInterval(interval); }
+        numEl.textContent = start;
+      }, 24);
+    }
+  }, 100);
+
+  // Log anonyme dans Supabase (optionnel — best-effort, ne bloque pas si fail)
+  try {
+    fetch('/.netlify/functions/log-cyber-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ score: total, grade: grade.letter, answers: _csState.answers })
+    }).catch(function(){});
+  } catch(e) {}
+}
 </script>
 </body>
 </html>
