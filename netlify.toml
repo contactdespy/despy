@@ -55,3 +55,7 @@
 
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
+
+# Agent IA réseaux sociaux — post Facebook quotidien
+[functions.social-agent]
+  schedule = "30 6 * * *"          # 6h30 UTC = 8h30 Paris (heure d'été) / 7h30 (heure d'hiver)
