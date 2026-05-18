@@ -186,7 +186,12 @@ async function generateStoryImage(hookText) {
     font: {
       loadSystemFonts: false,
       fontBuffers: [fontBuffer],
-      defaultFontFamily: 'Inter'
+      defaultFontFamily: 'Inter',
+      sansSerifFamily: 'Inter',
+      serifFamily: 'Inter',
+      cursiveFamily: 'Inter',
+      fantasyFamily: 'Inter',
+      monospaceFamily: 'Inter'
     },
     fitTo: { mode: 'width', value: 1080 }
   });
