@@ -137,6 +137,8 @@ function buildStorySvg(hookText) {
 
   <!-- Background -->
   <rect width="1080" height="1920" fill="url(#bg)"/>
+  <!-- DEBUG MARKER -->
+  <circle cx="100" cy="100" r="60" fill="#ff0000"/>
   <rect width="1080" height="1920" fill="url(#halo1)"/>
   <rect width="1080" height="1920" fill="url(#halo2)"/>
 
