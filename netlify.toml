@@ -6,6 +6,10 @@
   publish = "."
   functions = "netlify/functions"
 
+# Fonts bundlées pour la génération d'images (story-agent)
+[functions]
+  included_files = ["netlify/functions/_assets/**"]
+
 # ── Redirections ──
 [[redirects]]
   from = "/app"

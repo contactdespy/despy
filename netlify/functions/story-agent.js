@@ -12,35 +12,20 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { Resvg } = require('@resvg/resvg-js');
+const fs = require('fs');
+const path = require('path');
 
 const FB_API_VERSION = 'v18.0';
 const FB_GRAPH = `https://graph.facebook.com/${FB_API_VERSION}`;
 
-// ── Police Inter Bold chargée une fois et mise en cache ──
-// Liste de fallback : on prend la 1ère qui répond (jsDelivr + unpkg)
-const FONT_URLS = [
-  'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff2',
-  'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff',
-  'https://unpkg.com/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff2',
-  'https://unpkg.com/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff'
-];
+// ── Police Inter (TTF variable, supporte tous les poids) bundlée dans le repo ──
 let _fontBufferCache = null;
-async function getFontBuffer() {
+function getFontBuffer() {
   if (_fontBufferCache) return _fontBufferCache;
-  let lastErr = null;
-  for (const url of FONT_URLS) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) { lastErr = new Error(url + ' → ' + res.status); continue; }
-      const ab = await res.arrayBuffer();
-      _fontBufferCache = Buffer.from(ab);
-      console.log('✅ Police chargée depuis', url, '(' + _fontBufferCache.length + ' bytes)');
-      return _fontBufferCache;
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw new Error('Impossible de télécharger la police Inter Bold : ' + (lastErr && lastErr.message));
+  const fontPath = path.join(__dirname, '_assets', 'font.ttf');
+  _fontBufferCache = fs.readFileSync(fontPath);
+  console.log('✅ Police TTF chargée (' + _fontBufferCache.length + ' bytes)');
+  return _fontBufferCache;
 }
 
 // ── Helpers texte ────────────────────────────
@@ -179,9 +164,9 @@ function buildStorySvg(hookText) {
 </svg>`;
 }
 
-async function generateStoryImage(hookText) {
+function generateStoryImage(hookText) {
   const svg = buildStorySvg(hookText);
-  const fontBuffer = await getFontBuffer();
+  const fontBuffer = getFontBuffer();
   const resvg = new Resvg(svg, {
     font: {
       loadSystemFonts: false,
