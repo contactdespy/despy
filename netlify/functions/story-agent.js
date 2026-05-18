@@ -18,14 +18,13 @@ const path = require('path');
 const FB_API_VERSION = 'v18.0';
 const FB_GRAPH = `https://graph.facebook.com/${FB_API_VERSION}`;
 
-// ── Police Inter (TTF variable, supporte tous les poids) bundlée dans le repo ──
-let _fontBufferCache = null;
-function getFontBuffer() {
-  if (_fontBufferCache) return _fontBufferCache;
-  const fontPath = path.join(__dirname, '_assets', 'font.ttf');
-  _fontBufferCache = fs.readFileSync(fontPath);
-  console.log('✅ Police TTF chargée (' + _fontBufferCache.length + ' bytes)');
-  return _fontBufferCache;
+// ── Chemin de la police bundlée dans le repo ──
+const FONT_PATH = path.join(__dirname, '_assets', 'font.ttf');
+function getFontPath() {
+  if (!fs.existsSync(FONT_PATH)) {
+    throw new Error('Police introuvable : ' + FONT_PATH);
+  }
+  return FONT_PATH;
 }
 
 // ── Helpers texte ────────────────────────────
@@ -137,8 +136,6 @@ function buildStorySvg(hookText) {
 
   <!-- Background -->
   <rect width="1080" height="1920" fill="url(#bg)"/>
-  <!-- DEBUG MARKER -->
-  <circle cx="100" cy="100" r="60" fill="#ff0000"/>
   <rect width="1080" height="1920" fill="url(#halo1)"/>
   <rect width="1080" height="1920" fill="url(#halo2)"/>
 
@@ -168,11 +165,11 @@ function buildStorySvg(hookText) {
 
 function generateStoryImage(hookText) {
   const svg = buildStorySvg(hookText);
-  const fontBuffer = getFontBuffer();
+  const fontPath = getFontPath();
   const resvg = new Resvg(svg, {
     font: {
       loadSystemFonts: false,
-      fontBuffers: [fontBuffer],
+      fontFiles: [fontPath],
       defaultFontFamily: 'Roboto',
       sansSerifFamily: 'Roboto',
       serifFamily: 'Roboto',
