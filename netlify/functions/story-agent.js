@@ -155,7 +155,12 @@ function buildStorySvg(hookText) {
   <!-- CTA bouton -->
   <g transform="translate(540, 1560)">
     <rect x="-360" y="0" width="720" height="140" rx="70" fill="#ffd700"/>
-    <text x="0" y="92" font-family="Roboto" font-size="58" font-weight="900" fill="#0a1f3a" text-anchor="middle" letter-spacing="2">despy.fr  →</text>
+    <text x="-50" y="92" font-family="Roboto" font-size="58" font-weight="900" fill="#0a1f3a" text-anchor="middle" letter-spacing="2">despy.fr</text>
+    <!-- Flèche SVG dessinée (Roboto subset n'a pas U+2192) -->
+    <g transform="translate(170, 70)" stroke="#0a1f3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <line x1="-30" y1="0" x2="30" y2="0"/>
+      <polyline points="10,-18 32,0 10,18"/>
+    </g>
   </g>
 
   <!-- Tagline bas -->
