@@ -6,12 +6,16 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || '').toLowerCase().trim();
+// Accepte plusieurs emails admin séparés par virgules : ADMIN_EMAIL="x@a.fr,y@b.com"
+const ADMIN_EMAILS = (process.env.ADMIN_EMAIL || '')
+  .split(',')
+  .map(e => e.toLowerCase().trim())
+  .filter(Boolean);
 
 function isAdmin(email) {
   if (!email) return false;
-  if (!ADMIN_EMAIL) return false;
-  return String(email).toLowerCase().trim() === ADMIN_EMAIL;
+  if (!ADMIN_EMAILS.length) return false;
+  return ADMIN_EMAILS.includes(String(email).toLowerCase().trim());
 }
 
 // ── Prompts Claude par catégorie ──
@@ -109,7 +113,18 @@ exports.handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); } catch(e) {}
 
   if (!isAdmin(body.adminEmail)) {
-    return { statusCode: 403, headers, body: JSON.stringify({ error: 'Accès admin refusé' }) };
+    return {
+      statusCode: 403,
+      headers,
+      body: JSON.stringify({
+        error: 'Accès admin refusé',
+        debug: {
+          yourSessionEmail: body.adminEmail || '(aucun)',
+          authorizedEmails: ADMIN_EMAILS.length ? ADMIN_EMAILS.length + ' email(s) configuré(s)' : 'aucun (variable ADMIN_EMAIL vide)',
+          hint: 'Ajoute l\'email "' + (body.adminEmail || '?') + '" à la variable ADMIN_EMAIL sur Netlify (séparé par virgule si plusieurs).'
+        }
+      })
+    };
   }
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
