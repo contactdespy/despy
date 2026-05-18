@@ -17,15 +17,30 @@ const FB_API_VERSION = 'v18.0';
 const FB_GRAPH = `https://graph.facebook.com/${FB_API_VERSION}`;
 
 // ── Police Inter Bold chargée une fois et mise en cache ──
-const FONT_URL = 'https://cdn.jsdelivr.net/gh/rsms/inter@master/docs/font-files/Inter-Bold.ttf';
+// Liste de fallback : on prend la 1ère qui répond (jsDelivr + unpkg)
+const FONT_URLS = [
+  'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff2',
+  'https://cdn.jsdelivr.net/npm/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff',
+  'https://unpkg.com/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff2',
+  'https://unpkg.com/@fontsource/inter@5.1.1/files/inter-latin-700-normal.woff'
+];
 let _fontBufferCache = null;
 async function getFontBuffer() {
   if (_fontBufferCache) return _fontBufferCache;
-  const res = await fetch(FONT_URL);
-  if (!res.ok) throw new Error('Impossible de télécharger la police Inter Bold');
-  const ab = await res.arrayBuffer();
-  _fontBufferCache = Buffer.from(ab);
-  return _fontBufferCache;
+  let lastErr = null;
+  for (const url of FONT_URLS) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) { lastErr = new Error(url + ' → ' + res.status); continue; }
+      const ab = await res.arrayBuffer();
+      _fontBufferCache = Buffer.from(ab);
+      console.log('✅ Police chargée depuis', url, '(' + _fontBufferCache.length + ' bytes)');
+      return _fontBufferCache;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw new Error('Impossible de télécharger la police Inter Bold : ' + (lastErr && lastErr.message));
 }
 
 // ── Helpers texte ────────────────────────────
