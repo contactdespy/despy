@@ -2106,6 +2106,53 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </section>
 </div><!-- /page-client -->
 
+<!-- ════════════════════════════════════════ -->
+<!-- ADMIN — Dashboard groupes Facebook       -->
+<!-- ════════════════════════════════════════ -->
+<div id="page-admin-fb" class="page">
+<section style="background:var(--bg2);min-height:100vh;padding:calc(var(--nav-h) + 2rem) clamp(1rem,4vw,2rem) 5rem">
+  <div style="max-width:1000px;margin:0 auto">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700">Dashboard</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);letter-spacing:-.02em">🔒 Admin — Groupes Facebook</div>
+      </div>
+      <button onclick="showPage('home')" style="padding:10px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text2)">← Retour site</button>
+    </div>
+
+    <!-- Suggestion du jour -->
+    <div id="fbadmin-today" style="background:linear-gradient(160deg,#0a1f3a,#2D5BFF);color:#fff;border-radius:18px;padding:24px;margin-bottom:24px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);pointer-events:none"></div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#ffd700;font-weight:800;margin-bottom:6px">Aujourd'hui</div>
+      <div id="fbadmin-today-content" style="font-size:16px;line-height:1.6">Chargement…</div>
+    </div>
+
+    <!-- Filtres catégories -->
+    <div style="display:flex;gap:6px;margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px">
+      <button class="fbadmin-cat" data-cat="all" onclick="fbAdminFilter('all')" style="padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">Tous</button>
+      <button class="fbadmin-cat" data-cat="anti-arnaque" onclick="fbAdminFilter('anti-arnaque')" style="padding:8px 14px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">🚨 Anti-arnaques</button>
+      <button class="fbadmin-cat" data-cat="seniors" onclick="fbAdminFilter('seniors')" style="padding:8px 14px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">👴 Seniors</button>
+      <button class="fbadmin-cat" data-cat="famille" onclick="fbAdminFilter('famille')" style="padding:8px 14px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">👨‍👩‍👧 Famille</button>
+      <button class="fbadmin-cat" data-cat="local" onclick="fbAdminFilter('local')" style="padding:8px 14px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">📍 Local</button>
+      <button class="fbadmin-cat" data-cat="retraite" onclick="fbAdminFilter('retraite')" style="padding:8px 14px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit">🛡 Retraite</button>
+    </div>
+
+    <!-- Liste des groupes -->
+    <div id="fbadmin-groups" style="display:grid;grid-template-columns:1fr;gap:14px"></div>
+
+  </div>
+</section>
+</div><!-- /page-admin-fb -->
+
+<!-- Modal génération post -->
+<div id="fbadmin-modal" style="display:none;position:fixed;inset:0;background:rgba(15,18,30,.82);z-index:10000;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px)">
+  <div style="background:#fff;border-radius:20px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;padding:28px;position:relative">
+    <button onclick="document.getElementById('fbadmin-modal').style.display='none'" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--bg2);border:none;font-size:20px;cursor:pointer;color:var(--text3);line-height:1">×</button>
+    <div id="fbadmin-modal-content"></div>
+  </div>
+</div>
+
 <!-- ══ FOOTER ══ -->
 
 <!-- WhatsApp flottant -->
@@ -6325,6 +6372,269 @@ async function submitDefi(email) {
       var el = document.getElementById('defi-titre');
       if (el) el.textContent = 'Quiz de la semaine';
     });
+})();
+
+
+// ══════════════════════════════════════════════════════════
+// ADMIN — Dashboard groupes Facebook (réservé à ton email)
+// Accès via console (window.openFbAdmin()) ou URL #admin-fb
+// ══════════════════════════════════════════════════════════
+var FBADMIN_STATE = { groups: [], filter: 'all', adminEmail: null };
+
+function openFbAdmin() {
+  var s = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+  if (!s || !s.email) {
+    alert('Connectez-vous d\'abord avec votre compte admin Despy.');
+    if (typeof showLoginModal === 'function') showLoginModal();
+    return;
+  }
+  FBADMIN_STATE.adminEmail = s.email;
+  showPage('admin-fb');
+  fbAdminLoad();
+}
+
+async function fbAdminLoad() {
+  var container = document.getElementById('fbadmin-groups');
+  if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Chargement…</div>';
+
+  try {
+    var r = await fetch('/.netlify/functions/fb-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list', adminEmail: FBADMIN_STATE.adminEmail })
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;font-weight:600">' + (data.error || 'Erreur de chargement') + '</div>';
+      return;
+    }
+    FBADMIN_STATE.groups = data.groups || [];
+    fbAdminRenderToday(data.today);
+    fbAdminRenderGroups();
+  } catch (e) {
+    if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626">Erreur réseau</div>';
+  }
+}
+
+function fbAdminRenderToday(today) {
+  var el = document.getElementById('fbadmin-today-content');
+  if (!el || !today) return;
+  if (today.isRestDay) {
+    el.innerHTML = '<div style="font-size:20px;font-weight:900;margin-bottom:6px;text-transform:capitalize">' + today.date + '</div>' +
+      '<div style="opacity:.95">Pas de publication aujourd\'hui — focus sur l\'engagement. Like et commente dans les groupes pour rester visible 👀</div>';
+    return;
+  }
+  var catLabels = {
+    'anti-arnaque': '🚨 Anti-arnaques',
+    'seniors': '👴 Seniors',
+    'famille': '👨‍👩‍👧 Famille',
+    'local': '📍 Local Strasbourg',
+    'retraite': '🛡 Retraite'
+  };
+  var label = catLabels[today.category] || today.category;
+  el.innerHTML = '<div style="font-size:20px;font-weight:900;margin-bottom:6px;text-transform:capitalize">' + today.date + '</div>' +
+    '<div style="opacity:.95;font-size:15px;margin-bottom:14px">Catégorie recommandée : <strong>' + label + '</strong></div>' +
+    '<button onclick="fbAdminFilter(\'' + today.category + '\')" style="padding:10px 16px;background:#ffd700;color:#0a1f3a;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">Voir les groupes ' + label + ' →</button>';
+}
+
+function fbAdminFilter(cat) {
+  FBADMIN_STATE.filter = cat;
+  // Update buttons
+  document.querySelectorAll('.fbadmin-cat').forEach(function(b){
+    if (b.dataset.cat === cat) {
+      b.style.background = 'var(--blue)';
+      b.style.color = '#fff';
+      b.style.border = 'none';
+    } else {
+      b.style.background = '#fff';
+      b.style.color = 'var(--text2)';
+      b.style.border = '1px solid var(--border)';
+    }
+  });
+  fbAdminRenderGroups();
+}
+
+function fbAdminRenderGroups() {
+  var container = document.getElementById('fbadmin-groups');
+  if (!container) return;
+  var groups = FBADMIN_STATE.groups;
+  if (FBADMIN_STATE.filter !== 'all') {
+    groups = groups.filter(function(g){ return g.category === FBADMIN_STATE.filter; });
+  }
+  if (!groups.length) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3)">Aucun groupe dans cette catégorie.</div>';
+    return;
+  }
+  var statusBadge = {
+    'pending_join': { label: 'À rejoindre', bg: '#fef3c7', color: '#92400e' },
+    'joined':       { label: 'Membre',      bg: '#dcfce7', color: '#16a34a' },
+    'banned':       { label: 'Banni',       bg: '#fee2e2', color: '#dc2626' },
+    'left':         { label: 'Quitté',      bg: '#f3f4f6', color: '#6b7280' }
+  };
+  var catColors = {
+    'anti-arnaque': '#dc2626',
+    'seniors':      '#2D5BFF',
+    'famille':      '#7c3aed',
+    'local':        '#16a34a',
+    'retraite':     '#f59e0b'
+  };
+
+  container.innerHTML = groups.map(function(g) {
+    var status = statusBadge[g.status] || statusBadge.pending_join;
+    var catCol = catColors[g.category] || 'var(--blue)';
+    var sizeFr = (g.estimated_size || 0).toLocaleString('fr-FR');
+    var lastPost = g.last_post_at ? new Date(g.last_post_at).toLocaleDateString('fr-FR') : '—';
+    var statusOptions = ['pending_join','joined','banned','left'].map(function(s){
+      var lbl = statusBadge[s].label;
+      return '<option value="' + s + '"' + (g.status === s ? ' selected' : '') + '>' + lbl + '</option>';
+    }).join('');
+
+    return '<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:0 2px 6px rgba(0,0,0,.04)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap">' +
+        '<div style="flex:1;min-width:200px">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">' +
+            '<span style="display:inline-block;width:8px;height:8px;background:' + catCol + ';border-radius:50%;flex-shrink:0"></span>' +
+            '<div style="font-weight:800;font-size:15px;color:var(--text)">' + g.name + '</div>' +
+            '<span style="padding:2px 8px;background:' + status.bg + ';color:' + status.color + ';border-radius:10px;font-size:11px;font-weight:700">' + status.label + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--text3)">≈ ' + sizeFr + ' membres · ' + g.posts_count + ' post(s) publié(s) · Dernier : ' + lastPost + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">' +
+        '<button onclick="fbAdminGeneratePost(' + g.id + ')" style="flex:1;min-width:140px;padding:10px;background:var(--text);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:6px">✨ Générer un post</button>' +
+        '<select onchange="fbAdminUpdateStatus(' + g.id + ', this.value)" style="padding:10px;background:#fff;border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2)">' +
+          statusOptions +
+        '</select>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function fbAdminUpdateStatus(groupId, newStatus) {
+  try {
+    await fetch('/.netlify/functions/fb-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'update_group',
+        adminEmail: FBADMIN_STATE.adminEmail,
+        groupId: groupId,
+        updates: { status: newStatus }
+      })
+    });
+    // Mise à jour locale
+    var g = FBADMIN_STATE.groups.find(function(x){ return x.id === groupId; });
+    if (g) g.status = newStatus;
+    fbAdminRenderGroups();
+  } catch (e) {
+    alert('Erreur mise à jour');
+  }
+}
+
+async function fbAdminGeneratePost(groupId) {
+  var modal = document.getElementById('fbadmin-modal');
+  var content = document.getElementById('fbadmin-modal-content');
+  if (!modal || !content) return;
+  modal.style.display = 'flex';
+  content.innerHTML = '<div style="text-align:center;padding:40px"><div style="width:48px;height:48px;margin:0 auto 16px;border:4px solid var(--bg2);border-top-color:var(--blue);border-radius:50%;animation:csSpin .8s linear infinite"></div><div style="font-weight:700;color:var(--text)">Claude rédige votre post…</div><div style="font-size:13px;color:var(--text3);margin-top:6px">(15-25 secondes)</div></div>';
+
+  try {
+    var r = await fetch('/.netlify/functions/fb-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'generate_post',
+        adminEmail: FBADMIN_STATE.adminEmail,
+        groupId: groupId
+      })
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      content.innerHTML = '<div style="padding:20px;color:#dc2626;font-weight:600">Erreur : ' + (data.error || 'inconnue') + '</div>';
+      return;
+    }
+
+    var safePost = String(data.post).replace(/`/g, '\\`').replace(/\$/g, '\\$').replace(/\\/g, '\\\\');
+    var escapedForTextarea = data.post.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    content.innerHTML =
+      '<div style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;font-weight:700;margin-bottom:6px">Post pour</div>' +
+      '<div style="font-size:18px;font-weight:800;color:var(--text);margin-bottom:18px">' + data.group.name + '</div>' +
+      '<textarea id="fbadmin-post-text" style="width:100%;min-height:280px;padding:14px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;line-height:1.5;color:var(--text);background:#fafafa;resize:vertical;box-sizing:border-box">' + escapedForTextarea + '</textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">' +
+        '<button onclick="fbAdminCopyPost()" style="flex:1;min-width:130px;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">📋 Copier</button>' +
+        '<button onclick="fbAdminGeneratePost(' + groupId + ')" style="padding:12px 16px;background:#fff;color:var(--text2);border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">🔄 Régénérer</button>' +
+        '<button onclick="fbAdminMarkPosted(' + groupId + ')" style="padding:12px 16px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">✅ Publié</button>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--text3);margin-top:10px;line-height:1.5">Astuce : tu peux éditer le texte avant de copier. Clique "Publié" une fois le post collé sur Facebook pour l\'enregistrer.</div>';
+  } catch (e) {
+    content.innerHTML = '<div style="padding:20px;color:#dc2626;font-weight:600">Erreur réseau</div>';
+  }
+}
+
+function fbAdminCopyPost() {
+  var ta = document.getElementById('fbadmin-post-text');
+  if (!ta) return;
+  ta.select();
+  ta.setSelectionRange(0, 999999);
+  try {
+    document.execCommand('copy');
+    var btn = event.target;
+    var old = btn.innerHTML;
+    btn.innerHTML = '✓ Copié !';
+    btn.style.background = '#16a34a';
+    setTimeout(function(){ btn.innerHTML = old; btn.style.background = 'var(--blue)'; }, 1500);
+  } catch (e) {
+    // Fallback navigator.clipboard
+    if (navigator.clipboard) navigator.clipboard.writeText(ta.value);
+  }
+}
+
+async function fbAdminMarkPosted(groupId) {
+  var ta = document.getElementById('fbadmin-post-text');
+  if (!ta) return;
+  var content = ta.value.trim();
+  if (!content) return alert('Texte vide');
+
+  var btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Enregistrement…';
+
+  try {
+    var r = await fetch('/.netlify/functions/fb-admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'log_post',
+        adminEmail: FBADMIN_STATE.adminEmail,
+        groupId: groupId,
+        content: content
+      })
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      alert('Erreur : ' + (data.error || 'inconnue'));
+      btn.disabled = false;
+      btn.innerHTML = '✅ Publié';
+      return;
+    }
+    document.getElementById('fbadmin-modal').style.display = 'none';
+    fbAdminLoad(); // refresh
+  } catch (e) {
+    alert('Erreur réseau');
+    btn.disabled = false;
+    btn.innerHTML = '✅ Publié';
+  }
+}
+
+// Activation par URL #admin-fb (sans afficher de bouton sur le site)
+(function(){
+  if (window.location.hash === '#admin-fb' || window.location.hash === '#admin') {
+    setTimeout(function(){ openFbAdmin(); }, 200);
+  }
+  window.addEventListener('hashchange', function(){
+    if (window.location.hash === '#admin-fb' || window.location.hash === '#admin') openFbAdmin();
+  });
 })();
 
 
