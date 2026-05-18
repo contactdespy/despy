@@ -11,10 +11,22 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
-const sharp = require('sharp');
+const { Resvg } = require('@resvg/resvg-js');
 
 const FB_API_VERSION = 'v18.0';
 const FB_GRAPH = `https://graph.facebook.com/${FB_API_VERSION}`;
+
+// ── Police Inter Bold chargée une fois et mise en cache ──
+const FONT_URL = 'https://cdn.jsdelivr.net/gh/rsms/inter@master/docs/font-files/Inter-Bold.ttf';
+let _fontBufferCache = null;
+async function getFontBuffer() {
+  if (_fontBufferCache) return _fontBufferCache;
+  const res = await fetch(FONT_URL);
+  if (!res.ok) throw new Error('Impossible de télécharger la police Inter Bold');
+  const ab = await res.arrayBuffer();
+  _fontBufferCache = Buffer.from(ab);
+  return _fontBufferCache;
+}
 
 // ── Helpers texte ────────────────────────────
 
@@ -102,7 +114,7 @@ function buildStorySvg(hookText) {
 
   const textElements = lines.map((line, i) => {
     const y = startY + i * lineHeight;
-    return `<text x="540" y="${y}" font-family="Helvetica, Arial, sans-serif" font-size="${fontSize}" font-weight="900" fill="#ffffff" text-anchor="middle" style="paint-order:stroke">${escapeXml(line)}</text>`;
+    return `<text x="540" y="${y}" font-family="Inter" font-size="${fontSize}" font-weight="900" fill="#ffffff" text-anchor="middle">${escapeXml(line)}</text>`;
   }).join('\n  ');
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -130,8 +142,8 @@ function buildStorySvg(hookText) {
 
   <!-- Logo bloc (top) -->
   <g transform="translate(540, 220)">
-    <text x="0" y="0" font-family="Helvetica, Arial, sans-serif" font-size="64" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="14">DESPY</text>
-    <text x="0" y="56" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#ffd700" text-anchor="middle" letter-spacing="8">CYBERSÉCURITÉ</text>
+    <text x="0" y="0" font-family="Inter" font-size="64" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="14">DESPY</text>
+    <text x="0" y="56" font-family="Inter" font-size="22" font-weight="700" fill="#ffd700" text-anchor="middle" letter-spacing="8">CYBERSÉCURITÉ</text>
     <line x1="-40" y1="100" x2="40" y2="100" stroke="#ffd700" stroke-width="3" stroke-linecap="round"/>
   </g>
 
@@ -144,19 +156,26 @@ function buildStorySvg(hookText) {
   <!-- CTA bouton -->
   <g transform="translate(540, 1560)">
     <rect x="-360" y="0" width="720" height="140" rx="70" fill="#ffd700"/>
-    <text x="0" y="92" font-family="Helvetica, Arial, sans-serif" font-size="58" font-weight="900" fill="#0a1f3a" text-anchor="middle" letter-spacing="2">despy.fr  →</text>
+    <text x="0" y="92" font-family="Inter" font-size="58" font-weight="900" fill="#0a1f3a" text-anchor="middle" letter-spacing="2">despy.fr  →</text>
   </g>
 
   <!-- Tagline bas -->
-  <text x="540" y="1780" font-family="Helvetica, Arial, sans-serif" font-size="26" font-weight="600" fill="#ffffff" fill-opacity="0.78" text-anchor="middle" letter-spacing="3">SCORE CYBER GRATUIT · 60 SECONDES</text>
+  <text x="540" y="1780" font-family="Inter" font-size="26" font-weight="600" fill="#ffffff" fill-opacity="0.78" text-anchor="middle" letter-spacing="3">SCORE CYBER GRATUIT · 60 SECONDES</text>
 </svg>`;
 }
 
 async function generateStoryImage(hookText) {
   const svg = buildStorySvg(hookText);
-  return await sharp(Buffer.from(svg))
-    .png({ quality: 92 })
-    .toBuffer();
+  const fontBuffer = await getFontBuffer();
+  const resvg = new Resvg(svg, {
+    font: {
+      loadSystemFonts: false,
+      fontBuffers: [fontBuffer],
+      defaultFontFamily: 'Inter'
+    },
+    fitTo: { mode: 'width', value: 1080 }
+  });
+  return resvg.render().asPng();
 }
 
 // ── Facebook API ────────────────────────────
