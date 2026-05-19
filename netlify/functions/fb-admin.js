@@ -23,14 +23,15 @@ const DESPY_FB_PAGE_URL = process.env.FACEBOOK_PAGE_URL || '';
 
 // Intro chaleureuse partagée par toutes les catégories (humanise le post)
 const PERSONAL_INTRO_RULE = `IMPORTANT — INTRO DE PRÉSENTATION :
-Commence TOUJOURS par 1 phrase courte (max 12 mots) qui présente Yacine de façon chaleureuse et humaine, suivie d'un saut de ligne avant le contenu.
+Commence TOUJOURS par 1 phrase courte (max 12 mots) qui présente Despy de façon chaleureuse et humaine, suivie d'un saut de ligne avant le contenu.
 Varie la formulation à chaque post pour éviter la répétition. Exemples possibles (choisis-en un et adapte) :
-- "Bonjour à tous, Yacine ici 👋"
-- "Bonjour, je suis Yacine, créateur de Despy."
-- "Yacine ici, je m'occupe de cybersécurité pour les particuliers."
-- "Bonjour à toutes et tous, c'est Yacine."
-- "Bonjour, Yacine de Despy — petit conseil du jour 👇"
-- "Bonjour à tous ! Yacine de Despy."`;
+- "Bonjour à tous, Despy ici 👋"
+- "Bonjour à toutes et tous, l'équipe Despy vous salue."
+- "Despy à votre service — un mot rapide aujourd'hui."
+- "Bonjour, l'équipe Despy ici 👇"
+- "Bonjour à tous ! Petit message de Despy."
+- "Bonjour, c'est Despy — vigilance sur le numérique."
+N'utilise JAMAIS de prénom personnel. Toujours "Despy" ou "l'équipe Despy".`;
 
 // ── Prompts Claude par catégorie ──
 // Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
@@ -90,17 +91,21 @@ CTAs OBLIGATOIRES à la fin :
 Mission : rédige un post Facebook COURT (80 à 110 mots maximum) qui propose un service local d'intervention cyber.
 
 INTRO LOCALE OBLIGATOIRE (et non l'intro standard) :
-Commence par 1 phrase qui se présente comme local : "Bonjour à tous, je m'appelle Yacine, j'habite Strasbourg." ou "Bonjour à tous, Yacine ici, votre voisin strasbourgeois." (varie à chaque génération).
+Commence par 1 phrase qui se présente comme local Despy basé à Strasbourg, sans utiliser de prénom. Exemples (varie à chaque génération) :
+- "Bonjour à tous, Despy ici — équipe locale basée à Strasbourg."
+- "Bonjour à toutes et tous, l'équipe Despy vous parle depuis Strasbourg."
+- "Bonjour, Despy à votre service — votre voisin numérique strasbourgeois."
+- "Bonjour Strasbourg ! L'équipe Despy ici, basée chez vous."
 
 Structure complète :
-1. Intro locale (1 phrase + saut de ligne)
+1. Intro locale Despy (1 phrase + saut de ligne, sans prénom)
 2. 📍 accroche locale en 1 phrase
-3. 2 lignes : "Je propose [services en 1 phrase]"
+3. 2 lignes : "Nous proposons [services en 1 phrase]"
 4. 1 ligne tarifs : "89€ (1h) ou 129€ (2h) selon vos besoins"
-Ton : voisin sympa, première personne ("je").
+Ton : équipe locale sympathique, troisième personne ("nous", "l'équipe Despy"). JAMAIS de prénom personnel.
 
 CTAs OBLIGATOIRES à la fin :
-- "👉 Suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
+- "👉 Suivez la page Despy : ${DESPY_FB_PAGE_URL}"
 - "Réservation en ligne sur despy.fr"
 - 1 ligne d'invitation à poser des questions en commentaire.`,
 
