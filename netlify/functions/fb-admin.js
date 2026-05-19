@@ -22,64 +22,69 @@ function isAdmin(email) {
 const DESPY_FB_PAGE_URL = process.env.FACEBOOK_PAGE_URL || '';
 
 // ── Prompts Claude par catégorie ──
-// Funnel à 2 étages : Groupe → Suivre la Page Despy (CTA primaire) → despy.fr (CTA secondaire)
-// Le primaire est plus important : un follower de Page reçoit ensuite 30+ posts/mois auto.
+// Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
+// Funnel à 2 étages : Groupe → Page Despy (CTA primaire) → despy.fr (secondaire)
 const CATEGORY_PROMPTS = {
   'anti-arnaque': `Public : groupe Facebook "{group}" — communauté française qui partage des arnaques.
-Mission : rédige un post Facebook de 130 à 180 mots qui partage UNE arnaque concrète + comment la reconnaître.
-Structure : 🚨 accroche → description courte → 3 signes pour la repérer → 1 action immédiate.
-Ton : utile, expert, jamais condescendant. Vouvoiement.
+Mission : rédige un post Facebook ULTRA COURT (60 à 90 mots maximum) qui alerte sur UNE arnaque.
+Structure :
+1. 🚨 accroche en 1 phrase choc
+2. 2-3 lignes : décrire l'arnaque en une phrase + 2 signes pour la repérer (format liste à puces ✅/❌)
+3. 1 ligne d'action concrète
+Ton : direct, percutant. Pas de blabla. Vouvoiement.
 
-CTAs OBLIGATOIRES à intégrer en fin de post, dans cet ordre :
-1. CTA PRINCIPAL — invite à suivre la page Facebook Despy pour recevoir les alertes chaque jour :
-   "👉 Pour ne rater aucune nouvelle arnaque, suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
-2. CTA SECONDAIRE — mention discrète de despy.fr pour l'analyseur :
-   "Vous pouvez aussi vérifier vos messages suspects sur despy.fr (gratuit)"`,
+CTAs OBLIGATOIRES à la fin (1 ligne chacun, séparés par 1 saut de ligne) :
+- "👉 Suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
+- "Vérifiez vos messages sur despy.fr"`,
 
   'seniors': `Public : groupe Facebook "{group}" — seniors connectés français (60+).
-Mission : rédige un post Facebook de 130 à 180 mots qui donne UN conseil pratique cybersécurité, applicable en 5 min par un senior.
-Structure : 💡 accroche → pourquoi c'est important → 3 étapes numérotées concrètes.
-Ton : pédagogique, bienveillant, jamais alarmiste. Vouvoiement. Pas de jargon non expliqué.
+Mission : rédige un post Facebook ULTRA COURT (60 à 90 mots maximum) avec UN seul conseil cyber concret.
+Structure :
+1. 💡 accroche en 1 phrase (question ou affirmation)
+2. 3 étapes numérotées 1️⃣ 2️⃣ 3️⃣ (1 ligne chacune, max 12 mots/étape)
+3. 1 phrase de conclusion rassurante
+Ton : pédagogique, simple. Vouvoiement. Zéro jargon non expliqué.
 
-CTAs OBLIGATOIRES en fin de post :
-1. CTA PRINCIPAL — invite à suivre la page Despy pour des conseils chaque jour :
-   "👉 Pour un conseil cyber adapté chaque jour, suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
-2. CTA SECONDAIRE — Score Cyber gratuit :
-   "Et si vous voulez tester votre niveau de sécurité, il y a un test gratuit (60 sec, sans inscription) sur despy.fr"`,
+CTAs OBLIGATOIRES à la fin :
+- "👉 Suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
+- "Test gratuit en 60 sec sur despy.fr"`,
 
   'famille': `Public : groupe Facebook "{group}" — adultes 30-50 ans avec parents/grands-parents.
-Mission : rédige un post Facebook de 130 à 180 mots qui touche le cœur : "Si vos parents reçoivent un SMS suspect, voici quoi faire / comment les protéger".
-Structure : 👨‍👩‍👧 accroche émotionnelle → exemple parlant (anonymisé) → ce qu'il faut faire.
-Ton : chaleureux, narratif, jamais commercial agressif.
+Mission : rédige un post Facebook ULTRA COURT (70 à 100 mots maximum) qui touche le cœur.
+Structure :
+1. 👨‍👩‍👧 accroche émotionnelle en 1 phrase (parle aux proches)
+2. 2-3 lignes : exemple bref (anonymisé) + ce qu'il faut faire
+3. 1 ligne rassurante
+Ton : chaleureux, jamais commercial agressif.
 
-CTAs OBLIGATOIRES en fin de post :
-1. CTA PRINCIPAL — invite à suivre la page Despy pour partager aux parents :
-   "👉 Pour des conseils à partager à vos proches, suivez la page Despy : ${DESPY_FB_PAGE_URL}"
-2. CTA SECONDAIRE — cadeau d'abonnement :
-   "Vous pouvez aussi leur offrir l'abonnement Despy (9,99€/mois) sur despy.fr — il y a même un code parrainage qui offre 1 mois aux 2"`,
+CTAs OBLIGATOIRES à la fin :
+- "👉 Suivez la page Despy : ${DESPY_FB_PAGE_URL}"
+- "Offrez Despy à un proche (9,99€/mois, 1 mois offert avec parrainage) sur despy.fr"`,
 
   'local': `Public : groupe Facebook "{group}" — habitants de Strasbourg et Eurométropole.
-Mission : rédige un post Facebook de 130 à 180 mots qui propose un SERVICE LOCAL d'intervention cybersécurité à domicile.
-Structure : 📍 accroche locale → "Je m'appelle Yacine, je propose..." → 3 services concrets → tarifs (89€ pour 1h, 129€ pour 2h).
-Ton : voisin sympa, professionnel, accessible. Première personne ("je").
+Mission : rédige un post Facebook ULTRA COURT (70 à 100 mots maximum) qui propose un service local d'intervention cyber.
+Structure :
+1. 📍 accroche locale en 1 phrase ("Strasbourg, ...")
+2. 2 lignes : "Je m'appelle Yacine. Je propose [services en 1 phrase]"
+3. 1 ligne tarifs : "89€ (1h) ou 129€ (2h) selon vos besoins"
+Ton : voisin sympa, première personne ("je").
 
-CTAs OBLIGATOIRES en fin de post :
-1. CTA PRINCIPAL — invite à suivre la page Despy pour rester informé :
-   "👉 Suivez ma page Despy pour les actualités cyber : ${DESPY_FB_PAGE_URL}"
-2. CTA SECONDAIRE — réservation directe :
-   "Pour réserver un créneau à domicile, rendez-vous sur despy.fr (paiement sécurisé Stripe)"
-3. Invitation à poser des questions en commentaire.`,
+CTAs OBLIGATOIRES à la fin :
+- "👉 Suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
+- "Réservation en ligne sur despy.fr"
+- 1 ligne d'invitation à poser des questions en commentaire.`,
 
-  'retraite': `Public : groupe Facebook "{group}" — retraités et préretraités intéressés par leur futur.
-Mission : rédige un post Facebook de 150 à 200 mots, ton article éducatif, sur un thème cybersécurité de la retraite : protection des comptes bancaires en ligne, attention aux faux conseillers, sécurisation des données médicales en ligne.
-Structure : 🛡 titre fort → contexte → conseils détaillés.
-Ton : expert, factuel, posé. Format article long avec sauts de ligne.
+  'retraite': `Public : groupe Facebook "{group}" — retraités et préretraités.
+Mission : rédige un post Facebook COURT (80 à 120 mots maximum) sur un thème cyber/retraite.
+Structure :
+1. 🛡 titre fort en 1 phrase
+2. 3-4 lignes : conseil clé en quelques phrases courtes
+3. 1 ligne d'action concrète
+Ton : expert, factuel, posé. Pas trop long.
 
-CTAs OBLIGATOIRES en fin de post :
-1. CTA PRINCIPAL — invite à suivre la page Despy pour des articles réguliers :
-   "👉 Pour un article cyber complet chaque semaine, suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
-2. CTA SECONDAIRE — test gratuit :
-   "Vous pouvez aussi tester votre niveau de protection en 60 secondes sur despy.fr"`
+CTAs OBLIGATOIRES à la fin :
+- "👉 Suivez ma page Despy : ${DESPY_FB_PAGE_URL}"
+- "Test de sécurité gratuit (60 sec) sur despy.fr"`
 };
 
 async function generatePostForGroup(group, ctx = {}) {
