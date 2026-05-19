@@ -37,8 +37,6 @@ N'utilise JAMAIS de prénom personnel. Toujours "Despy" ou "l'équipe Despy".`;
 // Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
 // Funnel à 2 étages : Groupe → Page Despy (CTA primaire) → despy.fr (secondaire)
 const CATEGORY_PROMPTS = {
-
-const CATEGORY_PROMPTS = {
   'anti-arnaque': `Public : groupe Facebook "{group}" — communauté française qui partage des arnaques.
 Mission : rédige un post Facebook COURT (70 à 100 mots maximum) qui alerte sur UNE arnaque.
 
