@@ -25,12 +25,28 @@ const DESPY_FB_PAGE_URL = process.env.FACEBOOK_PAGE_URL || '';
 // Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
 // Funnel à 2 étages : Groupe → Page Despy (CTA primaire) → despy.fr (secondaire)
 const CATEGORY_PROMPTS = {
+// Intro chaleureuse partagée par toutes les catégories (humanise le post)
+const PERSONAL_INTRO_RULE = `IMPORTANT — INTRO DE PRÉSENTATION :
+Commence TOUJOURS par 1 phrase courte (max 12 mots) qui présente Yacine de façon chaleureuse et humaine, suivie d'un saut de ligne avant le contenu.
+Varie la formulation à chaque post pour éviter la répétition. Exemples possibles (choisis-en un et adapte) :
+- "Bonjour à tous, Yacine ici 👋"
+- "Bonjour, je suis Yacine, créateur de Despy."
+- "Yacine ici, je m'occupe de cybersécurité pour les particuliers."
+- "Bonjour à toutes et tous, c'est Yacine."
+- "Bonjour, Yacine de Despy — petit conseil du jour 👇"
+- "Bonjour à tous ! Yacine de Despy."`;
+
+const CATEGORY_PROMPTS = {
   'anti-arnaque': `Public : groupe Facebook "{group}" — communauté française qui partage des arnaques.
-Mission : rédige un post Facebook ULTRA COURT (60 à 90 mots maximum) qui alerte sur UNE arnaque.
-Structure :
-1. 🚨 accroche en 1 phrase choc
-2. 2-3 lignes : décrire l'arnaque en une phrase + 2 signes pour la repérer (format liste à puces ✅/❌)
-3. 1 ligne d'action concrète
+Mission : rédige un post Facebook COURT (70 à 100 mots maximum) qui alerte sur UNE arnaque.
+
+${PERSONAL_INTRO_RULE}
+
+Structure complète :
+1. Intro perso (1 phrase + saut de ligne)
+2. 🚨 accroche en 1 phrase choc
+3. 2-3 lignes : décrire l'arnaque + 2 signes pour la repérer (format liste à puces ✅/❌)
+4. 1 ligne d'action concrète
 Ton : direct, percutant. Pas de blabla. Vouvoiement.
 
 CTAs OBLIGATOIRES à la fin (1 ligne chacun, séparés par 1 saut de ligne) :
@@ -38,11 +54,15 @@ CTAs OBLIGATOIRES à la fin (1 ligne chacun, séparés par 1 saut de ligne) :
 - "Vérifiez vos messages sur despy.fr"`,
 
   'seniors': `Public : groupe Facebook "{group}" — seniors connectés français (60+).
-Mission : rédige un post Facebook ULTRA COURT (60 à 90 mots maximum) avec UN seul conseil cyber concret.
-Structure :
-1. 💡 accroche en 1 phrase (question ou affirmation)
-2. 3 étapes numérotées 1️⃣ 2️⃣ 3️⃣ (1 ligne chacune, max 12 mots/étape)
-3. 1 phrase de conclusion rassurante
+Mission : rédige un post Facebook COURT (70 à 100 mots maximum) avec UN seul conseil cyber concret.
+
+${PERSONAL_INTRO_RULE}
+
+Structure complète :
+1. Intro perso (1 phrase + saut de ligne)
+2. 💡 accroche en 1 phrase (question ou affirmation)
+3. 3 étapes numérotées 1️⃣ 2️⃣ 3️⃣ (1 ligne chacune, max 12 mots/étape)
+4. 1 phrase de conclusion rassurante
 Ton : pédagogique, simple. Vouvoiement. Zéro jargon non expliqué.
 
 CTAs OBLIGATOIRES à la fin :
@@ -50,11 +70,15 @@ CTAs OBLIGATOIRES à la fin :
 - "Test gratuit en 60 sec sur despy.fr"`,
 
   'famille': `Public : groupe Facebook "{group}" — adultes 30-50 ans avec parents/grands-parents.
-Mission : rédige un post Facebook ULTRA COURT (70 à 100 mots maximum) qui touche le cœur.
-Structure :
-1. 👨‍👩‍👧 accroche émotionnelle en 1 phrase (parle aux proches)
-2. 2-3 lignes : exemple bref (anonymisé) + ce qu'il faut faire
-3. 1 ligne rassurante
+Mission : rédige un post Facebook COURT (80 à 110 mots maximum) qui touche le cœur.
+
+${PERSONAL_INTRO_RULE}
+
+Structure complète :
+1. Intro perso (1 phrase + saut de ligne)
+2. 👨‍👩‍👧 accroche émotionnelle en 1 phrase (parle aux proches)
+3. 2-3 lignes : exemple bref (anonymisé) + ce qu'il faut faire
+4. 1 ligne rassurante
 Ton : chaleureux, jamais commercial agressif.
 
 CTAs OBLIGATOIRES à la fin :
@@ -62,11 +86,16 @@ CTAs OBLIGATOIRES à la fin :
 - "Offrez Despy à un proche (9,99€/mois, 1 mois offert avec parrainage) sur despy.fr"`,
 
   'local': `Public : groupe Facebook "{group}" — habitants de Strasbourg et Eurométropole.
-Mission : rédige un post Facebook ULTRA COURT (70 à 100 mots maximum) qui propose un service local d'intervention cyber.
-Structure :
-1. 📍 accroche locale en 1 phrase ("Strasbourg, ...")
-2. 2 lignes : "Je m'appelle Yacine. Je propose [services en 1 phrase]"
-3. 1 ligne tarifs : "89€ (1h) ou 129€ (2h) selon vos besoins"
+Mission : rédige un post Facebook COURT (80 à 110 mots maximum) qui propose un service local d'intervention cyber.
+
+INTRO LOCALE OBLIGATOIRE (et non l'intro standard) :
+Commence par 1 phrase qui se présente comme local : "Bonjour à tous, je m'appelle Yacine, j'habite Strasbourg." ou "Bonjour à tous, Yacine ici, votre voisin strasbourgeois." (varie à chaque génération).
+
+Structure complète :
+1. Intro locale (1 phrase + saut de ligne)
+2. 📍 accroche locale en 1 phrase
+3. 2 lignes : "Je propose [services en 1 phrase]"
+4. 1 ligne tarifs : "89€ (1h) ou 129€ (2h) selon vos besoins"
 Ton : voisin sympa, première personne ("je").
 
 CTAs OBLIGATOIRES à la fin :
@@ -75,11 +104,15 @@ CTAs OBLIGATOIRES à la fin :
 - 1 ligne d'invitation à poser des questions en commentaire.`,
 
   'retraite': `Public : groupe Facebook "{group}" — retraités et préretraités.
-Mission : rédige un post Facebook COURT (80 à 120 mots maximum) sur un thème cyber/retraite.
-Structure :
-1. 🛡 titre fort en 1 phrase
-2. 3-4 lignes : conseil clé en quelques phrases courtes
-3. 1 ligne d'action concrète
+Mission : rédige un post Facebook COURT (90 à 130 mots maximum) sur un thème cyber/retraite.
+
+${PERSONAL_INTRO_RULE}
+
+Structure complète :
+1. Intro perso (1 phrase + saut de ligne)
+2. 🛡 titre fort en 1 phrase
+3. 3-4 lignes : conseil clé en quelques phrases courtes
+4. 1 ligne d'action concrète
 Ton : expert, factuel, posé. Pas trop long.
 
 CTAs OBLIGATOIRES à la fin :
