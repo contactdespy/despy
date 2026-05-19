@@ -382,7 +382,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
-    <button class="nav-link" onclick="scrollToSection('fidelisation')">Formation</button>
+    <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
     <button class="nav-link" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">Conseiller IA</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
     <button class="nav-cta" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);margin-right:6px;font-size:13px" onclick="showLoginModal()">Connexion</button>
@@ -398,8 +398,8 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <span>Tarifs &amp; services</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <button class="mob-link" onclick="scrollToSection('fidelisation');closeMob()">
-      <span>Formation</span>
+    <button class="mob-link" onclick="showPage('comment-ca-marche');closeMob()">
+      <span>Comment ça marche</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">
@@ -1807,6 +1807,315 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </section>
 </div><!-- /page-conseiller -->
 
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- PAGE COMMENT ÇA MARCHE                                      -->
+<!-- Guide d'utilisation simple et rassurant pour les seniors    -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<div id="page-comment-ca-marche" class="page">
+<section style="background:linear-gradient(180deg,#fff,#f8faff);padding:calc(var(--nav-h) + 3rem) clamp(1rem,4vw,2rem) 5rem">
+  <div style="max-width:920px;margin:0 auto">
+
+    <!-- En-tête rassurant -->
+    <div style="text-align:center;margin-bottom:3rem">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:var(--blue-light);border-radius:30px;font-size:13px;font-weight:700;color:var(--blue);margin-bottom:14px">📖 Guide d'utilisation</div>
+      <h1 style="font-size:clamp(28px,5vw,40px);font-weight:900;color:var(--text);letter-spacing:-.02em;line-height:1.2;margin-bottom:14px">Comment fonctionne Despy ?</h1>
+      <p style="font-size:clamp(15px,2vw,18px);color:var(--text2);line-height:1.6;max-width:680px;margin:0 auto">Un guide simple et pas à pas pour utiliser toutes les fonctionnalités de Despy en toute sérénité. <strong>Aucune compétence technique nécessaire.</strong></p>
+    </div>
+
+    <!-- Sommaire visuel -->
+    <div style="background:#fff;border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:3rem;box-shadow:0 4px 20px rgba(0,0,0,.04)">
+      <div style="font-size:12px;font-weight:800;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Au sommaire — cliquez pour aller directement</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">
+        <a href="#cm-analyseur" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">📱</span><span>Vérifier un SMS / email</span></a>
+        <a href="#cm-annuaire" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">📞</span><span>Vérifier un numéro</span></a>
+        <a href="#cm-site" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🛒</span><span>Vérifier un site marchand</span></a>
+        <a href="#cm-conseiller" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">💬</span><span>Le Conseiller IA</span></a>
+        <a href="#cm-score" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">⭐</span><span>Score Cyber gratuit</span></a>
+        <a href="#cm-darkweb" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🌑</span><span>Surveillance dark web</span></a>
+        <a href="#cm-alertes" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🔔</span><span>Alertes nationales</span></a>
+        <a href="#cm-parrainage" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🎁</span><span>Code parrainage</span></a>
+        <a href="#cm-domicile" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🏠</span><span>Intervention à domicile</span></a>
+        <a href="#cm-abonnement" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">💳</span><span>Mon abonnement</span></a>
+        <a href="#cm-resilier" style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg2);border-radius:12px;text-decoration:none;color:var(--text);font-weight:600;font-size:14px;transition:.2s"><span style="font-size:22px">🚫</span><span>Résilier</span></a>
+        <a href="#cm-aide" style="display:flex;align-items:center;gap:10px;padding:12px;background:#fff3cd;border:1.5px solid #f59e0b;border-radius:12px;text-decoration:none;color:#92400e;font-weight:700;font-size:14px;transition:.2s"><span style="font-size:22px">🆘</span><span>Besoin d'aide humaine ?</span></a>
+      </div>
+    </div>
+
+    <!-- Section : Analyseur SMS/Email -->
+    <div id="cm-analyseur" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📱</div>
+        <div>
+          <div style="font-size:12px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.08em">Outil principal</div>
+          <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Vérifier un SMS, un email ou un lien</h2>
+        </div>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Vous recevez un message qui vous semble étrange ? Notre IA analyse le texte et vous dit en quelques secondes si c'est une arnaque ou pas, avec une explication claire.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Sur la page d'accueil, descendez jusqu'à <strong>"Analyser un message"</strong></li>
+          <li><strong>Copiez</strong> le message suspect depuis votre téléphone ou votre boîte mail (appui long → Copier)</li>
+          <li><strong>Collez</strong>-le dans le grand cadre blanc (appui long → Coller)</li>
+          <li>Cliquez sur <strong>"Analyser maintenant"</strong></li>
+          <li>Vous obtenez un verdict en couleurs : <span style="color:#16a34a;font-weight:700">vert = sûr</span>, <span style="color:#f59e0b;font-weight:700">orange = douteux</span>, <span style="color:#dc2626;font-weight:700">rouge = arnaque</span></li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#f0fdf4;border-left:4px solid #16a34a;border-radius:8px;font-size:14px;color:#15803d;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">💡</span>
+        <div><strong>Astuce :</strong> En version gratuite, vous avez droit à 1 analyse par semaine. Avec l'abonnement, c'est illimité.</div>
+      </div>
+    </div>
+
+    <!-- Section : Annuaire inversé -->
+    <div id="cm-annuaire" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">📞</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Vérifier un numéro de téléphone</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Un numéro inconnu vous a appelé ? Avant de rappeler, vérifiez-le. Despy vous dit si d'autres personnes l'ont signalé comme étant une arnaque.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Cliquez sur l'onglet <strong>"Annuaire inversé"</strong> dans la zone des outils</li>
+          <li>Tapez le numéro qui vous a appelé (avec ou sans 0 devant, peu importe)</li>
+          <li>Cliquez sur <strong>"Vérifier"</strong></li>
+          <li>Vous voyez en 1 coup d'œil : nombre de signalements, catégorie (arnaque téléphonique, démarchage abusif…)</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:8px;font-size:14px;color:#991b1b;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">⚠️</span>
+        <div><strong>Important :</strong> Si vous avez été victime, vous pouvez vous-même <strong>signaler le numéro</strong> via le bouton "Signaler" pour aider la communauté.</div>
+      </div>
+    </div>
+
+    <!-- Section : Vérificateur site marchand -->
+    <div id="cm-site" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#dcfce7,#bbf7d0);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🛒</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Vérifier un site avant d'acheter</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Vous voulez acheter quelque chose sur un site que vous ne connaissez pas ? Despy vérifie pour vous : depuis combien de temps il existe, s'il a bonne réputation, et si c'est un site sécurisé.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Cliquez sur l'onglet <strong>"Vérificateur de site"</strong></li>
+          <li>Copiez l'adresse complète du site (par exemple <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:13px">https://...</code>)</li>
+          <li>Collez-la dans le cadre</li>
+          <li>Cliquez sur <strong>"Vérifier ce site"</strong></li>
+          <li>En 10 secondes, vous obtenez un rapport : ancienneté, sécurité du paiement, certificat, avis détectés</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Section : Conseiller IA -->
+    <div id="cm-conseiller" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#f3e8ff,#e9d5ff);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">💬</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Le Conseiller IA — posez vos questions</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">C'est un assistant intelligent à qui vous pouvez poser n'importe quelle question sur la sécurité numérique. Il vous répond en français simple, comme un expert qui prendrait le temps de tout expliquer.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Cliquez sur <strong>"Conseiller IA"</strong> dans le menu</li>
+          <li>Tapez votre question dans le grand cadre (par exemple : <em>"Comment je sais si mon mot de passe est sécurisé ?"</em>)</li>
+          <li>Cliquez sur <strong>"Envoyer"</strong> ou appuyez sur Entrée</li>
+          <li>La réponse arrive en quelques secondes</li>
+          <li>Vous pouvez poser une nouvelle question dans la foulée</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#f5f3ff;border-left:4px solid #7c3aed;border-radius:8px;font-size:14px;color:#5b21b6;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">💡</span>
+        <div>Le Conseiller est <strong>illimité avec l'abonnement</strong>. Sans abonnement, vous avez 3 questions gratuites pour tester.</div>
+      </div>
+    </div>
+
+    <!-- Section : Score Cyber -->
+    <div id="cm-score" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#fff7ed,#ffedd5);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">⭐</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Tester votre niveau de sécurité (60 secondes)</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Un mini-questionnaire de 8 à 10 questions pour évaluer votre niveau de protection numérique. À la fin, vous obtenez un <strong>score sur 100</strong> et une note (A, B, C ou D) avec des conseils personnalisés.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Sur la page d'accueil, descendez jusqu'à <strong>"Score Cyber"</strong></li>
+          <li>Cliquez sur <strong>"Commencer le test"</strong></li>
+          <li>Répondez aux questions (toutes les réponses sont possibles, aucune ne fait perdre de points injustement)</li>
+          <li>À la fin, vous découvrez votre score et vos points à améliorer</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#f0fdf4;border-left:4px solid #16a34a;border-radius:8px;font-size:14px;color:#15803d;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">🎁</span>
+        <div><strong>Entièrement gratuit, sans inscription.</strong> Vous pouvez le refaire autant de fois que vous voulez.</div>
+      </div>
+    </div>
+
+    <!-- Section : Dark web -->
+    <div id="cm-darkweb" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#1f2937,#374151);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🌑</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Vérifier si votre email a été piraté</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">On l'appelle <em>"dark web"</em> : c'est la partie cachée d'Internet où les pirates revendent les emails et mots de passe volés. Despy vérifie si <strong>VOTRE email</strong> apparaît dans ces fuites pour vous prévenir.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Connectez-vous à votre compte Despy</li>
+          <li>Allez dans <strong>"Mon espace" → "Protection"</strong></li>
+          <li>Cliquez sur <strong>"Vérifier mon email"</strong></li>
+          <li>Vous obtenez la liste des fuites où votre email apparaît</li>
+          <li>Pour chaque fuite, vous avez la marche à suivre (changer votre mot de passe sur tel ou tel site)</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#eff6ff;border-left:4px solid var(--blue);border-radius:8px;font-size:14px;color:#1e40af;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">🔒</span>
+        <div><strong>100% sécurisé :</strong> on ne stocke jamais vos mots de passe. La vérification se fait par cryptographie anonyme.</div>
+      </div>
+    </div>
+
+    <!-- Section : Alertes nationales -->
+    <div id="cm-alertes" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🔔</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Recevoir les alertes d'arnaques en cours</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Quand une grosse arnaque circule en France (faux SMS Chronopost, fausse alerte Ameli, etc.), Despy vous envoie une <strong>notification directe sur votre téléphone</strong> pour vous prévenir.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment activer</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Allez sur la page d'accueil de despy.fr</li>
+          <li>Acceptez les notifications quand votre navigateur vous le demande</li>
+          <li>C'est fait ! Vous recevrez 1 à 4 alertes par jour selon l'actualité</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#f0fdf4;border-left:4px solid #16a34a;border-radius:8px;font-size:14px;color:#15803d;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">✓</span>
+        <div><strong>Service gratuit, sans inscription.</strong> Vous pouvez désactiver à tout moment dans les paramètres de votre navigateur.</div>
+      </div>
+    </div>
+
+    <!-- Section : Parrainage -->
+    <div id="cm-parrainage" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🎁</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Parrainer un proche = 1 mois offert pour les 2</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Partagez votre code de parrainage avec un membre de votre famille ou un ami. Quand il s'inscrit avec votre code, <strong>vous gagnez 1 mois gratuit</strong>, et lui aussi.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment faire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Connectez-vous à votre compte Despy</li>
+          <li>Allez dans <strong>"Mon espace" → "Parrainage"</strong></li>
+          <li>Copiez votre code (6 caractères, format <code style="background:#fff;padding:2px 6px;border-radius:4px">ABC123</code>)</li>
+          <li>Partagez-le par SMS, WhatsApp ou email</li>
+          <li>Quand votre filleul s'inscrit avec, vous recevez 1 mois offert dès qu'il prend l'abonnement</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#fce7f3;border-left:4px solid #db2777;border-radius:8px;font-size:14px;color:#9d174d;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">♾️</span>
+        <div><strong>Sans limite :</strong> chaque filleul vous offre 1 mois supplémentaire, à l'infini.</div>
+      </div>
+    </div>
+
+    <!-- Section : Intervention domicile -->
+    <div id="cm-domicile" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#ecfeff,#cffafe);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🏠</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Demander une intervention à domicile</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Si vous habitez à <strong>Strasbourg ou dans un rayon de 15 km</strong>, Yacine (le fondateur de Despy) peut venir chez vous pour sécuriser tous vos appareils, vous former et répondre à toutes vos questions.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment réserver</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Allez sur la page <strong>"Tarifs & Services"</strong></li>
+          <li>Descendez jusqu'à <strong>"Interventions personnalisées"</strong></li>
+          <li>Cliquez sur <strong>"Réserver mon créneau"</strong> (pour 1h ou 2h)</li>
+          <li>Choisissez votre créneau sur le calendrier qui s'ouvre</li>
+          <li>Remplissez le formulaire (adresse, téléphone, durée souhaitée)</li>
+          <li>Yacine vous contactera dans la journée pour confirmer</li>
+        </ol>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px">
+        <div style="padding:12px;background:#eff6ff;border-radius:10px;text-align:center">
+          <div style="font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.05em">1 heure</div>
+          <div style="font-size:22px;font-weight:900;color:var(--text);margin-top:4px">89€</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">Sécurisation essentielle</div>
+        </div>
+        <div style="padding:12px;background:#eff6ff;border-radius:10px;text-align:center">
+          <div style="font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.05em">2 heures</div>
+          <div style="font-size:22px;font-weight:900;color:var(--text);margin-top:4px">129€</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">Diagnostic + sécurisation + formation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section : Abonnement -->
+    <div id="cm-abonnement" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">💳</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Mon abonnement Despy</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">L'abonnement Despy débloque toutes les fonctionnalités : analyses illimitées, conseiller IA illimité, surveillance dark web, formation, bilan mensuel personnalisé, score sécurité.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment souscrire</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Cliquez sur <strong>"Tarifs"</strong> en haut de la page</li>
+          <li>Choisissez votre formule (mensuelle 9,99€ ou annuelle 89€)</li>
+          <li>Vous êtes redirigé vers la page de paiement sécurisée <strong>Stripe</strong></li>
+          <li>Payez par carte bancaire (CB, Visa, Mastercard, Apple Pay, Google Pay)</li>
+          <li>C'est fait ! Toutes les fonctionnalités sont débloquées immédiatement</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#eff6ff;border-left:4px solid var(--blue);border-radius:8px;font-size:14px;color:#1e40af;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">🛡️</span>
+        <div><strong>Paiement 100% sécurisé.</strong> Vos coordonnées bancaires ne sont jamais stockées sur despy.fr — uniquement par Stripe, le leader mondial du paiement en ligne (certifié PCI-DSS).</div>
+      </div>
+    </div>
+
+    <!-- Section : Résilier -->
+    <div id="cm-resilier" class="cm-section" style="background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px;margin-bottom:24px;box-shadow:0 4px 20px rgba(0,0,0,.04);scroll-margin-top:100px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#fee2e2,#fecaca);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🚫</div>
+        <h2 style="font-size:24px;font-weight:900;color:var(--text);margin:0">Résilier mon abonnement</h2>
+      </div>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:18px">Despy est <strong>sans engagement</strong>. Vous pouvez résilier à tout moment, en 1 clic, sans justification.</p>
+      <div style="background:var(--bg2);border-radius:14px;padding:20px;margin-bottom:14px">
+        <div style="font-weight:800;color:var(--text);margin-bottom:12px">👉 Comment résilier</div>
+        <ol style="margin:0;padding-left:24px;font-size:15px;color:var(--text);line-height:1.9">
+          <li>Connectez-vous à votre compte Despy</li>
+          <li>Allez dans <strong>"Mon espace" → "Mon compte" → "Paramètres"</strong></li>
+          <li>Cliquez sur <strong>"Résilier mon abonnement"</strong></li>
+          <li>Confirmez votre choix</li>
+          <li>Votre abonnement prend fin à la fin de la période en cours (vous gardez l'accès jusque-là)</li>
+        </ol>
+      </div>
+      <div style="display:flex;gap:10px;padding:14px;background:#fff7ed;border-left:4px solid #f59e0b;border-radius:8px;font-size:14px;color:#92400e;line-height:1.6">
+        <span style="font-size:20px;flex-shrink:0">💰</span>
+        <div><strong>Garantie satisfait ou remboursé 30 jours.</strong> Si vous résiliez dans les 30 premiers jours, on vous rembourse intégralement, sans justification.</div>
+      </div>
+    </div>
+
+    <!-- Bloc final : besoin d'aide -->
+    <div id="cm-aide" class="cm-section" style="background:linear-gradient(160deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:20px;padding:36px;margin-top:36px;text-align:center;position:relative;overflow:hidden;scroll-margin-top:100px">
+      <div style="position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);pointer-events:none"></div>
+      <div style="font-size:48px;margin-bottom:10px">🆘</div>
+      <h2 style="font-size:26px;font-weight:900;margin:0 0 10px;letter-spacing:-.02em">Besoin d'aide humaine ?</h2>
+      <p style="font-size:16px;opacity:.95;line-height:1.6;max-width:520px;margin:0 auto 24px">Si vous bloquez sur une étape ou que vous préférez parler avec quelqu'un, Yacine est là pour vous aider personnellement.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="tel:+33689148395" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#fff;color:var(--blue);border-radius:12px;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.15)">📞 06 89 14 83 95</a>
+        <a href="mailto:contact@despy.fr" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none">✉️ contact@despy.fr</a>
+        <a href="https://wa.me/33689148395?text=Bonjour%20Despy,%20j'ai%20une%20question" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;padding:14px 22px;background:#25d366;color:#fff;border-radius:12px;font-weight:700;font-size:15px;text-decoration:none">💬 WhatsApp</a>
+      </div>
+      <div style="margin-top:22px;font-size:13px;opacity:.85">Réponse sous 24h en semaine — généralement bien plus rapidement</div>
+    </div>
+
+  </div>
+</section>
+</div><!-- /page-comment-ca-marche -->
+
 <!-- ══════════════════════════════════════ -->
 <!-- PAGE LOGIN / ESPACE CLIENT            -->
 <!-- ══════════════════════════════════════ -->
@@ -2192,6 +2501,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <div class="footer-title">Navigation</div>
       <button class="footer-link" onclick="scrollToSection('situations')">Protection</button>
       <button class="footer-link" onclick="scrollToSection('features')">Fonctionnalités</button>
+      <button class="footer-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
       <button class="footer-link" onclick="showPage('tarifs')">Tarifs</button>
       <button class="footer-link" onclick="scrollToSection('faq')">FAQ</button>
       <button class="footer-link" onclick="go('conseiller')">Conseiller</button>

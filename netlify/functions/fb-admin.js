@@ -21,10 +21,6 @@ function isAdmin(email) {
 // ── URL de la Page Facebook Despy (pour CTA dans les posts groupes) ──
 const DESPY_FB_PAGE_URL = process.env.FACEBOOK_PAGE_URL || '';
 
-// ── Prompts Claude par catégorie ──
-// Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
-// Funnel à 2 étages : Groupe → Page Despy (CTA primaire) → despy.fr (secondaire)
-const CATEGORY_PROMPTS = {
 // Intro chaleureuse partagée par toutes les catégories (humanise le post)
 const PERSONAL_INTRO_RULE = `IMPORTANT — INTRO DE PRÉSENTATION :
 Commence TOUJOURS par 1 phrase courte (max 12 mots) qui présente Yacine de façon chaleureuse et humaine, suivie d'un saut de ligne avant le contenu.
@@ -35,6 +31,11 @@ Varie la formulation à chaque post pour éviter la répétition. Exemples possi
 - "Bonjour à toutes et tous, c'est Yacine."
 - "Bonjour, Yacine de Despy — petit conseil du jour 👇"
 - "Bonjour à tous ! Yacine de Despy."`;
+
+// ── Prompts Claude par catégorie ──
+// Posts COURTS (60-100 mots) pour maximiser l'engagement sur Facebook.
+// Funnel à 2 étages : Groupe → Page Despy (CTA primaire) → despy.fr (secondaire)
+const CATEGORY_PROMPTS = {
 
 const CATEGORY_PROMPTS = {
   'anti-arnaque': `Public : groupe Facebook "{group}" — communauté française qui partage des arnaques.
