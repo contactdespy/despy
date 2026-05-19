@@ -167,12 +167,12 @@ exports.handler = async (event) => {
       };
     }
 
-    // ── UPDATE_GROUP : modifie le statut/notes d'un groupe ──
+    // ── UPDATE_GROUP : modifie un groupe ──
     if (action === 'update_group') {
       const { groupId, updates } = body;
       if (!groupId || !updates) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Paramètres manquants' }) };
 
-      const allowed = ['status', 'notes', 'facebook_url', 'joined_at'];
+      const allowed = ['name', 'category', 'estimated_size', 'status', 'notes', 'facebook_url', 'joined_at'];
       const clean = {};
       for (const k of allowed) if (k in updates) clean[k] = updates[k];
 
@@ -183,6 +183,39 @@ exports.handler = async (event) => {
       }
 
       const { error } = await supabase.from('fb_groups').update(clean).eq('id', groupId);
+      if (error) throw error;
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+    }
+
+    // ── ADD_GROUP : ajoute un nouveau groupe ──
+    if (action === 'add_group') {
+      const { name, category, facebook_url, estimated_size } = body;
+      if (!name || !category) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Nom et catégorie requis' }) };
+      const validCat = ['anti-arnaque', 'seniors', 'famille', 'local', 'retraite'];
+      if (!validCat.includes(category)) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Catégorie invalide' }) };
+
+      const { data, error } = await supabase.from('fb_groups').insert({
+        name: name.trim(),
+        category,
+        facebook_url: facebook_url || null,
+        estimated_size: estimated_size ? parseInt(estimated_size, 10) : null,
+        status: 'pending_join'
+      }).select().single();
+      if (error) {
+        if (String(error.message || '').includes('duplicate')) {
+          return { statusCode: 409, headers, body: JSON.stringify({ error: 'Un groupe avec ce nom existe déjà' }) };
+        }
+        throw error;
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, group: data }) };
+    }
+
+    // ── DELETE_GROUP : supprime un groupe (et ses posts associés via ON DELETE CASCADE) ──
+    if (action === 'delete_group') {
+      const { groupId } = body;
+      if (!groupId) return { statusCode: 400, headers, body: JSON.stringify({ error: 'groupId manquant' }) };
+
+      const { error } = await supabase.from('fb_groups').delete().eq('id', groupId);
       if (error) throw error;
       return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
     }
