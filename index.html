@@ -2451,6 +2451,20 @@ function updateNavForSession() {
       }
       menu.appendChild(mkItem('Mon espace', '👤', function(){ showPage('client'); }));
       menu.appendChild(mkItem('Tarifs', '💳', function(){ showPage('tarifs'); }));
+
+      // Bouton Admin — affiché uniquement pour les emails autorisés
+      var ADMIN_EMAILS_UI = ['yacine.bourefis67@gmail.com', 'boutchou67@outlook.fr', 'contact@despy.fr'];
+      var userEmail = (s.email || '').toLowerCase().trim();
+      if (ADMIN_EMAILS_UI.indexOf(userEmail) !== -1) {
+        var adminDivider = document.createElement('div');
+        adminDivider.style.cssText = 'height:1px;background:var(--border);margin:6px 4px';
+        menu.appendChild(adminDivider);
+        var adminBtn = mkItem('Admin · Groupes FB', '🔒', function(){ if (typeof openFbAdmin === 'function') openFbAdmin(); });
+        adminBtn.style.color = 'var(--blue)';
+        adminBtn.style.fontWeight = '700';
+        menu.appendChild(adminBtn);
+      }
+
       var divider = document.createElement('div');
       divider.style.cssText = 'height:1px;background:var(--border);margin:6px 4px';
       menu.appendChild(divider);
