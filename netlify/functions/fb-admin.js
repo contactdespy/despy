@@ -113,31 +113,12 @@ exports.handler = async (event) => {
   try { body = JSON.parse(event.body || '{}'); } catch(e) {}
 
   if (!isAdmin(body.adminEmail)) {
-    // Debug : on masque partiellement les emails pour la sécurité mais on montre la structure
-    const rawEnv = process.env.ADMIN_EMAIL || '';
-    const masked = ADMIN_EMAILS.map(e => {
-      const [user, dom] = e.split('@');
-      if (!user || !dom) return '(format invalide: ' + JSON.stringify(e) + ')';
-      return user.slice(0, 3) + '***@' + dom;
-    });
-    const yourEmail = String(body.adminEmail || '').toLowerCase().trim();
     return {
       statusCode: 403,
       headers,
       body: JSON.stringify({
         error: 'Accès admin refusé',
-        debug: {
-          yourSessionEmail: body.adminEmail || '(aucun)',
-          yourEmailNormalized: yourEmail,
-          authorizedEmailsCount: ADMIN_EMAILS.length,
-          authorizedEmailsMasked: masked,
-          rawEnvLength: rawEnv.length,
-          rawEnvFirstChars: rawEnv.slice(0, 5),
-          rawEnvLastChars: rawEnv.slice(-5),
-          containsComma: rawEnv.includes(','),
-          containsSemicolon: rawEnv.includes(';'),
-          exactMatch: ADMIN_EMAILS.includes(yourEmail)
-        }
+        hint: 'Vérifie que la variable ADMIN_EMAIL sur Netlify contient bien ton email de session.'
       })
     };
   }
