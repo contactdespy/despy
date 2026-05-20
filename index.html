@@ -78,18 +78,18 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;lin
 /* ── SCROLL PROGRESS ── */
 #scroll-prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:300;transform-origin:left;transform:scaleX(0);transition:transform .1s}
 
-/* ── NAV ── */
-nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
-nav.scrolled{border-color:var(--border);box-shadow:0 1px 12px rgba(0,0,0,0.06)}
-.logo{font-size:20px;font-weight:900;color:var(--blue);letter-spacing:-0.5px;cursor:pointer;display:flex;align-items:center;gap:8px}
+/* ── NAV (dark navy, style logo original) ── */
+nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:rgba(10,31,58,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(91,227,245,.12);transition:border-color .3s,box-shadow .3s}
+nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.logo{font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;cursor:pointer;display:flex;align-items:center;gap:12px}
 .logo-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center}
 .nav-links{display:flex;align-items:center;gap:2rem}
-.nav-link{background:none;border:none;font-size:15px;font-weight:500;color:var(--text2);cursor:pointer;transition:color .2s;padding:4px 0;position:relative}
-.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--blue);transition:width .25s}
-.nav-link:hover{color:var(--blue)}
+.nav-link{background:none;border:none;font-size:15px;font-weight:500;color:rgba(255,255,255,.78);cursor:pointer;transition:color .2s;padding:4px 0;position:relative}
+.nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#5BE3F5;transition:width .25s}
+.nav-link:hover{color:#fff}
 .nav-link:hover::after{width:100%}
-.nav-cta{background:var(--blue);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
-.nav-cta:hover{background:var(--blue-dark);transform:translateY(-1px);box-shadow:var(--shadow-blue)}
+.nav-cta{background:linear-gradient(135deg,#3580E8,#1A3FD9);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(53,128,232,.35)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(53,128,232,.5)}
 .mob-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:4px}
 .mob-menu-btn span{display:block;width:22px;height:2px;background:#333;margin:5px 0;transition:all .25s;border-radius:1px}
 #mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.5rem;flex-direction:column;gap:.75rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08)}
@@ -403,7 +403,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <defs>
         <linearGradient id="navShield" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#5BE3F5"/>
-          <stop offset="100%" stop-color="#1A3FD9"/>
+          <stop offset="100%" stop-color="#FFFFFF"/>
         </linearGradient>
       </defs>
       <path d="M50 8 L88 22 L88 60 C88 84 72 100 50 105 C28 100 12 84 12 60 L12 22 Z" fill="none" stroke="url(#navShield)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
@@ -414,7 +414,12 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       </g>
       <circle cx="50" cy="65" r="5" fill="url(#navShield)"/>
     </svg>
-    <span class="nav-wordmark">DESPY</span>
+    <svg width="120" height="30" viewBox="0 0 230 50" xmlns="http://www.w3.org/2000/svg" aria-label="DESPY" style="flex-shrink:0">
+      <text x="0" y="42" font-family="Inter, -apple-system, sans-serif" font-weight="900" font-size="48" fill="#fff" letter-spacing="3">DESPY</text>
+      <!-- 2 fines rayures couleur fond nav (dark navy) -->
+      <rect x="-2" y="14" width="235" height="2.5" fill="#0a1f3a"/>
+      <rect x="-2" y="30" width="235" height="2.5" fill="#0a1f3a"/>
+    </svg>
   </div>
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
