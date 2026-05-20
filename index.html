@@ -1213,6 +1213,22 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 </div>
 
 <script>
+// ─── REDIRECTION PWA : si l'utilisateur a installé l'icône depuis despy.fr/
+// (cas iOS Safari qui ignore le start_url du manifest), on le redirige vers /app
+(function redirectIfStandalone() {
+  try {
+    var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+                    || window.navigator.standalone === true;
+    if (isStandalone) {
+      // On évite la boucle si on est déjà sur /app ou similaire
+      var path = window.location.pathname;
+      if (path === '/' || path === '/index.html') {
+        window.location.replace('/app');
+      }
+    }
+  } catch(e) {}
+})();
+
 // ─── PWA Install Logic ───
 var _pwaPrompt = null;
 var _pwaInstalled = false;
@@ -1266,8 +1282,16 @@ function triggerPWAInstall() {
     return;
   }
 
-  // iPhone (Safari) → instructions
+  // iPhone (Safari) → on doit d'abord aller sur /app pour que l'icône
+  // pointe vers /app après installation (iOS ignore le start_url du manifest)
   if (isIOS) {
+    var onAppPage = window.location.pathname.indexOf('despy_app_v') !== -1 || window.location.pathname === '/app';
+    if (!onAppPage) {
+      // Petite popup avant la redirection pour expliquer
+      alert('Pour bien installer l\'app, nous allons d\'abord vous emmener sur l\'écran de l\'app.\n\nUne fois sur la page de l\'app, touchez Partager ⬆️ en bas, puis « Sur l\'écran d\'accueil ».');
+      window.location = '/app';
+      return;
+    }
     document.getElementById('ios-install-modal').style.display = 'flex';
     return;
   }

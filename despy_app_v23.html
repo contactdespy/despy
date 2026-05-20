@@ -350,6 +350,27 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
   </div>
 </div>
 
+<!-- Banner d'installation PWA (visible si l'app n'est pas installée) -->
+<div id="install-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);color:#fff;padding:12px 16px;z-index:500;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding-top:calc(env(safe-area-inset-top,0) + 12px)">
+  <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  </div>
+  <div style="flex:1;font-size:13px;line-height:1.3">
+    <div style="font-weight:700">Installer Despy sur votre écran d'accueil</div>
+    <div style="opacity:.85;font-size:12px">Accès en 1 tap, notifications, hors-ligne</div>
+  </div>
+  <button onclick="showInstallInstructions()" style="padding:8px 14px;background:#fff;color:#2D5BFF;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap">Installer</button>
+  <button onclick="document.getElementById('install-banner').style.display='none';try{localStorage.setItem('despy_install_dismissed','1')}catch(e){}" aria-label="Fermer" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);border:none;border-radius:8px;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0">×</button>
+</div>
+
+<!-- Modal Install iOS / Android (visible depuis /app aussi) -->
+<div id="install-modal" style="display:none;position:fixed;inset:0;background:rgba(15,18,30,.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)">
+  <div style="background:#fff;border-radius:22px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;padding:28px 24px;position:relative">
+    <button onclick="document.getElementById('install-modal').style.display='none'" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:#F2F2F7;border:none;font-size:20px;cursor:pointer;color:#3C3C43;line-height:1">×</button>
+    <div id="install-modal-content"></div>
+  </div>
+</div>
+
 <!-- ═══ APP VIEW ═══ -->
 <div id="app-view" class="view">
 
@@ -1314,10 +1335,63 @@ function openBilan() {
   );
 }
 
+// ─── PWA install (depuis /app) ───
+var _pwaPromptApp = null;
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); _pwaPromptApp = e; });
+
+function isStandaloneApp() {
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+      || window.navigator.standalone === true;
+}
+
+function showInstallBanner() {
+  if (isStandaloneApp()) return; // déjà installée
+  try { if (localStorage.getItem('despy_install_dismissed') === '1') return; } catch(e){}
+  var banner = document.getElementById('install-banner');
+  if (banner) banner.style.display = 'flex';
+}
+
+function showInstallInstructions() {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isAndroid = /android/.test(ua);
+
+  // Android avec prompt natif
+  if (_pwaPromptApp) {
+    _pwaPromptApp.prompt();
+    _pwaPromptApp.userChoice.then(function(c){ _pwaPromptApp = null; if (c.outcome === 'accepted') document.getElementById('install-banner').style.display = 'none'; });
+    return;
+  }
+
+  var content;
+  if (isIOS) {
+    content =
+      '<div style="text-align:center;margin-bottom:24px"><div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h2 style="font-size:22px;font-weight:700;color:#1C1C1E;margin:0;letter-spacing:-.02em">Installer Despy sur iPhone</h2><p style="font-size:14px;color:#8E8E93;margin:6px 0 0">3 étapes · 20 secondes</p></div>' +
+      '<div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">1</div><div style="flex:1"><div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Touchez l\'icône Partager</div><div style="font-size:13px;color:#3C3C43">En bas de votre écran Safari</div></div><div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div></div>' +
+      '<div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">2</div><div style="flex:1"><div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Sur l\'écran d\'accueil</div><div style="font-size:13px;color:#3C3C43">Faites défiler et touchez cette option</div></div><div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div></div>' +
+      '<div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">3</div><div style="flex:1"><div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Touchez « Ajouter »</div><div style="font-size:13px;color:#3C3C43">L\'icône Despy apparaît sur votre écran</div></div><div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;color:#2D5BFF">Ajouter</div></div>' +
+      '<div style="background:#FEF3C7;border:1px solid #FBBF24;border-radius:12px;padding:12px;margin-top:18px;font-size:13px;color:#92400E;line-height:1.45"><strong>⚠️ Important :</strong> Vous devez utiliser <strong>Safari</strong>. Si vous êtes dans Chrome/Facebook, ouvrez d\'abord ce lien dans Safari.</div>' +
+      '<button onclick="document.getElementById(\'install-modal\').style.display=\'none\'" style="width:100%;margin-top:18px;padding:14px;background:#2D5BFF;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">J\'ai compris, j\'essaie !</button>';
+  } else if (isAndroid) {
+    content =
+      '<div style="text-align:center;margin-bottom:24px"><div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h2 style="font-size:22px;font-weight:700;color:#1C1C1E;margin:0;letter-spacing:-.02em">Installer Despy sur Android</h2><p style="font-size:14px;color:#8E8E93;margin:6px 0 0">2 étapes · 15 secondes</p></div>' +
+      '<div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">1</div><div style="flex:1"><div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Menu Chrome (3 points)</div><div style="font-size:13px;color:#3C3C43">En haut à droite de Chrome</div></div></div>' +
+      '<div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;align-items:center"><div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">2</div><div style="flex:1"><div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">« Installer l\'application »</div><div style="font-size:13px;color:#3C3C43">Ou « Ajouter à l\'écran d\'accueil »</div></div></div>' +
+      '<button onclick="document.getElementById(\'install-modal\').style.display=\'none\'" style="width:100%;margin-top:18px;padding:14px;background:#2D5BFF;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">J\'ai compris</button>';
+  } else {
+    content = '<div style="text-align:center;padding:20px"><div style="font-size:32px;margin-bottom:12px">💻</div><div style="font-weight:700;margin-bottom:8px">Sur ordinateur</div><div style="font-size:14px;color:#3C3C43;line-height:1.5">Dans la barre d\'adresse Chrome, cliquez sur l\'icône ⊕ à droite, puis « Installer ».</div><button onclick="document.getElementById(\'install-modal\').style.display=\'none\'" style="margin-top:18px;padding:12px 24px;background:#2D5BFF;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">OK</button></div>';
+  }
+  document.getElementById('install-modal-content').innerHTML = content;
+  document.getElementById('install-modal').style.display = 'flex';
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
+
+  // Banner d'install (visible si pas installé et pas masqué)
+  setTimeout(showInstallBanner, 1500);
 
   // Enregistre le service worker pour PWA + push
   if ('serviceWorker' in navigator) {
