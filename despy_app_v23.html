@@ -13,6 +13,12 @@
 <meta name="apple-mobile-web-app-title" content="Despy">
 <meta name="mobile-web-app-capable" content="yes">
 
+<!-- Manifest + icônes -->
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1001,13 +1007,57 @@ function openAlertes() {
   }, 200);
 }
 
+// Helper : urlBase64ToUint8Array (pour la clé VAPID)
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
 async function requestPush() {
   try {
+    // 1. Demande permission
     var perm = await Notification.requestPermission();
     if (perm !== 'granted') return toast('Notifications refusées');
+
+    // 2. Récupère la clé VAPID publique
+    var keyRes = await fetch('/.netlify/functions/push-key');
+    var keyData = await keyRes.json();
+    if (!keyData.publicKey) {
+      toast('Erreur de configuration push');
+      return;
+    }
+
+    // 3. Enregistre le service worker (si pas déjà)
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    // 4. Souscription PushManager
+    var sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+      });
+    }
+
+    // 5. Envoie la subscription au backend
+    var s = session.get() || {};
+    await fetch('/.netlify/functions/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, email: s.email })
+    });
+
     toast('Alertes activées !');
     setTimeout(openAlertes, 500);
-  } catch(e) { toast('Erreur'); }
+  } catch(e) {
+    console.error('push subscribe error:', e);
+    toast('Erreur : ' + (e.message || 'inconnue'));
+  }
 }
 
 function openSOS() {
@@ -1076,16 +1126,181 @@ function shareRef(code) {
   }
 }
 
+// ── QUIZ NATIF ──
+var QUIZ_BANK = [
+  {
+    q: "Vous recevez ce SMS : « Votre colis La Poste est en attente, payez 1,99€ pour la livraison : laposte-livraison-fr.com ». Que faites-vous ?",
+    opts: ["Je clique et je paie pour récupérer mon colis", "Je signale au 33700 et je supprime", "Je rappelle le numéro qui m'a envoyé le SMS"],
+    answer: 1,
+    expl: "C'est une arnaque classique. La Poste utilise toujours laposte.fr, jamais des sous-domaines suspects. Signalez au 33700 (gratuit, anti-spam SMS) puis supprimez."
+  },
+  {
+    q: "Un appel : « Bonjour, je suis votre conseiller bancaire, votre compte a été piraté, donnez-moi le code reçu par SMS pour bloquer la fraude. »",
+    opts: ["Je donne le code, c'est urgent", "Je raccroche et j'appelle ma banque sur le numéro au dos de ma carte", "Je demande son nom et son matricule"],
+    answer: 1,
+    expl: "Aucune banque ne demande jamais votre code SMS au téléphone. C'est ce code qui valide les paiements. Raccrochez et rappelez vous-même le numéro officiel au dos de votre carte."
+  },
+  {
+    q: "Combien de caractères minimum pour un mot de passe robuste en 2026 ?",
+    opts: ["6 caractères", "8 caractères", "12 caractères ou plus"],
+    answer: 2,
+    expl: "Les recommandations actuelles de l'ANSSI sont 12 caractères minimum, mélangeant majuscules, minuscules, chiffres et symboles. Un mot de passe de 8 caractères se casse en quelques heures."
+  },
+  {
+    q: "Vous recevez un email d'« Ameli » qui vous demande de cliquer sur un lien pour mettre à jour vos coordonnées bancaires. Que faites-vous ?",
+    opts: ["Je clique et je remplis le formulaire", "J'ignore et je vais directement sur ameli.fr en tapant l'adresse moi-même", "Je transfère l'email à Ameli pour confirmer"],
+    answer: 1,
+    expl: "Ameli ne demande JAMAIS vos coordonnées bancaires par email avec un lien. En cas de doute, tapez vous-même ameli.fr dans votre navigateur — jamais via un lien reçu."
+  },
+  {
+    q: "À quoi sert la double authentification (2FA) ?",
+    opts: ["À se connecter plus vite", "À ajouter une deuxième sécurité en plus du mot de passe", "À récupérer un mot de passe perdu"],
+    answer: 1,
+    expl: "La double authentification (ou 2FA) exige un code reçu par SMS ou via une appli en plus du mot de passe. Même si quelqu'un vole votre mot de passe, il ne peut pas se connecter."
+  },
+  {
+    q: "Un site marchand inconnu propose un iPhone à -70 %. Quel est le bon réflexe ?",
+    opts: ["J'achète vite avant que ça parte", "Je vérifie l'ancienneté du site et les avis avant tout", "Je commande, si c'est une arnaque je porterai plainte"],
+    answer: 1,
+    expl: "Les promotions trop belles pour être vraies sont presque toujours des arnaques. Vérifiez l'ancienneté du domaine (sur despy.fr → vérificateur de site) et les avis avant de payer."
+  },
+  {
+    q: "Vous installez une nouvelle application sur votre téléphone. Elle vous demande l'accès à vos contacts, photos, micro, position. Que faites-vous ?",
+    opts: ["J'accepte tout pour que l'app fonctionne", "Je refuse les permissions inutiles (par exemple, pas besoin du micro pour une calculatrice)", "Je désinstalle l'app"],
+    answer: 1,
+    expl: "Accordez uniquement les permissions cohérentes avec l'usage de l'app. Une calculatrice n'a aucune raison d'accéder à vos contacts. iOS et Android permettent de refuser certaines permissions."
+  },
+  {
+    q: "Vous voyez sur Facebook une publicité « Voyance gratuite, juste votre date de naissance et numéro de carte pour vérifier votre âge ». Vrai ou arnaque ?",
+    opts: ["Vrai, c'est juste pour vérifier mon âge", "Arnaque évidente, on ne donne jamais sa CB pour ça", "Vrai si la pub a beaucoup de likes"],
+    answer: 1,
+    expl: "Une vérification d'âge ne nécessite JAMAIS de carte bancaire. Aucun service légitime ne fonctionne ainsi. C'est de l'hameçonnage."
+  },
+  {
+    q: "Votre petit-fils vous envoie un message WhatsApp : « Mamie, c'est mon nouveau numéro. Tu peux m'envoyer 300€ en urgence, je t'expliquerai. »",
+    opts: ["Je transfère l'argent tout de suite", "J'appelle son ancien numéro pour vérifier que c'est bien lui", "Je demande un selfie pour confirmer"],
+    answer: 1,
+    expl: "Arnaque « SMS au proche » très courante en 2026. Appelez TOUJOURS le proche sur son numéro habituel avant d'envoyer de l'argent. Un selfie peut être falsifié par IA."
+  },
+  {
+    q: "Comment savoir si un site est sécurisé pour acheter en ligne ?",
+    opts: ["Si le site est joli", "Si l'URL commence par https:// avec un cadenas", "Si je peux payer en plusieurs fois"],
+    answer: 1,
+    expl: "Le https:// + cadenas garantit que la connexion est chiffrée (vos données sont protégées). MAIS attention : ça ne garantit pas que le site est honnête. Vérifiez aussi l'ancienneté et les avis."
+  }
+];
+
+function getQuizQuota() {
+  try {
+    var key = 'despy_app_quiz_quota';
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : { used: 0, month: '' };
+    var now = new Date();
+    var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+    if (data.month !== currentMonth) {
+      data = { used: 0, month: currentMonth };
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+    return data;
+  } catch(e) { return { used: 0, month: '' }; }
+}
+function incrQuizQuota() {
+  var d = getQuizQuota();
+  d.used++;
+  localStorage.setItem('despy_app_quiz_quota', JSON.stringify(d));
+}
+
+var _quizState = { idx: 0, score: 0, answered: false };
+
 function openQuiz() {
+  var s = session.get();
+  if (!s || !s.email) {
+    openSheet('Quiz cybersécurité', '<div class="result-card">Connectez-vous pour accéder au quiz.</div>');
+    return;
+  }
+  var quota = getQuizQuota();
+  var isPaid = !!s.subscribed;
+  if (!isPaid && quota.used >= 5) {
+    openSheet('Quota atteint',
+      '<div class="result-card" style="text-align:center">' +
+        '<div style="font-size:48px;margin-bottom:8px">🔒</div>' +
+        '<div style="font-weight:800;font-size:18px;margin-bottom:8px;color:var(--text)">Quota mensuel atteint</div>' +
+        '<div style="font-size:14px;color:var(--text3);margin-bottom:18px;line-height:1.5">Vous avez utilisé vos 5 questions découverte ce mois. Abonnez-vous pour un accès illimité au quiz, conseiller IA et toutes les fonctionnalités.</div>' +
+        '<a href="/#tarifs" class="btn-primary" style="display:inline-block;text-decoration:none">Voir les forfaits</a>' +
+      '</div>'
+    );
+    return;
+  }
+  // Pick random question (or by index)
+  _quizState = { idx: Math.floor(Math.random() * QUIZ_BANK.length), score: 0, answered: false };
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  var q = QUIZ_BANK[_quizState.idx];
+  var quota = getQuizQuota();
+  var s = session.get() || {};
+  var isPaid = !!s.subscribed;
+  var counterHtml = isPaid
+    ? ''
+    : '<div style="background:#FFF7E5;border:1px solid #FFCC00;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400E;font-weight:600">⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci</div>';
+  var optsHtml = q.opts.map(function(o, i){
+    return '<button class="quiz-opt" data-idx="' + i + '" onclick="answerQuiz(' + i + ')" style="width:100%;padding:14px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;text-align:left;font-size:15px;color:var(--text);line-height:1.4;transition:all .15s;cursor:pointer">' + o + '</button>';
+  }).join('');
   openSheet('Quiz cybersécurité',
-    '<p class="sheet-help">Une question par jour pour entraîner vos réflexes. 5 questions découverte gratuites par mois.</p>' +
-    '<div class="result-card" style="text-align:center">' +
-      '<div style="font-size:36px;margin-bottom:6px">🎯</div>' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:6px">Quiz disponible sur le site</div>' +
-      '<div style="font-size:14px;color:var(--text3);margin-bottom:14px">Pour le moment, le quiz interactif est accessible depuis le site complet.</div>' +
-      '<a href="/#fidelisation" class="btn-primary" style="display:inline-block;text-decoration:none">Faire le quiz</a>' +
-    '</div>'
+    counterHtml +
+    '<div style="font-size:17px;font-weight:600;line-height:1.5;margin-bottom:18px;color:var(--text)">' + q.q + '</div>' +
+    '<div id="quiz-opts">' + optsHtml + '</div>' +
+    '<div id="quiz-expl"></div>'
   );
+}
+
+function answerQuiz(idx) {
+  if (_quizState.answered) return;
+  _quizState.answered = true;
+  var q = QUIZ_BANK[_quizState.idx];
+  var correct = idx === q.answer;
+  if (correct) _quizState.score++;
+  if (!session.get().subscribed) incrQuizQuota();
+
+  // Highlight all options
+  var opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(function(b, i){
+    b.disabled = true;
+    b.style.cursor = 'default';
+    if (i === q.answer) { b.style.background = '#DEF7EC'; b.style.borderColor = '#34C759'; b.style.color = '#03543F'; }
+    else if (i === idx) { b.style.background = '#FEE2E2'; b.style.borderColor = '#FF3B30'; b.style.color = '#991B1B'; }
+    else { b.style.opacity = '.5'; }
+  });
+
+  // Show explanation
+  var verdict = correct ? '✅ Bonne réponse !' : '❌ Mauvaise réponse';
+  var verdictColor = correct ? '#03543F' : '#991B1B';
+  var verdictBg = correct ? '#DEF7EC' : '#FEE2E2';
+  document.getElementById('quiz-expl').innerHTML =
+    '<div style="background:' + verdictBg + ';border-radius:12px;padding:14px;margin-top:18px">' +
+      '<div style="font-weight:700;font-size:15px;color:' + verdictColor + ';margin-bottom:6px">' + verdict + '</div>' +
+      '<div style="font-size:14px;color:' + verdictColor + ';line-height:1.5">' + q.expl + '</div>' +
+    '</div>' +
+    '<button class="btn-primary" onclick="nextQuizQuestion()" style="margin-top:14px">Question suivante →</button>' +
+    '<button class="btn-secondary" onclick="closeSheet()" style="margin-top:8px">Fermer</button>';
+
+  if (navigator.vibrate) navigator.vibrate(correct ? [10, 50, 10] : [50]);
+}
+
+function nextQuizQuestion() {
+  var s = session.get() || {};
+  var isPaid = !!s.subscribed;
+  var quota = getQuizQuota();
+  if (!isPaid && quota.used >= 5) {
+    openQuiz(); // déclenchera le paywall
+    return;
+  }
+  // Pick a different random question
+  var newIdx;
+  do { newIdx = Math.floor(Math.random() * QUIZ_BANK.length); } while (newIdx === _quizState.idx && QUIZ_BANK.length > 1);
+  _quizState = { idx: newIdx, score: _quizState.score, answered: false };
+  renderQuizQuestion();
 }
 
 function openBilan() {
@@ -1103,6 +1318,22 @@ document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
+
+  // Enregistre le service worker pour PWA + push
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(e){ console.warn('SW register failed:', e.message); });
+  }
+
+  // Détecte les raccourcis PWA (?tool=analyseur, etc.)
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var tool = params.get('tool');
+    if (tool && s && s.email) {
+      setTimeout(function(){ openTool(tool); }, 300);
+    }
+  } catch(e){}
+
+  // Swipe-to-close pour les sheets
   var startY = 0;
   var sheet = document.getElementById('sheet');
   sheet.addEventListener('touchstart', function(e){ startY = e.touches[0].clientY; }, { passive: true });
