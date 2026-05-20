@@ -398,22 +398,8 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 <!-- ══ NAV ══ -->
 <nav id="nav">
-  <div class="logo" onclick="showPage('home')" style="display:flex;align-items:center;gap:10px;cursor:pointer">
-    <svg width="44" height="48" viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg" aria-label="Despy" style="flex-shrink:0">
-      <defs>
-        <linearGradient id="navShield" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#5BE3F5"/>
-          <stop offset="100%" stop-color="#FFFFFF"/>
-        </linearGradient>
-      </defs>
-      <path d="M50 8 L88 22 L88 60 C88 84 72 100 50 105 C28 100 12 84 12 60 L12 22 Z" fill="none" stroke="url(#navShield)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-      <g fill="none" stroke="url(#navShield)" stroke-width="3.5" stroke-linecap="round">
-        <path d="M28 78 Q50 40 72 78"/>
-        <path d="M34 84 Q50 55 66 84"/>
-        <path d="M40 89 Q50 70 60 89"/>
-      </g>
-      <circle cx="50" cy="65" r="5" fill="url(#navShield)"/>
-    </svg>
+  <div class="logo" onclick="showPage('home')" style="display:flex;align-items:center;cursor:pointer">
+    <img src="/assets/logo-despy.png" alt="Despy" style="height:56px;width:auto;object-fit:contain;display:block">
   </div>
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
