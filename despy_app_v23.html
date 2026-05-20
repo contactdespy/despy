@@ -22,7 +22,7 @@
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Audiowide&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -80,34 +80,36 @@ a { color: var(--blue); text-decoration: none; }
   filter: drop-shadow(0 8px 24px rgba(0,0,0,.25));
 }
 .despy-wordmark {
-  font-family: 'Audiowide', 'Inter', sans-serif;
-  font-weight: 400;
-  font-size: 52px;
-  letter-spacing: .08em;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 900;
+  font-size: 48px;
+  letter-spacing: .14em;
   color: #fff;
   text-align: center;
   display: block;
-  margin: 0 auto 6px;
-  text-shadow: 0 4px 16px rgba(0,0,0,.3);
+  margin: 0 auto 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 0 4px 16px rgba(0,0,0,.25);
 }
 .despy-tagline {
-  font-family: 'Audiowide', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
-  letter-spacing: .25em;
-  color: rgba(255,255,255,.92);
+  letter-spacing: .35em;
+  color: rgba(255,255,255,.85);
   text-align: center;
   margin-bottom: 4px;
-  font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
 }
 .despy-subtagline {
   font-family: 'Inter', sans-serif;
   font-size: 10px;
-  letter-spacing: .15em;
+  letter-spacing: .25em;
   color: #5BE3F5;
   text-align: center;
   margin-bottom: 36px;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
 }
 .auth-card {
