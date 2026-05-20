@@ -69,7 +69,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;lin
   --ok-bg:#f0fdf4;
   --warn:#d97706;
   --danger:#dc2626;
-  --nav-h:92px;
+  --nav-h:72px;
   --radius:16px;
   --shadow:0 1px 3px rgba(0,0,0,0.08),0 8px 24px rgba(0,0,0,0.06);
   --shadow-blue:0 8px 32px rgba(45,91,255,0.18);
@@ -79,7 +79,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;lin
 #scroll-prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:300;transform-origin:left;transform:scaleX(0);transition:transform .1s}
 
 /* ── NAV (dark navy, style logo original) ── */
-nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:rgba(10,31,58,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(91,227,245,.12);transition:border-color .3s,box-shadow .3s}
+nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);overflow:visible;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:rgba(10,31,58,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(91,227,245,.12);transition:border-color .3s,box-shadow .3s}
 nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.25)}
 .logo{font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;cursor:pointer;display:flex;align-items:center;gap:12px}
 .logo-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center}
@@ -399,7 +399,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 <!-- ══ NAV ══ -->
 <nav id="nav">
   <div class="logo" onclick="showPage('home')" style="display:flex;align-items:center;cursor:pointer">
-    <img src="/assets/logo-despy.png" alt="Despy" style="height:84px;width:auto;object-fit:contain;display:block;image-rendering:-webkit-optimize-contrast" decoding="async" fetchpriority="high">
+    <img src="/assets/logo-despy.png" alt="Despy" style="height:100px;width:auto;object-fit:contain;display:block;image-rendering:-webkit-optimize-contrast" decoding="async" fetchpriority="high">
   </div>
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
