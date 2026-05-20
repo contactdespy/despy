@@ -21,25 +21,25 @@
   to = "/despy_app_v23.html"
   status = 301
 
-# Icônes PWA — proxy vers la fonction icon.js
+# Icônes PWA — fichiers statiques pré-générés depuis le logo officiel
 [[redirects]]
   from = "/icon-192.png"
-  to = "/.netlify/functions/icon?size=192"
+  to = "/assets/icon-192.png"
   status = 200
 
 [[redirects]]
   from = "/icon-512.png"
-  to = "/.netlify/functions/icon?size=512"
+  to = "/assets/icon-512.png"
   status = 200
 
 [[redirects]]
   from = "/icon-maskable.png"
-  to = "/.netlify/functions/icon?size=512&maskable=1"
+  to = "/assets/icon-maskable.png"
   status = 200
 
 [[redirects]]
   from = "/apple-touch-icon.png"
-  to = "/.netlify/functions/icon?size=180"
+  to = "/assets/apple-touch-icon.png"
   status = 200
 
 # ── Headers de sécurité ──
