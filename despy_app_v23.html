@@ -82,21 +82,13 @@ a { color: var(--blue); text-decoration: none; }
 .despy-wordmark {
   font-family: 'Audiowide', 'Inter', sans-serif;
   font-weight: 400;
-  font-size: 56px;
-  letter-spacing: .06em;
+  font-size: 52px;
+  letter-spacing: .08em;
   color: #fff;
   text-align: center;
   display: block;
   margin: 0 auto 6px;
-  /* Effet "stripe" horizontale sur les lettres */
-  -webkit-mask: linear-gradient(180deg,
-    #000 0%, #000 46%,
-    transparent 46%, transparent 54%,
-    #000 54%, #000 100%);
-  mask: linear-gradient(180deg,
-    #000 0%, #000 46%,
-    transparent 46%, transparent 54%,
-    #000 54%, #000 100%);
+  text-shadow: 0 4px 16px rgba(0,0,0,.3);
 }
 .despy-tagline {
   font-family: 'Audiowide', sans-serif;

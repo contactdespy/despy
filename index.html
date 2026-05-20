@@ -8,35 +8,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Audiowide&display=swap" rel="stylesheet">
 <style>
-/* Wordmark Despy (typographie futuriste avec stripe horizontale) */
+/* Wordmark Despy (typographie futuriste, couleur unie) */
 .nav-wordmark {
   font-family: 'Audiowide', 'Inter', sans-serif;
   font-weight: 400;
-  font-size: 22px;
-  letter-spacing: .06em;
-  color: #2D5BFF;
-  -webkit-mask: linear-gradient(180deg,
-    #000 0%, #000 44%,
-    transparent 44%, transparent 56%,
-    #000 56%, #000 100%);
-  mask: linear-gradient(180deg,
-    #000 0%, #000 44%,
-    transparent 44%, transparent 56%,
-    #000 56%, #000 100%);
+  font-size: 24px;
+  letter-spacing: .08em;
+  background: linear-gradient(135deg, #5BE3F5 0%, #3580E8 50%, #1A3FD9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: none;
 }
 .despy-wordmark-lg {
   font-family: 'Audiowide', 'Inter', sans-serif;
   font-weight: 400;
-  letter-spacing: .06em;
+  letter-spacing: .08em;
   display: inline-block;
-  -webkit-mask: linear-gradient(180deg,
-    #000 0%, #000 46%,
-    transparent 46%, transparent 54%,
-    #000 54%, #000 100%);
-  mask: linear-gradient(180deg,
-    #000 0%, #000 46%,
-    transparent 46%, transparent 54%,
-    #000 54%, #000 100%);
 }
 </style>
 <!-- Google Identity Services (Sign in with Google) -->
