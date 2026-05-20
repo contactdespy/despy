@@ -383,6 +383,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
+    <button class="nav-link" onclick="document.getElementById('pwa-install-section').scrollIntoView({behavior:'smooth'})" style="color:var(--blue);font-weight:700">📲 App mobile</button>
     <button class="nav-link" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">Conseiller IA</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
     <button class="nav-cta" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);margin-right:6px;font-size:13px" onclick="showLoginModal()">Connexion</button>
@@ -1034,6 +1035,253 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     </div>
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SECTION : TÉLÉCHARGER L'APPLICATION       -->
+<!-- ══════════════════════════════════════════ -->
+<section id="pwa-install-section" style="background:linear-gradient(135deg,#0a1f3a 0%,#2D5BFF 100%);padding:6rem 0;position:relative;overflow:hidden;color:#fff">
+  <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);pointer-events:none"></div>
+  <div style="position:absolute;bottom:-80px;left:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.08),transparent 70%);pointer-events:none"></div>
+  <div class="wrap" style="position:relative;z-index:1">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto" id="pwa-grid">
+
+      <!-- TEXTE -->
+      <div>
+        <div style="display:inline-block;padding:6px 14px;background:rgba(255,255,255,.15);border-radius:30px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:18px">📱 Nouveau · Application mobile</div>
+        <h2 style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:0 0 16px">Despy dans votre poche,<br><span style="background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en 30 secondes</span></h2>
+        <p style="font-size:17px;opacity:.92;line-height:1.5;margin:0 0 24px">Installez l'application Despy directement sur l'écran d'accueil de votre téléphone. Tous vos outils en 1 clic, même hors connexion.</p>
+
+        <!-- Bénéfices -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:30px">
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
+            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Plein écran, sans barre de navigateur</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
+            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Notifications d'alertes arnaque en temps réel</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
+            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span>Gratuit · sans app store · sans inscription forcée</span>
+          </div>
+        </div>
+
+        <!-- Bouton install -->
+        <button onclick="triggerPWAInstall()" id="pwa-install-btn" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:#fff;color:#0a1f3a;border:none;border-radius:14px;font-weight:800;font-size:17px;cursor:pointer;font-family:inherit;box-shadow:0 8px 28px rgba(0,0,0,.25);transition:transform .15s">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Installer Despy
+        </button>
+        <div style="margin-top:14px;font-size:13px;opacity:.7" id="pwa-platform-hint">Compatible iPhone, Android et ordinateur</div>
+      </div>
+
+      <!-- MOCKUP TELEPHONE -->
+      <div style="display:flex;justify-content:center;align-items:center" id="pwa-mockup">
+        <div style="width:240px;height:480px;background:#1C1C1E;border-radius:38px;padding:8px;box-shadow:0 30px 70px rgba(0,0,0,.4),inset 0 0 0 2px #2a2a2c;position:relative">
+          <!-- Notch -->
+          <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:88px;height:24px;background:#1C1C1E;border-radius:14px;z-index:2"></div>
+          <!-- Screen content -->
+          <div style="width:100%;height:100%;background:linear-gradient(160deg,#2D5BFF 0%,#1a3fd9 100%);border-radius:30px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+            <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;backdrop-filter:blur(10px)">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:4px">Despy</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:22px;text-align:center">Cybersécurité simple</div>
+            <!-- Mock list rows -->
+            <div style="width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.15)">
+              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
+                <div style="width:24px;height:24px;border-radius:6px;background:#007AFF;flex-shrink:0"></div>
+                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Vérifier un message</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
+                <div style="width:24px;height:24px;border-radius:6px;background:#34C759;flex-shrink:0"></div>
+                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Qui m'appelle ?</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
+                <div style="width:24px;height:24px;border-radius:6px;background:#FF9500;flex-shrink:0"></div>
+                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Vérifier un site</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding:10px">
+                <div style="width:24px;height:24px;border-radius:6px;background:#AF52DE;flex-shrink:0"></div>
+                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Conseiller IA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<style>
+@media (max-width:760px){
+  #pwa-grid{grid-template-columns:1fr !important;gap:36px !important;text-align:center}
+  #pwa-grid > div:first-child > div:first-child{margin-left:auto;margin-right:auto}
+}
+</style>
+
+<!-- Modal iOS Install Instructions -->
+<div id="ios-install-modal" style="display:none;position:fixed;inset:0;background:rgba(15,18,30,.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)">
+  <div style="background:#fff;border-radius:22px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;padding:28px 24px;position:relative;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif">
+    <button onclick="document.getElementById('ios-install-modal').style.display='none'" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:#F2F2F7;border:none;font-size:20px;cursor:pointer;color:#3C3C43;line-height:1">×</button>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 6px 20px rgba(45,91,255,.25)">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h2 style="font-size:22px;font-weight:700;color:#1C1C1E;margin:0;letter-spacing:-.02em">Installer Despy sur iPhone</h2>
+      <p style="font-size:14px;color:#8E8E93;margin:6px 0 0">3 étapes ultra simples · 20 secondes</p>
+    </div>
+
+    <!-- Étape 1 -->
+    <div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">1</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Touchez l'icône Partager</div>
+        <div style="font-size:13px;color:#3C3C43">En bas de votre écran Safari</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </div>
+    </div>
+
+    <!-- Étape 2 -->
+    <div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">2</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Sur l'écran d'accueil</div>
+        <div style="font-size:13px;color:#3C3C43">Faites défiler et touchez cette option</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 10px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+    </div>
+
+    <!-- Étape 3 -->
+    <div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;align-items:center">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">3</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Touchez « Ajouter »</div>
+        <div style="font-size:13px;color:#3C3C43">L'icône Despy apparaît sur votre écran</div>
+      </div>
+      <div style="background:#fff;border:1px solid #E5E5EA;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;color:#2D5BFF">Ajouter</div>
+    </div>
+
+    <div style="background:#FEF3C7;border:1px solid #FBBF24;border-radius:12px;padding:12px;margin-top:18px;font-size:13px;color:#92400E;line-height:1.45">
+      <strong>⚠️ Important :</strong> Vous devez utiliser <strong>Safari</strong> (pas Chrome ni Facebook). Si vous êtes ouvert via une autre app, copiez le lien et collez-le dans Safari.
+    </div>
+
+    <button onclick="document.getElementById('ios-install-modal').style.display='none'" style="width:100%;margin-top:18px;padding:14px;background:#2D5BFF;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">J'ai compris, j'essaie !</button>
+  </div>
+</div>
+
+<!-- Modal Android Install Instructions -->
+<div id="android-install-modal" style="display:none;position:fixed;inset:0;background:rgba(15,18,30,.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)">
+  <div style="background:#fff;border-radius:22px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;padding:28px 24px;position:relative;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif">
+    <button onclick="document.getElementById('android-install-modal').style.display='none'" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:#F2F2F7;border:none;font-size:20px;cursor:pointer;color:#3C3C43;line-height:1">×</button>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h2 style="font-size:22px;font-weight:700;color:#1C1C1E;margin:0;letter-spacing:-.02em">Installer Despy sur Android</h2>
+      <p style="font-size:14px;color:#8E8E93;margin:6px 0 0">2 étapes · 15 secondes</p>
+    </div>
+
+    <div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;margin-bottom:10px;align-items:center">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">1</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">Menu Chrome (3 points en haut)</div>
+        <div style="font-size:13px;color:#3C3C43">Touchez ⋮ en haut à droite</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:14px;padding:14px;background:#F2F2F7;border-radius:14px;align-items:center">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2D5BFF;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px">2</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:15px;color:#1C1C1E;margin-bottom:2px">« Installer l'application »</div>
+        <div style="font-size:13px;color:#3C3C43">Ou « Ajouter à l'écran d'accueil »</div>
+      </div>
+    </div>
+
+    <button onclick="document.getElementById('android-install-modal').style.display='none'" style="width:100%;margin-top:18px;padding:14px;background:#2D5BFF;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit">J'ai compris</button>
+  </div>
+</div>
+
+<script>
+// ─── PWA Install Logic ───
+var _pwaPrompt = null;
+var _pwaInstalled = false;
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _pwaPrompt = e;
+  // Update bouton hint
+  var hint = document.getElementById('pwa-platform-hint');
+  if (hint) hint.textContent = '✨ Prêt à installer en 1 clic';
+});
+
+window.addEventListener('appinstalled', function() {
+  _pwaInstalled = true;
+  hidePWASection();
+});
+
+function hidePWASection() {
+  var s = document.getElementById('pwa-install-section');
+  if (s) s.style.display = 'none';
+}
+
+// Si déjà installé, masquer la section
+if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+  document.addEventListener('DOMContentLoaded', hidePWASection);
+}
+if (window.navigator.standalone === true) {
+  document.addEventListener('DOMContentLoaded', hidePWASection);
+}
+
+function triggerPWAInstall() {
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isAndroid = /android/.test(ua);
+  var isSafari = /safari/.test(ua) && !/chrome|crios|fxios/.test(ua);
+  var isInApp = /fban|fbav|instagram|wv;|linkedin/i.test(navigator.userAgent);
+
+  // Cas spécial : navigateur in-app (Facebook, Insta, etc.)
+  if (isInApp) {
+    alert('Pour installer Despy, ouvrez cette page dans Safari (iPhone) ou Chrome (Android).\n\nDans cette app, touchez le menu et choisissez « Ouvrir dans Safari » ou « Ouvrir dans Chrome ».');
+    return;
+  }
+
+  // Chrome/Edge/Android avec prompt natif → on l'utilise
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(function(choice) {
+      _pwaPrompt = null;
+      if (choice.outcome === 'accepted') hidePWASection();
+    });
+    return;
+  }
+
+  // iPhone (Safari) → instructions
+  if (isIOS) {
+    document.getElementById('ios-install-modal').style.display = 'flex';
+    return;
+  }
+
+  // Android sans prompt natif → instructions
+  if (isAndroid) {
+    document.getElementById('android-install-modal').style.display = 'flex';
+    return;
+  }
+
+  // Desktop ou autre → redirection vers /app
+  window.location = '/app';
+}
+</script>
 
 <!-- ── FAQ ── -->
 
