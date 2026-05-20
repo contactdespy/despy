@@ -348,43 +348,25 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
 
 <!-- ═══ AUTH VIEW ═══ -->
 <div id="auth-view" class="view active">
-  <!-- Logo SVG bouclier + empreinte + pixels + orbite -->
+  <!-- Logo SVG bouclier épuré (premium) -->
   <svg class="auth-logo" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" aria-label="Despy">
     <defs>
-      <linearGradient id="despyG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="despyG" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#5BE3F5"/>
-        <stop offset="50%" stop-color="#3580E8"/>
-        <stop offset="100%" stop-color="#1A3FD9"/>
+        <stop offset="100%" stop-color="#FFFFFF"/>
       </linearGradient>
     </defs>
     <!-- Bouclier -->
-    <path d="M100 15 L165 38 L165 115 C165 165 138 200 100 215 C62 200 35 165 35 115 L35 38 Z"
-          fill="none" stroke="url(#despyG)" stroke-width="5" stroke-linejoin="round"/>
-    <!-- Empreinte digitale (arcs concentriques) -->
-    <g fill="none" stroke="url(#despyG)" stroke-width="3" stroke-linecap="round">
-      <path d="M60 145 Q100 95 140 145"/>
-      <path d="M68 158 Q100 113 132 158"/>
-      <path d="M76 171 Q100 132 124 171"/>
-      <path d="M84 183 Q100 152 116 183"/>
+    <path d="M100 15 L170 40 L170 120 C170 170 142 200 100 215 C58 200 30 170 30 120 L30 40 Z"
+          fill="none" stroke="url(#despyG)" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Empreinte digitale (3 arcs propres) -->
+    <g fill="none" stroke="url(#despyG)" stroke-width="5" stroke-linecap="round">
+      <path d="M55 155 Q100 75 145 155"/>
+      <path d="M65 167 Q100 105 135 167"/>
+      <path d="M75 178 Q100 130 125 178"/>
     </g>
-    <!-- Serrure au centre -->
-    <g fill="url(#despyG)">
-      <circle cx="100" cy="105" r="11"/>
-      <path d="M93 113 L93 135 Q93 140 100 140 Q107 140 107 135 L107 113 Z"/>
-    </g>
-    <!-- Effet pixel/glitch sur la gauche -->
-    <g fill="url(#despyG)">
-      <rect x="18" y="85" width="14" height="14" rx="2"/>
-      <rect x="6" y="100" width="10" height="10" rx="1.5"/>
-      <rect x="20" y="116" width="8" height="8" rx="1"/>
-      <rect x="10" y="130" width="12" height="12" rx="2"/>
-      <rect x="0" y="148" width="8" height="8" rx="1"/>
-      <rect x="16" y="160" width="6" height="6" rx="1"/>
-    </g>
-    <!-- Orbite -->
-    <path d="M167 80 C 200 110, 200 165, 165 195"
-          fill="none" stroke="url(#despyG)" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="165" cy="195" r="6" fill="url(#despyG)"/>
+    <!-- Point central (serrure) -->
+    <circle cx="100" cy="130" r="9" fill="url(#despyG)"/>
   </svg>
   <div class="despy-wordmark">DESPY</div>
   <div class="despy-tagline">Protéger · Détecter · Guider</div>
