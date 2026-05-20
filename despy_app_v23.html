@@ -59,15 +59,15 @@ html, body {
 button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 a { color: var(--blue); text-decoration: none; }
 
-.view { display: none; min-height: 100vh; min-height: 100dvh; }
-.view.active { display: block; }
+.view { display: none !important; min-height: 100vh; min-height: 100dvh; }
+.view.active { display: block !important; }
+#auth-view.active { display: flex !important; }
 
 /* ─── AUTH VIEW ─── */
 #auth-view {
   background: linear-gradient(160deg, #2D5BFF 0%, #1a3fd9 100%);
   color: #fff;
   padding: calc(var(--safe-top) + 40px) 24px calc(var(--safe-bottom) + 24px);
-  display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
