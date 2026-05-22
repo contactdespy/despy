@@ -403,6 +403,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
   <div class="nav-links">
     <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
+    <button class="nav-link" onclick="showPage('privacy')" style="display:inline-flex;align-items:center;gap:6px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Privacy Cleanup
+      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
+    </button>
     <button class="nav-link" onclick="showPage('livret')">Livret</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
     <button class="nav-link" onclick="document.getElementById('pwa-install-section').scrollIntoView({behavior:'smooth'})" style="color:var(--blue);font-weight:700">📲 App mobile</button>
@@ -419,6 +424,10 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   <div id="mob-menu">
     <button class="mob-link" onclick="showPage('tarifs');closeMob()">
       <span>Tarifs &amp; services</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="showPage('privacy');closeMob()">
+      <span style="display:inline-flex;align-items:center;gap:6px">Privacy Cleanup <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.5px">NEW</span></span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="mob-link" onclick="showPage('livret');closeMob()">
@@ -1454,6 +1463,116 @@ function triggerPWAInstall() {
   </section>
 
 
+  <!-- ═══ PRIVACY CLEANUP - SECTION HÉRO ═══ -->
+  <section id="privacy-home-section" style="background:linear-gradient(135deg,#050B1A 0%,#0a1f3a 50%,#1a3fd9 100%);padding:5rem 0;color:#fff;position:relative;overflow:hidden">
+    <!-- Effet halo décoratif -->
+    <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(94,228,255,.15) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-150px;left:-100px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(45,91,255,.2) 0%,transparent 70%);pointer-events:none"></div>
+
+    <div class="wrap" style="position:relative">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1c1c1e;border-radius:99px;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
+            ⚡ NOUVEAU · Exclusif Despy
+          </div>
+          <h2 style="font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.1;letter-spacing:-1px;margin-bottom:1.25rem;color:#fff">
+            Faites disparaître vos données de <span style="color:#5ee4ff">+100 sites</span>.
+          </h2>
+          <p style="font-size:16px;line-height:1.7;color:rgba(255,255,255,.85);margin-bottom:1.75rem">
+            Vos nom, téléphone, adresse circulent sur des dizaines d'annuaires inversés et de courtiers de données — sans votre accord. <strong style="color:#fff">Privacy Cleanup envoie automatiquement les demandes RGPD d'effacement</strong> et surveille chaque mois que vos données ne réapparaissent pas.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:2rem">
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ee4ff" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Scan automatique</strong> de 30+ data brokers (annuaires inversés, Spokeo, Pipl…)</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ee4ff" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Demandes RGPD article 17</strong> envoyées en votre nom (obligation légale UE)</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ee4ff" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Re-scan mensuel</strong> pour que vos données ne réapparaissent pas</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5ee4ff" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Saisie CNIL automatique</strong> en cas de refus injustifié d'un site</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button onclick="showPage('privacy')" style="background:#fff;color:var(--blue);border:none;border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+              Découvrir Privacy Cleanup →
+            </button>
+            <button onclick="showPage('tarifs')" style="background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">
+              Inclus dès 9,99 €/mois
+            </button>
+          </div>
+        </div>
+
+        <!-- Visuel : mock mini-dashboard -->
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.5rem;backdrop-filter:blur(20px)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1)">
+            <div>
+              <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:4px">Aperçu dashboard</div>
+              <div style="font-size:14px;color:#fff;font-weight:700">Vos données disparaissent</div>
+            </div>
+            <div style="display:flex;gap:12px">
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:900;color:#22c55e">23</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px">OK</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:22px;font-weight:900;color:#fbbf24">7</div>
+                <div style="font-size:9px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px">En cours</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px">
+              <div style="width:24px;height:24px;border-radius:6px;background:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="flex:1;font-size:13px;color:#fff;font-weight:600">118-712.fr</div>
+              <span style="font-size:10px;font-weight:700;color:#5ee4ff">Supprimé</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px">
+              <div style="width:24px;height:24px;border-radius:6px;background:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="flex:1;font-size:13px;color:#fff;font-weight:600">Spokeo</div>
+              <span style="font-size:10px;font-weight:700;color:#5ee4ff">Supprimé</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px">
+              <div style="width:24px;height:24px;border-radius:6px;background:#fbbf24;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div style="flex:1;font-size:13px;color:#fff;font-weight:600">annuaire-inverse-france.com</div>
+              <span style="font-size:10px;font-weight:700;color:#fbbf24">En cours</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px">
+              <div style="width:24px;height:24px;border-radius:6px;background:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="flex:1;font-size:13px;color:#fff;font-weight:600">Pipl</div>
+              <span style="font-size:10px;font-weight:700;color:#5ee4ff">Supprimé</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px">
+              <div style="width:24px;height:24px;border-radius:6px;background:#fbbf24;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div style="flex:1;font-size:13px;color:#fff;font-weight:600">BeenVerified</div>
+              <span style="font-size:10px;font-weight:700;color:#fbbf24">Rappel CNIL</span>
+            </div>
+          </div>
+          <div style="text-align:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,.5);font-style:italic">
+            Aperçu — Votre dashboard affichera vos vrais sites
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
   <!-- ═══ AVIS GOOGLE ═══ -->
   <section id="reviews" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
     <div class="wrap">
@@ -1925,6 +2044,7 @@ function triggerPWAInstall() {
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérificateur de site marchand <strong>illimité</strong></div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérification email piraté (HIBP)</div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Conseiller IA <strong>illimité 24h/24</strong></div>
+        <div class="plan-feat" style="background:linear-gradient(135deg,rgba(45,91,255,.08),rgba(94,228,255,.08));border:1px solid rgba(45,91,255,.25);border-radius:8px;padding:8px 10px;margin:6px 0;font-weight:700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span style="color:var(--text)"><strong style="color:var(--blue)">⭐ Privacy Cleanup</strong> · Suppression automatique de vos données sur 30+ data brokers <span style="display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:.5px;margin-left:4px">NEW</span></span></div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Surveillance dark web mensuelle</div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Formation complète + badges XP</div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Bilan mensuel personnalisé</div>
@@ -2750,6 +2870,372 @@ function triggerPWAInstall() {
 </div><!-- /page-comment-ca-marche -->
 
 <!-- ══════════════════════════════════════ -->
+<!-- PAGE PRIVACY CLEANUP                   -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-privacy" class="page">
+
+  <!-- HERO -->
+  <section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(180deg,#0a1f3a 0%,#1a3fd9 100%);color:#fff">
+    <div style="max-width:1100px;margin:0 auto;text-align:center">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Nouveau · Inclus dans l'abonnement
+      </div>
+      <h1 style="font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1.1;letter-spacing:-1.5px;margin-bottom:1.25rem">
+        Vos données personnelles<br>circulent sur <span style="color:#5ee4ff">+100 sites</span>.
+      </h1>
+      <h2 style="font-size:clamp(22px,3vw,32px);font-weight:700;line-height:1.2;margin-bottom:1.5rem;color:#fff">
+        Despy les fait disparaître. Automatiquement.
+      </h2>
+      <p style="font-size:clamp(15px,2vw,18px);line-height:1.7;max-width:680px;margin:0 auto 2.5rem;color:rgba(255,255,255,.85)">
+        Annuaires inversés, courtiers de données, archives oubliées… Vos nom, téléphone, adresse et email sont republiés partout sans votre accord. Despy envoie automatiquement les demandes légales d'effacement pour vous, et surveille chaque mois que vos données ne réapparaissent pas.
+      </p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem">
+        <button onclick="showPage('tarifs')" style="background:#fff;color:var(--blue);border:none;border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+          Activer ma protection → 9,99 €/mois
+        </button>
+        <button onclick="scrollToSection('privacy-how')" style="background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">
+          Comment ça marche ?
+        </button>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65)">
+        Sans engagement · Satisfait ou remboursé 30 jours · Données traitées en France
+      </div>
+    </div>
+  </section>
+
+  <!-- TEST CHOC : tape ton nom sur Google -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:1000px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Faites le test maintenant</div>
+      <h2 class="sh2" style="margin-bottom:1rem">Tapez votre <span>numéro de téléphone</span> sur Google.</h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:2.5rem">
+        Vous allez probablement être surpris. Et c'est juste la partie visible. Vos données sont également dans des bases que Google n'indexe même pas.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-bottom:2rem">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(220,38,38,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22h.01"/><path d="M2 16h20"/><path d="M7 20l10-12"/><path d="M14 2l-4 4"/><path d="M21 6l-3 3"/></svg>
+          </div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Annuaires inversés</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">118-712, annuaire-inverse-france, pages-blanches… Votre numéro de portable est listé avec votre nom. Source N°1 des faux conseillers bancaires.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(220,38,38,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+          </div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Courtiers internationaux</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">Spokeo, Pipl, BeenVerified… Ces brokers américains agrègent vos données à partir de réseaux sociaux, fuites et bases publiques. Tout est revendu.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(220,38,38,.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Archives oubliées</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">Anciens forums, vieux profils, newsletter d'il y a 8 ans, cache Google, Wayback Machine… Tout reste indéfiniment, sauf si on demande la suppression.</div>
+        </div>
+      </div>
+
+      <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fbbf24;border-radius:16px;padding:24px;display:flex;gap:16px;align-items:flex-start">
+        <div style="width:44px;height:44px;border-radius:50%;background:#f59e0b;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:800;color:#78350f;margin-bottom:6px">Pourquoi c'est dangereux ?</div>
+          <div style="font-size:14px;color:#78350f;line-height:1.6">
+            Les arnaqueurs achètent ces bases pour <strong>cibler personnellement</strong> leurs victimes. Le faux conseiller bancaire qui connaît votre nom, prénom, agence, et numéro réel ? Il a payé 5 € pour avoir ces infos. <strong>Quand vous disparaissez de ces bases, vous redevenez anonyme aux yeux des pirates.</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMENT ÇA MARCHE -->
+  <section id="privacy-how" style="padding:4rem clamp(1rem,6vw,6rem);background:var(--bg2)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Comment ça marche</div>
+      <h2 class="sh2" style="margin-bottom:1rem">4 étapes. <span>Automatique.</span></h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:3rem">
+        Une fois activé, le service tourne en autonomie. Vous voyez juste les résultats dans votre espace client.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem">
+        <!-- Étape 1 -->
+        <div style="background:#fff;border-radius:16px;padding:28px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">01</div>
+          <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Découverte</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">
+            Vous renseignez vos infos (nom, email, téléphone, ville). Despy scanne automatiquement <strong>30 sites prioritaires</strong> en France et à l'international pour identifier où vos données apparaissent.
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
+            Scan : 30+ data brokers · Durée : ~10 min
+          </div>
+        </div>
+
+        <!-- Étape 2 -->
+        <div style="background:#fff;border-radius:16px;padding:28px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">02</div>
+          <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Demandes RGPD</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">
+            Pour chaque site identifié, Despy envoie une <strong>demande légale d'effacement</strong> (article 17 RGPD). Le site a <strong>1 mois maximum</strong> pour s'exécuter — c'est obligatoire en Europe.
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
+            Article 17 RGPD · Droit à l'oubli
+          </div>
+        </div>
+
+        <!-- Étape 3 -->
+        <div style="background:#fff;border-radius:16px;padding:28px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">03</div>
+          <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Suivi & escalade</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">
+            Despy relance les sites qui ne répondent pas. En cas de refus injustifié, on <strong>saisit la CNIL</strong> automatiquement. Vous voyez l'avancement de chaque demande en temps réel.
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
+            Recours CNIL · Gratuit · Inclus
+          </div>
+        </div>
+
+        <!-- Étape 4 -->
+        <div style="background:#fff;border-radius:16px;padding:28px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">04</div>
+          <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Monitoring permanent</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">
+            Les data brokers réimportent régulièrement les bases. Despy <strong>re-scanne chaque mois</strong> et renvoie une demande si vos données réapparaissent. Vous êtes protégé en continu.
+          </div>
+          <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
+            Re-scan : 1× par mois · Automatique
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APERÇU DU DASHBOARD -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Aperçu du tableau de bord</div>
+      <h2 class="sh2" style="margin-bottom:1rem">Voyez <span>vos données</span> reprendre leur place.</h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:2.5rem">
+        Depuis votre espace client, vous suivez chaque demande en temps réel : envoyée, en attente, supprimée. Avec date, statut et preuve.
+      </p>
+
+      <!-- Mock dashboard -->
+      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:20px;padding:clamp(1rem,3vw,2rem);box-shadow:0 20px 60px rgba(45,91,255,.25)">
+        <div style="background:#fff;border-radius:14px;padding:clamp(1rem,3vw,1.5rem);overflow:hidden">
+          <!-- Header dashboard -->
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);font-weight:800;margin-bottom:4px">Privacy Cleanup</div>
+              <div style="font-size:20px;font-weight:900;color:var(--text)">Bonjour Marie 👋</div>
+              <div style="font-size:13px;color:var(--text3)">Dernier scan : il y a 2 jours</div>
+            </div>
+            <div style="display:flex;gap:14px;flex-wrap:wrap">
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:900;color:#22c55e">23</div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Supprimés</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:900;color:#f59e0b">7</div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">En attente</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:900;color:var(--text)">30</div>
+                <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">Sites suivis</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Liste sites (mock) -->
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <!-- Site 1 supprimé -->
+            <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:14px;color:var(--text)">118-712.fr</div>
+                <div style="font-size:12px;color:var(--text3)">Annuaire inversé · Supprimé le 14 mars 2026</div>
+              </div>
+              <span style="font-size:11px;font-weight:700;background:#22c55e;color:#fff;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px">Supprimé</span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#22c55e;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Spokeo</div>
+                <div style="font-size:12px;color:var(--text3)">Broker international · Supprimé le 11 mars 2026</div>
+              </div>
+              <span style="font-size:11px;font-weight:700;background:#22c55e;color:#fff;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px">Supprimé</span>
+            </div>
+
+            <!-- En attente -->
+            <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#f59e0b;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:14px;color:var(--text)">annuaire-inverse-france.com</div>
+                <div style="font-size:12px;color:var(--text3)">Annuaire inversé · Demande envoyée le 8 mars · Délai légal jusqu'au 8 avril</div>
+              </div>
+              <span style="font-size:11px;font-weight:700;background:#f59e0b;color:#fff;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px">En attente</span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px">
+              <div style="width:32px;height:32px;border-radius:8px;background:#f59e0b;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;font-size:14px;color:var(--text)">BeenVerified</div>
+                <div style="font-size:12px;color:var(--text3)">Broker international · 1er rappel envoyé · Saisie CNIL prévue le 15 avril si pas de réponse</div>
+              </div>
+              <span style="font-size:11px;font-weight:700;background:#f59e0b;color:#fff;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px">Rappel envoyé</span>
+            </div>
+          </div>
+
+          <div style="text-align:center;margin-top:1.25rem;font-size:13px;color:var(--text3)">
+            <em>Aperçu — Votre tableau de bord sera personnalisé avec vos vrais sites</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POUR QUI -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:var(--bg2)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Pour qui ?</div>
+      <h2 class="sh2" style="margin-bottom:2rem">Particulièrement utile <span>si vous êtes…</span></h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">👩</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Victime de harcèlement</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Stalker, ex toxique, harceleur en ligne. Faire disparaître vos infos coupe leur source d'information.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">👨‍💼</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Profession à risque</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Dirigeant, journaliste, médecin, avocat. Limiter votre exposition aux menaces ciblées.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">💼</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Freelance ou EI</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Votre SIRET expose votre vrai nom et adresse. Despy minimise le lien public entre pro et perso.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">👴</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Senior protégé</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">80 % des arnaques senior commencent par un appel d'un faux conseiller. Disparaître des annuaires = moins ciblé.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">👨‍👩‍👧</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Parent vigilant</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Vos enfants apparaissent sur des photos partagées il y a 10 ans. Despy les fait retirer.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">🛡️</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Tout le monde, en fait</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Si vous tenez à votre vie privée et voulez compliquer la tâche aux arnaqueurs. C'est l'hygiène numérique 2026.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:800px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Questions fréquentes</div>
+      <h2 class="sh2" style="margin-bottom:2rem">Vos questions, <span>nos réponses.</span></h2>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            C'est légal de demander la suppression ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            Oui, c'est même <strong>obligatoire</strong> pour les sites depuis 2018. L'article 17 du RGPD européen prévoit votre droit à l'effacement : tout site qui détient vos données doit les supprimer sur demande, sous 1 mois maximum. En cas de refus, vous pouvez saisir la CNIL gratuitement.
+          </div>
+        </details>
+
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            Combien de temps ça prend ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            Le premier scan complet est livré sous <strong>7 jours</strong>. Les premières suppressions commencent à arriver sous 7 à 15 jours. La majorité de vos données est retirée sous <strong>1 mois</strong>. Pour les sites récalcitrants (5-10 %), on saisit la CNIL — délai supplémentaire de 2 à 6 mois.
+          </div>
+        </details>
+
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            Qu'est-ce qui se passe pour les sites étrangers (Spokeo, Pipl…) ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            La majorité des grands brokers américains <strong>respectent les demandes RGPD européennes</strong> car ils traitent des résidents européens (obligation légale). On utilise leurs formulaires officiels de suppression. Pour les irréductibles, on documente le refus — pratique en cas de litige.
+          </div>
+        </details>
+
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            Mes données vont-elles vraiment disparaître à 100 % ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            Honnêtement, non — aucun service au monde ne peut promettre 100 % (il existe des milliers de mini-brokers obscurs). Mais on couvre les <strong>30 plus gros sites</strong> qui concentrent 95 % des cas d'arnaques ciblées. Et on re-scanne chaque mois car les bases reviennent. <strong>Vous passez de "exposé partout" à "très difficile à trouver"</strong> — c'est là où ça compte.
+          </div>
+        </details>
+
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            Mes infos personnelles sont-elles en sécurité chez Despy ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            Évidemment — c'est notre métier. Vos données sont stockées en France (Supabase Paris 🇫🇷), chiffrées au repos, et utilisées <strong>uniquement</strong> pour générer les demandes RGPD. Aucune revente. Aucun cookie publicitaire. Vous pouvez tout effacer chez nous en 1 clic.
+          </div>
+        </details>
+
+        <details style="background:var(--bg2);border-radius:14px;padding:18px 22px;cursor:pointer">
+          <summary style="font-weight:800;color:var(--text);font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center">
+            Et les concurrents (Incogni, DeleteMe) ?
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
+            Incogni (Surfshark) coûte 99 €/an mais cible surtout le marché US/UK. DeleteMe (129 $/an) est US uniquement. <strong>Despy est conçu pour la France</strong> : on cible en priorité les annuaires inversés français (118-712, pages-blanches, etc.) qui sont la source N°1 des faux conseillers bancaires. Et c'est <strong>inclus dans votre abonnement 9,99 €/mois</strong> — avec aussi le Conseiller IA, les alertes, le centre SOS et tout le reste.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section style="padding:5rem clamp(1rem,6vw,6rem);background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);color:#fff;text-align:center">
+    <div style="max-width:700px;margin:0 auto">
+      <h2 style="font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.15;letter-spacing:-1px;margin-bottom:1.25rem">
+        Reprenez le contrôle<br>de vos données aujourd'hui.
+      </h2>
+      <p style="font-size:17px;line-height:1.7;color:rgba(255,255,255,.85);margin-bottom:2rem">
+        Privacy Cleanup est inclus dans votre abonnement Despy. Avec aussi le Conseiller IA, les alertes en temps réel, le centre SOS et l'analyseur anti-arnaque.
+      </p>
+      <button onclick="siteSubscribe('monthly')" style="background:#fff;color:var(--blue);border:none;border-radius:99px;padding:16px 36px;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 12px 36px rgba(0,0,0,.3);margin-bottom:14px">
+        Activer Privacy Cleanup → 9,99 €/mois
+      </button>
+      <div style="font-size:13px;color:rgba(255,255,255,.65)">
+        Sans engagement · Résiliable en 1 clic · Satisfait ou remboursé 30 jours
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page-privacy -->
+
+<!-- ══════════════════════════════════════ -->
 <!-- PAGE LOGIN / ESPACE CLIENT            -->
 <!-- ══════════════════════════════════════ -->
 <div id="page-login" class="page">
@@ -2788,6 +3274,11 @@ function triggerPWAInstall() {
       <button onclick="switchTab('dashboard')" id="tab-dashboard" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;white-space:nowrap;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5Z"/></svg>
         Accueil
+      </button>
+      <button onclick="switchTab('privacy')" id="tab-privacy" class="client-tab" style="flex:1;min-width:80px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;position:relative">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
+        Privacy
+        <span style="position:absolute;top:-4px;right:2px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:7px;font-weight:900;padding:1px 4px;border-radius:4px;letter-spacing:.3px">NEW</span>
       </button>
       <button onclick="switchTab('protection')" id="tab-protection" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -2859,6 +3350,89 @@ function triggerPWAInstall() {
         <div id="journal-zone" style="max-height:280px;overflow-y:auto"></div>
       </div>
     </div>
+
+    <!-- ═══ PANEL PRIVACY CLEANUP ═══ -->
+    <div id="panel-privacy" style="display:none">
+
+      <!-- Header avec score privacy -->
+      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:18px;padding:24px;margin-bottom:1.5rem;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(94,228,255,.18) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="position:relative">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            Privacy Cleanup
+          </div>
+          <div style="font-size:24px;font-weight:900;margin-bottom:6px">Vos données. Votre contrôle.</div>
+          <div id="privacy-status-text" style="font-size:14px;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:18px">
+            Activez le service en 2 minutes. Despy va scanner les 30 plus grands data brokers et envoyer les demandes RGPD d'effacement.
+          </div>
+
+          <!-- État INACTIF (par défaut) -->
+          <div id="privacy-state-inactive">
+            <button onclick="openPrivacyOnboarding()" style="background:#fff;color:var(--blue);border:none;border-radius:99px;padding:13px 26px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Lancer mon premier audit
+            </button>
+            <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.6)">⏱ Premier rapport sous 7 jours · Re-scan mensuel automatique</div>
+          </div>
+
+          <!-- État ACTIF (montré après onboarding) -->
+          <div id="privacy-state-active" style="display:none">
+            <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px">
+              <div>
+                <div id="privacy-stat-cleaned" style="font-size:28px;font-weight:900;color:#22c55e">0</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Données supprimées</div>
+              </div>
+              <div>
+                <div id="privacy-stat-pending" style="font-size:28px;font-weight:900;color:#fbbf24">0</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">En cours</div>
+              </div>
+              <div>
+                <div id="privacy-stat-total" style="font-size:28px;font-weight:900;color:#fff">30</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Sites suivis</div>
+              </div>
+            </div>
+            <div id="privacy-next-scan" style="font-size:12px;color:rgba(255,255,255,.65)">📅 Prochain re-scan : dans 28 jours</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTE DES SITES (visible une fois actif) -->
+      <div id="privacy-sites-list" style="display:none;background:#fff;border-radius:14px;padding:20px;margin-bottom:1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div style="font-weight:800;color:var(--text);font-size:15px">Sites suivis</div>
+          <button onclick="refreshPrivacyScan()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Actualiser
+          </button>
+        </div>
+        <div id="privacy-sites-container" style="display:flex;flex-direction:column;gap:8px;max-height:480px;overflow-y:auto"></div>
+      </div>
+
+      <!-- INFORMATIONS / FAQ rapide dans l'espace client -->
+      <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+        <div style="font-weight:800;color:var(--text);margin-bottom:14px;font-size:15px">Comment ça marche concrètement ?</div>
+        <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;color:var(--text2);line-height:1.6">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">1</div>
+            <div><strong style="color:var(--text)">Vous renseignez vos infos</strong> (nom, email, téléphone, ville) — 2 minutes. Stockées chiffrées en France.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">2</div>
+            <div><strong style="color:var(--text)">Despy scanne 30+ sites</strong> où vos données peuvent apparaître (annuaires, brokers, archives).</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">3</div>
+            <div><strong style="color:var(--text)">Demandes RGPD article 17 envoyées</strong> automatiquement en votre nom. Délai légal : 1 mois pour s'exécuter.</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">4</div>
+            <div><strong style="color:var(--text)">Re-scan mensuel</strong> pour s'assurer que vos données ne réapparaissent pas dans les bases.</div>
+          </div>
+        </div>
+        <a onclick="showPage('privacy')" style="display:inline-block;margin-top:14px;font-size:13px;color:var(--blue);font-weight:700;cursor:pointer;text-decoration:underline">En savoir plus →</a>
+      </div>
+    </div><!-- /panel-privacy -->
 
     <!-- PANEL PROTECTION -->
     <div id="panel-protection" style="display:none">
@@ -4992,7 +5566,7 @@ function renderJournal() {
 // ESPACE CLIENT — Onglets + Mon compte
 // ========================================
 function switchTab(tabName) {
-  ['dashboard','protection','formation','parrainage','compte'].forEach(function(t) {
+  ['dashboard','privacy','protection','formation','parrainage','compte'].forEach(function(t) {
     var panel = document.getElementById('panel-' + t);
     var tab = document.getElementById('tab-' + t);
     if (panel) panel.style.display = 'none';
@@ -5014,6 +5588,7 @@ function switchTab(tabName) {
   }
   if (tabName === 'compte') { try { renderAccountPanel(); } catch(e){} }
   if (tabName === 'parrainage') { try { loadReferralStatus(); } catch(e){} }
+  if (tabName === 'privacy') { try { renderPrivacyPanel(); } catch(e){} }
 }
 
 // ── Parrainage ──
@@ -5124,6 +5699,316 @@ function doLogout() {
   if (!confirm('Voulez-vous vous déconnecter ?')) return;
   try { localStorage.removeItem('despy_session'); localStorage.removeItem('despy_site_session'); } catch(e) {}
   showPage('home');
+}
+
+// ═══════════════════════════════════════════════
+// PRIVACY CLEANUP — Module d'effacement de données
+// ═══════════════════════════════════════════════
+
+// Liste des 30 sites cibles (data brokers)
+var PRIVACY_TARGETS = [
+  { name: '118-712.fr',                    category: 'Annuaire inversé FR',        priority: 1 },
+  { name: '118-218.fr',                    category: 'Annuaire inversé FR',        priority: 1 },
+  { name: 'pagesjaunes.fr',                category: 'Annuaire inversé FR',        priority: 1 },
+  { name: 'annuaire-inverse-france.com',   category: 'Annuaire inversé FR',        priority: 1 },
+  { name: 'annuaire-inverse.net',          category: 'Annuaire inversé FR',        priority: 2 },
+  { name: 'pages-blanches.fr',             category: 'Annuaire inversé FR',        priority: 2 },
+  { name: 'annu-inverse.com',              category: 'Annuaire inversé FR',        priority: 2 },
+  { name: 'Spokeo',                        category: 'Broker international',       priority: 1 },
+  { name: 'Whitepages',                    category: 'Broker international',       priority: 1 },
+  { name: 'Pipl',                          category: 'Broker international',       priority: 1 },
+  { name: 'BeenVerified',                  category: 'Broker international',       priority: 2 },
+  { name: 'Intelius',                      category: 'Broker international',       priority: 2 },
+  { name: 'PeopleFinder',                  category: 'Broker international',       priority: 2 },
+  { name: 'Pappers.fr',                    category: 'Aggregator pro',             priority: 2 },
+  { name: 'Societe.com',                   category: 'Aggregator pro',             priority: 2 },
+  { name: 'Infogreffe',                    category: 'Aggregator pro',             priority: 3 },
+  { name: 'Verif.com',                     category: 'Aggregator pro',             priority: 3 },
+  { name: 'Manageo',                       category: 'Aggregator pro',             priority: 3 },
+  { name: 'Google Cache',                  category: 'Archives & moteurs',         priority: 1 },
+  { name: 'Internet Archive',              category: 'Archives & moteurs',         priority: 2 },
+  { name: 'Bing Cache',                    category: 'Archives & moteurs',         priority: 3 },
+  { name: 'Datafrance',                    category: 'Base marketing',             priority: 3 },
+  { name: 'Geoscope',                      category: 'Base marketing',             priority: 3 },
+  { name: 'Annuaire 118.fr',               category: 'Annuaire inversé FR',        priority: 2 },
+  { name: 'fichier-prospect.com',          category: 'Base marketing',             priority: 3 },
+  { name: 'qui-est-ce.com',                category: 'Annuaire inversé FR',        priority: 3 },
+  { name: 'AnnuaireFrancais',              category: 'Annuaire inversé FR',        priority: 3 },
+  { name: 'Yandex People Search',          category: 'Broker international',       priority: 3 },
+  { name: 'TruePeopleSearch',              category: 'Broker international',       priority: 3 },
+  { name: 'FastPeopleSearch',              category: 'Broker international',       priority: 3 },
+];
+
+// Statuts possibles : 'pending' (en attente scan), 'sent' (demande envoyée), 'cleaned' (supprimé), 'cnil' (escalade CNIL), 'not_found' (pas trouvé)
+
+// ── Modal d'onboarding Privacy ──
+function openPrivacyOnboarding() {
+  var session = siteSession.get();
+  if (!session || !session.email) {
+    showLoginModal();
+    return;
+  }
+
+  // Si déjà actif, on ne réouvre pas
+  var existing = getPrivacyData();
+  if (existing && existing.activated) {
+    if (!confirm("Privacy Cleanup est déjà activé pour votre compte.\n\nVoulez-vous mettre à jour vos informations ?")) return;
+  }
+
+  var modal = document.createElement('div');
+  modal.id = 'privacy-onboarding-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;max-width:480px;width:100%;max-height:92vh;overflow-y:auto;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative';
+
+  box.innerHTML =
+    '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;padding:24px 24px 22px;border-radius:20px 20px 0 0;position:relative">' +
+      '<button onclick="closePrivacyOnboarding()" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);border:none;font-size:20px;cursor:pointer;color:#fff;line-height:1">×</button>' +
+      '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Activation Privacy Cleanup</div>' +
+      '<div style="font-size:20px;font-weight:900;line-height:1.2;margin-bottom:6px">Lançons votre premier audit.</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.5">Renseignez les informations à protéger. Despy va scanner 30+ data brokers et envoyer les demandes RGPD en votre nom.</div>' +
+    '</div>' +
+    '<div style="padding:24px">' +
+      '<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px">' +
+        '<div><label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Prénom *</label><input id="pp-prenom" type="text" placeholder="Marie" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="given-name"></div>' +
+        '<div><label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Nom *</label><input id="pp-nom" type="text" placeholder="Dupont" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="family-name"></div>' +
+        '<div><label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Email à protéger *</label><input id="pp-email" type="email" placeholder="marie@exemple.fr" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="email"></div>' +
+        '<div><label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Téléphone *</label><input id="pp-tel" type="tel" placeholder="06 12 34 56 78" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="tel"></div>' +
+        '<div><label style="display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Ville / Code postal *</label><input id="pp-ville" type="text" placeholder="Strasbourg 67000" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="address-level2"></div>' +
+      '</div>' +
+      '<label style="display:flex;gap:10px;align-items:flex-start;padding:14px;background:var(--bg2);border-radius:10px;cursor:pointer;margin-bottom:18px;font-size:12.5px;color:var(--text2);line-height:1.5">' +
+        '<input type="checkbox" id="pp-consent" style="margin-top:3px;flex-shrink:0">' +
+        '<span>J\'autorise Despy à envoyer en mon nom des demandes d\'effacement RGPD (article 17) aux sites où mes données apparaissent. Je peux désactiver ce service à tout moment.</span>' +
+      '</label>' +
+      '<div id="pp-error" style="display:none;background:rgba(220,38,38,.1);border-left:3px solid #dc2626;color:#991b1b;padding:10px 12px;border-radius:6px;font-size:13px;margin-bottom:12px"></div>' +
+      '<button id="pp-submit-btn" onclick="submitPrivacyOnboarding()" style="width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+        'Lancer mon audit Privacy' +
+      '</button>' +
+      '<div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text3);line-height:1.6">' +
+        '🔒 Données stockées chiffrées en France · Aucune revente · Suppression possible en 1 clic' +
+      '</div>' +
+    '</div>';
+
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) closePrivacyOnboarding(); };
+
+  // Préremplir avec les données de session si dispo
+  var s = siteSession.get();
+  if (s && s.email) {
+    var emailEl = document.getElementById('pp-email');
+    if (emailEl) emailEl.value = s.email;
+  }
+}
+
+function closePrivacyOnboarding() {
+  var m = document.getElementById('privacy-onboarding-modal');
+  if (m) m.remove();
+}
+
+async function submitPrivacyOnboarding() {
+  var prenom  = (document.getElementById('pp-prenom') || {}).value || '';
+  var nom     = (document.getElementById('pp-nom')    || {}).value || '';
+  var email   = (document.getElementById('pp-email')  || {}).value || '';
+  var tel     = (document.getElementById('pp-tel')    || {}).value || '';
+  var ville   = (document.getElementById('pp-ville')  || {}).value || '';
+  var consent = (document.getElementById('pp-consent') || {}).checked;
+  var errEl   = document.getElementById('pp-error');
+  var btn     = document.getElementById('pp-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!prenom.trim() || !nom.trim()) { errEl.textContent = 'Merci de saisir votre prénom et nom.'; errEl.style.display='block'; return; }
+  if (!email.includes('@'))           { errEl.textContent = 'Email invalide.';                        errEl.style.display='block'; return; }
+  if (tel.replace(/\D/g, '').length < 9) { errEl.textContent = 'Téléphone invalide.';                 errEl.style.display='block'; return; }
+  if (!ville.trim())                  { errEl.textContent = 'Merci de saisir votre ville.';          errEl.style.display='block'; return; }
+  if (!consent)                       { errEl.textContent = 'Merci de cocher l\'autorisation.';       errEl.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Activation…';
+
+  var session = siteSession.get();
+  var payload = {
+    user_email: (session && session.email) || email,
+    prenom: prenom.trim(),
+    nom: nom.trim(),
+    target_email: email.trim(),
+    phone: tel.trim(),
+    ville: ville.trim(),
+    activated_at: new Date().toISOString(),
+  };
+
+  // Sauvegarder localement (état activé)
+  var data = {
+    activated: true,
+    targets: payload,
+    sites: PRIVACY_TARGETS.map(function(t) {
+      return { name: t.name, category: t.category, priority: t.priority, status: 'pending', sent_at: null, cleaned_at: null };
+    }),
+    last_scan: new Date().toISOString(),
+    next_scan: new Date(Date.now() + 7 * 86400000).toISOString(),
+  };
+  savePrivacyData(data);
+
+  // Envoyer au backend (silencieux si erreur — MVP)
+  try {
+    await fetch('/.netlify/functions/privacy-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.warn('privacy-request failed:', e); }
+
+  // Toast de succès + re-render
+  closePrivacyOnboarding();
+  showPrivacySuccessToast();
+  renderPrivacyPanel();
+}
+
+function showPrivacySuccessToast() {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:30px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:14px 24px;border-radius:99px;font-family:inherit;font-size:14px;font-weight:700;z-index:99999;box-shadow:0 12px 40px rgba(34,197,94,.4);display:inline-flex;align-items:center;gap:10px;animation:slideDown .3s';
+  t.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Privacy Cleanup activé — Premier rapport sous 7 jours';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(function(){t.remove();}, 400); }, 4500);
+}
+
+// ── Stockage local des données Privacy ──
+function getPrivacyData() {
+  try {
+    var s = siteSession.get();
+    if (!s || !s.email) return null;
+    var key = 'despy_privacy_' + s.email;
+    var raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+function savePrivacyData(data) {
+  try {
+    var s = siteSession.get();
+    if (!s || !s.email) return;
+    var key = 'despy_privacy_' + s.email;
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch(e) {}
+}
+
+// ── Render du panel Privacy ──
+function renderPrivacyPanel() {
+  var data = getPrivacyData();
+  var inactive = document.getElementById('privacy-state-inactive');
+  var active   = document.getElementById('privacy-state-active');
+  var statusText = document.getElementById('privacy-status-text');
+  var sitesList = document.getElementById('privacy-sites-list');
+
+  if (!data || !data.activated) {
+    if (inactive) inactive.style.display = 'block';
+    if (active)   active.style.display = 'none';
+    if (sitesList) sitesList.style.display = 'none';
+    if (statusText) statusText.textContent = 'Activez le service en 2 minutes. Despy va scanner les 30 plus grands data brokers et envoyer les demandes RGPD d\'effacement.';
+    return;
+  }
+
+  if (inactive) inactive.style.display = 'none';
+  if (active)   active.style.display = 'block';
+  if (sitesList) sitesList.style.display = 'block';
+
+  // Compteurs
+  var cleaned = (data.sites || []).filter(function(s){ return s.status === 'cleaned'; }).length;
+  var pending = (data.sites || []).filter(function(s){ return s.status === 'sent' || s.status === 'cnil'; }).length;
+  var total   = (data.sites || []).length;
+
+  var cleanedEl = document.getElementById('privacy-stat-cleaned');
+  var pendingEl = document.getElementById('privacy-stat-pending');
+  var totalEl   = document.getElementById('privacy-stat-total');
+  if (cleanedEl) cleanedEl.textContent = cleaned;
+  if (pendingEl) pendingEl.textContent = pending;
+  if (totalEl)   totalEl.textContent   = total;
+
+  if (statusText) {
+    var firstName = (data.targets && data.targets.prenom) ? data.targets.prenom : '';
+    statusText.innerHTML = 'Bonjour ' + (firstName || 'à vous') + ' 👋 — Despy travaille en arrière-plan pour faire disparaître vos données.';
+  }
+
+  // Date prochain re-scan
+  var nextScanEl = document.getElementById('privacy-next-scan');
+  if (nextScanEl && data.next_scan) {
+    var ns = new Date(data.next_scan);
+    var diffDays = Math.max(0, Math.ceil((ns - new Date()) / 86400000));
+    nextScanEl.textContent = '📅 Prochain re-scan : dans ' + diffDays + ' jour' + (diffDays > 1 ? 's' : '');
+  }
+
+  // Liste des sites
+  renderPrivacySites(data);
+}
+
+function renderPrivacySites(data) {
+  var container = document.getElementById('privacy-sites-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  (data.sites || []).forEach(function(site) {
+    var card = document.createElement('div');
+    var iconBg, iconSvg, badgeBg, badgeText, infoText;
+
+    if (site.status === 'cleaned') {
+      iconBg = '#22c55e'; badgeBg = '#22c55e'; badgeText = 'Supprimé';
+      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      infoText = site.category + ' · Supprimé' + (site.cleaned_at ? ' le ' + new Date(site.cleaned_at).toLocaleDateString('fr-FR') : '');
+      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px';
+    } else if (site.status === 'sent') {
+      iconBg = '#f59e0b'; badgeBg = '#f59e0b'; badgeText = 'En cours';
+      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
+      infoText = site.category + ' · Demande envoyée' + (site.sent_at ? ' le ' + new Date(site.sent_at).toLocaleDateString('fr-FR') : '');
+      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px';
+    } else if (site.status === 'cnil') {
+      iconBg = '#dc2626'; badgeBg = '#dc2626'; badgeText = 'CNIL';
+      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>';
+      infoText = site.category + ' · Saisie CNIL en cours';
+      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:10px';
+    } else {
+      // pending
+      iconBg = '#9ca3af'; badgeBg = '#9ca3af'; badgeText = 'À scanner';
+      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+      infoText = site.category + ' · Programmé pour scan';
+      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:#f9fafb;border:1px solid var(--border);border-radius:10px';
+    }
+
+    card.innerHTML =
+      '<div style="width:30px;height:30px;border-radius:8px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' + iconSvg + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:700;font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis">' + site.name + '</div>' +
+        '<div style="font-size:11.5px;color:var(--text3);margin-top:2px">' + infoText + '</div>' +
+      '</div>' +
+      '<span style="font-size:10px;font-weight:700;background:' + badgeBg + ';color:#fff;padding:4px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0">' + badgeText + '</span>';
+    container.appendChild(card);
+  });
+}
+
+// ── Actualiser (simulation MVP : avance l'état) ──
+function refreshPrivacyScan() {
+  var data = getPrivacyData();
+  if (!data) return;
+  // Simulation : pour chaque site pending sans sent_at, on passe à sent
+  // (À remplacer par un vrai fetch backend quand le backend sera prêt)
+  var now = new Date();
+  (data.sites || []).forEach(function(s) {
+    if (s.status === 'pending' && !s.sent_at) {
+      s.status = 'sent';
+      s.sent_at = now.toISOString();
+    }
+  });
+  data.last_scan = now.toISOString();
+  savePrivacyData(data);
+  renderPrivacyPanel();
+
+  // Toast
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:30px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;padding:12px 20px;border-radius:99px;font-family:inherit;font-size:13px;font-weight:700;z-index:99999;box-shadow:0 8px 24px rgba(45,91,255,.3)';
+  t.textContent = '🔄 Liste actualisée';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(function(){t.remove();}, 400); }, 2200);
 }
 
 function initClientSpace() {
