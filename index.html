@@ -408,6 +408,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       Privacy Cleanup
       <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
     </button>
+    <button class="nav-link" onclick="showPage('sos-humain')" style="display:inline-flex;align-items:center;gap:6px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      SOS Humain
+      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
+    </button>
     <button class="nav-link" onclick="showPage('livret')">Livret</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
     <button class="nav-link" onclick="document.getElementById('pwa-install-section').scrollIntoView({behavior:'smooth'})" style="color:var(--blue);font-weight:700">📲 App mobile</button>
@@ -428,6 +433,10 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     </button>
     <button class="mob-link" onclick="showPage('privacy');closeMob()">
       <span style="display:inline-flex;align-items:center;gap:6px">Privacy Cleanup <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.5px">NEW</span></span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="showPage('sos-humain');closeMob()">
+      <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:#dc2626">🆘</span> SOS Humain <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.5px">NEW</span></span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="mob-link" onclick="showPage('livret');closeMob()">
@@ -1573,6 +1582,90 @@ function triggerPWAInstall() {
   </section>
 
 
+  <!-- ═══ SOS HUMAIN - SECTION ═══ -->
+  <section id="sos-home-section" style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 50%,#ef4444 100%);padding:5rem 0;color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-100px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-150px;left:-100px;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.2) 0%,transparent 70%);pointer-events:none"></div>
+
+    <div class="wrap" style="position:relative">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:3rem;align-items:center">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,0,0,.25);color:#fef3c7;border:1px solid rgba(255,255,255,.25);border-radius:99px;font-size:11px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
+            ⚡ NOUVEAU · Service humain unique en France
+          </div>
+          <h2 style="font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.1;letter-spacing:-1px;margin-bottom:1.25rem;color:#fff">
+            Vous vous faites pirater ?<br><span style="color:#fef3c7">Un humain vous rappelle.</span>
+          </h2>
+          <p style="font-size:16px;line-height:1.7;color:rgba(255,255,255,.9);margin-bottom:1.75rem">
+            Pas un chatbot. Pas un formulaire qui répond en 7 jours. <strong style="color:#fff">SOS Humain</strong> vous met au téléphone avec une personne réelle qui vous guide, rédige les démarches officielles à votre place, et coordonne les actions pour <strong style="color:#fff">maximiser vos chances de récupération</strong>.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:2rem">
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fef3c7" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Rappel sous 30 min</strong> en soirée et week-end · sous 4h en journée</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fef3c7" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Cas critique : 15 min</strong> (compte vidé en direct, ransomware actif)</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fef3c7" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Rédaction des lettres officielles</strong> à votre place (banque, plainte, RGPD)</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.6">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fef3c7" stroke-width="3" stroke-linecap="round" style="flex-shrink:0;margin-top:2px"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong style="color:#fff">Suivi 30 jours</strong> jusqu'à résolution complète</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button onclick="showPage('sos-humain')" style="background:#fff;color:#dc2626;border:none;border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25)">
+              Découvrir SOS Humain →
+            </button>
+            <button onclick="showPage('tarifs')" style="background:rgba(0,0,0,.2);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">
+              Inclus dès 9,99 €/mois
+            </button>
+          </div>
+        </div>
+
+        <!-- Visuel : bouton SOS mock -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem">
+          <!-- Cercle SOS animé -->
+          <div style="position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center">
+            <div style="position:absolute;inset:0;border:2px solid rgba(255,255,255,.3);border-radius:50%;animation:sos-pulse 2s ease-out infinite"></div>
+            <div style="position:absolute;inset:10px;border:2px solid rgba(255,255,255,.2);border-radius:50%;animation:sos-pulse 2s ease-out infinite .5s"></div>
+            <div style="position:absolute;inset:20px;border:2px solid rgba(255,255,255,.1);border-radius:50%;animation:sos-pulse 2s ease-out infinite 1s"></div>
+            <div style="width:140px;height:140px;border-radius:50%;background:#fff;color:#dc2626;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;box-shadow:0 12px 36px rgba(0,0,0,.3)">
+              <div style="font-size:34px;line-height:1">SOS</div>
+              <div style="font-size:11px;letter-spacing:1px;margin-top:4px">HUMAIN</div>
+            </div>
+          </div>
+
+          <!-- Mock conversation -->
+          <div style="background:rgba(255,255,255,.1);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:1.25rem;width:100%;max-width:340px">
+            <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#fef3c7;font-weight:800;margin-bottom:12px">Exemple de notification</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:rgba(255,255,255,.08);padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.55">
+                <div style="font-weight:700;color:#fff;margin-bottom:2px">🆘 Nouveau SOS — Marie L.</div>
+                <div style="font-size:11.5px;color:rgba(255,255,255,.75)">CB volée · Débit frauduleux ce matin · 06 12 34 56 78</div>
+              </div>
+              <div style="background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.4);padding:10px 12px;border-radius:10px;font-size:12.5px;color:#fff">
+                ✓ Rappel passé en 18 min · Démarches en cours
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    @keyframes sos-pulse {
+      0%   { transform:scale(.9); opacity:.7; }
+      100% { transform:scale(1.4); opacity:0; }
+    }
+  </style>
+
+
   <!-- ═══ AVIS GOOGLE ═══ -->
   <section id="reviews" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
     <div class="wrap">
@@ -2039,16 +2132,30 @@ function triggerPWAInstall() {
       <div class="plan-price">9,99€<span>/mois</span></div>
       <div style="font-size:13px;color:var(--text3);margin:4px 0 16px">Sans engagement · Résiliable en 1 clic</div>
       <div class="plan-features">
+
+        <!-- ⭐ Features phares (mises en valeur) -->
+        <div class="plan-feat" style="background:linear-gradient(135deg,rgba(220,38,38,.06),rgba(239,68,68,.08));border:1.5px solid rgba(220,38,38,.3);border-radius:8px;padding:10px 12px;margin:6px 0;font-weight:700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg><span style="color:var(--text)"><strong style="color:#dc2626">🆘 SOS Humain</strong> · Un humain vous rappelle (30 min soirée/WE, 15 min critique). 2 inclus/an. <span style="display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:.5px;margin-left:4px">NEW</span></span></div>
+
+        <div class="plan-feat" style="background:linear-gradient(135deg,rgba(45,91,255,.06),rgba(94,228,255,.08));border:1.5px solid rgba(45,91,255,.3);border-radius:8px;padding:10px 12px;margin:6px 0;font-weight:700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg><span style="color:var(--text)"><strong style="color:var(--blue)">🕵️ Privacy Cleanup</strong> · Suppression auto de vos données sur 30+ data brokers <span style="display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:.5px;margin-left:4px">NEW</span></span></div>
+
+        <!-- Tous les outils -->
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Conseiller IA</strong> illimité 24h/24 (Claude Anthropic)</div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Analyses SMS/email/lien <strong>illimitées</strong></div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Annuaire inversé <strong>illimité</strong></div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérificateur de site marchand <strong>illimité</strong></div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Vérification email piraté (HIBP)</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Conseiller IA <strong>illimité 24h/24</strong></div>
-        <div class="plan-feat" style="background:linear-gradient(135deg,rgba(45,91,255,.08),rgba(94,228,255,.08));border:1px solid rgba(45,91,255,.25);border-radius:8px;padding:8px 10px;margin:6px 0;font-weight:700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span style="color:var(--text)"><strong style="color:var(--blue)">⭐ Privacy Cleanup</strong> · Suppression automatique de vos données sur 30+ data brokers <span style="display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;letter-spacing:.5px;margin-left:4px">NEW</span></span></div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Surveillance dark web mensuelle</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Formation complète + badges XP</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Bilan mensuel personnalisé</div>
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Code parrainage · 1 mois offert/filleul</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Annuaire inversé + vérif. site marchand <strong>illimités</strong></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Surveillance dark web</strong> mensuelle (HIBP)</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Alertes nationales en temps réel (push)</div>
+
+        <!-- Formation -->
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Formation complète</strong> · 8 modules + 40 quiz + badges XP</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Défi Chrono hebdomadaire</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Simulateur d'arnaque (entraînement)</div>
+
+        <!-- Suivi -->
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><strong>Bilan mensuel</strong> personnalisé par email</div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Score de sécurité évolutif</div>
+
+        <!-- Bonus -->
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Code parrainage · <strong>1 mois offert</strong> par filleul</div>
       </div>
       <button class="plan-btn outline" onclick="siteSubscribe('monthly')">Choisir le mensuel</button>
     </div>
@@ -3236,6 +3343,277 @@ function triggerPWAInstall() {
 </div><!-- /page-privacy -->
 
 <!-- ══════════════════════════════════════ -->
+<!-- PAGE SOS HUMAIN                       -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-sos-humain" class="page">
+
+  <!-- HERO -->
+  <section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 60%,#ef4444 100%);color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="max-width:1100px;margin:0 auto;text-align:center;position:relative">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.3);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Service exclusif Despy · Inclus dans l'abonnement
+      </div>
+      <h1 style="font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1.05;letter-spacing:-1.5px;margin-bottom:1.25rem">
+        Vous vous faites pirater ?<br><span style="color:#fef3c7">Un humain vous rappelle.</span>
+      </h1>
+      <h2 style="font-size:clamp(20px,2.8vw,28px);font-weight:700;line-height:1.3;margin-bottom:1.5rem;color:rgba(255,255,255,.95)">
+        Pas un chatbot. Pas un formulaire qui répond en 7 jours.<br>Un vrai humain au téléphone, qui sait quoi faire.
+      </h2>
+      <p style="font-size:clamp(15px,2vw,18px);line-height:1.7;max-width:720px;margin:0 auto 2.5rem;color:rgba(255,255,255,.9)">
+        Compte piraté, carte bancaire volée, arnaque en cours, faux conseiller au téléphone… Vous cliquez SOS dans votre espace Despy, et un humain vous rappelle pour <strong>vous guider étape par étape</strong>, <strong>rédiger les démarches officielles à votre place</strong> et <strong>maximiser vos chances de récupération</strong>.
+      </p>
+
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem">
+        <button onclick="showPage('tarifs')" style="background:#fff;color:#dc2626;border:none;border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25)">
+          Activer SOS Humain → 9,99 €/mois
+        </button>
+        <button onclick="scrollToSection('sos-how')" style="background:rgba(0,0,0,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:99px;padding:14px 28px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer">
+          Voir comment ça marche →
+        </button>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.75)">
+        Service réservé aux abonnés · Aussi disponible à l'unité : <strong>49 € / intervention</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- CRENEAUX HONNETES -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:1000px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Notre promesse · Honnête et tenable</div>
+      <h2 class="sh2" style="margin-bottom:1.5rem">Quand on vous <span>rappelle.</span></h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:2.5rem">
+        Pas de fausse promesse "15 min 24/7" comme certains. Voici nos vrais créneaux, garantis par contrat.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem">
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Soirée semaine</div>
+          <div style="font-size:24px;font-weight:900;margin-bottom:8px">≤ 30 minutes</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6">Lundi → Vendredi de 18h à 22h. Le créneau le plus probable pour la majorité des incidents.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Samedi</div>
+          <div style="font-size:24px;font-weight:900;margin-bottom:8px">≤ 30 minutes</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6">Samedi de 9h à 22h. On est dispo pendant que les autres services sont fermés.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Dimanche</div>
+          <div style="font-size:24px;font-weight:900;margin-bottom:8px">≤ 1 heure</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6">Dimanche de 9h à 22h. Vous n'êtes jamais seul, même en week-end.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-weight:800;margin-bottom:8px">Journée semaine</div>
+          <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">≤ 4 heures</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Lundi → Vendredi de 9h à 18h. On vous écrit immédiatement et on rappelle dès la pause déjeuner ou après le bureau.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-weight:800;margin-bottom:8px">Nuit (22h-9h)</div>
+          <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">Avant 9h30</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">On vous lit dès le réveil. En attendant, l'IA Conseiller est dispo 24/7 pour les premiers gestes.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fbbf24;border-radius:14px;padding:24px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#78350f;font-weight:800;margin-bottom:8px">⚡ Cas critique</div>
+          <div style="font-size:24px;font-weight:900;color:#78350f;margin-bottom:8px">≤ 15 minutes</div>
+          <div style="font-size:13px;color:#78350f;line-height:1.6">Compte bancaire vidé en direct, ransomware actif, pirate connecté en ce moment : on décroche immédiatement, peu importe l'heure.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CE QU'ON FAIT / CE QU'ON NE FAIT PAS -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:var(--bg2)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Transparence totale</div>
+      <h2 class="sh2" style="margin-bottom:1rem">Ce qu'on <span>fait</span> · Ce qu'on <span style="background:linear-gradient(135deg,#dc2626,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">ne fait pas</span></h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:2.5rem">
+        Pour éviter toute déception : voici très clairement notre périmètre. Pas de fausse promesse.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem">
+        <!-- Ce qu'on FAIT -->
+        <div style="background:#fff;border:2px solid var(--ok);border-radius:16px;padding:24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--ok);display:flex;align-items:center;justify-content:center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0">Ce qu'on FAIT</h3>
+          </div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Plan d'action étape par étape</strong> par téléphone, dans l'ordre optimal</span></li>
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Rédaction des lettres officielles</strong> : contestation banque (L133-18), plainte commissariat, demande effacement RGPD</span></li>
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Coaching téléphonique</strong> : on vous dit quoi répondre à votre banquier ou aux autorités</span></li>
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Suivi 30 jours</strong> : on relance la banque, on vérifie les délais légaux respectés</span></li>
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Surveillance dark web post-incident</strong> : on vérifie si vos identifiants ressortent</span></li>
+            <li style="display:flex;gap:8px"><span style="color:var(--ok);font-weight:900;flex-shrink:0">✓</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Accompagnement émotionnel</strong> : vous n'êtes plus seul, on vous rassure et on agit</span></li>
+          </ul>
+        </div>
+
+        <!-- Ce qu'on NE FAIT PAS -->
+        <div style="background:#fff;border:2px solid #dc2626;border-radius:16px;padding:24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#dc2626;display:flex;align-items:center;justify-content:center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <h3 style="font-size:18px;font-weight:900;color:var(--text);margin:0">Ce qu'on NE FAIT PAS</h3>
+          </div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;gap:8px"><span style="color:#dc2626;font-weight:900;flex-shrink:0">×</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Récupérer l'argent à votre place</strong> — c'est la banque qui décide (mais elle est obligée par la loi de rembourser dans 95 % des cas)</span></li>
+            <li style="display:flex;gap:8px"><span style="color:#dc2626;font-weight:900;flex-shrink:0">×</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Se connecter à vos comptes</strong> — interdit par les CGV bancaires, et nous-mêmes on refuse pour votre sécurité</span></li>
+            <li style="display:flex;gap:8px"><span style="color:#dc2626;font-weight:900;flex-shrink:0">×</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Plaider au tribunal</strong> — nous ne sommes pas avocats. On vous oriente vers un avocat partenaire si nécessaire</span></li>
+            <li style="display:flex;gap:8px"><span style="color:#dc2626;font-weight:900;flex-shrink:0">×</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>Garantir 100 % de récupération</strong> — aucun service sérieux ne peut promettre ça. Mais on maximise drastiquement vos chances</span></li>
+            <li style="display:flex;gap:8px"><span style="color:#dc2626;font-weight:900;flex-shrink:0">×</span><span style="font-size:14px;color:var(--text);line-height:1.55"><strong>"Pirater le pirate"</strong> — c'est illégal. On joue dans les règles, on les utilise contre les arnaqueurs</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Stat encart -->
+      <div style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border:1px solid #93c5fd;border-radius:16px;padding:24px;margin-top:1.5rem;text-align:center">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#1e40af;font-weight:800;margin-bottom:8px">Notre vraie valeur ajoutée</div>
+        <div style="font-size:20px;font-weight:900;color:#1e3a8a;line-height:1.3">
+          85 % des contestations bancaires <span style="color:#dc2626">échouent</span> quand on agit seul, par méconnaissance de la procédure.<br>
+          <span style="color:#16a34a">90 % aboutissent</span> au remboursement quand on agit avec la bonne procédure, vite et bien.
+        </div>
+        <div style="font-size:13px;color:#1e40af;margin-top:10px">Source : étude ACPR 2024 sur les contestations de fraude bancaire</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMENT ÇA MARCHE -->
+  <section id="sos-how" style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">En pratique</div>
+      <h2 class="sh2" style="margin-bottom:1rem">Comment ça <span>marche.</span></h2>
+      <p style="font-size:16px;color:var(--text2);line-height:1.7;max-width:700px;margin-bottom:3rem">
+        Vous êtes en train de paniquer. Voici exactement ce qui se passe quand vous cliquez SOS.
+      </p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem">
+        <div style="background:var(--bg2);border-radius:16px;padding:24px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:#dc2626;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">01</div>
+          <div style="margin-top:12px;font-weight:800;font-size:16px;color:var(--text);margin-bottom:10px">Vous cliquez 🆘 SOS</div>
+          <div style="font-size:13.5px;color:var(--text2);line-height:1.6">Depuis votre espace client. Modal qui demande : "Que se passe-t-il ?" + votre numéro de téléphone + 2 phrases de contexte. <strong>2 minutes.</strong></div>
+        </div>
+        <div style="background:var(--bg2);border-radius:16px;padding:24px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:#dc2626;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">02</div>
+          <div style="margin-top:12px;font-weight:800;font-size:16px;color:var(--text);margin-bottom:10px">Notification immédiate</div>
+          <div style="font-size:13.5px;color:var(--text2);line-height:1.6">Despy reçoit votre demande en temps réel sur son téléphone (Telegram + SMS). En cas critique, on décroche en 15 min.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:16px;padding:24px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:#dc2626;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">03</div>
+          <div style="margin-top:12px;font-weight:800;font-size:16px;color:var(--text);margin-bottom:10px">On vous rappelle</div>
+          <div style="font-size:13.5px;color:var(--text2);line-height:1.6">Un humain. Au téléphone. Qui écoute votre situation et vous donne le <strong>plan d'action exact</strong>. Premiers gestes en 5 min, démarches dans la foulée.</div>
+        </div>
+        <div style="background:var(--bg2);border-radius:16px;padding:24px;position:relative">
+          <div style="position:absolute;top:-14px;left:24px;background:#dc2626;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">04</div>
+          <div style="margin-top:12px;font-weight:800;font-size:16px;color:var(--text);margin-bottom:10px">On agit avec vous</div>
+          <div style="font-size:13.5px;color:var(--text2);line-height:1.6">Rédaction des lettres officielles, coaching pour appeler la banque, suivi 30 jours. <strong>Vous n'êtes plus seul</strong>. Et on relance jusqu'à résolution.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAS D'USAGE -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:var(--bg2)">
+    <div style="max-width:1100px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Pour quels cas ?</div>
+      <h2 class="sh2" style="margin-bottom:2rem">Les situations <span>typiques.</span></h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">💳</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Carte bancaire utilisée</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Débits frauduleux, abonnement non reconnu, achat à l'autre bout du monde. On vous guide pour l'opposition, la contestation, et le remboursement par votre banque (loi L133-18).</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">📧</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Compte Gmail / Facebook piraté</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Vous ne pouvez plus vous connecter. On vous fait remplir les bons formulaires de récupération (Google, Meta) avec les bons arguments, dans le bon ordre.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">📞</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Faux conseiller bancaire</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Il a votre nom, votre numéro, votre IBAN, vos derniers achats. Avant qu'il vous fasse signer un virement, on intervient pour arrêter l'arnaque en cours.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">🔒</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Ransomware actif</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Vos fichiers sont chiffrés. On vous donne les premiers gestes immédiats, on identifie le ransomware, on cherche un déchiffreur gratuit (parfois ça existe).</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">👤</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Usurpation d'identité</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Quelqu'un a ouvert un compte ou souscrit un crédit à votre nom. On vous accompagne pour le signalement Banque de France, la plainte, et la régularisation.</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px">
+          <div style="font-size:28px;margin-bottom:10px">📱</div>
+          <div style="font-weight:800;color:var(--text);margin-bottom:6px">Sextorsion / chantage en ligne</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Quelqu'un menace de diffuser des photos ou messages. On vous dit <strong>ne JAMAIS payer</strong>, et on vous accompagne pour le signalement Pharos + dépôt de plainte.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARIFICATION -->
+  <section style="padding:4rem clamp(1rem,6vw,6rem);background:#fff">
+    <div style="max-width:900px;margin:0 auto">
+      <div class="section-tag" style="margin-bottom:14px">Tarification</div>
+      <h2 class="sh2" style="margin-bottom:1rem">Combien ça <span>coûte ?</span></h2>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:2rem">
+        <!-- Abonnés -->
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;border-radius:18px;padding:28px;position:relative;overflow:hidden">
+          <div style="position:absolute;top:14px;right:14px;background:#fbbf24;color:#1c1c1e;font-size:10px;font-weight:900;padding:4px 10px;border-radius:99px;letter-spacing:.5px">RECOMMANDÉ</div>
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Abonnés Despy</div>
+          <div style="font-size:32px;font-weight:900;line-height:1.1;margin-bottom:4px">2 SOS / an inclus</div>
+          <div style="font-size:14px;color:rgba(255,255,255,.8);margin-bottom:16px">+ guidance illimitée par chat IA</div>
+          <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div style="font-size:13px;line-height:1.6"><strong>9,99 €/mois</strong> tout compris : Privacy Cleanup, surveillance dark web, conseiller IA, alertes, formation… et SOS Humain en cas de coup dur.</div>
+          </div>
+          <button onclick="siteSubscribe('monthly')" style="width:100%;padding:13px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">M'abonner maintenant →</button>
+        </div>
+
+        <!-- Non-abonnés -->
+        <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:28px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);font-weight:800;margin-bottom:8px">Non-abonnés</div>
+          <div style="font-size:32px;font-weight:900;color:var(--text);line-height:1.1;margin-bottom:4px">49 € / intervention</div>
+          <div style="font-size:14px;color:var(--text3);margin-bottom:16px">Paiement à l'unité, sans engagement</div>
+          <div style="background:#fff7ed;border-left:3px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
+            <strong>💡 Astuce :</strong> Pour 9,99 €/mois (donc 5 mois de SOS unitaire), vous avez l'abonnement complet incluant <strong>2 SOS / an</strong> + toutes les autres protections.
+          </div>
+          <button onclick="alert('Stripe Payment Link 49€ à configurer dans le dashboard Stripe')" style="width:100%;padding:13px;background:var(--bg2);color:var(--text);border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">SOS unique — 49 € →</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:1.5rem;font-size:13px;color:var(--text3)">
+        Garantie satisfait ou remboursé sur le SOS unitaire si le résultat n'est pas à la hauteur.
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section style="padding:5rem clamp(1rem,6vw,6rem);background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);color:#fff;text-align:center">
+    <div style="max-width:700px;margin:0 auto">
+      <h2 style="font-size:clamp(28px,4vw,42px);font-weight:900;line-height:1.15;letter-spacing:-1px;margin-bottom:1.25rem">
+        Vous n'êtes plus seul<br>face au piratage.
+      </h2>
+      <p style="font-size:17px;line-height:1.7;color:rgba(255,255,255,.9);margin-bottom:2rem">
+        SOS Humain est inclus dans votre abonnement Despy à 9,99 €/mois. Avec aussi le Conseiller IA, les alertes, Privacy Cleanup, et le centre de formation.
+      </p>
+      <button onclick="siteSubscribe('monthly')" style="background:#fff;color:#dc2626;border:none;border-radius:99px;padding:16px 36px;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 12px 36px rgba(0,0,0,.3);margin-bottom:14px">
+        Activer mon SOS Humain → 9,99 €/mois
+      </button>
+      <div style="font-size:13px;color:rgba(255,255,255,.7)">
+        Sans engagement · Résiliable en 1 clic · Satisfait ou remboursé 30 jours
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page-sos-humain -->
+
+<!-- ══════════════════════════════════════ -->
 <!-- PAGE LOGIN / ESPACE CLIENT            -->
 <!-- ══════════════════════════════════════ -->
 <div id="page-login" class="page">
@@ -3300,6 +3678,23 @@ function triggerPWAInstall() {
 
     <!-- PANEL ACCUEIL -->
     <div id="panel-dashboard">
+
+      <!-- ═══ BOUTON SOS HUMAIN (toujours visible en haut) ═══ -->
+      <div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);border-radius:16px;padding:18px 20px;margin-bottom:1.5rem;color:#fff;box-shadow:0 8px 24px rgba(220,38,38,.25);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="width:54px;height:54px;border-radius:50%;background:#fff;color:#dc2626;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.2);position:relative">
+          <div style="font-size:15px;line-height:1">SOS</div>
+          <div style="font-size:7px;letter-spacing:.5px">HUMAIN</div>
+          <div style="position:absolute;inset:-6px;border:2px solid rgba(255,255,255,.4);border-radius:50%;animation:sos-pulse 2s ease-out infinite;pointer-events:none"></div>
+        </div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:14px;font-weight:900;margin-bottom:2px">Vous vous faites pirater ? On vous rappelle.</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.85)">Rappel sous 30 min en soirée et week-end · 4h en journée · 15 min en cas critique</div>
+        </div>
+        <button onclick="openSOSModal()" style="background:#fff;color:#dc2626;border:none;border-radius:99px;padding:11px 22px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,.15)">
+          🆘 Activer le SOS
+        </button>
+      </div>
+
       <!-- Score de sécurité -->
       <div style="background:linear-gradient(135deg,#0a1f3a,#2D5BFF);border-radius:16px;padding:24px;margin-bottom:1.5rem;color:#fff;box-shadow:0 8px 24px rgba(45,91,255,.2)">
         <div style="font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Votre score de sécurité</div>
@@ -4513,7 +4908,7 @@ var LEGAL = {
   },
   cgv: {
     title: 'Conditions Générales de Vente',
-    html: '<p><em>En vigueur au 14/04/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Intervention à distance : 49€ (téléphone ou visio)<br>• Intervention à domicile : 89€ (Strasbourg ±15km)<br>• Forfait complet : 129€ (tous appareils + rapport)</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
+    html: '<p><em>En vigueur au 14/04/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Intervention à distance : 49€ (téléphone ou visio)<br>• Intervention à domicile : 89€ (Strasbourg ±15km)<br>• Forfait complet : 129€ (tous appareils + rapport)</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Service SOS Humain &mdash; Nature et limites</h4><p>Le service SOS Humain consiste en un accompagnement par téléphone et par écrit, à des fins de conseil, de coordination et de rédaction de courriers. Despy n&#39;est ni une banque, ni un avocat, ni une autorité judiciaire ou de police. Despy ne se substitue à aucun de ces acteurs et ne garantit pas la récupération de sommes débitées ou la résolution juridique d&#39;un litige. L&#39;utilisateur reste seul responsable de ses comptes, mots de passe et démarches officielles. Despy peut rédiger des courriers à des fins d&#39;accompagnement, mais l&#39;utilisateur en reste signataire et responsable. <strong>Délais de rappel garantis :</strong> 15 minutes pour les cas critiques, 30 minutes en soirée et week-end, 4 heures en journée semaine, lendemain matin pour les demandes de nuit. <strong>Inclusion :</strong> 2 SOS Humain par an inclus dans l&#39;abonnement; au-delà, ou pour les non-abonnés, paiement à l&#39;unité de 49€ par intervention.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
   },
   confidentialite: {
     title: "Politique de confidentialité",
@@ -6009,6 +6404,201 @@ function refreshPrivacyScan() {
   t.textContent = '🔄 Liste actualisée';
   document.body.appendChild(t);
   setTimeout(function(){ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(function(){t.remove();}, 400); }, 2200);
+}
+
+// ═══════════════════════════════════════════════
+// SOS HUMAIN — Module urgence
+// ═══════════════════════════════════════════════
+
+var SOS_TYPES = [
+  { id: 'banque',       label: 'Compte bancaire / CB',  emoji: '💳', critical: true,
+    desc: 'Débit frauduleux, CB volée, virement non autorisé' },
+  { id: 'compte_pirate', label: 'Compte piraté',         emoji: '📧', critical: true,
+    desc: 'Gmail, Facebook, Insta, autre compte inaccessible' },
+  { id: 'faux_conseil',  label: 'Faux conseiller',       emoji: '📞', critical: true,
+    desc: 'Faux banquier, faux gendarme, faux support technique' },
+  { id: 'ransomware',    label: 'Ransomware actif',      emoji: '🔒', critical: true,
+    desc: 'Fichiers chiffrés, rançon demandée' },
+  { id: 'usurpation',    label: 'Usurpation d\'identité', emoji: '👤', critical: false,
+    desc: 'Compte ouvert ou crédit à votre nom, sans autorisation' },
+  { id: 'sextorsion',    label: 'Chantage / sextorsion', emoji: '📱', critical: false,
+    desc: 'Menace de diffusion de photos ou messages' },
+  { id: 'autre',         label: 'Autre situation',       emoji: '🆘', critical: false,
+    desc: 'Une autre urgence cyber non listée' },
+];
+
+function openSOSModal() {
+  var session = siteSession.get();
+  var isSubscribed = session && session.subscribed;
+
+  var modal = document.createElement('div');
+  modal.id = 'sos-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;max-width:520px;width:100%;max-height:92vh;overflow-y:auto;padding:0;box-shadow:0 24px 64px rgba(0,0,0,.4);position:relative';
+
+  var typesHtml = SOS_TYPES.map(function(t) {
+    return '<button class="sos-type-btn" onclick="selectSOSType(this, \'' + t.id + '\')" data-type="' + t.id + '" style="text-align:left;padding:14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;display:flex;align-items:flex-start;gap:12px;transition:all .15s;width:100%">' +
+      '<div style="font-size:24px;flex-shrink:0">' + t.emoji + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:2px">' + t.label + (t.critical ? ' <span style="background:#dc2626;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.3px;margin-left:4px">CRITIQUE</span>' : '') + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);line-height:1.4">' + t.desc + '</div>' +
+      '</div>' +
+    '</button>';
+  }).join('');
+
+  box.innerHTML =
+    '<div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;padding:22px 24px;border-radius:20px 20px 0 0;position:relative">' +
+      '<button onclick="closeSOSModal()" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;font-size:20px;cursor:pointer;color:#fff;line-height:1">×</button>' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">' +
+        '<div style="width:42px;height:42px;border-radius:50%;background:#fff;color:#dc2626;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900">' +
+          '<div style="font-size:13px;line-height:1">SOS</div>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#fef3c7;font-weight:800;margin-bottom:2px">Service d\'urgence</div>' +
+          '<div style="font-size:18px;font-weight:900;line-height:1.2">Un humain va vous rappeler</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.5">Décrivez-nous votre situation. Nous vous rappelons sous 30 min (soirée/week-end), 4h (journée), ou 15 min si critique.</div>' +
+    '</div>' +
+    '<div style="padding:22px 24px">' +
+
+      (!isSubscribed ?
+        '<div style="background:#fff7ed;border-left:4px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#92400e;line-height:1.5">' +
+          '<strong>⚠️ Vous n\'êtes pas abonné</strong><br>' +
+          'Le SOS Humain coûte <strong>49 €</strong> en paiement unique. Avec l\'abonnement <strong>9,99 €/mois</strong>, vous avez 2 SOS inclus / an + toutes les autres protections.' +
+        '</div>' : '') +
+
+      '<div style="margin-bottom:14px">' +
+        '<label style="display:block;font-size:11px;font-weight:800;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Quel type d\'urgence ?</label>' +
+        '<div id="sos-types-list" style="display:flex;flex-direction:column;gap:8px">' + typesHtml + '</div>' +
+      '</div>' +
+
+      '<div style="margin-bottom:14px"><label style="display:block;font-size:11px;font-weight:800;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Votre téléphone *</label><input id="sos-phone" type="tel" placeholder="06 12 34 56 78" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;outline:none;box-sizing:border-box" autocomplete="tel"></div>' +
+
+      '<div style="margin-bottom:18px"><label style="display:block;font-size:11px;font-weight:800;color:var(--text);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Décrivez en 2 phrases *</label><textarea id="sos-context" rows="3" placeholder="Ex : Mon compte Gmail ne s\'ouvre plus depuis ce matin, j\'ai reçu un email étrange hier soir avec un lien que j\'ai cliqué…" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:13.5px;line-height:1.5;outline:none;box-sizing:border-box;resize:vertical"></textarea></div>' +
+
+      '<div id="sos-error" style="display:none;background:rgba(220,38,38,.1);border-left:3px solid #dc2626;color:#991b1b;padding:10px 12px;border-radius:6px;font-size:13px;margin-bottom:12px"></div>' +
+
+      '<button id="sos-submit-btn" onclick="submitSOSRequest()" style="width:100%;padding:14px;background:#dc2626;color:#fff;border:none;border-radius:12px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 20px rgba(220,38,38,.3)">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.71 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.71A2 2 0 0 1 22 16.92z"/></svg>' +
+        'Envoyer ma demande SOS' +
+      '</button>' +
+
+      '<div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text3);line-height:1.6">' +
+        'En envoyant, vous acceptez nos conditions du service SOS. Despy ne se substitue pas à votre banque, la police ou un avocat.' +
+      '</div>' +
+    '</div>';
+
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+  modal.onclick = function(e) { if (e.target === modal) closeSOSModal(); };
+
+  // Auto-focus le premier type
+  window._sosSelectedType = null;
+
+  // Préremplir avec session si dispo
+  if (session && session.phone) {
+    var phoneEl = document.getElementById('sos-phone');
+    if (phoneEl) phoneEl.value = session.phone;
+  }
+}
+
+function selectSOSType(btn, typeId) {
+  // Désélectionner tous
+  document.querySelectorAll('.sos-type-btn').forEach(function(b) {
+    b.style.background = '#fff';
+    b.style.borderColor = 'var(--border)';
+    b.style.boxShadow = 'none';
+  });
+  // Sélectionner celui-ci
+  btn.style.background = '#fef2f2';
+  btn.style.borderColor = '#dc2626';
+  btn.style.boxShadow = '0 4px 12px rgba(220,38,38,.15)';
+  window._sosSelectedType = typeId;
+}
+
+function closeSOSModal() {
+  var m = document.getElementById('sos-modal');
+  if (m) m.remove();
+}
+
+async function submitSOSRequest() {
+  var type    = window._sosSelectedType;
+  var phone   = (document.getElementById('sos-phone')   || {}).value || '';
+  var context = (document.getElementById('sos-context') || {}).value || '';
+  var errEl   = document.getElementById('sos-error');
+  var btn     = document.getElementById('sos-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!type)                              { errEl.textContent = 'Merci de sélectionner un type d\'urgence.'; errEl.style.display='block'; return; }
+  if (phone.replace(/\D/g, '').length < 9){ errEl.textContent = 'Téléphone invalide.';                        errEl.style.display='block'; return; }
+  if (context.trim().length < 10)         { errEl.textContent = 'Merci de décrire votre situation (10 caractères minimum).'; errEl.style.display='block'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Envoi en cours…';
+
+  var session = siteSession.get();
+  var typeInfo = SOS_TYPES.find(function(t) { return t.id === type; }) || {};
+  var payload = {
+    user_email: (session && session.email) || 'anonymous@despy.fr',
+    type: type,
+    type_label: typeInfo.label || type,
+    is_critical: !!typeInfo.critical,
+    phone: phone.trim(),
+    context: context.trim(),
+    subscribed: !!(session && session.subscribed),
+    submitted_at: new Date().toISOString(),
+  };
+
+  // Envoyer au backend
+  var ok = false;
+  try {
+    var res = await fetch('/.netlify/functions/sos-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    ok = res.ok;
+  } catch(e) {
+    console.warn('sos-request failed:', e);
+  }
+
+  closeSOSModal();
+  showSOSSuccessToast(typeInfo.critical);
+}
+
+function showSOSSuccessToast(critical) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:20px;max-width:440px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.4)';
+
+  var delay = critical ? '15 minutes' : 'sous 30 minutes (soirée/week-end) ou sous 4h (journée)';
+
+  box.innerHTML =
+    '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(34,197,94,.3)">' +
+      '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
+    '</div>' +
+    '<div style="font-size:24px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px">Demande SOS envoyée !</div>' +
+    '<div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:18px">Despy a reçu votre demande en temps réel. Un humain vous rappelle <strong>' + delay + '</strong>.</div>' +
+    '<div style="background:var(--bg2);border-radius:10px;padding:14px;text-align:left;margin-bottom:18px">' +
+      '<div style="font-weight:800;font-size:12px;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">En attendant son appel :</div>' +
+      '<div style="font-size:13px;color:var(--text2);line-height:1.7">' +
+        (critical ?
+          '• Ne payez RIEN au pirate (si ransomware ou chantage)<br>• Notez tout ce qui se passe (capture d\'écran, montants, dates)<br>• Ne supprimez rien (les preuves comptent)' :
+          '• Restez calme, vous n\'êtes plus seul<br>• Notez tout ce que vous remarquez<br>• Ne payez RIEN si on vous le demande sous pression'
+        ) +
+      '</div>' +
+    '</div>' +
+    '<button onclick="this.closest(\'div[style*=&quot;position:fixed&quot;]\').remove()" style="padding:11px 24px;background:var(--blue);color:#fff;border:none;border-radius:99px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer">OK, j\'attends l\'appel</button>';
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 }
 
 function initClientSpace() {
