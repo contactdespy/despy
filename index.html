@@ -3583,7 +3583,13 @@ function triggerPWAInstall() {
           <div style="background:#fff7ed;border-left:3px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
             <strong>💡 Astuce :</strong> Pour 9,99 €/mois (donc 5 mois de SOS unitaire), vous avez l'abonnement complet incluant <strong>2 SOS / an</strong> + toutes les autres protections.
           </div>
-          <button onclick="alert('Stripe Payment Link 49€ à configurer dans le dashboard Stripe')" style="width:100%;padding:13px;background:var(--bg2);color:var(--text);border:1.5px solid var(--border);border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">SOS unique — 49 € →</button>
+          <a href="https://buy.stripe.com/fZu5kFch76bK8Fg6wt8AE05" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;text-decoration:none;box-shadow:0 4px 12px rgba(220,38,38,.2);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(220,38,38,.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(220,38,38,.2)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8.9 6.5 2.5"/><polyline points="22 4 12 14 9 11"/></svg>
+            SOS unique — 49 € (paiement sécurisé) →
+          </a>
+          <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3);line-height:1.5">
+            🔒 Paiement Stripe · 🛡️ Garantie remboursé 7 jours si Despy ne peut pas vous aider
+          </div>
         </div>
       </div>
 
@@ -4553,6 +4559,24 @@ function buyLivret() {
         if (typeof showPage === 'function') showPage('livret-merci');
         if (history.replaceState) history.replaceState(null, '', location.pathname);
       }, 100);
+    }
+  } catch(e) { /* silencieux */ }
+})();
+
+// Détection retour depuis Stripe SOS (?sos_paid=1 → ouvre le modal SOS payant)
+(function handleSosPaidReturn() {
+  try {
+    if (location.search.indexOf('sos_paid=1') !== -1) {
+      // Marquer comme payé en sessionStorage pour le retrouver dans le flux
+      try { sessionStorage.setItem('despy_sos_paid', '1'); } catch(e) {}
+      setTimeout(function() {
+        if (typeof showPage === 'function') showPage('sos-humain');
+        // Ouvre auto le modal SOS après un petit délai
+        setTimeout(function() {
+          if (typeof openSOSModal === 'function') openSOSModal();
+        }, 400);
+        if (history.replaceState) history.replaceState(null, '', location.pathname);
+      }, 150);
     }
   } catch(e) { /* silencieux */ }
 })();
@@ -6502,11 +6526,23 @@ function openSOSModal() {
     '</div>' +
     '<div style="padding:22px 24px">' +
 
-      (!isSubscribed ?
-        '<div style="background:#fff7ed;border-left:4px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#92400e;line-height:1.5">' +
-          '<strong>⚠️ Vous n\'êtes pas abonné</strong><br>' +
-          'Le SOS Humain coûte <strong>49 €</strong> en paiement unique. Avec l\'abonnement <strong>9,99 €/mois</strong>, vous avez 2 SOS inclus / an + toutes les autres protections.' +
-        '</div>' : '') +
+      // Bannière selon le statut : payé / abonné / ni l'un ni l'autre
+      ((function() {
+        var paid = false;
+        try { paid = sessionStorage.getItem('despy_sos_paid') === '1'; } catch(e) {}
+        if (paid) {
+          return '<div style="background:#dcfce7;border-left:4px solid #16a34a;border-radius:6px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#14532d;line-height:1.5;display:flex;gap:10px;align-items:flex-start">' +
+                   '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>' +
+                   '<div><strong>Paiement de 49 € bien reçu</strong><br>Décrivez votre situation et nous vous rappelons selon les délais habituels. Garantie remboursé 7 jours si nous ne pouvons pas vous aider.</div>' +
+                 '</div>';
+        } else if (!isSubscribed) {
+          return '<div style="background:#fff7ed;border-left:4px solid #f59e0b;border-radius:6px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:#92400e;line-height:1.5">' +
+                   '<strong>⚠️ Vous n\'êtes pas abonné</strong><br>' +
+                   'Le SOS Humain coûte <strong>49 €</strong> en paiement unique (<a href="https://buy.stripe.com/fZu5kFch76bK8Fg6wt8AE05" target="_blank" rel="noopener" style="color:#92400e;font-weight:700;text-decoration:underline">payer maintenant</a>). Avec l\'abonnement <strong>9,99 €/mois</strong>, vous avez 2 SOS inclus / an + toutes les autres protections.' +
+                 '</div>';
+        }
+        return '';
+      })()) +
 
       '<div style="margin-bottom:14px">' +
         '<label style="display:block;font-size:11px;font-weight:800;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Quel type d\'urgence ?</label>' +
@@ -6580,6 +6616,13 @@ async function submitSOSRequest() {
 
   var session = siteSession.get();
   var typeInfo = SOS_TYPES.find(function(t) { return t.id === type; }) || {};
+
+  // Détection paiement à l'unité (non-abonné qui revient de Stripe)
+  var paidOneOff = false;
+  try {
+    paidOneOff = sessionStorage.getItem('despy_sos_paid') === '1';
+  } catch(e) {}
+
   var payload = {
     user_email: (session && session.email) || 'anonymous@despy.fr',
     type: type,
@@ -6588,8 +6631,14 @@ async function submitSOSRequest() {
     phone: phone.trim(),
     context: context.trim(),
     subscribed: !!(session && session.subscribed),
+    paid_one_off: paidOneOff,
     submitted_at: new Date().toISOString(),
   };
+
+  // Une fois utilisé, on enlève le flag pour éviter qu'il soit pris en compte si le client refait un SOS plus tard
+  if (paidOneOff) {
+    try { sessionStorage.removeItem('despy_sos_paid'); } catch(e) {}
+  }
 
   // Envoyer au backend
   var ok = false;

@@ -72,6 +72,7 @@ exports.handler = async (event) => {
       phone,
       context,
       subscribed,
+      paid_one_off,
       submitted_at
     } = body;
 
@@ -89,6 +90,7 @@ exports.handler = async (event) => {
         phone: phone.trim(),
         context: context.trim(),
         subscribed: !!subscribed,
+        paid_one_off: !!paid_one_off,
         status: 'pending',
         submitted_at: submitted_at || new Date().toISOString()
       });
@@ -96,13 +98,22 @@ exports.handler = async (event) => {
       console.warn('Supabase insert failed (table may not exist):', e.message);
     }
 
+    // ── Statut client : déterminer le tag selon abonné/payé/ni ──
+    let statusTag;
+    if (paid_one_off) {
+      statusTag = "💰 <b>PAYÉ 49 €</b> (non-abonné)";
+    } else if (subscribed) {
+      statusTag = "✅ Abonné";
+    } else {
+      statusTag = "⚠️ <b>Non-abonné — N'A PAS PAYÉ</b> (à orienter vers Stripe)";
+    }
+
     // ── Notification TELEGRAM à Yacine (priorité 1) ──
     const urgencyTag = is_critical ? "🔴 <b>CRITIQUE — RAPPEL 15 MIN</b>" : "🟡 <b>SOS HUMAIN</b>";
-    const subscribedTag = subscribed ? "✅ Abonné" : "💰 Non-abonné (49€)";
     const telegramMsg =
       `${urgencyTag}\n\n` +
       `<b>Type :</b> ${type_label || type}\n` +
-      `<b>Statut :</b> ${subscribedTag}\n` +
+      `<b>Statut :</b> ${statusTag}\n` +
       `<b>Email :</b> ${user_email || '(anonyme)'}\n` +
       `<b>Tel :</b> <a href="tel:${phone.replace(/\s/g,'')}">${phone}</a>\n\n` +
       `<b>Situation :</b>\n<i>${context.substring(0, 500)}</i>\n\n` +
@@ -116,7 +127,8 @@ exports.handler = async (event) => {
 
     // ── Notification EMAIL à Yacine (backup si Telegram down) ──
     const adminEmail = "contact.despy@gmail.com";
-    const adminSubject = `${is_critical ? '🔴 SOS CRITIQUE' : '🆘 SOS Humain'} — ${type_label || type}`;
+    const paidPrefix = paid_one_off ? '💰 PAYÉ — ' : '';
+    const adminSubject = `${paidPrefix}${is_critical ? '🔴 SOS CRITIQUE' : '🆘 SOS Humain'} — ${type_label || type}`;
     const adminHtml = `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px;background:#f9fafb">
   <div style="background:linear-gradient(135deg,${is_critical ? '#7f1d1d,#dc2626' : '#f59e0b,#d97706'});color:#fff;padding:24px;border-radius:12px 12px 0 0">
@@ -126,7 +138,7 @@ exports.handler = async (event) => {
   <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
     <table style="width:100%;border-collapse:collapse;margin-bottom:18px">
       <tr><td style="padding:8px 0;color:#6b7280;font-size:13px;width:130px">Type</td><td style="padding:8px 0;font-weight:700">${type_label || type}</td></tr>
-      <tr style="border-top:1px solid #f3f4f6"><td style="padding:8px 0;color:#6b7280;font-size:13px">Statut</td><td style="padding:8px 0;font-weight:700">${subscribed ? '✅ Abonné Despy' : '💰 Non-abonné (49€)'}</td></tr>
+      <tr style="border-top:1px solid #f3f4f6"><td style="padding:8px 0;color:#6b7280;font-size:13px">Statut</td><td style="padding:8px 0;font-weight:700">${paid_one_off ? '💰 PAYÉ 49 € (non-abonné)' : (subscribed ? '✅ Abonné Despy' : '⚠️ Non-abonné — n\'a pas encore payé')}</td></tr>
       <tr style="border-top:1px solid #f3f4f6"><td style="padding:8px 0;color:#6b7280;font-size:13px">Email client</td><td style="padding:8px 0;font-weight:700">${user_email || '(anonyme)'}</td></tr>
       <tr style="border-top:1px solid #f3f4f6"><td style="padding:8px 0;color:#6b7280;font-size:13px">Téléphone</td><td style="padding:8px 0;font-weight:700"><a href="tel:${phone.replace(/\s/g,'')}" style="color:#2D5BFF">${phone}</a></td></tr>
       <tr style="border-top:1px solid #f3f4f6"><td style="padding:8px 0;color:#6b7280;font-size:13px">Soumis le</td><td style="padding:8px 0;font-weight:700">${new Date(submitted_at || Date.now()).toLocaleString('fr-FR')}</td></tr>
