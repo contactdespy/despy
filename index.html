@@ -364,6 +364,106 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   .ctab { padding:10px 8px !important; font-size:11px !important; min-width:75px !important }
   #client-tabs button { font-size:11px !important }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   BOTTOM SHEETS — Modales style "app mobile" qui montent du bas
+   Sur desktop : reste centré classique. Sur mobile (<768px) :
+   glisse depuis le bas comme une vraie app iOS/Android.
+   ═══════════════════════════════════════════════════════════ */
+
+.bs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 15, 30, .78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: bs-fade-in .2s ease-out;
+}
+
+.bs-content {
+  background: #fff;
+  border-radius: 22px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 0;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .35);
+  position: relative;
+  animation: bs-pop-in .3s cubic-bezier(.16, 1, .3, 1);
+  -webkit-overflow-scrolling: touch;
+}
+
+.bs-handle {
+  display: none;          /* Caché sur desktop */
+  width: 40px;
+  height: 4px;
+  background: rgba(0, 0, 0, .15);
+  border-radius: 2px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+
+.bs-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #fff;
+  line-height: 1;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes bs-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bs-pop-in {
+  from { transform: translateY(20px) scale(.96); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes bs-slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ───── Mobile : devient une bottom sheet ───── */
+@media (max-width: 768px) {
+  .bs-overlay {
+    padding: 0;
+    align-items: flex-end;     /* monte du bas */
+  }
+  .bs-content {
+    max-width: 100%;
+    max-height: 92dvh;          /* utilise dvh (dynamic viewport height) */
+    max-height: 92vh;
+    border-radius: 22px 22px 0 0;
+    animation: bs-slide-up .35s cubic-bezier(.16, 1, .3, 1);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .bs-handle {
+    display: block;             /* Apparaît sur mobile */
+  }
+  .bs-close {
+    width: 38px;
+    height: 38px;
+    background: rgba(0, 0, 0, .35);
+  }
+}
 </style>
 </head>
 <body>
@@ -6235,16 +6335,21 @@ function openPrivacyOnboarding() {
     if (!confirm("Privacy Cleanup est déjà activé pour votre compte.\n\nVoulez-vous mettre à jour vos informations ?")) return;
   }
 
+  document.body.style.overflow = 'hidden';
+
   var modal = document.createElement('div');
   modal.id = 'privacy-onboarding-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s';
+  modal.className = 'bs-overlay';
 
   var box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:20px;max-width:480px;width:100%;max-height:92vh;overflow-y:auto;padding:0;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative';
+  box.className = 'bs-content';
+  // Privacy modal un peu plus étroite sur desktop
+  box.style.maxWidth = '480px';
 
   box.innerHTML =
-    '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;padding:24px 24px 22px;border-radius:20px 20px 0 0;position:relative">' +
-      '<button onclick="closePrivacyOnboarding()" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);border:none;font-size:20px;cursor:pointer;color:#fff;line-height:1">×</button>' +
+    '<div class="bs-handle"></div>' +
+    '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);color:#fff;padding:24px 24px 22px;border-radius:22px 22px 0 0;position:relative">' +
+      '<button onclick="closePrivacyOnboarding()" class="bs-close">×</button>' +
       '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">Activation Privacy Cleanup</div>' +
       '<div style="font-size:20px;font-weight:900;line-height:1.2;margin-bottom:6px">Lançons votre premier audit.</div>' +
       '<div style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.5">Renseignez les informations à protéger. Despy va scanner 30+ data brokers et envoyer les demandes RGPD en votre nom.</div>' +
@@ -6286,6 +6391,7 @@ function openPrivacyOnboarding() {
 function closePrivacyOnboarding() {
   var m = document.getElementById('privacy-onboarding-modal');
   if (m) m.remove();
+  document.body.style.overflow = '';
 }
 
 async function submitPrivacyOnboarding() {
@@ -6516,12 +6622,15 @@ function openSOSModal() {
   var session = siteSession.get();
   var isSubscribed = session && session.subscribed;
 
+  // Verrouillage du scroll body (évite double scroll mobile)
+  document.body.style.overflow = 'hidden';
+
   var modal = document.createElement('div');
   modal.id = 'sos-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .2s';
+  modal.className = 'bs-overlay';
 
   var box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:20px;max-width:520px;width:100%;max-height:92vh;overflow-y:auto;padding:0;box-shadow:0 24px 64px rgba(0,0,0,.4);position:relative';
+  box.className = 'bs-content';
 
   var typesHtml = SOS_TYPES.map(function(t) {
     return '<button class="sos-type-btn" onclick="selectSOSType(this, \'' + t.id + '\')" data-type="' + t.id + '" style="text-align:left;padding:14px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;display:flex;align-items:flex-start;gap:12px;transition:all .15s;width:100%">' +
@@ -6534,8 +6643,9 @@ function openSOSModal() {
   }).join('');
 
   box.innerHTML =
-    '<div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;padding:22px 24px;border-radius:20px 20px 0 0;position:relative">' +
-      '<button onclick="closeSOSModal()" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);border:none;font-size:20px;cursor:pointer;color:#fff;line-height:1">×</button>' +
+    '<div class="bs-handle"></div>' +
+    '<div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;padding:22px 24px;border-radius:22px 22px 0 0;position:relative">' +
+      '<button onclick="closeSOSModal()" class="bs-close">×</button>' +
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">' +
         '<div style="width:42px;height:42px;border-radius:50%;background:#fff;color:#dc2626;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900">' +
           '<div style="font-size:13px;line-height:1">SOS</div>' +
@@ -6619,6 +6729,7 @@ function selectSOSType(btn, typeId) {
 function closeSOSModal() {
   var m = document.getElementById('sos-modal');
   if (m) m.remove();
+  document.body.style.overflow = '';
 }
 
 async function submitSOSRequest() {
@@ -6681,34 +6792,47 @@ async function submitSOSRequest() {
 }
 
 function showSOSSuccessToast(critical) {
+  document.body.style.overflow = 'hidden';
+
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.id = 'sos-success-overlay';
+  overlay.className = 'bs-overlay';
 
   var box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:20px;max-width:440px;width:100%;padding:32px 28px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.4)';
+  box.className = 'bs-content';
+  box.style.maxWidth = '440px';
 
   var delay = critical ? '15 minutes' : 'sous 30 minutes (soirée/week-end) ou sous 4h (journée)';
 
   box.innerHTML =
-    '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(34,197,94,.3)">' +
-      '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-    '</div>' +
-    '<div style="font-size:24px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px">Demande SOS envoyée !</div>' +
-    '<div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:18px">Despy a reçu votre demande en temps réel. Un humain vous rappelle <strong>' + delay + '</strong>.</div>' +
-    '<div style="background:var(--bg2);border-radius:10px;padding:14px;text-align:left;margin-bottom:18px">' +
-      '<div style="font-weight:800;font-size:12px;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">En attendant son appel :</div>' +
-      '<div style="font-size:13px;color:var(--text2);line-height:1.7">' +
-        (critical ?
-          '• Ne payez RIEN au pirate (si ransomware ou chantage)<br>• Notez tout ce qui se passe (capture d\'écran, montants, dates)<br>• Ne supprimez rien (les preuves comptent)' :
-          '• Restez calme, vous n\'êtes plus seul<br>• Notez tout ce que vous remarquez<br>• Ne payez RIEN si on vous le demande sous pression'
-        ) +
+    '<div class="bs-handle"></div>' +
+    '<div style="padding:32px 28px 28px;text-align:center">' +
+      '<div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 8px 24px rgba(34,197,94,.3)">' +
+        '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
       '</div>' +
-    '</div>' +
-    '<button onclick="this.closest(\'div[style*=&quot;position:fixed&quot;]\').remove()" style="padding:11px 24px;background:var(--blue);color:#fff;border:none;border-radius:99px;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer">OK, j\'attends l\'appel</button>';
+      '<div style="font-size:24px;font-weight:900;color:var(--text);line-height:1.2;margin-bottom:8px">Demande SOS envoyée !</div>' +
+      '<div style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:18px">Despy a reçu votre demande en temps réel. Un humain vous rappelle <strong>' + delay + '</strong>.</div>' +
+      '<div style="background:var(--bg2);border-radius:10px;padding:14px;text-align:left;margin-bottom:18px">' +
+        '<div style="font-weight:800;font-size:12px;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">En attendant son appel :</div>' +
+        '<div style="font-size:13px;color:var(--text2);line-height:1.7">' +
+          (critical ?
+            '• Ne payez RIEN au pirate (si ransomware ou chantage)<br>• Notez tout ce qui se passe (capture d\'écran, montants, dates)<br>• Ne supprimez rien (les preuves comptent)' :
+            '• Restez calme, vous n\'êtes plus seul<br>• Notez tout ce que vous remarquez<br>• Ne payez RIEN si on vous le demande sous pression'
+          ) +
+        '</div>' +
+      '</div>' +
+      '<button onclick="closeSOSSuccessToast()" style="padding:13px 28px;background:var(--blue);color:#fff;border:none;border-radius:99px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">OK, j\'attends l\'appel</button>' +
+    '</div>';
 
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.onclick = function(e) { if (e.target === overlay) closeSOSSuccessToast(); };
+}
+
+function closeSOSSuccessToast() {
+  var el = document.getElementById('sos-success-overlay');
+  if (el) el.remove();
+  document.body.style.overflow = '';
 }
 
 function initClientSpace() {
