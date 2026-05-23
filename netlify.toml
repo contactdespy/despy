@@ -42,6 +42,45 @@
   to = "/assets/apple-touch-icon.png"
   status = 200
 
+# ── URLs propres pour les pages internes (SPA routing) ──
+# Ces rewrites servent index.html, et le JS au chargement détecte le path
+# et appelle showPage() avec la bonne page. URL conservée dans la barre.
+
+[[redirects]]
+  from = "/sos-humain"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy-cleanup"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/livret"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/tarifs"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/comment-ca-marche"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/conseiller"
+  to = "/index.html"
+  status = 200
+
 # ── Headers de sécurité ──
 [[headers]]
   for = "/*"

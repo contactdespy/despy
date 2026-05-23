@@ -4563,6 +4563,29 @@ function buyLivret() {
   } catch(e) { /* silencieux */ }
 })();
 
+// Mini router : si l'URL pointe vers une page spécifique (ex: /sos-humain),
+// on appelle showPage() avec le bon ID. Marche grâce aux rewrites Netlify.
+(function handleUrlRouting() {
+  try {
+    var path = location.pathname.replace(/\/$/, '');  // retire trailing slash
+    var routes = {
+      '/sos-humain':         'sos-humain',
+      '/privacy':            'privacy',
+      '/privacy-cleanup':    'privacy',
+      '/livret':             'livret',
+      '/tarifs':             'tarifs',
+      '/comment-ca-marche':  'comment-ca-marche',
+      '/conseiller':         'conseiller',
+    };
+    var targetPage = routes[path];
+    if (targetPage) {
+      setTimeout(function() {
+        if (typeof showPage === 'function') showPage(targetPage);
+      }, 50);
+    }
+  } catch(e) { /* silencieux */ }
+})();
+
 // Détection retour depuis Stripe SOS (?sos_paid=1 → ouvre le modal SOS payant)
 (function handleSosPaidReturn() {
   try {
