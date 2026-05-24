@@ -8945,7 +8945,15 @@ function renderQuiz() {
       counter.style.cssText = 'background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #fbbf24;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400e;font-weight:700;display:flex;align-items:center;gap:8px';
       zone.parentNode.insertBefore(counter, zone);
     }
-    counter.innerHTML = '⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci · <span style="font-weight:400;opacity:.85">' + (5 - quota.used - 1) + ' restante' + (5 - quota.used - 1 > 1 ? 's' : '') + ' après celle-ci</span>';
+    var remaining = 5 - quota.used - 1;
+    var remainingText = remaining <= 0
+      ? '<strong>dernière question gratuite du mois</strong>'
+      : (remaining + ' restante' + (remaining > 1 ? 's' : '') + ' après celle-ci');
+    counter.innerHTML = '⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci · <span style="font-weight:400;opacity:.85">' + remainingText + '</span>';
+    // Bug fix : rotation des questions sur les 5 essais gratuits (sinon 5x la même)
+    if (QUIZZES && QUIZZES.length > 0) {
+      window._quizIdx = quota.used % QUIZZES.length;
+    }
   } else {
     // Abonné — masquer le compteur s'il existe
     var oldCounter = document.getElementById('quiz-counter');
@@ -8995,24 +9003,25 @@ function answerQuiz(idx) {
       opts[i].style.color = '#dc2626';
     }
   }
+  var zone = document.getElementById('quiz-zone');
+  if (!zone) return;
   var isCorrect = (idx === q.answer);
   // XP : 100 bon premier coup, 50 bon 2eme, 10 mauvais
   var firstTry = !zone.dataset.triedWrong;
-  _siteXP += isCorrect ? (firstTry ? 100 : 50) : 10;
+  var xpGained = isCorrect ? (firstTry ? 100 : 50) : 10;
+  _siteXP += xpGained;
   if (isCorrect) updateScoreData && updateScoreData('quiz_completed');
   if (!isCorrect) zone.dataset.triedWrong = "1";
-  var zone = document.getElementById('quiz-zone');
-  if (!zone) return;
   var fb = document.createElement('div');
   fb.style.cssText = 'margin-top:12px;padding:16px;border-radius:12px;background:' + (isCorrect ? 'var(--ok-bg)' : '#fff7ed') + ';border:1px solid ' + (isCorrect ? '#bbf7d0' : '#fed7aa');
-  fb.innerHTML = '<div style="font-weight:700;font-size:14px;color:' + (isCorrect ? 'var(--ok)' : '#d97706') + ';margin-bottom:6px">' + (isCorrect ? 'Bonne reponse ! +50 XP' : 'Pas tout a fait... +10 XP quand meme') + '</div><div style="font-size:13px;color:var(--text2);line-height:1.6">' + q.expl + '</div>';
+  fb.innerHTML = '<div style="font-weight:700;font-size:14px;color:' + (isCorrect ? 'var(--ok)' : '#d97706') + ';margin-bottom:6px">' + (isCorrect ? 'Bonne reponse ! +' + xpGained + ' XP' : 'Pas tout a fait... +10 XP quand meme') + '</div><div style="font-size:13px;color:var(--text2);line-height:1.6">' + q.expl + '</div>';
   var nextBtn = document.createElement('button');
   nextBtn.textContent = 'Voir ma progression';
   nextBtn.style.cssText = 'margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
   nextBtn.onclick = function() { updateSiteXP(); scrollToSection('fidelisation'); };
   fb.appendChild(nextBtn);
   zone.appendChild(fb);
-  if (isCorrect) showXPToast(50);
+  if (isCorrect) showXPToast(xpGained);
 }
 
 function showXPToast(xp) {
