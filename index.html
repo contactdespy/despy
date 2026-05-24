@@ -457,6 +457,70 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MODALES SECONDAIRES — Batch D : bottom sheets mobile
+   (quiz, simulator, defi chrono, prompts d'upgrade)
+   Toutes les .sub-modal-overlay deviennent des bottom sheets sur mobile.
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .sub-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+  .sub-modal {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 92dvh !important;
+    max-height: 92vh !important;
+    border-radius: 22px 22px 0 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    animation: bs-slide-up .35s cubic-bezier(.16, 1, .3, 1) !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0)) !important;
+    position: relative;
+  }
+  /* Drag handle visuel automatique en haut de chaque sub-modal sur mobile */
+  .sub-modal::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 0, 0, .15);
+    border-radius: 2px;
+    margin: -16px auto 14px;
+    position: sticky;
+    top: 0;
+  }
+  /* Quiz modal : padding adapté mobile */
+  #quiz-modal-overlay .bs-content,
+  #quiz-modal-overlay > div:not(.bs-handle) {
+    padding: 18px !important;
+  }
+
+  /* Défi Chrono modal : bottom sheet aussi */
+  .cs-modal-overlay {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+  .cs-modal-box {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 92dvh !important;
+    max-height: 92vh !important;
+    border-radius: 22px 22px 0 0 !important;
+    padding-bottom: env(safe-area-inset-bottom, 0) !important;
+  }
+  .cs-modal-box::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 0, 0, .15);
+    border-radius: 2px;
+    margin: 10px auto 0;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    ESPACE CLIENT — Batch C : panels individuels mobile
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 600px) {
@@ -1129,7 +1193,6 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
             Aucune installation
           </div>
         </div>
-        <button class="btn-primary" style="margin-top:1.25rem" onclick="siteSubscribe('monthly')">Accéder à Despy →</button>
       </div>
     </div>
   </div>
@@ -8382,18 +8445,27 @@ function showQuizModal() {
   var existing = document.getElementById('quiz-modal-overlay');
   if (existing) existing.remove();
 
+  document.body.style.overflow = 'hidden';
+
   var overlay = document.createElement('div');
   overlay.id = 'quiz-modal-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.78);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn .25s;overflow-y:auto';
+  overlay.className = 'bs-overlay';
 
   var box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)';
+  box.className = 'bs-content';
+  box.style.maxWidth = '560px';
+  box.style.padding = '24px';
+
+  // Drag handle pour mobile
+  var handle = document.createElement('div');
+  handle.className = 'bs-handle';
+  box.appendChild(handle);
 
   // Bouton fermer
   var closeBtn = document.createElement('button');
   closeBtn.innerHTML = '×';
   closeBtn.style.cssText = 'position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:var(--bg2);border:none;font-size:22px;cursor:pointer;color:var(--text3);font-family:inherit;line-height:1;z-index:10';
-  closeBtn.onclick = function(){ overlay.remove(); };
+  closeBtn.onclick = function(){ overlay.remove(); document.body.style.overflow = ''; };
 
   // Header avec module
   var header = document.createElement('div');
@@ -8421,7 +8493,7 @@ function showQuizModal() {
   overlay.appendChild(box);
 
   // Fermer au clic sur fond
-  overlay.onclick = function(e){ if(e.target === overlay) overlay.remove(); };
+  overlay.onclick = function(e){ if(e.target === overlay) { overlay.remove(); document.body.style.overflow = ''; } };
 
   document.body.appendChild(overlay);
 
@@ -9802,12 +9874,25 @@ function _csRenderModal() {
   var existing = document.getElementById('cs-overlay');
   if (existing) existing.remove();
 
+  document.body.style.overflow = 'hidden';
+
+  // Surveille la disparition de l'overlay pour rétablir le scroll body
+  var observer = new MutationObserver(function() {
+    if (!document.getElementById('cs-overlay')) {
+      document.body.style.overflow = '';
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true });
+
   var overlay = document.createElement('div');
   overlay.id = 'cs-overlay';
+  overlay.className = 'cs-modal-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,18,30,.82);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:csFadeIn .25s ease';
 
   var box = document.createElement('div');
   box.id = 'cs-box';
+  box.className = 'cs-modal-box';
   box.style.cssText = 'background:#fff;border-radius:24px;max-width:520px;width:100%;max-height:92vh;overflow-y:auto;padding:0;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.3);font-family:inherit;animation:csSlideUp .35s cubic-bezier(.16,1,.3,1)';
 
   var close = document.createElement('button');
