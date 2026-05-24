@@ -457,6 +457,112 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ANIMATIONS — Transitions de page + entre onglets espace client
+   ═══════════════════════════════════════════════════════════ */
+
+/* Apparition douce de chaque page lors d'un showPage() */
+.page.active {
+  animation: page-enter .35s cubic-bezier(.16, 1, .3, 1);
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Transition entre les panels de l'espace client (déjà partiellement via cpanel/fadeIn) */
+#panel-dashboard,
+#panel-privacy,
+#panel-protection,
+#panel-formation,
+#panel-parrainage,
+#panel-compte {
+  animation: tab-enter .28s ease-out;
+}
+@keyframes tab-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile : transition légèrement plus marquée pour le ressenti "app" */
+@media (max-width: 768px) {
+  .page.active {
+    animation: page-enter-mobile .35s cubic-bezier(.16, 1, .3, 1);
+  }
+  @keyframes page-enter-mobile {
+    from { opacity: 0; transform: translateX(8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SMART BANNER PUSH NOTIFICATIONS (mobile)
+   Bandeau bas qui apparaît après 8 sec si jamais activé.
+   ═══════════════════════════════════════════════════════════ */
+#push-smart-banner {
+  display: none;
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0)); /* au-dessus de la bottom nav */
+  left: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #0a1f3a, #1a3fd9);
+  color: #fff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  z-index: 850;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .35);
+  align-items: center;
+  gap: 12px;
+  animation: smart-banner-up .4s cubic-bezier(.16, 1, .3, 1);
+}
+@keyframes smart-banner-up {
+  from { transform: translateY(160%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+#push-smart-banner.visible { display: flex; }
+#push-smart-banner .psb-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#push-smart-banner .psb-text {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.35;
+}
+#push-smart-banner .psb-text strong { display: block; font-weight: 800; margin-bottom: 2px; }
+#push-smart-banner .psb-text span { color: rgba(255, 255, 255, .8); font-size: 11.5px; }
+#push-smart-banner .psb-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+#push-smart-banner button {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+#push-smart-banner .psb-yes {
+  background: #fff;
+  color: var(--blue);
+}
+#push-smart-banner .psb-no {
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+}
+
+/* Affichage uniquement <= 768px */
+@media (min-width: 769px) { #push-smart-banner { display: none !important; } }
+
+/* ═══════════════════════════════════════════════════════════
    BATCH E — Bottom navigation mobile (sticky bottom)
    Style app native iOS/Android. Visible uniquement <= 768px.
    ═══════════════════════════════════════════════════════════ */
@@ -4455,7 +4561,7 @@ function triggerPWAInstall() {
       </div>
 
       <!-- Analyse de lien -->
-      <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
+      <div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div style="font-size:22px">🔗</div>
           <div>
@@ -4464,6 +4570,24 @@ function triggerPWAInstall() {
           </div>
         </div>
         <button onclick="showPage('conseiller')" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Ouvrir l'analyseur →</button>
+      </div>
+
+      <!-- Notifications push (alertes nationales) -->
+      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:20px;color:#fff;box-shadow:0 8px 24px rgba(45,91,255,.2)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#fff">Alertes nationales en direct</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.7)">1 à 3 alertes/sem · Nouvelles arnaques détectées</div>
+          </div>
+        </div>
+        <div id="push-status-client" style="margin-bottom:10px"></div>
+        <button onclick="subscribePushFromClient()" id="push-client-btn" class="sub-btn" style="width:100%;padding:11px;font-size:13px;background:#fff;color:var(--blue);font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Activer les notifications
+        </button>
       </div>
     </div>
 
@@ -10310,6 +10434,130 @@ function _csShowResult() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// Variant push pour l'espace client (utilise le même backend, autre UI)
+// ═══════════════════════════════════════════════════════════
+async function subscribePushFromClient() {
+  var btn = document.getElementById('push-client-btn');
+  var status = document.getElementById('push-status-client');
+  if (!btn) return;
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (status) status.innerHTML = '<div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.85)">Votre navigateur ne supporte pas les notifications.</div>';
+    return;
+  }
+  var orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'Activation…';
+
+  try {
+    var perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      if (status) status.innerHTML = '<div style="background:rgba(220,38,38,.18);border:1px solid rgba(252,165,165,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#fecaca">Vous avez refusé. Réactivez-les dans les réglages du navigateur.</div>';
+      btn.disabled = false; btn.innerHTML = orig;
+      return;
+    }
+    var reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    var keyRes = await fetch('/.netlify/functions/push-key');
+    var keyData = await keyRes.json();
+    if (!keyData.publicKey) throw new Error('Service indisponible');
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
+    });
+    var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+    await fetch('/.netlify/functions/push-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub, email: session ? session.email : null })
+    });
+    if (status) status.innerHTML = '<div style="background:rgba(34,197,94,.18);border:1px solid rgba(187,247,208,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#bbf7d0;font-weight:700">✓ Alertes activées sur cet appareil</div>';
+    btn.innerHTML = '✓ Alertes activées';
+    btn.style.background = 'rgba(34,197,94,.25)';
+    btn.style.color = '#bbf7d0';
+  } catch(e) {
+    console.error('push client:', e);
+    if (status) status.innerHTML = '<div style="background:rgba(220,38,38,.18);border:1px solid rgba(252,165,165,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#fecaca">Erreur : ' + (e.message || 'inconnue') + '</div>';
+    btn.disabled = false; btn.innerHTML = orig;
+  }
+}
+
+// État initial du bouton (vérifie si déjà activé)
+function refreshPushClientState() {
+  var btn = document.getElementById('push-client-btn');
+  var status = document.getElementById('push-status-client');
+  if (!btn) return;
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    btn.innerHTML = '✓ Alertes activées';
+    btn.style.background = 'rgba(34,197,94,.25)';
+    btn.style.color = '#bbf7d0';
+    btn.disabled = false;
+    if (status) status.innerHTML = '<div style="background:rgba(34,197,94,.18);border:1px solid rgba(187,247,208,.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#bbf7d0;font-weight:700">✓ Vous recevez les alertes nationales</div>';
+  } else if (Notification.permission === 'denied') {
+    if (status) status.innerHTML = '<div style="background:rgba(220,38,38,.15);border:1px solid rgba(252,165,165,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:#fecaca">Notifications bloquées. Réactivez-les dans les réglages du navigateur.</div>';
+  }
+}
+// Sync l'état au load des panels client
+setTimeout(refreshPushClientState, 600);
+
+// ═══════════════════════════════════════════════════════════
+// SMART BANNER PUSH — apparait apres 8s sur mobile si non activé.
+// Le user peut "Activer" ou "Plus tard" (dismiss = 14 jours).
+// ═══════════════════════════════════════════════════════════
+function shouldShowPushBanner() {
+  // Pas si écran > 768
+  if (window.innerWidth > 768) return false;
+  // Pas si pas de support
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  // Pas si déjà accepté ou refusé
+  if (Notification.permission !== 'default') return false;
+  // Pas si dismiss récent (14 jours)
+  try {
+    var dismissed = localStorage.getItem('despy_push_banner_dismissed');
+    if (dismissed) {
+      var d = parseInt(dismissed, 10);
+      if (Date.now() - d < 14 * 24 * 3600 * 1000) return false;
+    }
+  } catch(e) {}
+  return true;
+}
+
+function dismissPushBanner() {
+  var b = document.getElementById('push-smart-banner');
+  if (b) {
+    b.style.animation = 'smart-banner-up .25s reverse';
+    setTimeout(function() { b.classList.remove('visible'); b.style.animation = ''; }, 250);
+  }
+  try { localStorage.setItem('despy_push_banner_dismissed', String(Date.now())); } catch(e) {}
+}
+
+async function activatePushFromBanner() {
+  var b = document.getElementById('push-smart-banner');
+  // Stoque que l'user a tenté → ne plus afficher
+  try { localStorage.setItem('despy_push_banner_dismissed', String(Date.now())); } catch(e) {}
+
+  if (b) b.classList.remove('visible');
+
+  // Appelle la fonction existante d'activation push
+  if (typeof subscribePush === 'function') {
+    try {
+      await subscribePush();
+    } catch(e) {
+      console.warn('subscribePush failed from banner:', e);
+    }
+  }
+}
+
+// Affiche le banner après 8 secondes sur mobile (si conditions remplies)
+setTimeout(function() {
+  if (shouldShowPushBanner()) {
+    var b = document.getElementById('push-smart-banner');
+    if (b) b.classList.add('visible');
+  }
+}, 8000);
+
+// ═══════════════════════════════════════════════════════════
 // BATCH E — Bottom navigation mobile : sync active state
 // Met à jour l'icône active selon la page courante.
 // ═══════════════════════════════════════════════════════════
@@ -10348,6 +10596,23 @@ function updateMobileNavActive(pageId) {
 })();
 
 </script>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SMART BANNER PUSH (mobile) — apparait apres ~8s         -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div id="push-smart-banner" role="alert" aria-live="polite">
+  <div class="psb-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  </div>
+  <div class="psb-text">
+    <strong>Recevez les alertes arnaques en direct</strong>
+    <span>1 à 3 notifications/sem · Désactivable à tout moment</span>
+  </div>
+  <div class="psb-actions">
+    <button class="psb-no" onclick="dismissPushBanner()" aria-label="Plus tard">×</button>
+    <button class="psb-yes" onclick="activatePushFromBanner()">Activer</button>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════ -->
 <!-- BATCH E — Bottom Navigation mobile (sticky bottom)       -->
