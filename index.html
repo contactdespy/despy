@@ -457,6 +457,128 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ESPACE CLIENT — Batch C : panels individuels mobile
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* ── PANEL PRIVACY ── */
+  /* Stats (Données supprimées / En cours / Sites suivis) : 3 colonnes propres */
+  #privacy-state-active > div:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    text-align: center;
+  }
+  #privacy-stat-cleaned, #privacy-stat-pending, #privacy-stat-total {
+    font-size: 24px !important;
+  }
+  /* Hero gradient privacy : padding plus aéré */
+  #panel-privacy > div:first-of-type {
+    padding: 20px !important;
+  }
+  #panel-privacy h2,
+  #panel-privacy > div:first-of-type > div:nth-child(2) > div:nth-child(2) {
+    font-size: 20px !important;
+  }
+  /* Étapes numérotées (cercles 1-4) : plus de respiration */
+  #panel-privacy > div:last-child > div:nth-child(2) > div {
+    align-items: flex-start;
+  }
+
+  /* ── PANEL PROTECTION ── */
+  #panel-protection > div {
+    padding: 18px !important;
+  }
+  /* Dark web check + Analyse de lien : icône + texte respirent */
+  #darkweb-card > div:first-child {
+    margin-bottom: 14px !important;
+  }
+
+  /* ── PANEL FORMATION ── */
+  /* Badges : 4 colonnes → 2 colonnes sur mobile (plus gros, plus lisibles) */
+  #panel-formation > div:last-child > div:last-child {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  #panel-formation > div:last-child > div:last-child > div {
+    padding: 16px !important;
+  }
+  #panel-formation > div:last-child > div:last-child > div > div:first-child {
+    font-size: 32px !important;     /* emoji badge plus gros */
+  }
+  #panel-formation > div:last-child > div:last-child > div > div:last-child {
+    font-size: 11px !important;
+  }
+  /* Boutons quiz/simulateur/défi : plus aérés */
+  #defi-titre {
+    font-size: 17px !important;
+  }
+
+  /* ── PANEL PARRAINAGE ── */
+  /* Code de parrainage : adapter la taille pour pas déborder */
+  #parrainage-code-display {
+    font-size: 26px !important;
+    letter-spacing: 3px !important;
+  }
+  /* Stats parrainage : passer en 1 colonne sur très petit écran */
+  #panel-parrainage > div:nth-child(3) {
+    gap: 10px !important;
+  }
+  #parrainage-count, #parrainage-bonus {
+    font-size: 24px !important;
+  }
+  /* Hero parrainage : emoji 32px → 28px */
+  #panel-parrainage > div:first-of-type {
+    padding: 20px !important;
+  }
+  /* Boutons copier/partager : full-width sur très petit écran si besoin */
+  #panel-parrainage > div:nth-child(2) > div:last-child {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  #panel-parrainage > div:nth-child(2) > div:last-child > button {
+    flex: 1 1 140px;
+  }
+
+  /* ── PANEL COMPTE ── */
+  /* Lignes label/valeur : s'assurer que les longues valeurs wrappent */
+  #panel-compte div[style*="justify-content:space-between"] {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  #panel-compte div[style*="justify-content:space-between"] span {
+    word-break: break-word;
+  }
+  /* Email peut être long → laisser respirer */
+  #compte-email, #compte-tel {
+    font-size: 12px !important;
+    text-align: right;
+    max-width: 60%;
+  }
+}
+
+/* Très petits écrans (<380px) : encore plus compact */
+@media (max-width: 380px) {
+  #client-tabs-bar .client-tab {
+    font-size: 9.5px !important;
+    padding: 10px 4px !important;
+  }
+  #parrainage-code-display {
+    font-size: 22px !important;
+    letter-spacing: 2px !important;
+  }
+  /* Stats privacy : passer en 1 colonne si vraiment serré */
+  #privacy-state-active > div:first-child {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  #privacy-state-active > div:first-child > div:nth-child(3) {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    BOTTOM SHEETS — Modales style "app mobile" qui montent du bas
    Sur desktop : reste centré classique. Sur mobile (<768px) :
    glisse depuis le bas comme une vraie app iOS/Android.
