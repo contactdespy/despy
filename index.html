@@ -457,6 +457,182 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 /* ═══════════════════════════════════════════════════════════
+   BATCH E — Bottom navigation mobile (sticky bottom)
+   Style app native iOS/Android. Visible uniquement <= 768px.
+   ═══════════════════════════════════════════════════════════ */
+
+#mobile-bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, .92);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(0, 0, 0, .08);
+    z-index: 900;
+    padding: 6px 4px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0));
+    justify-content: space-around;
+    align-items: flex-end;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, .05);
+    height: calc(58px + env(safe-area-inset-bottom, 0));
+  }
+  .bnv-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #8a8a8e;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    transition: color .15s, transform .15s;
+    min-height: 50px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bnv-btn:active { transform: scale(.92); }
+  .bnv-btn.active { color: var(--blue); }
+  .bnv-btn svg { width: 22px; height: 22px; stroke-width: 2; transition: transform .15s; }
+  .bnv-btn.active svg { transform: scale(1.08); }
+  .bnv-btn span { letter-spacing: .2px; }
+
+  /* Bouton SOS central, plus gros, rouge avec cercle qui dépasse */
+  .bnv-sos { position: relative; }
+  .bnv-sos-circle {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7f1d1d, #dc2626);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, .4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: 3px solid #fff;
+    transition: transform .15s;
+  }
+  .bnv-sos { padding-top: 30px; color: #dc2626 !important; font-weight: 800; }
+  .bnv-sos:active .bnv-sos-circle { transform: translateX(-50%) scale(.92); }
+
+  /* Ajouter padding-bottom au body pour que la nav ne cache pas le contenu */
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0));
+  }
+
+  /* Masquer la bottom nav quand une modale fullscreen est ouverte */
+  body:has(.bs-overlay) #mobile-bottom-nav,
+  body:has(.sub-modal-overlay) #mobile-bottom-nav,
+  body:has(.cs-modal-overlay) #mobile-bottom-nav {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BATCH F — Refonte pages publiques mobile
+   Force 1 colonne propre + paddings + tailles adaptés
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  /* Toutes les grilles auto-fit avec minmax > 280 → forcer 1 colonne mobile */
+  .page section div[style*="grid-template-columns:repeat(auto-fit,minmax(260px"],
+  .page section div[style*="grid-template-columns:repeat(auto-fit,minmax(280px"],
+  .page section div[style*="grid-template-columns:repeat(auto-fit,minmax(300px"],
+  .page section div[style*="grid-template-columns:repeat(auto-fit,minmax(320px"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Sections : padding-vertical réduit mobile */
+  .page > section,
+  #page-home > section,
+  #page-tarifs > section,
+  #page-privacy > section,
+  #page-sos-humain > section,
+  #page-livret > section,
+  #page-comment-ca-marche > section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  /* PWA install section : passer en 1 colonne (texte au-dessus, mockup en-dessous) */
+  #pwa-grid {
+    grid-template-columns: 1fr !important;
+    gap: 30px !important;
+  }
+  #pwa-mockup {
+    transform: scale(.85);
+    transform-origin: center;
+  }
+
+  /* Hero des pages publiques : padding-bottom réduit */
+  #page-privacy > section:first-child,
+  #page-sos-humain > section:first-child,
+  #page-livret > section:first-child {
+    padding-top: calc(var(--nav-h) + 38px + 2rem) !important;
+    padding-bottom: 2.5rem !important;
+  }
+
+  /* Hero livret : forcer 1 colonne (mockup au-dessus, texte en-dessous) */
+  .livret-hero {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  /* CTA boutons hero : full width sur mobile pour meilleur tap */
+  .page section section button[onclick*="siteSubscribe"],
+  .page section section button[onclick*="showPage"],
+  #page-home .hero button {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  /* Cards : padding mobile harmonisé */
+  .page section > div[style*="background:#fff"][style*="border-radius:16"],
+  .page section > div[style*="background:#fff"][style*="border-radius:20"] {
+    padding: 22px !important;
+  }
+
+  /* Stats / chiffres : pas trop gros sur mobile */
+  .page h1[class*="sh"], .page h2[class*="sh"] {
+    font-size: clamp(24px, 6vw, 36px) !important;
+    line-height: 1.15 !important;
+  }
+
+  /* /tarifs : interventions cards en 1 colonne stricte */
+  #page-tarifs section[id*="interventions"] > div,
+  #page-tarifs section:has(.livret-tarif-card) > div {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Card teaser livret sur /tarifs : passe en 1 colonne mobile */
+  .livret-tarif-card {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 1rem !important;
+  }
+  .livret-tarif-card > div:nth-child(3) {
+    align-items: center !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    MODALES SECONDAIRES — Batch D : bottom sheets mobile
    (quiz, simulator, defi chrono, prompts d'upgrade)
    Toutes les .sub-modal-overlay deviennent des bottom sheets sur mobile.
@@ -10132,6 +10308,75 @@ function _csShowResult() {
     }).catch(function(){});
   } catch(e) {}
 }
+
+// ═══════════════════════════════════════════════════════════
+// BATCH E — Bottom navigation mobile : sync active state
+// Met à jour l'icône active selon la page courante.
+// ═══════════════════════════════════════════════════════════
+function updateMobileNavActive(pageId) {
+  try {
+    var pageMap = {
+      'home': 'home',
+      'tarifs': 'tarifs',
+      'sos-humain': 'sos',
+      'privacy': 'sos',           // privacy partage le slot "alerte/SOS"
+      'conseiller': 'conseiller',
+      'client': 'compte',
+      'login': 'compte',
+    };
+    var slot = pageMap[pageId] || null;
+    document.querySelectorAll('#mobile-bottom-nav .bnv-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.route === slot);
+    });
+  } catch(e) {}
+}
+
+// Hook sur showPage pour update la nav active
+(function hookMobileNavToShowPage() {
+  try {
+    var _origShowPage = window.showPage;
+    if (typeof _origShowPage === 'function') {
+      window.showPage = function(id) {
+        var r = _origShowPage.apply(this, arguments);
+        updateMobileNavActive(id);
+        return r;
+      };
+      // Initial state au chargement
+      setTimeout(function() { updateMobileNavActive(window._currentPage || 'home'); }, 100);
+    }
+  } catch(e) {}
+})();
+
 </script>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- BATCH E — Bottom Navigation mobile (sticky bottom)       -->
+<!-- Visible uniquement <= 768px. Style app native iOS/Android -->
+<!-- ════════════════════════════════════════════════════════ -->
+<nav id="mobile-bottom-nav" aria-label="Navigation mobile">
+  <button class="bnv-btn" data-route="home" onclick="showPage('home')" aria-label="Accueil">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5Z"/></svg>
+    <span>Accueil</span>
+  </button>
+  <button class="bnv-btn" data-route="tarifs" onclick="showPage('tarifs')" aria-label="Tarifs">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Tarifs</span>
+  </button>
+  <button class="bnv-btn bnv-sos" data-route="sos" onclick="showPage('sos-humain')" aria-label="SOS Humain">
+    <div class="bnv-sos-circle">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <span>SOS</span>
+  </button>
+  <button class="bnv-btn" data-route="conseiller" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)" aria-label="Conseiller IA">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span>Conseil</span>
+  </button>
+  <button class="bnv-btn" data-route="compte" onclick="(function(){var s=siteSession.get();if(s&&s.email){showPage('client');}else{showLoginModal();}})()" aria-label="Mon compte">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+    <span>Compte</span>
+  </button>
+</nav>
+
 </body>
 </html>
