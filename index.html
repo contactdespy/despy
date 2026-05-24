@@ -1086,6 +1086,36 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </button>
   <!-- Menu mobile dans la nav -->
   <div id="mob-menu">
+
+    <!-- ─── SECTION AUTH (en haut, affichage dynamique selon session) ─── -->
+    <!-- Visible UNIQUEMENT si NON connecté : Connexion + Créer un compte -->
+    <button id="mob-auth-login" class="mob-link" onclick="showLoginModal();closeMob()" style="display:none">
+      <span style="display:inline-flex;align-items:center;gap:8px;color:var(--text)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Connexion
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button id="mob-auth-signup" class="mob-link" onclick="showFreeSignup();closeMob()" style="display:none">
+      <span style="display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-weight:700">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Créer un compte gratuit
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+    <!-- Visible UNIQUEMENT si CONNECTÉ : Mon espace client -->
+    <button id="mob-client-space" class="mob-link" onclick="showClientArea();closeMob()" style="display:none">
+      <span style="display:inline-flex;align-items:center;gap:8px;color:var(--blue);font-weight:700">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        Mon espace client
+      </span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+
+    <div id="mob-auth-divider" class="mob-divider" style="display:none"></div>
+
+    <!-- ─── PAGES (toujours visibles) ─── -->
     <button class="mob-link" onclick="showPage('tarifs');closeMob()">
       <span>Tarifs &amp; services</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1118,12 +1148,14 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <span>Questions fréquentes</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <div class="mob-divider"></div>
-    <button class="mob-link mob-link-secondary" onclick="showClientArea();closeMob()">
-      <span>Mon espace client</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+
+    <!-- ─── CTA bas : caché si déjà abonné ─── -->
+    <button id="mob-cta-subscribe" class="mob-cta" onclick="siteSubscribe('monthly');closeMob()">Commencer — 9,99€/mois</button>
+
+    <!-- ─── Déconnexion (visible uniquement si connecté) ─── -->
+    <button id="mob-logout" class="mob-link" onclick="siteLogout();closeMob()" style="display:none;color:#dc2626;text-align:center;justify-content:center;margin-top:6px">
+      <span style="color:#dc2626;font-weight:700">Se déconnecter</span>
     </button>
-    <button class="mob-cta" onclick="siteSubscribe('monthly');closeMob()">Commencer — 9,99€/mois</button>
   </div>
 </nav>
 
@@ -5164,7 +5196,44 @@ function updateNavForSession() {
     if (btnSub)    btnSub.style.display    = '';
     if (existingWrap) existingWrap.remove();
   }
+
+  // ════════════════════════════════════════════════════════
+  // MOBILE BURGER MENU — Sync avec l'état de session
+  // ════════════════════════════════════════════════════════
+  try {
+    var mobLogin   = document.getElementById('mob-auth-login');
+    var mobSignup  = document.getElementById('mob-auth-signup');
+    var mobClient  = document.getElementById('mob-client-space');
+    var mobDiv     = document.getElementById('mob-auth-divider');
+    var mobSub     = document.getElementById('mob-cta-subscribe');
+    var mobLogout  = document.getElementById('mob-logout');
+
+    if (s && s.email) {
+      // CONNECTÉ : cacher Connexion + Créer compte, afficher Mon espace + Déconnexion
+      if (mobLogin)  mobLogin.style.display  = 'none';
+      if (mobSignup) mobSignup.style.display = 'none';
+      if (mobClient) mobClient.style.display = '';
+      if (mobDiv)    mobDiv.style.display    = '';
+      if (mobLogout) mobLogout.style.display = '';
+      // CTA "Commencer 9,99€/mois" : caché si déjà abonné
+      if (mobSub)    mobSub.style.display    = s.subscribed ? 'none' : '';
+    } else {
+      // NON CONNECTÉ : afficher Connexion + Créer compte, cacher Mon espace + Déconnexion
+      if (mobLogin)  mobLogin.style.display  = '';
+      if (mobSignup) mobSignup.style.display = '';
+      if (mobClient) mobClient.style.display = 'none';
+      if (mobDiv)    mobDiv.style.display    = '';
+      if (mobLogout) mobLogout.style.display = 'none';
+      // CTA visible (incite à s'abonner)
+      if (mobSub)    mobSub.style.display    = '';
+    }
+  } catch(e) { /* silencieux */ }
 }
+
+// Appel initial au chargement
+document.addEventListener('DOMContentLoaded', function() {
+  try { updateNavForSession(); } catch(e) {}
+});
 
 function showClientArea() {
   if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); }
