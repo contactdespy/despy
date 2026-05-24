@@ -366,6 +366,97 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ESPACE CLIENT — Refonte mobile premium (Batch 2)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Onglets : grille 3×2 sur mobile (plus lisible que scroll horizontal) ── */
+@media (max-width: 600px) {
+  #client-tabs-bar {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    padding: 6px !important;
+  }
+  #client-tabs-bar .client-tab {
+    flex: none !important;
+    min-width: 0 !important;
+    padding: 12px 6px !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+  }
+  #client-tabs-bar .client-tab svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+/* ── Bloc SOS : passer les 3 canaux en liste verticale sur mobile ── */
+@media (max-width: 600px) {
+  .sos-channels-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  .sos-channel-btn {
+    flex-direction: row !important;
+    text-align: left !important;
+    padding: 14px 16px !important;
+    gap: 14px !important;
+    justify-content: flex-start !important;
+    min-height: 56px !important;
+  }
+  .sos-channel-btn svg {
+    width: 28px !important;
+    height: 28px !important;
+    flex-shrink: 0;
+  }
+  .sos-channel-btn .sos-ch-text {
+    flex: 1;
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px;
+  }
+  .sos-channel-btn .sos-ch-text > div {
+    text-align: left !important;
+  }
+
+  /* En-tête espace client : nom + plan badge ─ mieux aérés */
+  #page-client > section {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-top: calc(var(--nav-h) + 1rem) !important;
+  }
+  #client-welcome { font-size: 20px !important; }
+  #client-email-display { font-size: 12px !important; }
+  #client-plan-badge { font-size: 11px !important; padding: 4px 10px !important; }
+
+  /* Score de sécurité : taille adaptée */
+  #panel-dashboard > div:first-of-type {
+    padding: 18px !important;
+    border-radius: 16px !important;
+  }
+  #panel-dashboard #security-score { font-size: 34px !important; }
+
+  /* Toutes les cards du dashboard et autres panels : padding harmonisé */
+  #panel-dashboard > div,
+  #panel-privacy > div,
+  #panel-protection > div,
+  #panel-formation > div,
+  #panel-parrainage > div,
+  #panel-compte > div {
+    padding: 18px !important;
+  }
+
+  /* Tap target minimum 44px (norme Apple/Google) */
+  #page-client button:not(.client-tab) {
+    min-height: 44px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    BOTTOM SHEETS — Modales style "app mobile" qui montent du bas
    Sur desktop : reste centré classique. Sur mobile (<768px) :
    glisse depuis le bas comme une vraie app iOS/Android.
@@ -3754,7 +3845,7 @@ function triggerPWAInstall() {
     </div>
 
     <!-- Onglets -->
-    <div style="display:flex;gap:4px;background:#fff;border-radius:14px;padding:5px;margin-bottom:1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <div id="client-tabs-bar" style="display:flex;gap:4px;background:#fff;border-radius:14px;padding:5px;margin-bottom:1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05);overflow-x:auto;-webkit-overflow-scrolling:touch">
       <button onclick="switchTab('dashboard')" id="tab-dashboard" class="client-tab" style="flex:1;min-width:75px;padding:10px;border:none;border-radius:10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;white-space:nowrap;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5Z"/></svg>
         Accueil
@@ -3805,30 +3896,36 @@ function triggerPWAInstall() {
         </div>
 
         <!-- 3 canaux d'urgence -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;position:relative">
+        <div class="sos-channels-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;position:relative">
 
           <!-- 1. Appel direct -->
-          <a href="tel:+33689148395" style="background:#fff;color:#dc2626;border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.2)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <a href="tel:+33689148395" class="sos-channel-btn" style="background:#fff;color:#dc2626;border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,.2)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.71 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.71A2 2 0 0 1 22 16.92z"/></svg>
-            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9b1c1c">Appel direct</div>
-            <div style="font-size:14px;font-weight:900;letter-spacing:.3px">06 89 14 83 95</div>
-            <div style="font-size:10px;color:#6b6b6b">Le plus rapide</div>
+            <div class="sos-ch-text">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9b1c1c">Appel direct</div>
+              <div style="font-size:14px;font-weight:900;letter-spacing:.3px">06 89 14 83 95</div>
+              <div style="font-size:10px;color:#6b6b6b">Le plus rapide</div>
+            </div>
           </a>
 
           <!-- 2. WhatsApp -->
-          <a href="https://wa.me/33689148395?text=Bonjour%20Despy%2C%20je%20suis%20abonn%C3%A9%20et%20j%27ai%20besoin%20d%27aide%20SOS%20%3A%20" target="_blank" rel="noopener" style="background:#25D366;color:#fff;border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(37,211,102,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+          <a href="https://wa.me/33689148395?text=Bonjour%20Despy%2C%20je%20suis%20abonn%C3%A9%20et%20j%27ai%20besoin%20d%27aide%20SOS%20%3A%20" target="_blank" rel="noopener" class="sos-channel-btn" style="background:#25D366;color:#fff;border-radius:12px;padding:14px 12px;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(37,211,102,.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">WhatsApp</div>
-            <div style="font-size:14px;font-weight:900">Écrire à Despy</div>
-            <div style="font-size:10px;opacity:.85">Si l'appel intimide</div>
+            <div class="sos-ch-text">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">WhatsApp</div>
+              <div style="font-size:14px;font-weight:900">Écrire à Despy</div>
+              <div style="font-size:10px;opacity:.85">Si l'appel intimide</div>
+            </div>
           </a>
 
           <!-- 3. Formulaire web -->
-          <button onclick="openSOSModal()" style="background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .15s,background .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.transform='translateY(0)';this.style.background='rgba(255,255,255,.12)'">
+          <button onclick="openSOSModal()" class="sos-channel-btn" style="background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;transition:transform .15s,background .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.transform='translateY(0)';this.style.background='rgba(255,255,255,.12)'">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Formulaire</div>
-            <div style="font-size:14px;font-weight:900">On vous rappelle</div>
-            <div style="font-size:10px;opacity:.85">Si vous préférez écrire</div>
+            <div class="sos-ch-text">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Formulaire</div>
+              <div style="font-size:14px;font-weight:900">On vous rappelle</div>
+              <div style="font-size:10px;opacity:.85">Si vous préférez écrire</div>
+            </div>
           </button>
 
         </div>
