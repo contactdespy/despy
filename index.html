@@ -4970,7 +4970,33 @@ function showPage(id) {
 }
 
 function scrollToSection(id) {
-  if (_currentPage !== 'home') { showPage('home'); setTimeout(function(){ var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }, 150); } else { var el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); }
+  var el = document.getElementById(id);
+  if (!el) { closeMob(); return; }
+
+  // Identifier la page parente (si l'élément est dans une page SPA)
+  var page = el.closest('.page');
+
+  // Cas 1 : pas dans une page SPA (ex: nav, footer) → scroll direct
+  if (!page) {
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    closeMob();
+    return;
+  }
+
+  // Cas 2 : déjà sur la bonne page → scroll direct
+  if (page.classList.contains('active')) {
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+    closeMob();
+    return;
+  }
+
+  // Cas 3 : section sur une autre page → switch puis scroll
+  var pageId = (page.id || '').replace(/^page-/, '') || 'home';
+  showPage(pageId);
+  setTimeout(function(){
+    var e2 = document.getElementById(id);
+    if (e2) e2.scrollIntoView({behavior:'smooth',block:'start'});
+  }, 150);
   closeMob();
 }
 
