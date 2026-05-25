@@ -5703,6 +5703,23 @@ async function confirmSub(plan) {
 }
 
 async function launchCheckout(email, name, plan) {
+  // Loader visible pendant le fetch (sinon l'utilisateur ne sait pas qu'il se passe quelque chose)
+  var loader = document.createElement('div');
+  loader.id = 'checkout-loader';
+  loader.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.65);backdrop-filter:blur(6px);z-index:99998;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s';
+  loader.innerHTML = '<div style="background:#fff;border-radius:18px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)">'
+    + '<div style="width:42px;height:42px;border:3px solid #e5e7eb;border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite"></div>'
+    + '<div style="font-size:14px;font-weight:700;color:var(--text)">Préparation du paiement…</div>'
+    + '<div style="font-size:12px;color:var(--text3)">Redirection vers Stripe sécurisé</div>'
+    + '</div>';
+  // Animation spin si pas déjà définie
+  if (!document.getElementById('despy-spin-kf')) {
+    var sty = document.createElement('style'); sty.id = 'despy-spin-kf';
+    sty.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(sty);
+  }
+  document.body.appendChild(loader);
+
   try {
     var r = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
@@ -5711,13 +5728,44 @@ async function launchCheckout(email, name, plan) {
     });
     if (!r.ok) { var err = await r.json(); throw new Error(err.error || 'Erreur serveur'); }
     var data = await r.json();
+    if (!data || !data.url) throw new Error('URL de paiement manquante');
     window.location.href = data.url;
   } catch(err) {
+    // Retirer le loader
+    var ld = document.getElementById('checkout-loader');
+    if (ld) ld.remove();
+
+    // Si la modal est ouverte (cas user non connecté), afficher l'erreur dedans
     var errEl = document.getElementById('sub-err');
     var btn   = document.getElementById('sub-go-btn');
-    if(errEl){ errEl.textContent = "Erreur : " + err.message + ". Contactez contact.despy@gmail.com"; errEl.style.display="block"; }
-    if(btn){ btn.textContent = "Réessayer"; btn.disabled = false; }
+    if(errEl){
+      errEl.textContent = "Erreur : " + err.message + ". Contactez contact.despy@gmail.com";
+      errEl.style.display="block";
+      if(btn){ btn.textContent = "Réessayer"; btn.disabled = false; }
+      return;
+    }
+
+    // Sinon (cas user déjà connecté → launchCheckout appelé directement) : toast global visible
+    showCheckoutErrorToast(err.message || 'Erreur de paiement');
   }
+}
+
+// Toast d'erreur global pour les paiements (visible même hors modal)
+function showCheckoutErrorToast(message) {
+  var existing = document.getElementById('checkout-err-toast');
+  if (existing) existing.remove();
+  var toast = document.createElement('div');
+  toast.id = 'checkout-err-toast';
+  toast.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:99999;background:#fff;border:1px solid #fecaca;border-left:4px solid #dc2626;border-radius:12px;padding:14px 18px;box-shadow:0 10px 32px rgba(0,0,0,.18);font-family:inherit;max-width:420px;width:calc(100vw - 32px);display:flex;gap:12px;align-items:flex-start;animation:fadeIn .25s';
+  toast.innerHTML = '<div style="font-size:22px;flex-shrink:0;line-height:1">⚠️</div>'
+    + '<div style="flex:1;min-width:0">'
+    +   '<div style="font-weight:800;font-size:14px;color:#991b1b;margin-bottom:4px">Erreur de paiement</div>'
+    +   '<div style="font-size:13px;color:var(--text2);line-height:1.5">' + message + '</div>'
+    +   '<div style="font-size:11px;color:var(--text3);margin-top:8px">Contactez <a href="mailto:contact.despy@gmail.com" style="color:var(--blue);font-weight:700">contact.despy@gmail.com</a> ou <a href="tel:0689148395" style="color:var(--blue);font-weight:700">06 89 14 83 95</a></div>'
+    + '</div>'
+    + '<button onclick="this.parentNode.remove()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;line-height:1;padding:0;margin-left:4px">×</button>';
+  document.body.appendChild(toast);
+  setTimeout(function(){ if (toast.parentNode) toast.remove(); }, 12000);
 }
 
 function handleStripeReturn() {
