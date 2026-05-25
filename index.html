@@ -5726,9 +5726,15 @@ async function launchCheckout(email, name, plan) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site' })
     });
-    if (!r.ok) { var err = await r.json(); throw new Error(err.error || 'Erreur serveur'); }
+    if (!r.ok) {
+      var err = await r.json();
+      // Afficher le détail technique (utile pour diagnostiquer Stripe)
+      var msg = err.error || 'Erreur serveur';
+      if (err.details) msg += ' — ' + err.details;
+      throw new Error(msg);
+    }
     var data = await r.json();
-    if (!data || !data.url) throw new Error('URL de paiement manquante');
+    if (!data || !data.url) throw new Error('URL de paiement manquante (réponse Stripe vide)');
     window.location.href = data.url;
   } catch(err) {
     // Retirer le loader
