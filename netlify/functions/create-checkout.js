@@ -87,13 +87,18 @@ exports.handler = async (event, context) => {
     }
 
     // Créer la session Checkout Stripe
-    // On utilise payment_method_types explicite (CB + PayPal). Apple Pay et
-    // Google Pay sont activés automatiquement via 'card' selon le device.
+    // payment_method_types: ['card'] couvre déjà :
+    //   • Carte bancaire (Visa, Mastercard, Amex…)
+    //   • Apple Pay (auto sur iPhone/Safari)
+    //   • Google Pay (auto sur Android/Chrome)
+    // PayPal nécessite une activation séparée dans Stripe Dashboard
+    // (Payments → Settings → Payment methods → PayPal). À activer puis
+    // rajouter 'paypal' ici quand ce sera fait.
     // ⚠️ Ne PAS combiner payment_method_types avec payment_method_configuration
     // (même à null) — Stripe refuse les deux paramètres simultanément.
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card', 'paypal'],
+      payment_method_types: ['card'],
       payment_method_options: {
         card: {
           request_three_d_secure: 'automatic',
