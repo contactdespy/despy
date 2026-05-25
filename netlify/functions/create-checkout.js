@@ -87,17 +87,15 @@ exports.handler = async (event, context) => {
     }
 
     // Créer la session Checkout Stripe
-    // payment_method_types: 'automatic' laisse Stripe choisir les meilleurs
-    // moyens de paiement disponibles selon le device et le pays du client
-    // → Apple Pay sur iPhone/Safari, PayPal, CB, etc.
+    // On utilise payment_method_types explicite (CB + PayPal). Apple Pay et
+    // Google Pay sont activés automatiquement via 'card' selon le device.
+    // ⚠️ Ne PAS combiner payment_method_types avec payment_method_configuration
+    // (même à null) — Stripe refuse les deux paramètres simultanément.
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      // 'automatic' active Apple Pay, Google Pay, PayPal, CB selon le device
-      // Plus besoin de lister manuellement — Stripe optimise automatiquement
       payment_method_types: ['card', 'paypal'],
       payment_method_options: {
         card: {
-          // Activer Apple Pay / Google Pay via Stripe (wallet payments)
           request_three_d_secure: 'automatic',
         },
       },
@@ -110,8 +108,6 @@ exports.handler = async (event, context) => {
       cancel_url: cancelUrl,
       locale: 'fr',
       allow_promotion_codes: true,
-      // Activer les wallets (Apple Pay, Google Pay)
-      payment_method_configuration: null, // Utilise la config par défaut du compte
       subscription_data: Object.assign(
         {
           metadata: {
