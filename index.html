@@ -307,7 +307,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   .interventions-grid{grid-template-columns:1fr !important;max-width:100% !important}
   .client-tab{font-size:11px !important;padding:9px 6px !important;min-width:60px !important}
 
-  .hero{min-height:auto;padding:calc(var(--nav-h) + 16px) 1.25rem 3rem;align-items:flex-start}
+  .hero{min-height:auto;padding:calc(var(--nav-h) + 36px) 1.25rem calc(var(--bnv-h, 70px) + 2rem);align-items:flex-start}
   /* Formation — 1 colonne sur mobile */
   #fidelisation .wrap > div:last-child > div[style*="grid-template-columns:1fr 1fr"]{
     grid-template-columns:1fr !important;
@@ -344,7 +344,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 @media(max-width:480px){
   .plans-grid,.conseil-grid{grid-template-columns:1fr}
   .hero h1{font-size:1.8rem}
-  .hero{padding:calc(var(--nav-h) + 12px) 1rem 2.5rem}
+  .hero{padding:calc(var(--nav-h) + 32px) 1rem calc(var(--bnv-h, 70px) + 1.5rem)}
 }
 
 @keyframes fadeUp {
@@ -575,6 +575,16 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 }
 
 @media (max-width: 768px) {
+  /* Variable réutilisable : hauteur de la bottom-nav mobile (avec safe-area iOS) */
+  :root { --bnv-h: calc(58px + env(safe-area-inset-bottom, 0)); }
+
+  /* Tous les boutons flottants doivent rester au-dessus de la bottom-nav */
+  #despy-fab { bottom: calc(var(--bnv-h) + 16px) !important; }
+  /* Bouton WhatsApp flottant */
+  a[href*="wa.me/33689148395"][style*="position:fixed"] { bottom: calc(var(--bnv-h) + 16px) !important; }
+  /* Bouton "retour en haut" */
+  #back-top { bottom: calc(var(--bnv-h) + 78px) !important; }
+
   #mobile-bottom-nav {
     display: flex;
     position: fixed;
@@ -671,16 +681,29 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     gap: 14px !important;
   }
 
-  /* Sections : padding-vertical réduit mobile */
-  .page > section,
-  #page-home > section,
-  #page-tarifs > section,
-  #page-privacy > section,
-  #page-sos-humain > section,
-  #page-livret > section,
-  #page-comment-ca-marche > section {
+  /* Sections : padding-vertical réduit mobile — SAUF la première section
+     de chaque page (hero) qui doit conserver son padding-top compensant
+     la nav fixed (sinon le contenu passe DERRIÈRE la nav) */
+  .page > section:not(:first-of-type),
+  #page-home > section:not(:first-of-type),
+  #page-tarifs > section:not(:first-of-type),
+  #page-privacy > section:not(:first-of-type),
+  #page-sos-humain > section:not(:first-of-type),
+  #page-livret > section:not(:first-of-type),
+  #page-comment-ca-marche > section:not(:first-of-type) {
     padding-top: 2.5rem !important;
     padding-bottom: 2.5rem !important;
+  }
+  /* La dernière section de chaque page : padding-bottom suffisant pour
+     que le contenu ne soit pas masqué par la bottom-nav fixed (58px) */
+  .page > section:last-of-type,
+  #page-home > section:last-of-type,
+  #page-tarifs > section:last-of-type,
+  #page-privacy > section:last-of-type,
+  #page-sos-humain > section:last-of-type,
+  #page-livret > section:last-of-type,
+  #page-comment-ca-marche > section:last-of-type {
+    padding-bottom: calc(var(--bnv-h, 70px) + 1.5rem) !important;
   }
 
   /* PWA install section : passer en 1 colonne (texte au-dessus, mockup en-dessous) */
