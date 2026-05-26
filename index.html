@@ -1220,11 +1220,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <h1 style="color:#fff">Protégez votre<br><span>vie numérique.</span></h1>
       <p class="hero-sub" style="color:rgba(255,255,255,0.75)">Arnaques, fuites de données, comportements suspects sur vos appareils... Despy détecte les menaces et vous guide pas à pas. Sans jargon, sans compétence technique.</p>
       <div class="hero-btns">
-        <button class="btn-primary" onclick="showPage('tarifs')">
+        <button id="hero-cta-primary" class="btn-primary" onclick="showPage('tarifs')">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Commencer maintenant
+          <span id="hero-cta-primary-label">Commencer maintenant</span>
         </button>
-        <button class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
+        <button id="hero-cta-signup" class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Créer un compte gratuit
         </button>
@@ -5310,6 +5310,40 @@ function updateNavForSession() {
       if (mobLogout) mobLogout.style.display = 'none';
       // CTA visible (incite à s'abonner)
       if (mobSub)    mobSub.style.display    = '';
+    }
+  } catch(e) { /* silencieux */ }
+
+  // ════════════════════════════════════════════════════════
+  // HERO CTA BUTTONS — Adapter selon l'état de session
+  // ════════════════════════════════════════════════════════
+  try {
+    var heroSignup = document.getElementById('hero-cta-signup');
+    var heroPrim   = document.getElementById('hero-cta-primary');
+    var heroPrimLabel = document.getElementById('hero-cta-primary-label');
+
+    if (s && s.email) {
+      // CONNECTÉ : cacher "Créer un compte gratuit" (n'a plus de sens)
+      if (heroSignup) heroSignup.style.display = 'none';
+
+      // Adapter le bouton primaire :
+      //  - Si déjà abonné → "Accéder à mon espace"
+      //  - Si pas encore abonné → garder "Commencer maintenant" (push abo)
+      if (heroPrim && heroPrimLabel) {
+        if (s.subscribed) {
+          heroPrimLabel.textContent = 'Accéder à mon espace';
+          heroPrim.setAttribute('onclick', "showPage('client')");
+        } else {
+          heroPrimLabel.textContent = 'Commencer maintenant';
+          heroPrim.setAttribute('onclick', "showPage('tarifs')");
+        }
+      }
+    } else {
+      // NON CONNECTÉ : réafficher tout
+      if (heroSignup) heroSignup.style.display = '';
+      if (heroPrim && heroPrimLabel) {
+        heroPrimLabel.textContent = 'Commencer maintenant';
+        heroPrim.setAttribute('onclick', "showPage('tarifs')");
+      }
     }
   } catch(e) { /* silencieux */ }
 }
