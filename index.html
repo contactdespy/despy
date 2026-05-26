@@ -337,26 +337,9 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   .formation-grid > div > div[style*="grid-template-columns:1fr 1fr"]{
     grid-template-columns:1fr !important;
   }
-  /* Bannière lancement compacte sur mobile (pour ne pas masquer le burger) */
-  #launch-banner{
-    padding:6px 12px !important;
-    font-size:11.5px !important;
-    gap:8px !important;
-    flex-wrap:nowrap !important;
-    overflow:hidden;
-  }
-  /* Hide le bloc timer (j/h/m) — trop encombrant sur mobile */
-  #launch-banner > div:nth-of-type(2){display:none !important}
-  /* Hide le bouton "Souscrire maintenant" — déjà accessible via la nav */
-  #launch-banner > button[onclick*="siteSubscribe"]{display:none !important}
-  /* Texte tronqué proprement si vraiment trop long */
-  #launch-banner > div:first-of-type{
-    min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-    justify-content:flex-start;
-  }
-  #launch-banner > div:first-of-type span{
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
+  /* Bannière de lancement masquée sur mobile pour un rendu plus premium
+     (sur desktop elle reste visible — voir bloc CSS au-dessus de cette media query) */
+  #launch-banner{display:none !important}
 }
 @media(max-width:480px){
   .plans-grid,.conseil-grid{grid-template-columns:1fr}
@@ -595,6 +578,9 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   #mobile-bottom-nav {
     display: flex;
     position: fixed;
+    /* top: auto !important pour neutraliser toute valeur héritée
+       (ex: inline appliqué par mégarde) et forcer bottom:0 à prévaloir */
+    top: auto !important;
     bottom: 0;
     left: 0;
     right: 0;
@@ -5497,8 +5483,17 @@ function syncBannerOffset() {
   var nav = document.getElementById('nav');
   var mob = document.getElementById('mob-menu');
   if (!banner || !nav) return;
-  if (banner.style.display === 'none') return;
-  var h = banner.offsetHeight || 38;
+  // Détecte le banner caché que ce soit via inline (display:none),
+  // via CSS media query (display:none) ou via offsetHeight nul.
+  var hiddenInline = banner.style.display === 'none';
+  var hiddenComputed = (typeof window.getComputedStyle === 'function')
+    && window.getComputedStyle(banner).display === 'none';
+  var h = banner.offsetHeight;
+  if (hiddenInline || hiddenComputed || h === 0) {
+    nav.style.top = '0';
+    if (mob) mob.style.top = 'var(--nav-h)';
+    return;
+  }
   nav.style.top = h + 'px';
   if (mob) mob.style.top = 'calc(' + h + 'px + var(--nav-h))';
 }
