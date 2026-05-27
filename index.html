@@ -7578,12 +7578,71 @@ function savePrivacyData(data) {
 }
 
 // ── Render du panel Privacy ──
+// Synchronise l'état Privacy avec le serveur (Supabase) — appelé en
+// arrière-plan au render. Si une demande active existe côté serveur mais
+// pas en local, on reconstruit le localStorage à partir des données serveur.
+async function syncPrivacyFromServer() {
+  try {
+    var s = siteSession.get();
+    if (!s || !s.email) return false;
+    var local = getPrivacyData();
+    // Si on a déjà des données locales actives, pas besoin de re-fetch
+    // (la source de vérité reste localStorage tant qu'on est connecté)
+    if (local && local.activated && local.targets) return false;
+
+    var resp = await fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email));
+    if (!resp.ok) return false;
+    var serverData = await resp.json();
+    if (!serverData || !serverData.active) return false;
+
+    // Reconstruire l'objet local depuis les données serveur
+    var sites = (typeof PRIVACY_TARGETS !== 'undefined' ? PRIVACY_TARGETS : []).map(function(t, i) {
+      var cleaned = i < (serverData.stats && serverData.stats.cleaned || 0);
+      return {
+        name: t.name,
+        category: t.category,
+        priority: t.priority,
+        status: cleaned ? 'cleaned' : 'sent',
+        sent_at: serverData.activated_at,
+        cleaned_at: cleaned ? new Date().toISOString() : null
+      };
+    });
+    var rebuilt = {
+      activated: true,
+      targets: {
+        prenom: serverData.prenom,
+        nom: serverData.nom,
+        target_email: serverData.target_email,
+        phone: serverData.phone,
+        ville: serverData.ville,
+        activated_at: serverData.activated_at
+      },
+      sites: sites,
+      last_scan: serverData.activated_at,
+      next_scan: serverData.next_scan
+    };
+    savePrivacyData(rebuilt);
+    return true; // données rechargées
+  } catch(e) {
+    console.warn('syncPrivacyFromServer error:', e);
+    return false;
+  }
+}
+
 function renderPrivacyPanel() {
   var data = getPrivacyData();
   var inactive = document.getElementById('privacy-state-inactive');
   var active   = document.getElementById('privacy-state-active');
   var statusText = document.getElementById('privacy-status-text');
   var sitesList = document.getElementById('privacy-sites-list');
+
+  // Si localStorage est vide, on tente une récupération serveur en arrière-plan
+  // (asynchrone : si données trouvées côté serveur, on re-render le panel)
+  if (!data || !data.activated) {
+    syncPrivacyFromServer().then(function(restored){
+      if (restored) renderPrivacyPanel();
+    });
+  }
 
   if (!data || !data.activated) {
     if (inactive) inactive.style.display = 'block';
