@@ -120,10 +120,16 @@
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
 
-# Agent IA réseaux sociaux — post Facebook quotidien
+# Agent IA réseaux sociaux — refonte mai 2026
+# Passage de 7 posts/semaine à 3 posts/semaine (qualité > quantité)
+# Mardi  → scène vécue (storytelling humain)
+# Jeudi  → chiffre choc (stat isolée + 1 phrase)
+# Samedi → question directe (engagement commentaires)
 [functions.social-agent]
-  schedule = "30 6 * * *"          # 6h30 UTC = 8h30 Paris (heure d'été) / 7h30 (heure d'hiver)
+  schedule = "30 6 * * 2,4,6"      # 6h30 UTC mar/jeu/sam = 8h30 Paris (été) / 7h30 (hiver)
 
-# Agent Story Facebook quotidienne — diffère du post pour double exposition
-[functions.story-agent]
-  schedule = "0 12 * * *"          # 12h UTC = 14h Paris (été) / 13h (hiver) — créneau pause-déj seniors
+# Story-agent désactivé — les stories Facebook ont 5× moins de portée que les
+# posts standards et la cadence quotidienne créait de la lassitude. La fonction
+# reste dans le code, on peut la rebrancher plus tard si besoin (commentaire ci-dessous).
+# [functions.story-agent]
+#   schedule = "0 12 * * *"

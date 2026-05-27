@@ -128,11 +128,20 @@ async function getPageAccessToken(supabase) {
 }
 
 // ── Choix du type de post selon le jour ──────
-
+// Refonte mai 2026 : passage de 7 posts/sem à 3 posts/sem
+// Mardi  → scène vécue (storytelling humain)
+// Jeudi  → chiffre choc (stat isolée + 1 phrase)
+// Samedi → question directe (engagement commentaires)
+// Le cron Netlify ne déclenche QUE ces 3 jours (cf. netlify.toml).
+// Si appelé un autre jour (manuel), on retombe sur un fallback aléatoire.
 function getPostTypeForToday() {
-  const days = ['rappel-securite', 'bilan-semaine', 'alerte-arnaque', 'conseil-pratique', 'alerte-arnaque', 'quiz', 'temoignage'];
-  // 0 = dimanche, 1 = lundi, ...
-  return days[new Date().getDay()];
+  const day = new Date().getDay(); // 0=dim, 2=mar, 4=jeu, 6=sam
+  if (day === 2) return 'scene-vecue';
+  if (day === 4) return 'chiffre-choc';
+  if (day === 6) return 'question-directe';
+  // Fallback (mode manuel hors créneau cron)
+  const fallback = ['scene-vecue', 'chiffre-choc', 'question-directe'];
+  return fallback[Math.floor(Math.random() * fallback.length)];
 }
 
 // ── Lecture contextuelle Supabase ────────────
@@ -208,133 +217,147 @@ async function getContextData(supabase) {
 
 function buildPrompt(postType, ctx) {
   const dateFr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const baseRules = `RÈGLES STRICTES (à respecter sans exception) :
-- Écris en français impeccable, sans anglicismes inutiles
-- Public cible : seniors (60+ ans), peu à l'aise avec la technologie
-- Ton : expert rassurant ET PERSUASIF. Joue sur la peur saine (conséquences réelles) puis rassure avec la solution (Despy)
-- Phrases courtes (max 15 mots)
-- Pas de jargon technique non expliqué (toujours définir entre parenthèses si besoin)
-- Maximum 4 emojis bien placés dans tout le post (pas plus)
-- Longueur totale : 700 à 1300 caractères (environ 100 à 200 mots)
-- N'invente JAMAIS de chiffres, dates, ou faits non fournis dans les données
-- Tutoiement INTERDIT — vouvoiement uniquement
-- Pas de mention "Despy" plus de 2 fois dans le post
 
-🎯 MISE EN FORME — GRAS EN MARKDOWN :
-Pour mettre en valeur les éléments clés, encadre-les avec **double astérisques** (notation markdown).
-Notre système convertira automatiquement **texte** en caractères Unicode bold visibles sur Facebook.
-- Mets en **gras** :
-  • L'accroche d'ouverture (1ère phrase ou question d'accroche)
-  • Les chiffres marquants (€, %, nombre de victimes…)
-  • Les mots-clés d'urgence (**Attention**, **Arnaque**, **Urgent**, **Danger**…)
-  • Le CTA final complet (ligne entière avec le lien despy.fr)
-- Maximum 3-4 zones en gras par post (sinon ça perd son impact)
-- N'utilise PAS d'italique, ni de souligné, ni d'autre balise markdown
-- Garde les accents normaux (à, é, è, ê, ô, ç) même dans le gras
+  // Stratégie CTA : on varie pour éviter la lassitude algorithmique
+  // 33% sans CTA · 33% CTA discret · 33% CTA fort
+  const ctaRoll = Math.random();
+  const ctaStrategy = ctaRoll < 0.33 ? 'none' : (ctaRoll < 0.66 ? 'soft' : 'strong');
 
-⚠️ LEVIER ÉMOTIONNEL ET CONVERSION :
-Le but est de convertir les lecteurs en visiteurs de despy.fr. Pour chaque post :
-1. Commence par une 𝗽𝗲𝘂𝗿 𝗰𝗼𝗻𝗰𝗿𝗲̀𝘁𝗲 (perte d'argent, compte piraté, identité volée, isolement après arnaque)
-2. Donne UN exemple parlant (un retraité a perdu 3500€, un compte vidé en 10 minutes…)
-3. Apporte LA solution simple = utiliser Despy
-4. CTA puissant et urgent vers despy.fr
+  const baseRules = `RÈGLES D'ÉCRITURE (à respecter STRICTEMENT) :
+- Français parlé, vivant. Comme si tu parlais à un ami sénior au café.
+- AUCUN jargon technique, AUCUN anglicisme inutile.
+- Vouvoiement uniquement.
+- Pas de markdown, pas de gras Unicode, pas de soulignement.
+  → Texte naturel uniquement. Facebook récompense le contenu humain.
+- Maximum 2 emojis pertinents dans tout le post. Zéro si possible.
+- Longueur OBLIGATOIRE : 40 à 80 mots maximum. Pas plus.
+  → Sur Facebook, l'engagement chute après 80 mots. Reste court.
+- 1 SEULE idée par post. Pas d'accumulation, pas de liste à puces.
+- N'invente JAMAIS de chiffres précis, dates ou noms.
+  Si tu cites une victime fictive, dis-le clairement ou reste vague ("une dame", "un retraité").
 
-STRUCTURE OBLIGATOIRE :
-1. **Accroche forte** en gras markdown (question + chiffre choc OU avertissement direct)
-2. Mise en contexte qui suscite l'inquiétude (3-4 phrases — conséquences réelles)
-3. Rassurance + solution Despy (2-3 phrases — "vous n'êtes pas seul·e", "Despy vous protège")
-4. **CTA final en gras** vers despy.fr (urgent, bénéfice clair, gratuit)
+TON ET STYLE :
+- Direct, humain, parfois un peu rugueux.
+- Évite TOUTES les formulations "marketing" type :
+  ✗ "Despy vous protège" (creux)
+  ✗ "Activez votre cybersécurité dès maintenant" (slogan publicitaire)
+  ✗ "Ne soyez pas la prochaine victime" (alarmiste/cliché)
+  ✗ "Despy est votre allié français contre les arnaques" (corporate)
+- À la place, privilégie :
+  ✓ Des phrases qui surprennent ("Hier, une dame de 78 ans m'a appelé en pleurs.")
+  ✓ Des chiffres isolés qui frappent ("800 €. Voilà ce qu'une seule arnaque coûte en moyenne à un sénior.")
+  ✓ Des questions qui font réagir ("Vous décrocheriez si votre banque vous appelait à 21h ?")
+- Le post doit pouvoir être lu À HAUTE VOIX naturellement, sans buter.
 
-Exemples de CTA finaux à varier :
-- 👉 **Vérifiez votre sécurité gratuitement sur despy.fr**
-- 👉 **Ne soyez pas la prochaine victime. Rendez-vous sur despy.fr**
-- 👉 **Protégez-vous en 3 minutes sur despy.fr**
-- 👉 **Testez despy.fr avant que ça ne vous arrive**
+MENTION DE DESPY :
+${ctaStrategy === 'none'
+  ? `- Pour ce post, NE MENTIONNE PAS Despy ni despy.fr du tout.
+  → L'objectif est de créer du contenu de valeur pur, qui s'imprime dans l'esprit.
+  → Les lecteurs reviendront naturellement vers vous pour le contenu suivant.`
+  : ctaStrategy === 'soft'
+  ? `- À la fin du post, ajoute UNE seule ligne discrète : "👉 Plus d'infos en commentaire" ou "👉 Comment se protéger : commentaires" ou similaire.
+  → Le lien despy.fr sera posté en premier commentaire (logique Facebook).
+  → Ne mets PAS le lien dans le corps du post (l'algorithme pénalise).`
+  : `- À la fin du post, ajoute UN SEUL CTA simple et humain :
+  Choisis UNE formulation parmi :
+   - "Si vous voulez en parler, c'est sur despy.fr."
+   - "Pour ceux qui veulent comprendre comment, despy.fr."
+   - "On en parle ? despy.fr."
+   - "Plus d'infos sur despy.fr — sans engagement."
+  ÉVITE les CTA agressifs ("Vérifiez maintenant", "Activez", "Ne tardez pas").`
+}
 
-Renvoie UNIQUEMENT le texte du post Facebook avec les **gras markdown**, prêt à publier. Pas d'introduction de ta part.`;
+ANTI-PIÈGES IMPORTANTS :
+- N'utilise JAMAIS de mise en page bullet/liste (Facebook tronque).
+- N'utilise JAMAIS "selon une étude" sans source réelle.
+- Ne dis JAMAIS "merci d'avoir lu" ou "n'hésitez pas à partager".
+
+Renvoie UNIQUEMENT le texte du post Facebook, prêt à publier. Pas de balises markdown. Pas d'introduction. Pas de signature.`;
 
   let topic = '';
   let dataBlock = '';
 
   switch (postType) {
-    case 'alerte-arnaque':
-      topic = `Alerte arnaque du jour.
-Mission : alerter sur une arnaque concrète qui circule actuellement.
-Choisis parmi les données fournies ci-dessous la menace la plus pertinente (un domaine récurrent OU une alerte officielle ANSSI/Cybermalveillance).
-Explique en 3 phrases comment la reconnaître, puis donne 1 action immédiate à faire pour ne pas tomber dedans.`;
-      dataBlock = `DONNÉES À UTILISER :
-- Domaines suspects récurrents détectés par Despy (24h) : ${ctx.topDomains.length ? ctx.topDomains.map(d => `${d.dom} (${d.count} signalements)`).join(', ') : 'aucun cette semaine'}
-- Alertes officielles récentes : ${ctx.nationalAlerts.length ? ctx.nationalAlerts.slice(0, 3).map(a => `"${a.title}" (${a.source})`).join(' | ') : 'aucune'}
-- Total arnaques détectées dans la semaine : ${ctx.statsWeek.scams}`;
+
+    case 'scene-vecue':
+      topic = `FORMAT : Scène vécue / mini-histoire (storytelling humain).
+Mission : raconter une scène CONCRÈTE, en 2-3 phrases, qui se passe dans la vraie vie.
+Le but : faire dire au lecteur "C'EST EXACTEMENT CE QUI M'EST ARRIVÉ" ou "Ma mère/voisine vient de me raconter ça".
+
+Modèles d'accroche (choisis-en un et adapte) :
+- "Hier, une dame de [âge] m'a appelé en pleurs."
+- "Ce matin, j'ai eu Mme [prénom fictif] au téléphone."
+- "Un voisin de mon père m'a raconté ça la semaine dernière."
+- "J'ai eu [X] appels comme celui-là cette semaine."
+
+Puis, en 2 phrases : ce qui s'est passé + ce qui a fait basculer la situation (un détail qui aurait dû alerter, ou un réflexe qui a sauvé).
+
+Pas de morale. Pas de leçon. Pas de "Despy aurait évité ça". Juste la scène.`;
+      dataBlock = `Type d'arnaque possible (varie chaque semaine) : faux conseiller bancaire, faux SMS Chronopost/La Poste, arnaque "votre fils est en garde à vue", faux remboursement Ameli, faux site marchand.`;
       break;
 
-    case 'conseil-pratique':
-      topic = `Conseil pratique de cybersécurité.
-Mission : donner UN seul conseil concret, applicable en moins de 5 minutes par un senior.
-Exemples acceptés : activer la double authentification (Gmail/Free/Orange), vérifier les appareils connectés, créer un mot de passe fort, repérer un lien suspect avant de cliquer, sauvegarder ses photos, sécuriser sa box internet.
-Étapes numérotées 1-2-3, claires, sans jargon.`;
-      dataBlock = `Choisis un conseil utile et de saison (date du jour : ${dateFr}).`;
+    case 'chiffre-choc':
+      topic = `FORMAT : Chiffre choc isolé (data-driven).
+Mission : poser UN seul chiffre frappant en haut du post, isolé sur sa propre ligne, puis 2 phrases d'explication maximum.
+
+Structure exacte demandée :
+[CHIFFRE et unité, en gros]
+
+[Phrase 1 : ce que ce chiffre signifie concrètement]
+[Phrase 2 : pourquoi ça concerne le lecteur]
+
+Exemples de chiffres possibles (utilise des sources crédibles, ANSSI / Cybermalveillance / études publiques) :
+- "850 €" (montant moyen perdu par arnaque téléphonique en France, source Cybermalveillance)
+- "1 senior sur 3" (proportion ayant été ciblée par une arnaque dans l'année)
+- "12 minutes" (temps moyen pour vider un compte une fois le code SMS communiqué)
+- "73 %" (taux de re-ciblage d'une victime dans les 6 mois suivants)
+
+Le chiffre est l'accroche. Le reste est minimal.`;
+      dataBlock = `Date du jour : ${dateFr}. Choisis un chiffre crédible. Si tu n'es pas sûr d'une source, reste vague ("plusieurs centaines d'euros en moyenne") plutôt que d'inventer.`;
       break;
 
-    case 'bilan-semaine':
-      topic = `Bilan hebdomadaire de la communauté Despy.
-Mission : présenter en chiffres ce qui s'est passé cette semaine sur Despy, et terminer par une leçon que les lecteurs peuvent retenir.
-Ton : factuel, valorisant la communauté qui se protège grâce aux signalements.`;
-      dataBlock = `STATISTIQUES DE LA SEMAINE :
-- Analyses de messages réalisées : ${ctx.statsWeek.total}
-- Arnaques détectées : ${ctx.statsWeek.scams}
-- Numéros suspects signalés : ${ctx.statsWeek.phones}
-- Domaines récurrents : ${ctx.topDomains.slice(0, 3).map(d => d.dom).join(', ') || 'aucun'}
-${ctx.nationalAlerts.length ? `- Alertes officielles : ${ctx.nationalAlerts.slice(0, 2).map(a => a.title).join(' | ')}` : ''}`;
-      break;
+    case 'question-directe':
+      topic = `FORMAT : Question directe pour engagement commentaires.
+Mission : poser une question simple qui invite le lecteur à RÉPONDRE en commentaire avec son vécu personnel.
 
-    case 'quiz':
-      topic = `Quiz du week-end — 1 seule question avec 3 choix de réponse (A, B, C).
-Mission : poser une question sur une arnaque réelle ou un réflexe sécurité. Donner les 3 réponses possibles. Inviter à commenter sa réponse.
-NE PAS donner la solution dans le post (on la révélera en commentaire plus tard).
-Format : question claire + A) ... + B) ... + C) ... + "Votre réponse en commentaire 👇"`;
-      dataBlock = `Sujet libre, choisis un thème actuel pertinent.`;
-      break;
+La question doit être :
+- Concrète (pas abstraite, pas philosophique)
+- Universelle (95 % des seniors ont vécu ça)
+- Sans piège ni jugement
 
-    case 'temoignage':
-      topic = `Témoignage / cas réel d'arnaque évitée.
-Mission : raconter une situation concrète (anonymisée) où un utilisateur Despy a évité une arnaque grâce à un réflexe simple.
-Ton : narratif court, comme une mini-histoire, qui met en valeur le bon réflexe sans humilier la victime.
-Fictif accepté, mais réaliste.`;
-      dataBlock = `Exemples de scénarios courants pour t'inspirer (choisis-en UN) :
-- Faux SMS Chronopost / La Poste demandant 1,99 €
-- Appel d'un "conseiller bancaire" demandant un code SMS
-- Email Ameli / CAF urgent avec lien suspect
-- Faux profil sur Leboncoin demandant un acompte
-- Arnaque au faux support Microsoft / Apple par téléphone
-Inspire-toi des domaines récurrents détectés : ${ctx.topDomains.slice(0, 3).map(d => d.dom).join(', ') || '(rien à signaler)'}`;
-      break;
+Exemples de bonnes questions :
+- "Combien de fois cette semaine avez-vous reçu un SMS qui dit 'votre colis est en attente, cliquez ici' ?"
+- "Vous avez déjà raccroché au nez d'un conseiller bancaire qui demandait un code SMS ? Racontez."
+- "Quel est le pire SMS d'arnaque que vous ayez reçu récemment ?"
+- "À votre avis : que faut-il dire à un proche qui vient d'être arnaqué ?"
 
-    case 'rappel-securite':
-      topic = `Rappel sécurité court et impactant pour le dimanche.
-Mission : un message simple à retenir, formulé comme une "règle d'or" de la cybersécurité pour les seniors.
-Format : 3 réflexes essentiels sous forme de courte liste (✅ ... ✅ ... ✅).
-Idéal : on lit en 30 secondes le dimanche matin avec son café.`;
-      dataBlock = `Choisis 3 réflexes essentiels et concrets.`;
+Format du post :
+[Une phrase de mise en contexte ultra-courte]
+[LA question, claire et directe]
+[Invitation à commenter, très courte]
+
+Pas de CTA Despy dans ce type de post (l'engagement organique se fait dans les commentaires).`;
+      dataBlock = `Date : ${dateFr}. Choisis une question d'actualité (arnaques saisonnières si pertinent).`;
       break;
 
     default:
-      topic = `Post générique cybersécurité.`;
-      dataBlock = ``;
+      topic = `Post court de cybersécurité, format libre. 40-80 mots maximum, ton humain.`;
+      dataBlock = '';
   }
 
   return `${baseRules}
 
 CONTEXTE :
-Date du jour : ${dateFr}
-Type de post demandé : ${postType}
+- Date du jour : ${dateFr}
+- Type de post demandé : ${postType}
+- Stratégie CTA pour CE post : ${ctaStrategy}
 
 THÈME :
 ${topic}
 
 ${dataBlock}
 
-Rédige maintenant le post Facebook (texte brut, prêt à publier).`;
+Rédige maintenant LE post Facebook (texte brut, 40-80 mots).`;
 }
 
 // ── Génération via Claude ────────────────────
@@ -405,9 +428,15 @@ exports.handler = async (event) => {
     // 2. Construit le prompt
     const prompt = buildPrompt(postType, ctx);
 
-    // 3. Génère le post (Claude écrit en **markdown**, on convertit en Unicode bold)
+    // 3. Génère le post (refonte mai 2026 : texte naturel, sans markdown bold Unicode)
+    //    Facebook pénalise les caractères Unicode bold (𝗧𝗲𝘅𝘁𝗲) considérés comme spammy.
+    //    On garde le texte tel quel, ton humain.
     const rawContent = await generatePostContent(prompt);
-    const postContent = markdownBoldToUnicode(rawContent);
+    // Sécurité : si Claude renvoie du markdown malgré tout, on nettoie
+    const postContent = rawContent
+      .replace(/\*\*([^*]+)\*\*/g, '$1')   // **gras** → gras
+      .replace(/__([^_]+)__/g, '$1')         // __souligné__ → souligné
+      .trim();
 
     // 4. Mode preview : on génère mais on ne publie pas
     if (isPreview) {
