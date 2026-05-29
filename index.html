@@ -11222,6 +11222,61 @@ function updateMobileNavActive(pageId) {
   } catch(e) {}
 })();
 
+// ─── Historique navigateur pour la SPA ───
+// Chaque navigation interne (showPage) crée une entrée d'historique pour que
+// le bouton « retour » revienne à la page précédente DU SITE au lieu de
+// quitter vers Google / la page d'arrivée. Cohérent avec handleUrlRouting
+// et les rewrites de netlify.toml.
+(function enableSpaHistory() {
+  try {
+    var pageToPath = {
+      'home':              '/',
+      'sos-humain':        '/sos-humain',
+      'privacy':           '/privacy',
+      'livret':            '/livret',
+      'tarifs':            '/tarifs',
+      'comment-ca-marche': '/comment-ca-marche',
+      'conseiller':        '/conseiller'
+    };
+    function pathForPage(id) { return pageToPath[id] || ('/#' + id); }
+    function pageForPath(path) {
+      path = (path || '/').replace(/\/$/, '') || '/';
+      for (var k in pageToPath) { if (pageToPath[k] === path) return k; }
+      if (path.charAt(0) === '#') return path.slice(1);
+      return null;
+    }
+
+    var _navByPop = false;
+    var _prevShowPage = window.showPage;
+
+    // On enveloppe showPage : après le rendu, on empile une entrée d'historique
+    // (sauf si la navigation vient elle-même d'un retour/avance navigateur).
+    window.showPage = function(id) {
+      var r = _prevShowPage.apply(this, arguments);
+      try {
+        if (!_navByPop && !(history.state && history.state.spaPage === id)) {
+          history.pushState({ spaPage: id }, '', pathForPage(id));
+        }
+      } catch(e) {}
+      return r;
+    };
+
+    // Point d'ancrage initial : on attache l'état à l'entrée courante.
+    try {
+      var initId = pageForPath(location.pathname) || window._currentPage || 'home';
+      history.replaceState({ spaPage: initId }, '', location.pathname + location.hash);
+    } catch(e) {}
+
+    // Bouton retour / avance : on rejoue la bonne page sans ré-empiler.
+    window.addEventListener('popstate', function(ev) {
+      var id = (ev.state && ev.state.spaPage) || pageForPath(location.pathname) || 'home';
+      _navByPop = true;
+      try { window.showPage(id); } catch(e) {}
+      _navByPop = false;
+    });
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- ════════════════════════════════════════════════════════ -->
