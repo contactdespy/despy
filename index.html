@@ -92,7 +92,7 @@ nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(53,128,232,.5)}
 .mob-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:4px}
 .mob-menu-btn span{display:block;width:22px;height:2px;background:#333;margin:5px 0;transition:all .25s;border-radius:1px}
-#mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1.5rem;flex-direction:column;gap:.75rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+#mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1rem 1.25rem 1.5rem;flex-direction:column;gap:.35rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08);max-height:calc(100vh - 38px - var(--nav-h));overflow-y:auto;-webkit-overflow-scrolling:touch}
 #mob-menu.open{display:flex}
 .mob-link{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;padding:14px 16px;border-radius:10px;font-family:inherit;transition:background .15s ease;-webkit-tap-highlight-color:transparent}
 .mob-link:hover,.mob-link:active{background:var(--bg2)}
@@ -100,6 +100,7 @@ nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.
 .mob-link:hover svg{color:var(--blue);transform:translateX(2px)}
 .mob-link-secondary{font-size:14px;color:var(--text2);font-weight:500}
 .mob-divider{height:1px;background:var(--border);margin:8px 0}
+.mob-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);padding:10px 16px 2px}
 .mob-cta{display:block;width:100%;padding:14px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-align:center;margin-top:6px;transition:background .15s}.mob-cta:hover,.mob-cta:active{background:var(--blue-mid,#1a3fd9)}
 
 /* ── ANIMATIONS ── */
@@ -1145,6 +1146,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   <div id="mob-menu">
 
     <!-- ─── SECTION AUTH (en haut, affichage dynamique selon session) ─── -->
+    <div class="mob-section-title">Mon compte</div>
     <!-- Visible UNIQUEMENT si NON connecté : Connexion + Créer un compte -->
     <button id="mob-auth-login" class="mob-link" onclick="showLoginModal();closeMob()" style="display:none">
       <span style="display:inline-flex;align-items:center;gap:8px;color:var(--text)">
@@ -1172,36 +1174,40 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
     <div id="mob-auth-divider" class="mob-divider" style="display:none"></div>
 
-    <!-- ─── PAGES (toujours visibles) ─── -->
-    <button class="mob-link" onclick="showPage('tarifs');closeMob()">
-      <span>Tarifs &amp; services</span>
+    <!-- ─── SECTION 1 : ÊTRE PROTÉGÉ (les services qui agissent) ─── -->
+    <div class="mob-section-title">Être protégé</div>
+    <button class="mob-link" onclick="showPage('sos-humain');closeMob()">
+      <span style="display:inline-flex;align-items:center;gap:8px"><span style="color:#dc2626">🆘</span> SOS — parler à un humain</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">
+      <span>Poser une question à mon conseiller</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="mob-link" onclick="showPage('privacy');closeMob()">
-      <span style="display:inline-flex;align-items:center;gap:6px">Privacy Cleanup <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.5px">NEW</span></span>
+      <span>Effacer mes traces sur internet</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <button class="mob-link" onclick="showPage('sos-humain');closeMob()">
-      <span style="display:inline-flex;align-items:center;gap:6px"><span style="color:#dc2626">🆘</span> SOS Humain <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;letter-spacing:.5px">NEW</span></span>
+
+    <!-- ─── SECTION 2 : DÉCOUVRIR DESPY (à lire) ─── -->
+    <div class="mob-section-title">Découvrir Despy</div>
+    <button class="mob-link" onclick="showPage('comment-ca-marche');closeMob()">
+      <span>Comment ça marche</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="showPage('tarifs');closeMob()">
+      <span>Tarifs &amp; services</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
     <button class="mob-link" onclick="showPage('livret');closeMob()">
       <span>Livret de formation — 29,90€</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <button class="mob-link" onclick="showPage('comment-ca-marche');closeMob()">
-      <span>Comment ça marche</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-    <button class="mob-link" onclick="scrollToSection('conseiller-ia');closeMob()">
-      <span>Conseiller Despy</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-    <button class="mob-link" onclick="scrollToSection('reviews');closeMob()">
+    <button class="mob-link mob-link-secondary" onclick="scrollToSection('reviews');closeMob()">
       <span>Avis clients</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <button class="mob-link" onclick="scrollToSection('faq');closeMob()">
+    <button class="mob-link mob-link-secondary" onclick="scrollToSection('faq');closeMob()">
       <span>Questions fréquentes</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
