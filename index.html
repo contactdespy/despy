@@ -4406,6 +4406,8 @@ function triggerPWAInstall() {
   <h2 style="font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:8px">Mon espace Despy</h2>
   <p style="font-size:14px;color:var(--text2);margin-bottom:2rem">Connectez-vous avec l'email utilisé lors de votre souscription.</p>
   <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px">
+    <div id="google-btn-loginpage" style="display:flex;justify-content:center;min-height:42px;margin-bottom:8px"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0 16px;color:var(--text3);font-size:12px;font-weight:600"><div style="flex:1;height:1px;background:var(--border)"></div><div>ou connexion par email</div><div style="flex:1;height:1px;background:var(--border)"></div></div>
     <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="votre@email.com" autocomplete="email"></div>
     <div class="field" style="margin-top:12px"><label>Mot de passe</label><input type="password" id="login-password" placeholder="Votre mot de passe" autocomplete="current-password"></div>
     <button onclick="siteLogin()" style="width:100%;padding:13px;border-radius:10px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:8px">Se connecter →</button>
@@ -5928,6 +5930,11 @@ function showSubscribeModal(plan) {
   trust.textContent = '\uD83D\uDD12 Paiement s\u00e9curis\u00e9 Stripe \u00b7 PCI-DSS \u00b7 R\u00e9siliation 1 clic';
 
   box.appendChild(title); box.appendChild(sub);
+  // Bloc "Continuer avec Google" — uniquement si l'utilisateur n'est pas déjà connecté.
+  // Après authentification, on enchaîne automatiquement vers le paiement du plan choisi.
+  if (!(session && session.email)) {
+    box.appendChild(buildGoogleSection('subscribe', plan));
+  }
   box.appendChild(grid);
   box.appendChild(emailF); box.appendChild(telF); box.appendChild(dobW);
   box.appendChild(errDiv);
@@ -6818,11 +6825,14 @@ function fillCompteInfo() {
         html += '</button>';
       }
 
-      // Lien résiliation — discret, rassurant
-      html += '<a href="javascript:void(0)" onclick="showLegal(\'resiliation\')" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);text-decoration:none;font-weight:500;padding:4px 0;transition:color .15s" onmouseover="this.style.color=\'var(--text2)\'" onmouseout="this.style.color=\'var(--text3)\'">';
-      html +=   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
-      html +=   'Résilier mon abonnement (1 clic, sans question)';
-      html += '</a>';
+      // Résiliation — accès clair et toujours visible (bouton bordé, sobre)
+      html += '<button onclick="showLegal(\'resiliation\')" style="width:100%;padding:12px 16px;background:#fff;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor=\'#fca5a5\';this.style.color=\'#dc2626\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text2)\'">';
+      html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+      html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+      html +=     '<span>Résilier mon abonnement<span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">1 clic, sans question, sans engagement</span></span>';
+      html +=   '</span>';
+      html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+      html += '</button>';
 
       subEl.innerHTML = html;
     }
@@ -8057,7 +8067,18 @@ function renderAccountPanel() {
   } else {
     html += '<button onclick="siteSubscribe(\'monthly\')" style="padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">S\'abonner</button>';
   }
-  html += '</div></div>';
+  html += '</div>';
+  // Accès résiliation — clair et toujours visible pour les abonnés
+  if (session.subscribed) {
+    html += '<button onclick="showLegal(\'resiliation\')" style="width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor=\'#fca5a5\';this.style.color=\'#dc2626\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text2)\'">';
+    html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+    html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    html +=     '<span>Résilier mon abonnement<span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">1 clic, sans question, sans engagement</span></span>';
+    html +=   '</span>';
+    html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    html += '</button>';
+  }
+  html += '</div>';
 
   html += '<div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
   html += '<div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:14px">Aide & support</div>';
@@ -8076,6 +8097,7 @@ showPage = function(id) {
   _origShowPage(id);
   if (id === 'client') { setTimeout(function(){ try{ initClientSpace(); }catch(e){} }, 80); }
   if (id === 'tarifs') { setTimeout(function(){ try{ loadTarifsBonus(); }catch(e){} }, 80); }
+  if (id === 'login') { setTimeout(function(){ try{ renderGoogleButton('google-btn-loginpage','login'); }catch(e){} }, 80); }
 };
 
 // Affiche le bandeau "X mois offerts" sur la page tarifs si l'utilisateur est connecté
@@ -8199,8 +8221,9 @@ function showQuizPaywall() {
 // ════════════════════════════════════════════
 var GOOGLE_CLIENT_ID = '748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com';
 
-function renderGoogleButton(containerId, mode) {
-  // mode: 'signup' ou 'login' — pour le texte du bouton
+function renderGoogleButton(containerId, mode, plan) {
+  // mode: 'signup' | 'login' | 'subscribe' — pour le texte du bouton
+  // plan: (optionnel) si fourni, on enchaîne vers le paiement après auth
   function tryRender() {
     if (!window.google || !window.google.accounts || !window.google.accounts.id) {
       setTimeout(tryRender, 200);
@@ -8211,7 +8234,7 @@ function renderGoogleButton(containerId, mode) {
     try {
       window.google.accounts.id.initialize({
         client_id: GOOGLE_CLIENT_ID,
-        callback: function(resp){ handleGoogleAuth(resp, mode); },
+        callback: function(resp){ handleGoogleAuth(resp, mode, plan); },
         auto_select: false,
         cancel_on_tap_outside: true
       });
@@ -8230,7 +8253,7 @@ function renderGoogleButton(containerId, mode) {
   tryRender();
 }
 
-async function handleGoogleAuth(response, mode) {
+async function handleGoogleAuth(response, mode, plan) {
   if (!response || !response.credential) {
     alert('Connexion Google annulée.');
     return;
@@ -8293,7 +8316,16 @@ async function handleGoogleAuth(response, mode) {
     // Fermer modals
     var m1 = document.getElementById('free-signup-modal'); if (m1) m1.remove();
     var m2 = document.getElementById('login-modal'); if (m2) m2.remove();
+    var m3 = document.getElementById('sub-modal'); if (m3) m3.remove();
     loader.remove();
+
+    // Si on venait du tunnel d'abonnement (bouton "Commencer 9,99€") et que
+    // l'utilisateur n'est pas déjà abonné → enchaîner directement vers le paiement.
+    if (mode === 'subscribe' && plan && !data.subscribed) {
+      updateNavForSession();
+      await launchCheckout(data.email, data.name, plan);
+      return;
+    }
 
     // Toast bonus parrainage
     if (data.referralBonusApplied) {
@@ -8315,7 +8347,7 @@ async function handleGoogleAuth(response, mode) {
   }
 }
 
-function buildGoogleSection(mode) {
+function buildGoogleSection(mode, plan) {
   // Bloc "Continuer avec Google" + séparateur "ou avec un email"
   var wrap = document.createElement('div');
   wrap.style.cssText = 'margin:8px 0 16px';
@@ -8337,7 +8369,7 @@ function buildGoogleSection(mode) {
   wrap.appendChild(sep);
 
   // Rendu différé pour laisser le DOM s'attacher
-  setTimeout(function(){ renderGoogleButton('google-btn-' + mode, mode); }, 50);
+  setTimeout(function(){ renderGoogleButton('google-btn-' + mode, mode, plan); }, 50);
 
   return wrap;
 }
