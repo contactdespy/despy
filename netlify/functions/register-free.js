@@ -143,7 +143,7 @@ exports.handler = async (event) => {
         },
         body: JSON.stringify({
           type: 'welcome_free',
-          data: { email, prenom, name: prenom + ' ' + nom }
+          data: { email, prenom, name: prenom + ' ' + nom, referralCode: newReferralCode }
         })
       });
     } catch (e) {

@@ -1,9 +1,9 @@
 // ════════════════════════════════════════════
 // DESPY — Push d'alertes nationales
-// Cron : 4 fois par jour → 0 8,12,17,21 * * *
-// 1. RSS Cybermalveillance + ANSSI
-// 2. Top arnaques détectées via analyses_history (≥3 fois en 48h)
-// 3. Push à toutes les subscriptions
+// Cron : 2 fois par jour → 0 9,18 * * * (voir netlify.toml)
+// 1. RSS ANSSI (CERT-FR)
+// 2. Vagues d'arnaques détectées via analyses_history (≥3 fois en 48h)
+// 3. Push à toutes les subscriptions actives (abonnés ou gratuits)
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');

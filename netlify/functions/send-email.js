@@ -20,16 +20,89 @@ const sendResend = async (to, subject, html) => {
   return res.json();
 };
 
+// ── Briques réutilisables (cohérence visuelle entre emails) ──
+const brandHeader = (tagline) => `
+  <div style="background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);padding:38px 32px;text-align:center">
+    <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:.5px">Despy</div>
+    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:6px">${tagline || "Votre sécurité numérique, simplement"}</div>
+  </div>`;
+
+const trustStrip = () => `<p style="font-size:13px;color:#999;line-height:1.6;text-align:center;margin:26px 0 0">🔒 Vos données sont hébergées en France 🇫🇷, chiffrées et jamais revendues. Conforme RGPD.</p>`;
+
+const founderNote = () => `
+  <div style="background:#f7f9fc;border-radius:14px;padding:20px 22px;margin:26px 0">
+    <p style="font-size:15px;color:#444;line-height:1.65;margin:0;font-style:italic">« J'ai créé Despy parce que mes proches se faisaient piéger par des arnaques de plus en plus crédibles. Mon objectif : que vous ne soyez plus jamais seul face à un doute. »</p>
+    <div style="font-size:14px;color:#0a1f3a;font-weight:700;margin-top:12px">Yacine — fondateur de Despy, Strasbourg</div>
+  </div>`;
+
+const referralBlock = (code) => code ? `
+  <div style="background:linear-gradient(135deg,#eff6ff,#fff);border:1.5px dashed #2D5BFF;border-radius:14px;padding:20px;margin:26px 0;text-align:center">
+    <div style="font-size:14px;color:#555;margin-bottom:8px">🎁 <strong>Parrainez un proche</strong> — 1 mois offert pour chacun</div>
+    <div style="font-size:24px;font-weight:900;color:#2D5BFF;letter-spacing:3px;font-family:monospace">${code}</div>
+  </div>` : "";
+
+const brandFooter = () => `
+  <div style="padding:26px 32px;text-align:center;background:#0a1f3a">
+    <p style="font-size:14px;color:rgba(255,255,255,.7);margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
+    <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr · 06 89 14 83 95</p>
+    <p style="font-size:11px;color:rgba(255,255,255,.4);margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
+  </div>`;
+
 const templates = {
 
-  welcome: ({ name, prenom, plan }) => ({
-    subject: "Bienvenue dans Despy — Votre protection est active",
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><h1 style="color:#2D5BFF">Bienvenue ${prenom || name} !</h1><p>Votre abonnement Despy ${plan === "annual" ? "Annuel" : "Mensuel"} est actif.</p><p>✅ Questions illimitées au Conseiller Despy<br>✅ Defi Chrono hebdomadaire<br>✅ Rapport mensuel personnalisé<br>✅ Alertes cybermenaces en temps réel</p><a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Accéder à mon espace</a></div>`
+  welcome: ({ name, prenom, plan, referralCode }) => ({
+    subject: `${prenom || name}, votre protection Despy est active ✅`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Votre protection est active")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Bienvenue ${prenom || name} 🎉</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Votre abonnement <strong>${plan === "annual" ? "Annuel" : "Mensuel"}</strong> est actif. Vous êtes désormais protégé et accompagné, chaque jour, en toute simplicité.</p>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px 22px;margin:22px 0">
+          <div style="font-size:14px;color:#1a3fd9;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Tout est inclus</div>
+          <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
+        </div>
+
+        <div style="text-align:center;margin:28px 0">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Accéder à mon espace</a>
+        </div>
+
+        ${founderNote()}
+        ${referralBlock(referralCode)}
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
   }),
 
-  welcome_free: ({ name, prenom }) => ({
-    subject: "Votre compte Despy est créé !",
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><h1 style="color:#2D5BFF">Bienvenue ${prenom || name} !</h1><p>Votre compte gratuit est actif. Vous avez <strong>3 questions offertes</strong>.</p><p>Avec l'abonnement : questions illimitées, Défi Chrono, rapport mensuel, alertes cybermenaces.</p><a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Accéder à mon espace</a></div>`
+  welcome_free: ({ name, prenom, referralCode }) => ({
+    subject: `${prenom || name}, bienvenue chez Despy — votre compte est prêt`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader()}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Bienvenue ${prenom || name} 👋</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Votre compte Despy est créé. Vous rejoignez une communauté qui apprend, sereinement, à déjouer les arnaques et les pièges du numérique — sans jargon, à votre rythme.</p>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:22px;margin:22px 0;text-align:center">
+          <div style="font-size:17px;color:#1a3fd9;font-weight:800;margin-bottom:8px">🎁 Vous avez 3 questions offertes</div>
+          <div style="font-size:15px;color:#555;line-height:1.6">Un SMS suspect, un appel douteux, un mail bizarre ? Posez la question à votre Conseiller Despy : il vous répond clairement, en français simple.</div>
+        </div>
+
+        <div style="text-align:center;margin:28px 0">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Poser ma première question</a>
+        </div>
+
+        <div style="border-top:1px solid #eee;padding-top:22px">
+          <div style="font-size:13px;color:#888;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:12px">Ce que Despy fait aussi pour vous</div>
+          <div style="font-size:16px;color:#333;line-height:2">🆘 Un humain au bout du fil avec le SOS Despy<br>🔔 Des alertes quand une nouvelle arnaque circule<br>🧹 L'effacement de vos traces sur internet</div>
+        </div>
+
+        ${founderNote()}
+        ${referralBlock(referralCode)}
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
   }),
 
   cancelled: ({ name }) => ({
@@ -111,8 +184,47 @@ const templates = {
   },
 
   cyber_alert: ({ prenom, alertTitle, alertDesc, alertLink, alertSource }) => ({
-    subject: `Alerte Despy — ${(alertTitle || "").substring(0, 50)}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><div style="background:#dc2626;padding:20px 28px;color:#fff"><strong>ALERTE — ${alertSource || "ANSSI"}</strong><h2 style="margin:6px 0">${alertTitle}</h2></div><div style="padding:28px"><p>Bonjour ${prenom},</p><p>Une nouvelle menace détectée par <strong>${alertSource}</strong>. En tant que membre Despy, vous êtes informé en priorité.</p><div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin:16px 0">${(alertDesc || "").substring(0, 400)}...</div>${alertLink ? `<div style="text-align:center;margin:16px 0"><a href="${alertLink}" style="background:#dc2626;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Lire l'alerte complète</a></div>` : ""}<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin:16px 0">Posez vos questions à votre <a href="https://despy.fr" style="color:#2D5BFF">Conseiller Despy</a> pour savoir si vous êtes concerné.</div></div></div>`
+    subject: `🔴 Alerte Despy — ${(alertTitle || "").substring(0, 60)}`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:30px 32px;text-align:center">
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fecaca;font-weight:700">Alerte cybersécurité · ${alertSource || "ANSSI"}</div>
+        <div style="font-size:22px;font-weight:900;color:#fff;margin-top:8px;line-height:1.3">${alertTitle || "Nouvelle menace détectée"}</div>
+      </div>
+      <div style="background:#fff;padding:32px">
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour ${prenom || "cher membre"},</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 18px">Une nouvelle menace vient d'être repérée par <strong>${alertSource || "l'ANSSI"}</strong>. En tant que membre Despy, vous êtes prévenu en priorité.</p>
+        <div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 12px 12px 0;padding:18px 20px;margin:18px 0;font-size:15px;color:#333;line-height:1.6">${(alertDesc || "").substring(0, 400)}${(alertDesc || "").length > 400 ? "…" : ""}</div>
+        ${alertLink ? `<div style="text-align:center;margin:24px 0"><a href="${alertLink}" style="display:inline-block;background:#dc2626;color:#fff;padding:15px 30px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Lire l'alerte complète</a></div>` : ""}
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:18px;margin:20px 0;font-size:15px;color:#333;line-height:1.6">💬 Un doute sur un message que vous avez reçu ? Posez la question à votre <a href="https://despy.fr" style="color:#2D5BFF;font-weight:700;text-decoration:none">Conseiller Despy</a> : il vous dira clairement si vous êtes concerné.</div>
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
+  // Version "teaser" envoyée aux comptes gratuits (incite à s'abonner)
+  cyber_alert_free: ({ prenom, alertTitle, alertSource }) => ({
+    subject: `🔴 Une arnaque circule en ce moment — ${(alertTitle || "").substring(0, 50)}`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Alerte cybersécurité")}
+      <div style="background:#fff;padding:32px">
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour ${prenom || "cher membre"},</p>
+        <div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 12px 12px 0;padding:18px 20px;margin:0 0 18px">
+          <div style="font-size:11px;color:#dc2626;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Menace repérée · ${alertSource || "ANSSI"}</div>
+          <div style="font-size:17px;font-weight:800;color:#0a1f3a;line-height:1.35">${alertTitle || "Nouvelle arnaque en circulation"}</div>
+        </div>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 18px">Despy surveille en continu les arnaques qui visent les particuliers. <strong>Les abonnés reçoivent chaque alerte en détail</strong> et peuvent demander à leur Conseiller s'ils sont concernés.</p>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px;margin:18px 0;text-align:center">
+          <div style="font-size:16px;color:#1a3fd9;font-weight:800;margin-bottom:6px">Soyez protégé pour 9,99€/mois</div>
+          <div style="font-size:14px;color:#555;line-height:1.6">Alertes détaillées en temps réel · Conseiller illimité · SOS humain · sans engagement</div>
+        </div>
+        <div style="text-align:center;margin:24px 0">
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#2D5BFF;color:#fff;padding:15px 30px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Activer ma protection</a>
+        </div>
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
   }),
 
   // Template passthrough : html et subject fournis directement par l'appelant

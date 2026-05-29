@@ -1,7 +1,9 @@
 // ════════════════════════════════════════════
 // DESPY — Alertes Cybermenaces Automatisées
-// Cron : tous les jours à 8h → 0 8 * * *
-// Sources : ANSSI, Cybermalveillance, CERT-FR
+// Cron : tous les 2 jours à 8h → 0 8 */2 * * (voir netlify.toml)
+// Sources : ANSSI (CERT-FR), Cybermalveillance.gouv.fr
+// Envoi : alerte complète aux abonnés payants + teaser aux comptes
+//         gratuits (plafonné à 1 par passage pour ne pas spammer).
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
@@ -104,6 +106,43 @@ async function sendAlertToSubscribers(supabase, alert) {
   return sent;
 }
 
+// Teaser envoyé aux comptes gratuits (leads) pour les inciter à s'abonner.
+// Volontairement plafonné à 1 alerte par passage du robot (voir handler).
+async function sendTeaserToFree(supabase, alert) {
+  const { data: clients } = await supabase
+    .from('clients')
+    .select('email, name, prenom')
+    .eq('subscribed', false);
+
+  if (!clients || clients.length === 0) return 0;
+
+  let sent = 0;
+  for (const client of clients) {
+    const prenom = client.prenom || client.name?.split(' ')[0] || 'cher membre';
+    try {
+      await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.INTERNAL_SECRET || ''
+        },
+        body: JSON.stringify({
+          type: 'cyber_alert_free',
+          data: {
+            email: client.email,
+            prenom,
+            alertTitle: alert.title,
+            alertSource: alert.source
+          }
+        })
+      });
+      sent++;
+    } catch (e) { console.error('Teaser email error:', e); }
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return sent;
+}
+
 exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
@@ -118,6 +157,7 @@ exports.handler = async (event) => {
     const sentUrls = new Set((sentAlerts || []).map(a => a.alert_url));
     let totalSent = 0;
     let alertsTriggered = 0;
+    let teaserSent = false; // teaser aux gratuits : 1 max par passage
 
     for (const source of RSS_SOURCES) {
       const items = await fetchRSS(source.url);
@@ -136,6 +176,13 @@ exports.handler = async (event) => {
         const sent = await sendAlertToSubscribers(supabase, {
           ...item, source: source.name
         });
+
+        // Teaser aux comptes gratuits — uniquement sur la 1re alerte du passage
+        if (!teaserSent) {
+          try { await sendTeaserToFree(supabase, { ...item, source: source.name }); }
+          catch (e) { console.error('Teaser send error:', e); }
+          teaserSent = true;
+        }
 
         // Enregistrer l'alerte comme envoyée
         await supabase.from('sent_alerts').insert({
