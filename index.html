@@ -1253,16 +1253,16 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <div style="font-size:12px;margin-top:1px">Rejoignez les <strong style="color:#fff">premiers membres</strong> Despy</div>
         </div>
       </div>
-      <h1 style="color:#fff">Protégez votre<br><span>vie numérique.</span></h1>
-      <p class="hero-sub" style="color:rgba(255,255,255,0.75)">Arnaques, fuites de données, comportements suspects sur vos appareils... Despy détecte les menaces et vous guide pas à pas. Sans jargon, sans compétence technique.</p>
+      <h1 style="color:#fff">Ne tombez plus dans<br><span>les arnaques en ligne.</span></h1>
+      <p class="hero-sub" style="color:rgba(255,255,255,0.75)">SMS suspects, faux sites, appels frauduleux... Despy protège les seniors et leurs proches : on vérifie pour vous et on vous guide pas à pas. Sans jargon, sans compétence technique.</p>
       <div class="hero-btns">
-        <button id="hero-cta-primary" class="btn-primary" onclick="showPage('tarifs')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span id="hero-cta-primary-label">Commencer maintenant</span>
-        </button>
-        <button id="hero-cta-signup" class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
+        <button id="hero-cta-primary" class="btn-primary" onclick="showFreeSignup()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Créer un compte gratuit
+          <span id="hero-cta-primary-label">Créer mon compte gratuit</span>
+        </button>
+        <button id="hero-cta-signup" class="btn-secondary" onclick="showPage('tarifs')" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Voir les tarifs
         </button>
         <button class="btn-secondary" onclick="go('conseiller')" style="display:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -5543,27 +5543,26 @@ function updateNavForSession() {
     var heroPrimLabel = document.getElementById('hero-cta-primary-label');
 
     if (s && s.email) {
-      // CONNECTÉ : cacher "Créer un compte gratuit" (n'a plus de sens)
-      if (heroSignup) heroSignup.style.display = 'none';
-
-      // Adapter le bouton primaire :
-      //  - Si déjà abonné → "Accéder à mon espace"
-      //  - Si pas encore abonné → garder "Commencer maintenant" (push abo)
+      // CONNECTÉ : le bouton primaire pousse vers l'abonnement / l'espace.
+      // Le bouton secondaire "Voir les tarifs" reste visible (utile aux gratuits).
       if (heroPrim && heroPrimLabel) {
         if (s.subscribed) {
           heroPrimLabel.textContent = 'Accéder à mon espace';
           heroPrim.setAttribute('onclick', "showPage('client')");
+          if (heroSignup) heroSignup.style.display = 'none';
         } else {
-          heroPrimLabel.textContent = 'Commencer maintenant';
+          heroPrimLabel.textContent = 'Découvrir l’abonnement';
           heroPrim.setAttribute('onclick', "showPage('tarifs')");
+          if (heroSignup) heroSignup.style.display = 'none';
         }
       }
     } else {
-      // NON CONNECTÉ : réafficher tout
+      // NON CONNECTÉ (trafic froid) : bouton primaire = créer un compte gratuit,
+      // bouton secondaire = voir les tarifs.
       if (heroSignup) heroSignup.style.display = '';
       if (heroPrim && heroPrimLabel) {
-        heroPrimLabel.textContent = 'Commencer maintenant';
-        heroPrim.setAttribute('onclick', "showPage('tarifs')");
+        heroPrimLabel.textContent = 'Créer mon compte gratuit';
+        heroPrim.setAttribute('onclick', "showFreeSignup()");
       }
     }
   } catch(e) { /* silencieux */ }
@@ -8413,27 +8412,18 @@ function showFreeSignup() {
     return wrap;
   }
 
-  // Grille 2 colonnes pour nom/prénom
-  var grid = document.createElement('div');
-  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0';
-  var nomField = makeField('Nom', 'free-nom', 'text', 'Dupont', true);
+  // Champs essentiels uniquement (réduction des frictions à l'inscription)
   var prenomField = makeField('Prénom', 'free-prenom', 'text', 'Marie', true);
-  grid.appendChild(nomField); grid.appendChild(prenomField);
+  var emailField  = makeField('Email', 'free-email', 'email', 'votre@email.fr', true);
+  var pwdField    = makeField('Mot de passe', 'free-password', 'password', '8 caractères minimum', true);
 
-  var emailField = makeField('Email', 'free-email', 'email', 'votre@email.fr', true);
-  var telField = makeField('Téléphone', 'free-tel', 'tel', '06 12 34 56 78', true);
-  var pwdField = makeField('Mot de passe', 'free-password', 'password', '8 caractères minimum', true);
+  // Séparateur visuel : champs facultatifs (collectés pour info, non bloquants)
+  var optHint = document.createElement('div');
+  optHint.style.cssText = 'font-size:12px;color:var(--text3);margin:16px 0 6px;font-weight:600';
+  optHint.textContent = 'Facultatif — vous pourrez compléter plus tard';
 
-  // Date de naissance
-  var dobWrap = document.createElement('div');
-  dobWrap.className = 'field';
-  var dobLbl = document.createElement('label');
-  dobLbl.textContent = 'Date de naissance *';
-  var dobInp = document.createElement('input');
-  dobInp.type = 'date'; dobInp.id = 'free-dob';
-  dobInp.max = new Date().toISOString().split('T')[0];
-  dobInp.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit;transition:border-color .2s';
-  dobWrap.appendChild(dobLbl); dobWrap.appendChild(dobInp);
+  var nomField = makeField('Nom', 'free-nom', 'text', 'Dupont', false);
+  var telField = makeField('Téléphone', 'free-tel', 'tel', '06 12 34 56 78', false);
 
   // Code de parrainage / promo (optionnel)
   var refWrap = document.createElement('div');
@@ -8475,7 +8465,7 @@ function showFreeSignup() {
   var cguSpan2 = document.createElement('span');
   cguSpan2.textContent = 'politique de confidentialité'; cguSpan2.style.cssText = 'color:var(--blue);cursor:pointer;text-decoration:underline';
   cguSpan2.onclick = function(){ showLegal('confidentialite'); };
-  var cguText3 = document.createTextNode(". Mes données peuvent être utilisées pour me contacter avec des offres Despy.");
+  var cguText3 = document.createTextNode(".");
   cguLbl.appendChild(cguText1); cguLbl.appendChild(cguSpan1); cguLbl.appendChild(cguText2); cguLbl.appendChild(cguSpan2); cguLbl.appendChild(cguText3);
   cguWrap.appendChild(cguCb); cguWrap.appendChild(cguLbl);
 
@@ -8519,15 +8509,24 @@ function showFreeSignup() {
   trust.className = 'sub-trust';
   trust.textContent = 'Données sécurisées · Conformément au RGPD · Jamais revendues';
 
-  // Bloc Google (en haut, le plus visible)
+  // Bloc Google (en haut, le plus visible — inscription en 1 clic, sans mot de passe)
   var googleSection = buildGoogleSection('signup');
 
-  // Assembler
+  // Séparateur entre Google et l'inscription par email
+  var emailSep = document.createElement('div');
+  emailSep.style.cssText = 'text-align:center;font-size:13px;color:var(--text3);margin:16px 0 8px';
+  emailSep.textContent = '— ou avec votre email —';
+
+  // Assembler : champs essentiels d'abord, facultatifs ensuite
   box.appendChild(title); box.appendChild(sub);
   box.appendChild(googleSection);
-  box.appendChild(grid);
-  box.appendChild(emailField); box.appendChild(telField);
-  box.appendChild(pwdField); box.appendChild(dobWrap);
+  box.appendChild(emailSep);
+  box.appendChild(prenomField);
+  box.appendChild(emailField);
+  box.appendChild(pwdField);
+  box.appendChild(optHint);
+  box.appendChild(nomField);
+  box.appendChild(telField);
   box.appendChild(refWrap);
   box.appendChild(errDiv); box.appendChild(cguWrap);
   box.appendChild(btn); box.appendChild(loginLink); box.appendChild(sep);
@@ -8535,7 +8534,7 @@ function showFreeSignup() {
   modal.appendChild(box);
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
   document.body.appendChild(modal);
-  setTimeout(function(){ var el=document.getElementById('free-nom'); if(el) el.focus(); }, 100);
+  setTimeout(function(){ var el=document.getElementById('free-prenom'); if(el) el.focus(); }, 100);
 }
 
 async function createFreeAccount() {
@@ -8557,12 +8556,12 @@ async function createFreeAccount() {
     if(errEl){ errEl.textContent = msg; errEl.style.display='block'; }
   }
 
-  // Validations
-  if (!nom || !prenom) { showErr('Veuillez entrer votre nom et prénom.'); return; }
+  // Validations — seul l'essentiel est requis (réduction des frictions)
+  if (!prenom) { showErr('Veuillez entrer votre prénom.'); return; }
   if (!email || !email.includes('@')) { showErr('Email invalide.'); return; }
   if (!pwd || pwd.length < 8) { showErr('Mot de passe : minimum 8 caractères.'); return; }
-  if (!tel || tel.replace(/\s/g,'').length < 10) { showErr('Numéro de téléphone invalide.'); return; }
-  if (!dob) { showErr('Veuillez entrer votre date de naissance.'); return; }
+  // Téléphone facultatif : on valide seulement s'il est renseigné
+  if (tel && tel.replace(/\s/g,'').length < 10) { showErr('Numéro de téléphone invalide (ou laissez-le vide).'); return; }
   if (!cgu || !cgu.checked) { showErr('Veuillez accepter les conditions.'); return; }
 
   // Vérifier si compte existe déjà
@@ -8576,7 +8575,7 @@ async function createFreeAccount() {
   if(errEl) errEl.style.display='none';
   if(btn){ btn.textContent='Création...'; btn.disabled=true; }
 
-  var fullName = prenom + ' ' + nom;
+  var fullName = [prenom, nom].filter(Boolean).join(' ').trim();
   var account = {
     email: email, name: fullName, prenom: prenom, nom: nom,
     telephone: tel, tel: tel, password: pwd, dob: dob,

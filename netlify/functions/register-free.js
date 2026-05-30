@@ -57,9 +57,12 @@ exports.handler = async (event) => {
     if (!password || password.length < 8) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Mot de passe minimum 8 caractères' }) };
     }
-    if (!prenom || !nom) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Nom et prénom requis' }) };
+    if (!prenom) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Prénom requis' }) };
     }
+
+    // Nom facultatif : on construit le nom complet sans espace superflu
+    const fullName = [prenom, nom].filter(Boolean).join(' ').trim();
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
@@ -104,8 +107,8 @@ exports.handler = async (event) => {
         email: email.toLowerCase().trim(),
         password_hash,
         prenom,
-        nom,
-        name: prenom + ' ' + nom,
+        nom: nom || null,
+        name: fullName,
         telephone: telephone || null,
         date_naissance: dob || null,
         plan: 'free',
@@ -143,7 +146,7 @@ exports.handler = async (event) => {
         },
         body: JSON.stringify({
           type: 'welcome_free',
-          data: { email, prenom, name: prenom + ' ' + nom, referralCode: newReferralCode }
+          data: { email, prenom, name: fullName, referralCode: newReferralCode }
         })
       });
     } catch (e) {
@@ -156,9 +159,9 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         email,
-        name: prenom + ' ' + nom,
+        name: fullName,
         prenom,
-        nom,
+        nom: nom || '',
         plan: 'free',
         referralCode: newReferralCode,
         referralBonusApplied,
