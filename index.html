@@ -1084,6 +1084,45 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   }
 }
 </style>
+
+<!-- ════════════════════════════════════════════════════════════ -->
+<!-- META PIXEL — chargé UNIQUEMENT après consentement cookies       -->
+<!-- (RGPD/CNIL : aucun appel à Facebook tant que l'utilisateur      -->
+<!--  n'a pas cliqué « Accepter » dans la bannière cookies)          -->
+<!-- ════════════════════════════════════════════════════════════ -->
+<script>
+  window.DESPY_PIXEL_ID = '1298978145072102';
+  window._despyPixelLoaded = false;
+
+  // Le consentement publicitaire vaut UNIQUEMENT si l'utilisateur a accepté.
+  window.despyAdConsent = function () {
+    try { return localStorage.getItem('despy_cookies') === '1'; } catch (e) { return false; }
+  };
+
+  // Charge le Pixel + envoie PageView. Idempotent.
+  window.loadMetaPixel = function () {
+    if (window._despyPixelLoaded || !window.despyAdConsent()) return;
+    window._despyPixelLoaded = true;
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', window.DESPY_PIXEL_ID);
+    fbq('track', 'PageView');
+  };
+
+  // Envoie un évènement de conversion — sans rien faire si pas de consentement.
+  window.despyTrack = function (eventName, params) {
+    if (!window.despyAdConsent()) return;
+    window.loadMetaPixel();
+    try { if (window.fbq) window.fbq('track', eventName, params || {}); } catch (e) {}
+  };
+
+  // Visiteur déjà consentant lors d'une visite précédente → charger immédiatement.
+  if (window.despyAdConsent()) window.loadMetaPixel();
+</script>
+<!-- Pas de <noscript> fallback : il enverrait un PageView à Meta sans consentement. -->
 </head>
 <body>
 
@@ -1092,7 +1131,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 <!-- ══ COOKIE ══ -->
 <div id="cookie-bar" style="display:none">
-  <p>Nous utilisons uniquement des cookies essentiels. Aucun cookie publicitaire. <a onclick="showLegal('confidentialite')" style="color:var(--blue);cursor:pointer;font-weight:600">En savoir plus</a></p>
+  <p>Cookies essentiels au fonctionnement du site + un cookie de mesure publicitaire (Meta) pour évaluer nos campagnes. Ce dernier ne se déclenche qu'avec votre accord. <a onclick="showLegal('confidentialite')" style="color:var(--blue);cursor:pointer;font-weight:600">En savoir plus</a></p>
   <div class="ck-btns">
     <button class="ck-accept" onclick="hideCookie(true)">Accepter</button>
     <button class="ck-refuse" onclick="hideCookie(false)">Refuser</button>
@@ -4068,7 +4107,7 @@ function triggerPWAInstall() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </summary>
           <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-top:12px">
-            Évidemment — c'est notre métier. Vos données sont stockées en France (Supabase Paris 🇫🇷), chiffrées au repos, et utilisées <strong>uniquement</strong> pour générer les demandes RGPD. Aucune revente. Aucun cookie publicitaire. Vous pouvez tout effacer chez nous en 1 clic.
+            Évidemment — c'est notre métier. Vos données sont stockées en France (Supabase Paris 🇫🇷), chiffrées au repos, et utilisées <strong>uniquement</strong> pour générer les demandes RGPD. Aucune revente. Le seul cookie de mesure publicitaire (Meta) ne se déclenche qu'avec votre accord, et vous pouvez le refuser. Vous pouvez tout effacer chez nous en 1 clic.
           </div>
         </details>
 
@@ -5281,6 +5320,8 @@ function toggleFaq(btn) {
 // ======================================
 function hideCookie(accept) {
   try { localStorage.setItem('despy_cookies', accept ? '1' : '0'); } catch(e){}
+  // Consentement accordé → on charge le Pixel Meta (PageView). Refus → rien.
+  if (accept && typeof window.loadMetaPixel === 'function') { try { window.loadMetaPixel(); } catch(e){} }
   var bar = document.getElementById('cookie-bar');
   if (bar) { bar.style.opacity = '0'; bar.style.transition = 'opacity .3s'; setTimeout(function(){ bar.style.display = 'none'; }, 300); }
 }
@@ -6023,6 +6064,11 @@ async function launchCheckout(email, name, plan) {
   }
   document.body.appendChild(loader);
 
+  // Conversion Meta : début du paiement
+  if (typeof window.despyTrack === 'function') {
+    try { window.despyTrack('InitiateCheckout', { content_name: plan || 'abonnement', currency: 'EUR', value: 9.99 }); } catch(e){}
+  }
+
   try {
     var r = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
@@ -6081,6 +6127,10 @@ function handleStripeReturn() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('payment') === 'success') {
     window.history.replaceState({}, '', window.location.pathname);
+    // Conversion Meta : abonnement payé
+    if (typeof window.despyTrack === 'function') {
+      try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: 9.99 }); } catch(e){}
+    }
         var modal = document.createElement('div');
     modal.className = 'sub-modal-overlay';
     var box = document.createElement('div');
@@ -6168,7 +6218,7 @@ var LEGAL = {
   },
   confidentialite: {
     title: "Politique de confidentialité",
-    html: "<p><em>Conforme RGPD · Version 1.0 · Avril 2026</em></p><h4>Responsable du traitement</h4><p>Bourefis Yacine · SIRET 103 694 212 00012 · contact.despy@gmail.com</p><h4>Données collectées</h4><p>Email, prénom, diagnostics de sécurité, progression. Base légale : contrat (art. 6.1.b RGPD).</p><h4>Sous-traitants</h4><p>• Stripe · Paiements · PCI-DSS<br>• Supabase · Base de données · Europe (Paris) 🇫🇷<br>• Anthropic · Conseiller IA (Claude) · USA · CCT · <em>vos messages de chat sont traités aux USA</em><br>• Have I Been Pwned (HIBP) · Vérification fuites email · USA · CCT · données non conservées</p><h4>Durée de conservation</h4><p>Données actives : durée abonnement + 3 ans. Suppression sur demande sous 30 jours.</p><h4>Vos droits</h4><p>Accès, rectification, suppression, portabilité : contact.despy@gmail.com<br>Réclamation : cnil.fr</p><h4>Cookies</h4><p>Cookies essentiels uniquement. Aucun cookie publicitaire.</p>"
+    html: "<p><em>Conforme RGPD · Version 1.0 · Avril 2026</em></p><h4>Responsable du traitement</h4><p>Bourefis Yacine · SIRET 103 694 212 00012 · contact.despy@gmail.com</p><h4>Données collectées</h4><p>Email, prénom, diagnostics de sécurité, progression. Base légale : contrat (art. 6.1.b RGPD).</p><h4>Sous-traitants</h4><p>• Stripe · Paiements · PCI-DSS<br>• Supabase · Base de données · Europe (Paris) 🇫🇷<br>• Anthropic · Conseiller IA (Claude) · USA · CCT · <em>vos messages de chat sont traités aux USA</em><br>• Have I Been Pwned (HIBP) · Vérification fuites email · USA · CCT · données non conservées<br>• Meta Platforms (Facebook) · Mesure de nos campagnes publicitaires · USA · CCT · <em>uniquement si vous acceptez les cookies</em></p><h4>Durée de conservation</h4><p>Données actives : durée abonnement + 3 ans. Suppression sur demande sous 30 jours.</p><h4>Vos droits</h4><p>Accès, rectification, suppression, portabilité : contact.despy@gmail.com<br>Réclamation : cnil.fr</p><h4>Cookies</h4><p>Cookies essentiels au fonctionnement du site, déposés sans consentement. Un cookie de mesure publicitaire (Pixel Meta) est déposé <strong>uniquement après votre acceptation</strong> via la bannière cookies, pour mesurer l'efficacité de nos campagnes. Vous pouvez le refuser à tout moment ; aucune donnée n'est alors transmise à Meta.</p>"
   },
   resiliation: {
     title: "Résilier votre abonnement",
@@ -8613,7 +8663,12 @@ async function createFreeAccount() {
     }).catch(function(){});
   } catch(e) {}
 
-  // 4. Fermer modal et afficher espace client
+  // 4. Conversion Meta : compte gratuit créé
+  if (typeof window.despyTrack === 'function') {
+    try { window.despyTrack('CompleteRegistration', { content_name: 'compte_gratuit', status: 'free' }); } catch(e){}
+  }
+
+  // 5. Fermer modal et afficher espace client
   var modal = document.getElementById('free-signup-modal');
   if(modal) modal.remove();
   showPage('client');
