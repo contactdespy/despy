@@ -227,6 +227,53 @@ const templates = {
     </div>`
   }),
 
+  // Sensibilisation : arnaques générées par IA (peut être envoyé aux gratuits comme aux abonnés)
+  ia_scams_awareness: ({ name, prenom, referralCode }) => ({
+    subject: `Les arnaques sont maintenant écrites par une IA — voici comment les repérer`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Nouvelle menace 2026")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Bonjour ${prenom || name || "cher membre"},</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 18px">Pendant des années, on a appris à repérer une arnaque grâce aux fautes d'orthographe et aux tournures bizarres. Ce réflexe ne suffit plus.</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 22px">Aujourd'hui, les escrocs utilisent l'<strong>intelligence artificielle</strong> pour écrire des messages parfaits, sans la moindre faute. Voici les trois pièges du moment :</p>
+
+        <div style="border:1px solid #eee;border-radius:14px;overflow:hidden;margin:0 0 24px">
+          <div style="padding:18px 20px;border-bottom:1px solid #eee">
+            <div style="font-size:16px;font-weight:800;color:#0a1f3a;margin-bottom:4px">📧 Faux emails &amp; SMS parfaits</div>
+            <div style="font-size:14px;color:#555;line-height:1.6">Plus aucune faute pour vous alerter. Le message semble venir de votre banque, de La Poste ou des impôts.</div>
+          </div>
+          <div style="padding:18px 20px;border-bottom:1px solid #eee">
+            <div style="font-size:16px;font-weight:800;color:#0a1f3a;margin-bottom:4px">🌐 Faux sites copiés à l'identique</div>
+            <div style="font-size:14px;color:#555;line-height:1.6">L'IA recrée des sites quasi parfaits pour voler vos identifiants. À l'œil nu, impossible de faire la différence.</div>
+          </div>
+          <div style="padding:18px 20px">
+            <div style="font-size:16px;font-weight:800;color:#0a1f3a;margin-bottom:4px">📞 Voix de proches imitées</div>
+            <div style="font-size:14px;color:#555;line-height:1.6">« Maman, c'est moi, j'ai un problème… » — l'IA peut copier une voix à partir d'une simple vidéo en ligne.</div>
+          </div>
+        </div>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:22px;margin:0 0 22px">
+          <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:8px">Ce que change Despy</div>
+          <p style="font-size:15px;color:#333;line-height:1.65;margin:0">Despy n'analyse pas la qualité de l'écriture — il analyse le <strong>contenu et l'intention</strong> du message. Peu importe qui l'a écrit, un humain ou une IA. <strong>Copiez-collez un message douteux</strong>, on vous dit en quelques secondes si c'est une arnaque.</p>
+        </div>
+
+        <div style="background:#fffbeb;border-left:4px solid #FBBF24;border-radius:0 12px 12px 0;padding:16px 20px;margin:0 0 24px">
+          <div style="font-size:14px;font-weight:800;color:#92400e;margin-bottom:6px">Pour les appels à la voix imitée</div>
+          <p style="font-size:14px;color:#555;line-height:1.6;margin:0">Le bon réflexe : raccrochez, rappelez votre proche sur son vrai numéro, ou posez une question dont seule la vraie personne connaît la réponse. Despy vous apprend à garder ce réflexe sans paniquer.</p>
+        </div>
+
+        <div style="text-align:center;margin:28px 0">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Analyser un message gratuitement</a>
+        </div>
+
+        ${founderNote()}
+        ${referralBlock(referralCode)}
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
   // Template passthrough : html et subject fournis directement par l'appelant
   custom: ({ subject, html }) => ({ subject, html })
 };
