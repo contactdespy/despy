@@ -41,10 +41,12 @@ const referralBlock = (code) => code ? `
     <div style="font-size:24px;font-weight:900;color:#2D5BFF;letter-spacing:3px;font-family:monospace">${code}</div>
   </div>` : "";
 
-const brandFooter = () => `
+// showPhone = true uniquement dans les emails destinés aux abonnés
+// (le 06 personnel n'est pas exposé aux prospects/comptes gratuits).
+const brandFooter = (showPhone) => `
   <div style="padding:26px 32px;text-align:center;background:#0a1f3a">
     <p style="font-size:14px;color:rgba(255,255,255,.7);margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
-    <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr · 06 89 14 83 95</p>
+    <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr${showPhone ? ' · 06 89 14 83 95' : ''}</p>
     <p style="font-size:11px;color:rgba(255,255,255,.4);margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
   </div>`;
 
@@ -71,7 +73,7 @@ const templates = {
         ${referralBlock(referralCode)}
         ${trustStrip()}
       </div>
-      ${brandFooter()}
+      ${brandFooter(true)}
     </div>`
   }),
 
@@ -198,7 +200,7 @@ const templates = {
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:18px;margin:20px 0;font-size:15px;color:#333;line-height:1.6">💬 Un doute sur un message que vous avez reçu ? Posez la question à votre <a href="https://despy.fr" style="color:#2D5BFF;font-weight:700;text-decoration:none">Conseiller Despy</a> : il vous dira clairement si vous êtes concerné.</div>
         ${trustStrip()}
       </div>
-      ${brandFooter()}
+      ${brandFooter(true)}
     </div>`
   }),
 
