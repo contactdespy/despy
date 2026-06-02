@@ -1750,8 +1750,20 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
           <!-- TOOL 1 : ANALYSEUR SMS / EMAIL -->
           <div id="tool-panel-analyse" class="tool-panel">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Collez un SMS, un email ou un lien suspect. Notre IA détecte les arnaques en 5 secondes.</div>
-            <textarea id="analyse-input" rows="5" maxlength="4000" placeholder="Exemple : « Votre colis est en attente. Cliquez ici pour le récupérer : lapost-suivi.com »" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:110px;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Collez un SMS, un email ou un lien suspect — <strong>ou ajoutez une capture d'écran / photo</strong>. Notre IA détecte les arnaques en quelques secondes.</div>
+            <textarea id="analyse-input" rows="5" maxlength="4000" placeholder="Exemple : « Votre colis est en attente. Cliquez ici pour le récupérer : lapost-suivi.com »&#10;&#10;Vous pouvez aussi laisser ce champ vide et ajouter une capture d'écran ci-dessous." style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:110px;transition:border-color .2s;box-sizing:border-box" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+
+            <!-- Ajout d'une capture d'écran / photo -->
+            <input type="file" id="analyse-image-input" accept="image/*" style="display:none" onchange="if(this.files[0])handleAnalyseImage(this.files[0]);this.value='';">
+            <div style="display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap">
+              <button type="button" onclick="document.getElementById('analyse-image-input').click()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg2);color:var(--text);border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                Ajouter une capture d'écran / photo
+              </button>
+              <span style="font-size:11px;color:var(--text3)">ou collez l'image (Ctrl+V / ⌘+V)</span>
+            </div>
+            <div id="analyse-image-preview" style="display:none;margin-top:12px"></div>
+
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px">
               <div style="font-size:11px;color:var(--text3)"><span id="analyse-charcount">0</span>/4000 caractères · <span id="analyse-quota-display">3 analyses gratuites/jour</span></div>
               <button onclick="runAnalyse()" id="analyse-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px">
@@ -9943,11 +9955,69 @@ function switchTool(name) {
 }
 
 // ── Analyseur SMS / email / lien public ──
+var analyseImageData = null; // capture d'écran encodée (data URL JPEG) ou null
+
 (function(){
   var ta = document.getElementById('analyse-input');
   var cc = document.getElementById('analyse-charcount');
   if (ta && cc) ta.addEventListener('input', function(){ cc.textContent = ta.value.length; });
+
+  // Coller une image depuis le presse-papiers quand l'outil d'analyse est visible
+  document.addEventListener('paste', function(ev){
+    var panel = document.getElementById('tool-panel-analyse');
+    if (!panel || panel.style.display === 'none') return;
+    var items = (ev.clipboardData && ev.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf('image') === 0) {
+        var f = items[i].getAsFile();
+        if (f) { handleAnalyseImage(f); ev.preventDefault(); break; }
+      }
+    }
+  });
 })();
+
+// Redimensionne l'image côté client (max 1280px, JPEG) pour un envoi léger
+function handleAnalyseImage(file) {
+  if (!file || !file.type || file.type.indexOf('image/') !== 0) {
+    alert('Merci de choisir une image (capture d\'écran ou photo).');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var max = 1280, w = img.width, h = img.height;
+      if (w > max || h > max) { var r = Math.min(max / w, max / h); w = Math.round(w * r); h = Math.round(h * r); }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      try { analyseImageData = canvas.toDataURL('image/jpeg', 0.82); }
+      catch (err) { analyseImageData = e.target.result; }
+      showAnalyseImagePreview(analyseImageData);
+    };
+    img.onerror = function(){ alert('Image illisible, réessayez avec une autre.'); };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showAnalyseImagePreview(dataUrl) {
+  var box = document.getElementById('analyse-image-preview');
+  if (!box) return;
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:12px">' +
+      '<img src="' + dataUrl + '" alt="Capture à analyser" style="width:60px;height:60px;object-fit:cover;border-radius:8px;flex-shrink:0">' +
+      '<div style="flex:1;font-size:13px;color:var(--text);font-weight:600">Capture d\'écran prête à analyser</div>' +
+      '<button type="button" onclick="clearAnalyseImage()" aria-label="Retirer l\'image" style="width:30px;height:30px;border-radius:50%;background:var(--white);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;flex-shrink:0;line-height:1">×</button>' +
+    '</div>';
+}
+
+function clearAnalyseImage() {
+  analyseImageData = null;
+  var box = document.getElementById('analyse-image-preview');
+  if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
 
 async function runAnalyse() {
   var input = document.getElementById('analyse-input');
@@ -9955,9 +10025,9 @@ async function runAnalyse() {
   var btn = document.getElementById('analyse-btn');
   if (!input || !result) return;
   var content = (input.value || '').trim();
-  if (content.length < 5) {
+  if (content.length < 5 && !analyseImageData) {
     result.style.display = 'block';
-    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;font-size:13px;color:#dc2626">Collez au moins 5 caractères à analyser.</div>';
+    result.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;font-size:13px;color:#dc2626">Collez au moins 5 caractères, ou ajoutez une capture d\'écran à analyser.</div>';
     return;
   }
   btn.disabled = true;
@@ -9969,7 +10039,7 @@ async function runAnalyse() {
     var res = await fetch('/.netlify/functions/analyse-message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: content, email: session ? session.email : null })
+      body: JSON.stringify({ content: content, image: analyseImageData || null, email: session ? session.email : null })
     });
     var data = await res.json();
     result.style.display = 'block';

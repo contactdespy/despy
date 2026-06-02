@@ -25,11 +25,31 @@ Règles :
 - Liste 3 à 6 signaux maximum, en commençant par les plus critiques
 - Détecte : domaines usurpés, urgence artificielle, fautes d'orthographe, demandes de paiement, liens raccourcis, phishing, faux supports, fausses livraisons, faux impôts/CAF/Ameli/Sécu
 - Pour reportTo : 33700 si SMS, signal-spam.fr si email, Pharos si menaces graves, null si rien à signaler
+- Si on te fournit une capture d'écran : lis le texte visible (email, SMS, site web) et analyse-le. Si l'image ne contient aucun message lisible à analyser, renvoie verdict "suspicious" avec un signal "info" expliquant gentiment que la capture est illisible et qu'il faut réessayer avec une image plus nette.
 - Ne réponds JAMAIS autre chose que ce JSON. Pas de markdown, pas de texte avant ou après.`;
 
-async function analyseWithClaude(content) {
+async function analyseWithClaude(content, image) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('Service IA indisponible');
+
+  // Construire le contenu utilisateur : texte seul, ou image (+ contexte texte optionnel)
+  let userContent;
+  if (image) {
+    const m = /^data:(image\/(?:png|jpe?g|webp|gif));base64,(.+)$/i.exec(image);
+    if (!m) throw new Error('Format image non supporté (PNG, JPEG, WEBP ou GIF attendu)');
+    let mediaType = m[1].toLowerCase();
+    if (mediaType === 'image/jpg') mediaType = 'image/jpeg';
+    const b64 = m[2];
+    const instruction = (content && content.length >= 5)
+      ? `Analyse cette capture d'écran d'un message potentiellement suspect. Contexte ajouté par la personne : "${content}"`
+      : `Analyse cette capture d'écran (email, SMS ou site web). Lis le texte visible et détermine si c'est une arnaque.`;
+    userContent = [
+      { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } },
+      { type: 'text', text: instruction }
+    ];
+  } else {
+    userContent = `Analyse ce message suspect :\n\n${content}`;
+  }
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -42,9 +62,9 @@ async function analyseWithClaude(content) {
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 800,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: `Analyse ce message suspect :\n\n${content}` }]
+      messages: [{ role: 'user', content: userContent }]
     }),
-    signal: AbortSignal.timeout(15000)
+    signal: AbortSignal.timeout(image ? 25000 : 15000)
   });
 
   if (!res.ok) {
@@ -69,12 +89,19 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
 
   try {
-    const { content, email } = JSON.parse(event.body || '{}');
-    if (!content || content.trim().length < 5) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Contenu trop court (min 5 caractères)' }) };
+    const { content, image, email } = JSON.parse(event.body || '{}');
+    const hasImage = typeof image === 'string' && /^data:image\//i.test(image);
+    const textContent = (content || '').trim();
+
+    if (!hasImage && textContent.length < 5) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Collez un message (min 5 caractères) ou ajoutez une capture d\'écran.' }) };
     }
-    if (content.length > 4000) {
+    if (textContent.length > 4000) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Contenu trop long (max 4000 caractères)' }) };
+    }
+    // Limite taille image (~5 Mo en base64 ≈ 6,8M caractères)
+    if (hasImage && image.length > 6800000) {
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Image trop lourde (max 5 Mo).' }) };
     }
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -113,8 +140,8 @@ exports.handler = async (event) => {
       }
     }
 
-    // Lancer l'analyse IA
-    const result = await analyseWithClaude(content);
+    // Lancer l'analyse IA (texte et/ou capture d'écran)
+    const result = await analyseWithClaude(textContent, hasImage ? image : null);
 
     // Normaliser
     const verdict = ['safe', 'suspicious', 'scam'].includes(result.verdict) ? result.verdict : 'suspicious';
@@ -125,7 +152,7 @@ exports.handler = async (event) => {
     await supabase.from('analyses_history').insert({
       email: normEmail,
       ip,
-      content: content.substring(0, 2000),
+      content: (textContent || (hasImage ? '[Capture d\'écran analysée]' : '')).substring(0, 2000),
       verdict,
       score,
       signals,
