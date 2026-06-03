@@ -29,17 +29,23 @@
 
 <style>
 :root {
-  --bg: #F2F2F7;
+  --bg: #F4F5FA;
   --bg-elevated: #FFFFFF;
-  --border: #E5E5EA;
-  --separator: rgba(60,60,67,.12);
-  --text: #1C1C1E;
-  --text2: #3C3C43;
-  --text3: #8E8E93;
+  --border: #E8EAF1;
+  --separator: rgba(11,18,32,.07);
+  --text: #0B1220;
+  --text2: #3A4256;
+  --text3: #8A91A6;
   --blue: #2D5BFF;
+  --blue-d: #1A3FD9;
+  --navy: #0A1633;
+  --green: #16A34A;
+  --amber: #F59E0B;
+  --red: #FF3B30;
+  --radius: 20px;
   --safe-top: env(safe-area-inset-top, 0);
   --safe-bottom: env(safe-area-inset-bottom, 0);
-  --nav-h: 78px;
+  --nav-h: 84px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -49,7 +55,7 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -73,187 +79,212 @@ a { color: var(--blue); text-decoration: none; }
   min-height: 100vh;
   min-height: 100dvh;
 }
-.auth-logo {
-  width: 120px;
-  margin: 0 auto 18px;
-  display: block;
-  filter: drop-shadow(0 8px 24px rgba(0,0,0,.25));
-}
-.despy-wordmark {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 900;
-  font-size: 48px;
-  letter-spacing: .14em;
-  color: #fff;
-  text-align: center;
-  display: block;
-  margin: 0 auto 10px;
-  line-height: 1;
-  text-transform: uppercase;
-  text-shadow: 0 4px 16px rgba(0,0,0,.25);
-}
+.auth-logo { width: 120px; margin: 0 auto 18px; display: block; }
 .despy-tagline {
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  letter-spacing: .35em;
-  color: rgba(255,255,255,.85);
-  text-align: center;
-  margin-bottom: 4px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-.despy-subtagline {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  letter-spacing: .25em;
-  color: #5BE3F5;
-  text-align: center;
-  margin-bottom: 36px;
-  font-weight: 500;
-  text-transform: uppercase;
+  font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: .3em;
+  color: rgba(255,255,255,.85); text-align: center; margin-bottom: 30px;
+  font-weight: 600; text-transform: uppercase;
 }
 .auth-card {
-  background: #fff; border-radius: 22px; padding: 28px 22px;
-  color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  background: #fff; border-radius: 24px; padding: 28px 22px;
+  color: var(--text); box-shadow: 0 12px 40px rgba(0,0,0,.22);
 }
-.auth-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; letter-spacing: -.015em; }
-.auth-card p { font-size: 14px; color: var(--text3); margin-bottom: 18px; }
+.auth-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.02em; }
+.auth-card p { font-size: 15px; color: var(--text3); margin-bottom: 18px; }
 .auth-google-wrap { display: flex; justify-content: center; min-height: 44px; margin-bottom: 14px; }
 .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: var(--text3); font-size: 12px; font-weight: 600; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .auth-input {
-  width: 100%; padding: 13px 14px;
-  border: 1.5px solid var(--border); border-radius: 12px;
+  width: 100%; padding: 15px 16px;
+  border: 1.5px solid var(--border); border-radius: 14px;
   font-size: 16px; margin-bottom: 10px;
   background: #fff; color: var(--text);
 }
 .auth-input:focus { outline: none; border-color: var(--blue); }
 .btn-primary {
-  width: 100%; padding: 14px;
+  width: 100%; padding: 16px;
   background: var(--blue); color: #fff;
-  border-radius: 12px; font-weight: 700; font-size: 16px;
+  border-radius: 14px; font-weight: 800; font-size: 17px;
   margin-top: 6px; transition: transform .1s;
 }
 .btn-primary:active { transform: scale(.98); }
 .btn-secondary {
-  width: 100%; padding: 12px;
+  width: 100%; padding: 14px;
   background: transparent; color: var(--blue);
-  border: 1.5px solid var(--border); border-radius: 12px;
-  font-weight: 600; font-size: 15px; margin-top: 8px;
+  border: 1.5px solid var(--border); border-radius: 14px;
+  font-weight: 700; font-size: 16px; margin-top: 8px;
 }
-.auth-toggle { text-align: center; margin-top: 16px; font-size: 14px; color: var(--text3); }
-.auth-toggle button { color: var(--blue); font-weight: 600; padding: 4px; }
+.auth-toggle { text-align: center; margin-top: 16px; font-size: 15px; color: var(--text3); }
+.auth-toggle button { color: var(--blue); font-weight: 700; padding: 4px; }
 .auth-err {
   background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
-  padding: 10px 12px; border-radius: 8px; font-size: 13px;
+  padding: 11px 13px; border-radius: 10px; font-size: 14px;
   margin-bottom: 12px; display: none;
 }
 
 /* ─── APP SHELL ─── */
 #app-view { background: var(--bg); padding-bottom: calc(var(--nav-h) + var(--safe-bottom)); }
-.app-header { background: var(--bg); padding: calc(var(--safe-top) + 14px) 20px 12px; }
-.app-greeting { font-size: 13px; color: var(--text3); font-weight: 500; letter-spacing: -.01em; text-transform: capitalize; }
-.app-title { font-size: 32px; font-weight: 800; letter-spacing: -.03em; color: var(--text); margin-top: 2px; }
+.app-header { padding: calc(var(--safe-top) + 16px) 20px 6px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.app-greeting { font-size: 14px; color: var(--text3); font-weight: 600; text-transform: capitalize; }
+.app-title { font-size: 30px; font-weight: 900; letter-spacing: -.03em; color: var(--text); margin-top: 1px; }
+.header-avatar {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #2D5BFF, #1a3fd9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; font-weight: 800; color: #fff;
+  box-shadow: 0 4px 12px rgba(45,91,255,.3);
+}
 
 .tab-pane { display: none; padding-bottom: 20px; }
 .tab-pane.active { display: block; }
 
-.section { margin: 24px 0 0; }
+.section { margin: 26px 0 0; }
 .section-label {
-  font-size: 12px; font-weight: 600; color: var(--text3);
-  letter-spacing: .04em; text-transform: uppercase;
-  padding: 0 32px 8px;
+  font-size: 13px; font-weight: 800; color: var(--text2);
+  letter-spacing: -.01em;
+  padding: 0 20px 10px;
 }
 
+/* Hero protection */
+.hero {
+  margin: 14px 16px 0; padding: 22px;
+  background: linear-gradient(135deg, #0A1633 0%, #1a3fd9 70%, #2D5BFF 100%);
+  border-radius: 24px; color: #fff;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 16px;
+}
+.hero::after {
+  content: ''; position: absolute; top: -50px; right: -30px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(255,255,255,.16), transparent 70%);
+  pointer-events: none;
+}
+.hero-left { flex: 1; min-width: 0; position: relative; z-index: 1; }
+.hero-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; opacity: .8; }
+.hero-title { font-size: 21px; font-weight: 800; letter-spacing: -.02em; margin-top: 4px; line-height: 1.2; }
+.hero-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 14px; padding: 10px 16px;
+  background: #fff; color: var(--blue);
+  border-radius: 12px; font-weight: 800; font-size: 14px;
+}
+.hero-ring { flex-shrink: 0; position: relative; z-index: 1; }
+
+/* Quick action (Uber "where to" style) */
+.quick-action {
+  display: flex; align-items: center; gap: 14px;
+  margin: 16px; padding: 18px 18px;
+  background: var(--bg-elevated); border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(11,18,32,.07);
+  width: calc(100% - 32px); text-align: left;
+}
+.quick-action:active { transform: scale(.99); }
+.qa-icon {
+  width: 50px; height: 50px; border-radius: 14px; flex-shrink: 0;
+  background: rgba(45,91,255,.1);
+  display: flex; align-items: center; justify-content: center;
+}
+.qa-icon svg { width: 26px; height: 26px; }
+.qa-text { flex: 1; min-width: 0; }
+.qa-title { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+.qa-sub { font-size: 14px; color: var(--text3); margin-top: 1px; }
+
+/* Tools grid (2 col tiles) */
+.tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px; }
+.tile {
+  background: var(--bg-elevated); border-radius: 18px; padding: 16px;
+  text-align: left; box-shadow: 0 1px 3px rgba(11,18,32,.05);
+  min-height: 132px; display: flex; flex-direction: column;
+  transition: transform .12s;
+}
+.tile:active { transform: scale(.96); }
+.tile-icon {
+  width: 46px; height: 46px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.tile-icon svg { width: 25px; height: 25px; }
+.tile-title { font-size: 16px; font-weight: 800; margin-top: auto; padding-top: 14px; letter-spacing: -.01em; line-height: 1.2; }
+.tile-sub { font-size: 13px; color: var(--text3); margin-top: 3px; line-height: 1.3; }
+
+/* List groups (rows) */
 .list-group {
-  background: var(--bg-elevated); border-radius: 14px;
+  background: var(--bg-elevated); border-radius: 16px;
   margin: 0 16px; overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  box-shadow: 0 1px 3px rgba(11,18,32,.05);
 }
 .list-row {
-  display: flex; align-items: center;
-  width: 100%; padding: 12px 16px;
-  background: transparent; text-align: left;
+  display: flex; align-items: center; width: 100%;
+  padding: 14px 16px; background: transparent; text-align: left;
   border-bottom: 0.5px solid var(--separator);
-  transition: background .15s;
-  min-height: 60px;
+  transition: background .15s; min-height: 64px;
 }
 .list-row:last-child { border-bottom: none; }
-.list-row:active { background: rgba(60,60,67,.08); }
+.list-row:active { background: rgba(11,18,32,.04); }
 .row-icon-lg {
-  width: 36px; height: 36px; border-radius: 9px;
+  width: 38px; height: 38px; border-radius: 11px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0; margin-right: 14px;
 }
 .row-icon-lg svg { width: 21px; height: 21px; }
 .row-text { flex: 1; min-width: 0; }
-.row-title { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.3; }
+.row-title { font-size: 16px; font-weight: 600; color: var(--text); line-height: 1.3; }
 .row-desc { font-size: 13px; color: var(--text3); margin-top: 2px; line-height: 1.35; }
 .row-chevron { color: var(--text3); margin-left: 8px; flex-shrink: 0; }
 
-.hero-card {
-  margin: 8px 16px 0; padding: 20px;
-  background: linear-gradient(135deg, #2D5BFF, #1a3fd9);
-  border-radius: 18px; color: #fff;
+/* SOS card */
+.sos-card {
+  margin: 0 16px; padding: 18px;
+  background: linear-gradient(135deg, #FF3B30, #C70F0F);
+  border-radius: 18px; color: #fff; width: calc(100% - 32px);
+  display: flex; align-items: center; gap: 14px; text-align: left;
+  box-shadow: 0 6px 18px rgba(199,15,15,.28);
+}
+.sos-card:active { transform: scale(.98); }
+.sos-card .sos-ic {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  background: rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+}
+.sos-card .row-title { color: #fff; font-size: 17px; font-weight: 800; }
+.sos-card .row-desc { color: rgba(255,255,255,.88); }
+
+/* Learn card */
+.learn-card {
+  margin: 14px 16px 0; border-radius: 20px; padding: 20px; color: #fff;
+  background: linear-gradient(135deg, #5B21B6, #7C3AED);
   position: relative; overflow: hidden;
 }
-.hero-card::after {
-  content: ''; position: absolute;
-  top: -40px; right: -40px;
-  width: 140px; height: 140px;
-  background: radial-gradient(circle, rgba(255,255,255,.18), transparent 70%);
-  pointer-events: none;
-}
-.hero-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
-.hero-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px; }
-.hero-desc { font-size: 14px; opacity: .85; margin-top: 6px; line-height: 1.5; }
-.hero-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 14px; padding: 9px 16px;
-  background: #fff; color: var(--blue);
-  border-radius: 10px; font-weight: 700; font-size: 14px;
-}
-
-.sos-btn { background: linear-gradient(135deg, #FF3B30, #C70F0F) !important; }
-.sos-btn .row-title, .sos-btn .row-desc { color: #fff !important; }
-.sos-btn .row-desc { color: rgba(255,255,255,.85) !important; }
-.sos-btn .row-chevron { color: rgba(255,255,255,.7) !important; }
-
-.profile-header { text-align: center; padding: 24px 20px 20px; }
-.profile-avatar {
-  width: 80px; height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #2D5BFF, #1a3fd9);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px; font-weight: 700; color: #fff;
-  margin: 0 auto 12px;
-  box-shadow: 0 4px 14px rgba(45,91,255,.25);
-}
-.profile-name { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
-.profile-email { font-size: 14px; color: var(--text3); margin-top: 2px; }
-.profile-plan-badge {
-  display: inline-block; margin-top: 10px;
-  padding: 5px 12px; background: var(--bg-elevated);
-  border-radius: 20px; font-size: 12px; font-weight: 600;
-  color: var(--text2); box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
-.profile-plan-badge.active { background: #34C759; color: #fff; }
-
-.learn-card {
-  margin: 16px; background: var(--bg-elevated);
-  border-radius: 16px; padding: 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06);
-}
-.learn-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--blue); }
-.learn-card-title { font-size: 18px; font-weight: 700; margin-top: 4px; letter-spacing: -.015em; }
-.learn-card-desc { font-size: 14px; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+.learn-card.alt { background: linear-gradient(135deg, #0891B2, #06B6D4); }
+.learn-card-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
+.learn-card-title { font-size: 19px; font-weight: 800; margin-top: 4px; letter-spacing: -.015em; }
+.learn-card-desc { font-size: 14px; opacity: .9; margin-top: 6px; line-height: 1.45; }
 .learn-card-btn {
   display: inline-flex; align-items: center; gap: 6px;
-  margin-top: 14px; padding: 10px 16px;
-  background: var(--blue); color: #fff;
-  border-radius: 10px; font-weight: 600; font-size: 14px;
+  margin-top: 14px; padding: 11px 18px;
+  background: #fff; color: var(--text);
+  border-radius: 12px; font-weight: 800; font-size: 14px;
 }
 
+/* Profile */
+.profile-header { text-align: center; padding: 18px 20px 10px; }
+.profile-avatar {
+  width: 84px; height: 84px; border-radius: 50%;
+  background: linear-gradient(135deg, #2D5BFF, #1a3fd9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px; font-weight: 800; color: #fff;
+  margin: 0 auto 12px; box-shadow: 0 6px 18px rgba(45,91,255,.28);
+}
+.profile-name { font-size: 23px; font-weight: 800; letter-spacing: -.02em; }
+.profile-email { font-size: 15px; color: var(--text3); margin-top: 2px; }
+.profile-plan-badge {
+  display: inline-block; margin-top: 12px;
+  padding: 6px 14px; background: var(--bg-elevated);
+  border-radius: 20px; font-size: 13px; font-weight: 700;
+  color: var(--text2); box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.profile-plan-badge.active { background: var(--green); color: #fff; }
+
+/* Bottom nav */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: rgba(255,255,255,.92);
@@ -265,25 +296,24 @@ a { color: var(--blue); text-decoration: none; }
   display: grid; grid-template-columns: 1fr 1fr 1fr;
 }
 .nav-btn {
-  padding: 10px 0 6px;
+  padding: 11px 0 7px;
   display: flex; flex-direction: column; align-items: center; gap: 3px;
   color: var(--text3); transition: color .15s;
 }
-.nav-btn svg { width: 26px; height: 26px; }
-.nav-btn span { font-size: 10px; font-weight: 600; letter-spacing: -.01em; }
+.nav-btn svg { width: 27px; height: 27px; }
+.nav-btn span { font-size: 11px; font-weight: 700; letter-spacing: -.01em; }
 .nav-btn.active { color: var(--blue); }
 
+/* Sheet */
 .sheet-backdrop {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.4);
-  z-index: 200; display: none;
-  opacity: 0; transition: opacity .25s;
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  z-index: 200; display: none; opacity: 0; transition: opacity .25s;
 }
 .sheet-backdrop.open { display: block; opacity: 1; }
 .sheet {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--bg);
-  border-top-left-radius: 16px; border-top-right-radius: 16px;
+  border-top-left-radius: 22px; border-top-right-radius: 22px;
   z-index: 201; max-height: 92vh;
   transform: translateY(100%);
   transition: transform .3s cubic-bezier(.32,.72,0,1);
@@ -291,64 +321,62 @@ a { color: var(--blue); text-decoration: none; }
   padding-bottom: var(--safe-bottom);
 }
 .sheet.open { transform: translateY(0); }
-.sheet-handle {
-  width: 36px; height: 5px;
-  background: rgba(60,60,67,.3);
-  border-radius: 3px; margin: 8px auto 4px;
-}
+.sheet-handle { width: 38px; height: 5px; background: rgba(11,18,32,.18); border-radius: 3px; margin: 9px auto 4px; }
 .sheet-header {
   display: grid; grid-template-columns: 70px 1fr 70px;
   align-items: center; padding: 12px 16px;
   border-bottom: 0.5px solid var(--separator);
 }
-.sheet-header h2 {
-  font-size: 17px; font-weight: 700; text-align: center;
-  letter-spacing: -.015em; color: var(--text);
-}
-.sheet-close { font-size: 17px; color: var(--blue); padding: 6px; font-weight: 400; }
-.sheet-body { padding: 16px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
+.sheet-header h2 { font-size: 18px; font-weight: 800; text-align: center; letter-spacing: -.015em; color: var(--text); }
+.sheet-close { font-size: 17px; color: var(--blue); padding: 6px; font-weight: 600; }
+.sheet-body { padding: 18px 16px; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; }
 textarea.sheet-textarea {
-  width: 100%; min-height: 160px; padding: 14px;
-  border: 1.5px solid var(--border); border-radius: 12px;
+  width: 100%; min-height: 150px; padding: 15px;
+  border: 1.5px solid var(--border); border-radius: 14px;
   font-family: inherit; font-size: 16px; background: #fff;
   resize: none; line-height: 1.5;
 }
 textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
-.sheet-help { font-size: 13px; color: var(--text3); margin-bottom: 12px; line-height: 1.5; }
-.result-card { background: #fff; border-radius: 14px; padding: 18px; margin-top: 14px; }
-.verdict-banner { padding: 14px; border-radius: 12px; text-align: center; margin-bottom: 14px; }
+select.auth-input { appearance: auto; -webkit-appearance: menulist; }
+.sheet-help { font-size: 15px; color: var(--text2); margin-bottom: 14px; line-height: 1.5; }
+.result-card { background: #fff; border-radius: 16px; padding: 18px; margin-top: 14px; box-shadow: 0 1px 3px rgba(11,18,32,.05); }
+.verdict-banner { padding: 16px; border-radius: 14px; text-align: center; margin-bottom: 14px; }
 .verdict-banner.safe { background: #DEF7EC; color: #03543F; }
 .verdict-banner.doubt { background: #FEF3C7; color: #92400E; }
 .verdict-banner.scam { background: #FEE2E2; color: #991B1B; }
-.verdict-title { font-size: 20px; font-weight: 800; letter-spacing: -.02em; }
-.verdict-desc { font-size: 14px; margin-top: 4px; }
+.verdict-title { font-size: 21px; font-weight: 900; letter-spacing: -.02em; }
+.verdict-desc { font-size: 14px; margin-top: 5px; line-height: 1.45; }
+.sig-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-top: 0.5px solid var(--separator); font-size: 14px; line-height: 1.45; }
+.sig-row:first-child { border-top: none; }
+.sig-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 
 .spinner {
-  width: 32px; height: 32px;
+  width: 34px; height: 34px;
   border: 3px solid var(--border); border-top-color: var(--blue);
-  border-radius: 50%; animation: spin .8s linear infinite;
-  margin: 24px auto;
+  border-radius: 50%; animation: spin .8s linear infinite; margin: 28px auto;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .toast {
   position: fixed; top: calc(var(--safe-top) + 16px);
   left: 50%; transform: translateX(-50%);
-  background: rgba(28,28,30,.92); color: #fff;
-  padding: 11px 18px; border-radius: 999px;
-  font-size: 14px; font-weight: 500;
-  z-index: 300;
+  background: rgba(11,18,32,.94); color: #fff;
+  padding: 12px 20px; border-radius: 999px;
+  font-size: 15px; font-weight: 600; z-index: 300; max-width: 90vw; text-align: center;
   animation: toastIn .25s, toastOut .25s 2.5s forwards;
 }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%,-12px); } }
 @keyframes toastOut { to { opacity: 0; transform: translate(-50%,-12px); } }
+
+.img-thumb { position: relative; display: inline-block; margin-top: 12px; }
+.img-thumb img { max-width: 140px; max-height: 140px; border-radius: 12px; border: 1px solid var(--border); display: block; }
+.img-thumb button { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%; background: #1C1C1E; color: #fff; font-size: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
 </style>
 </head>
 <body>
 
 <!-- ═══ AUTH VIEW ═══ -->
 <div id="auth-view" class="view active">
-  <!-- Logo officiel Despy (PNG transparent) -->
   <img src="/assets/logo-despy.png" alt="Despy" class="auth-logo" style="width:min(420px,82vw);height:auto;display:block;margin:0 auto 20px;filter:drop-shadow(0 12px 30px rgba(0,0,0,.3));image-rendering:-webkit-optimize-contrast" decoding="async" fetchpriority="high">
   <div class="despy-tagline" style="margin-top:0">Cybersécurité simple pour tous</div>
 
@@ -377,7 +405,7 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
   </div>
 </div>
 
-<!-- Banner d'installation PWA (visible si l'app n'est pas installée) -->
+<!-- Banner d'installation PWA -->
 <div id="install-banner" style="display:none;position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);color:#fff;padding:12px 16px;z-index:500;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding-top:calc(env(safe-area-inset-top,0) + 12px)">
   <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -390,7 +418,7 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
   <button onclick="document.getElementById('install-banner').style.display='none';try{localStorage.setItem('despy_install_dismissed','1')}catch(e){}" aria-label="Fermer" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);border:none;border-radius:8px;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0">×</button>
 </div>
 
-<!-- Modal Install iOS / Android (visible depuis /app aussi) -->
+<!-- Modal Install iOS / Android -->
 <div id="install-modal" style="display:none;position:fixed;inset:0;background:rgba(15,18,30,.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)">
   <div style="background:#fff;border-radius:22px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;padding:28px 24px;position:relative">
     <button onclick="document.getElementById('install-modal').style.display='none'" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:#F2F2F7;border:none;font-size:20px;cursor:pointer;color:#3C3C43;line-height:1">×</button>
@@ -404,41 +432,61 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
   <!-- TAB : ACCUEIL -->
   <div id="tab-home" class="tab-pane active">
     <div class="app-header">
-      <div class="app-greeting" id="home-greeting">Bonjour</div>
-      <div class="app-title" id="home-firstname">!</div>
+      <div>
+        <div class="app-greeting" id="home-greeting">Bonjour</div>
+        <div class="app-title" id="home-firstname">!</div>
+      </div>
+      <button class="header-avatar" id="home-avatar" onclick="switchAppTab('profile')">?</button>
     </div>
 
-    <div class="hero-card" onclick="openScoreModal()">
-      <div class="hero-label">Score sécurité</div>
-      <div class="hero-title">Testez votre niveau en 60 sec</div>
-      <div class="hero-desc">Évaluez gratuitement vos pratiques numériques. Note A à D + conseils personnalisés.</div>
-      <div class="hero-btn">Commencer
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    <button class="hero" onclick="openTool('score')">
+      <div class="hero-left">
+        <div class="hero-label">Votre protection</div>
+        <div class="hero-title">Voir mon score sécurité</div>
+        <span class="hero-btn">Consulter
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
       </div>
-    </div>
+      <div class="hero-ring">
+        <svg width="86" height="86" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#5BE3F5" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="78" transform="rotate(-90 60 60)"/>
+          <g><svg x="42" y="42" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></g>
+        </svg>
+      </div>
+    </button>
+
+    <button class="quick-action" onclick="openTool('analyseur')">
+      <div class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <div class="qa-text">
+        <div class="qa-title">Un message vous inquiète&nbsp;?</div>
+        <div class="qa-sub">SMS, email, photo ou lien → analyse en 10 sec</div>
+      </div>
+      <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
 
     <div class="section">
       <div class="section-label">Outils du quotidien</div>
-      <div class="list-group">
-        <button class="list-row" onclick="openTool('analyseur')">
-          <div class="row-icon-lg" style="background:#007AFF"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-          <div class="row-text"><div class="row-title">Vérifier un message</div><div class="row-desc">SMS, email ou lien suspect</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <div class="tile-grid">
+        <button class="tile" onclick="openTool('annuaire')">
+          <div class="tile-icon" style="background:rgba(52,199,89,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+          <div class="tile-title">Qui m'appelle ?</div>
+          <div class="tile-sub">Vérifier un numéro inconnu</div>
         </button>
-        <button class="list-row" onclick="openTool('annuaire')">
-          <div class="row-icon-lg" style="background:#34C759"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-          <div class="row-text"><div class="row-title">Qui m'appelle ?</div><div class="row-desc">Vérifier un numéro inconnu</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="tile" onclick="openTool('site')">
+          <div class="tile-icon" style="background:rgba(255,149,0,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+          <div class="tile-title">Vérifier un site</div>
+          <div class="tile-sub">Avant d'acheter en ligne</div>
         </button>
-        <button class="list-row" onclick="openTool('site')">
-          <div class="row-icon-lg" style="background:#FF9500"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-          <div class="row-text"><div class="row-title">Vérifier un site marchand</div><div class="row-desc">Avant d'acheter en ligne</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="tile" onclick="openTool('conseiller')">
+          <div class="tile-icon" style="background:rgba(175,82,222,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#AF52DE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="tile-title">Conseiller IA</div>
+          <div class="tile-sub">Posez votre question</div>
         </button>
-        <button class="list-row" onclick="openTool('conseiller')">
-          <div class="row-icon-lg" style="background:#AF52DE"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-          <div class="row-text"><div class="row-title">Conseiller IA</div><div class="row-desc">Posez n'importe quelle question</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="tile" onclick="openTool('darkweb')">
+          <div class="tile-icon" style="background:rgba(28,28,30,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="tile-title">Email piraté ?</div>
+          <div class="tile-sub">Vérification dark web</div>
         </button>
       </div>
     </div>
@@ -446,9 +494,9 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
     <div class="section">
       <div class="section-label">Protection</div>
       <div class="list-group">
-        <button class="list-row" onclick="openTool('darkweb')">
-          <div class="row-icon-lg" style="background:#1C1C1E"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="row-text"><div class="row-title">Mon email a-t-il fuité ?</div><div class="row-desc">Vérification dark web</div></div>
+        <button class="list-row" onclick="openTool('signaler')">
+          <div class="row-icon-lg" style="background:#FF2D55"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+          <div class="row-text"><div class="row-title">Signaler un numéro</div><div class="row-desc">Aidez la communauté Despy</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="list-row" onclick="openTool('alertes')">
@@ -456,41 +504,54 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
           <div class="row-text"><div class="row-title">Alertes nationales</div><div class="row-desc">Notifications arnaques en cours</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        <button class="list-row" onclick="openTool('privacy')">
+          <div class="row-icon-lg" style="background:#5856D6"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="row-text"><div class="row-title">Effacer mes données</div><div class="row-desc">Privacy Cleanup · Premium</div></div>
+          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
     </div>
 
     <div class="section">
       <div class="section-label">En cas d'urgence</div>
-      <div class="list-group">
-        <button class="list-row sos-btn" onclick="openTool('sos')">
-          <div class="row-icon-lg" style="background:rgba(255,255,255,.2)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
-          <div class="row-text"><div class="row-title">J'ai été arnaqué(e)</div><div class="row-desc">Plan d'action immédiat</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
+      <button class="sos-card" onclick="openTool('sos')">
+        <div class="sos-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
+        <div class="row-text"><div class="row-title">J'ai été arnaqué(e)</div><div class="row-desc">Plan d'action immédiat, étape par étape</div></div>
+        <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </div>
 
   <!-- TAB : APPRENDRE -->
   <div id="tab-learn" class="tab-pane">
     <div class="app-header">
-      <div class="app-greeting">Formation</div>
-      <div class="app-title">Apprendre</div>
+      <div>
+        <div class="app-greeting">Formation</div>
+        <div class="app-title">Apprendre</div>
+      </div>
     </div>
     <div class="learn-card">
-      <div class="learn-card-label">Module de la semaine</div>
-      <div class="learn-card-title">Arnaques SMS : reconnaître les pièges</div>
-      <div class="learn-card-desc">Apprenez à repérer les faux SMS Chronopost, Ameli, banque. 5 minutes de lecture + quiz.</div>
-      <button class="learn-card-btn" onclick="openTool('quiz')">Commencer
+      <div class="learn-card-label">Quiz découverte</div>
+      <div class="learn-card-title">Testez vos réflexes anti-arnaque</div>
+      <div class="learn-card-desc">Des questions concrètes : faux SMS, appels suspects, mots de passe, IA…</div>
+      <button class="learn-card-btn" onclick="openTool('quiz')" style="color:#5B21B6">Commencer
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="learn-card alt">
+      <div class="learn-card-label">⏱️ Défi chrono</div>
+      <div class="learn-card-title">Le défi de la semaine</div>
+      <div class="learn-card-desc">3 questions chronométrées. Plus vous êtes rapide et juste, plus vous gagnez de points.</div>
+      <button class="learn-card-btn" onclick="openTool('defi')" style="color:#0891B2">Relever le défi
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
     <div class="section">
       <div class="section-label">Vos progrès</div>
       <div class="list-group">
-        <button class="list-row" onclick="openTool('quiz')">
-          <div class="row-icon-lg" style="background:#FFCC00"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          <div class="row-text"><div class="row-title">Quiz du jour</div><div class="row-desc">5 questions découverte / mois</div></div>
+        <button class="list-row" onclick="openTool('score')">
+          <div class="row-icon-lg" style="background:#2D5BFF"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="row-text"><div class="row-title">Mon score sécurité</div><div class="row-desc">Note + conseils personnalisés</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="list-row" onclick="openTool('bilan')">
@@ -514,7 +575,7 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
 
   <!-- TAB : MOI -->
   <div id="tab-profile" class="tab-pane">
-    <div class="app-header" style="text-align:center">
+    <div class="app-header" style="display:block;text-align:center">
       <div class="app-greeting">Profil</div>
       <div class="app-title">Mon compte</div>
     </div>
@@ -527,7 +588,7 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
     <div class="section">
       <div class="section-label">Mon abonnement</div>
       <div class="list-group">
-        <button class="list-row" onclick="window.location='/#tarifs'">
+        <button class="list-row" onclick="openSubscription()">
           <div class="row-icon-lg" style="background:#5856D6"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
           <div class="row-text"><div class="row-title">Gérer mon abonnement</div><div class="row-desc" id="sub-status-desc">Voir les forfaits</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -542,6 +603,11 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
     <div class="section">
       <div class="section-label">Services</div>
       <div class="list-group">
+        <button class="list-row" onclick="openTool('privacy')">
+          <div class="row-icon-lg" style="background:#0A84FF"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="row-text"><div class="row-title">Effacer mes données (Privacy)</div><div class="row-desc">Désindexation web · Premium</div></div>
+          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
         <button class="list-row" onclick="window.open('https://calendly.com/contact-despy/intervention-domicile','_blank')">
           <div class="row-icon-lg" style="background:#00C7BE"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
           <div class="row-text"><div class="row-title">Intervention à domicile</div><div class="row-desc">Strasbourg & 15 km · 89€ à 129€</div></div>
@@ -578,7 +644,7 @@ textarea.sheet-textarea:focus { outline: none; border-color: var(--blue); }
       </div>
     </div>
     <div style="text-align:center;padding:24px 16px 0;color:var(--text3);font-size:12px">
-      Despy v1.0 · cybersécurité française
+      Despy v2.0 · cybersécurité française
     </div>
   </div>
 
@@ -782,9 +848,11 @@ function refreshProfile() {
   var firstName = s.prenom || (s.name || s.email).split(' ')[0];
   document.getElementById('home-firstname').textContent = 'Bonjour ' + firstName + ' 👋';
   document.getElementById('home-greeting').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  var initial = (firstName[0] || '?').toUpperCase();
+  document.getElementById('home-avatar').textContent = initial;
   document.getElementById('profile-name').textContent = s.name || firstName;
   document.getElementById('profile-email').textContent = s.email;
-  document.getElementById('profile-avatar').textContent = (firstName[0] || '?').toUpperCase();
+  document.getElementById('profile-avatar').textContent = initial;
   var planEl = document.getElementById('profile-plan');
   var subDescEl = document.getElementById('sub-status-desc');
   if (s.subscribed) {
@@ -794,9 +862,8 @@ function refreshProfile() {
   } else {
     planEl.textContent = 'Compte gratuit';
     planEl.classList.remove('active');
-    if (subDescEl) subDescEl.textContent = 'Voir les forfaits Premium';
+    if (subDescEl) subDescEl.textContent = 'Passer en Premium';
   }
-  // Appel direct au support : réservé aux abonnés
   var callBtn = document.getElementById('app-support-call');
   if (callBtn) callBtn.style.display = s.subscribed ? '' : 'none';
 }
@@ -849,55 +916,140 @@ function openTool(name) {
     case 'parrainage': return openParrainage();
     case 'quiz':       return openQuiz();
     case 'bilan':      return openBilan();
+    case 'score':      return openScore();
+    case 'signaler':   return openPhoneReport();
+    case 'defi':       return openDefi();
+    case 'privacy':    return openPrivacy();
     default: toast('Outil bientôt disponible');
   }
 }
 
-function openScoreModal() { window.location = '/#score-cyber'; }
+function openSubscription() {
+  var s = session.get() || {};
+  if (s.subscribed) { window.location = '/#tarifs'; }
+  else { openPaywall(); }
+}
+
+// ─── ANALYSEUR (texte + photo, vision IA) ───
+var appAnalyseImg = null;
 
 function openAnalyseur() {
+  appAnalyseImg = null;
   openSheet('Vérifier un message',
-    '<p class="sheet-help">Collez le SMS, email ou lien suspect. Notre IA vous dira en quelques secondes s\'il s\'agit d\'une arnaque.</p>' +
+    '<p class="sheet-help">Collez le SMS, l\'email ou le lien suspect, <strong>ou ajoutez une photo / capture d\'écran</strong>. Notre IA vous dira en quelques secondes s\'il s\'agit d\'une arnaque.</p>' +
     '<textarea id="ana-input" class="sheet-textarea" placeholder="Collez le texte du message ici…"></textarea>' +
+    '<button class="btn-secondary" style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px" onclick="document.getElementById(\'ana-file\').click()">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' +
+      'Ajouter une photo / capture' +
+    '</button>' +
+    '<input type="file" id="ana-file" accept="image/*" style="display:none" onchange="if(this.files[0])handleAnaImage(this.files[0]);this.value=\'\'">' +
+    '<div id="ana-preview"></div>' +
     '<button class="btn-primary" onclick="runAnalyseur()" style="margin-top:14px">Analyser maintenant</button>' +
     '<div id="ana-result"></div>'
   );
-  setTimeout(function(){ var el = document.getElementById('ana-input'); if (el) el.focus(); }, 350);
+  setTimeout(function(){
+    var el = document.getElementById('ana-input');
+    if (el) {
+      el.focus();
+      el.addEventListener('paste', function(e){
+        var items = (e.clipboardData || {}).items || [];
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].type && items[i].type.indexOf('image') === 0) {
+            var f = items[i].getAsFile();
+            if (f) { handleAnaImage(f); }
+          }
+        }
+      });
+    }
+  }, 350);
+}
+
+function handleAnaImage(file) {
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = new Image();
+    img.onload = function() {
+      try {
+        var max = 1280;
+        var w = img.width, h = img.height;
+        if (w > max || h > max) {
+          if (w >= h) { h = Math.round(h * max / w); w = max; }
+          else { w = Math.round(w * max / h); h = max; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        appAnalyseImg = canvas.toDataURL('image/jpeg', 0.82);
+      } catch(e) {
+        appAnalyseImg = ev.target.result;
+      }
+      showAnaPreview(appAnalyseImg);
+    };
+    img.onerror = function(){ appAnalyseImg = ev.target.result; showAnaPreview(appAnalyseImg); };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function showAnaPreview(dataUrl) {
+  var el = document.getElementById('ana-preview');
+  if (el) el.innerHTML = '<div class="img-thumb"><img src="' + dataUrl + '" alt="aperçu"><button onclick="clearAnaImage()" aria-label="Retirer">×</button></div>';
+}
+function clearAnaImage() {
+  appAnalyseImg = null;
+  var el = document.getElementById('ana-preview');
+  if (el) el.innerHTML = '';
 }
 
 async function runAnalyseur() {
-  var input = document.getElementById('ana-input').value.trim();
-  if (input.length < 10) return toast('Texte trop court');
+  var input = (document.getElementById('ana-input').value || '').trim();
+  if (input.length < 10 && !appAnalyseImg) return toast('Collez un message ou ajoutez une photo');
   document.getElementById('ana-result').innerHTML = '<div class="spinner"></div>';
   try {
     var r = await fetch('/.netlify/functions/analyse-message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: input, email: (session.get() || {}).email })
+      body: JSON.stringify({ content: input, image: appAnalyseImg || null, email: (session.get() || {}).email })
     });
     var data = await r.json();
     if (!r.ok || data.error) {
-      document.getElementById('ana-result').innerHTML = '<div class="result-card" style="color:#dc2626">' + (data.error || 'Erreur') + '</div>';
+      var msg = data.limit_reached ? (data.error + ' ') : (data.error || 'Erreur');
+      document.getElementById('ana-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + msg +
+        (data.limit_reached ? '<button class="btn-primary" style="margin-top:12px" onclick="openPaywall()">Passer en Premium</button>' : '') + '</div>';
       return;
     }
     var v = (data.verdict || '').toLowerCase();
-    var cls = v === 'scam' ? 'scam' : (v === 'doubt' || v === 'suspicious') ? 'doubt' : 'safe';
+    var cls = v === 'scam' ? 'scam' : (v === 'suspicious' || v === 'doubt') ? 'doubt' : 'safe';
     var icon = cls === 'scam' ? '⚠️ ARNAQUE' : cls === 'doubt' ? '🤔 SUSPECT' : '✅ SÛR';
-    var summary = data.summary || data.explanation || '';
-    var signals = (data.signals || []).map(function(s){ return '<li>' + s + '</li>'; }).join('');
+    var title = data.title || (cls === 'scam' ? 'Message dangereux' : cls === 'doubt' ? 'Soyez prudent' : 'Aucun danger détecté');
+    var sigHtml = (Array.isArray(data.signals) ? data.signals : []).map(function(s){
+      var lvl = (s && s.level) || 'info';
+      var color = lvl === 'danger' ? '#FF3B30' : lvl === 'warn' ? '#F59E0B' : '#34C759';
+      var txt = (s && s.text) ? s.text : (typeof s === 'string' ? s : '');
+      return '<div class="sig-row"><span class="sig-dot" style="background:' + color + '"></span><span>' + txt + '</span></div>';
+    }).join('');
+    var reportHtml = '';
+    if (data.reportTo) {
+      var rt = data.reportTo;
+      var link = rt === '33700' ? 'Transférer le SMS au 33700 (gratuit)' :
+                 rt === 'signal-spam.fr' ? 'Signaler sur signal-spam.fr' :
+                 rt === 'Pharos' ? 'Signaler sur PHAROS (internet-signalement.gouv.fr)' : rt;
+      reportHtml = '<div class="result-card" style="background:#F0F4FF;margin-top:12px;font-size:14px"><strong>Où signaler :</strong> ' + link + '</div>';
+    }
     document.getElementById('ana-result').innerHTML =
       '<div class="result-card">' +
-        '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + icon + '</div><div class="verdict-desc">' + summary + '</div></div>' +
-        (signals ? '<div style="font-size:14px;line-height:1.6"><strong>Signes détectés :</strong><ul style="margin:8px 0 0 18px">' + signals + '</ul></div>' : '') +
-      '</div>';
+        '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + icon + '</div><div class="verdict-desc">' + title + (typeof data.score === 'number' ? ' · score ' + data.score + '/100' : '') + '</div></div>' +
+        (sigHtml ? '<div style="margin-top:4px"><div style="font-weight:700;font-size:14px;margin-bottom:4px">Signes détectés</div>' + sigHtml + '</div>' : '') +
+        (data.recommendation ? '<div style="margin-top:14px;padding-top:14px;border-top:0.5px solid var(--separator);font-size:15px;line-height:1.5"><strong>Que faire ?</strong><br>' + data.recommendation + '</div>' : '') +
+      '</div>' + reportHtml;
   } catch(e) {
-    document.getElementById('ana-result').innerHTML = '<div class="result-card" style="color:#dc2626">Erreur réseau</div>';
+    document.getElementById('ana-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
 
 function openAnnuaire() {
   openSheet('Qui m\'appelle ?',
-    '<p class="sheet-help">Entrez le numéro qui vous a appelé pour voir s\'il a été signalé.</p>' +
+    '<p class="sheet-help">Entrez le numéro qui vous a appelé pour voir s\'il a été signalé par la communauté.</p>' +
     '<input id="ann-input" class="auth-input" type="tel" placeholder="Ex : 06 12 34 56 78" inputmode="tel">' +
     '<button class="btn-primary" onclick="runAnnuaire()" style="margin-top:6px">Vérifier ce numéro</button>' +
     '<div id="ann-result"></div>'
@@ -922,10 +1074,11 @@ async function runAnnuaire() {
     document.getElementById('ann-result').innerHTML =
       '<div class="result-card">' +
         '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + desc + '</div></div>' +
-        (data.categories ? '<div style="font-size:14px;margin-top:8px"><strong>Catégories :</strong> ' + (Array.isArray(data.categories) ? data.categories.join(', ') : data.categories) + '</div>' : '') +
+        (data.categories ? '<div style="font-size:14px;margin-top:4px"><strong>Catégories :</strong> ' + (Array.isArray(data.categories) ? data.categories.join(', ') : data.categories) + '</div>' : '') +
+        '<button class="btn-secondary" style="margin-top:12px" onclick="openPhoneReport()">Signaler ce numéro</button>' +
       '</div>';
   } catch(e) {
-    document.getElementById('ann-result').innerHTML = '<div class="result-card" style="color:#dc2626">Erreur réseau</div>';
+    document.getElementById('ann-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
 
@@ -951,26 +1104,26 @@ async function runSiteCheck() {
     });
     var data = await r.json();
     if (!r.ok || data.error) {
-      document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#dc2626">' + (data.error || 'Erreur') + '</div>';
+      document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (data.error || 'Erreur') + '</div>';
       return;
     }
-    var v = (data.verdict || data.risk || '').toLowerCase();
-    var cls = (v.indexOf('scam') !== -1 || v === 'high') ? 'scam' : (v === 'doubt' || v === 'medium') ? 'doubt' : 'safe';
+    var vv = (data.verdict || data.risk || '').toLowerCase();
+    var cls = (vv.indexOf('scam') !== -1 || vv === 'high') ? 'scam' : (vv === 'doubt' || vv === 'medium') ? 'doubt' : 'safe';
     var label = cls === 'scam' ? '⚠️ SITE SUSPECT' : cls === 'doubt' ? '🤔 PRUDENCE' : '✅ SITE FIABLE';
     document.getElementById('site-result').innerHTML =
       '<div class="result-card">' +
         '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + (data.summary || '') + '</div></div>' +
-        (data.age ? '<div style="font-size:14px;margin-top:8px"><strong>Ancienneté :</strong> ' + data.age + '</div>' : '') +
+        (data.age ? '<div style="font-size:14px;margin-top:4px"><strong>Ancienneté :</strong> ' + data.age + '</div>' : '') +
       '</div>';
   } catch(e) {
-    document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#dc2626">Erreur réseau</div>';
+    document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
 
 function openConseiller() {
   openSheet('Conseiller IA',
     '<p class="sheet-help">Posez n\'importe quelle question sur la cybersécurité, les arnaques, les mots de passe…</p>' +
-    '<textarea id="adv-input" class="sheet-textarea" placeholder="Ex : Comment je sais si mon compte Gmail est sécurisé ?"></textarea>' +
+    '<textarea id="adv-input" class="sheet-textarea" placeholder="Ex : Comment savoir si mon compte Gmail est sécurisé ?"></textarea>' +
     '<button class="btn-primary" onclick="runConseiller()" style="margin-top:14px">Envoyer ma question</button>' +
     '<div id="adv-result"></div>'
   );
@@ -989,14 +1142,14 @@ async function runConseiller() {
     });
     var data = await r.json();
     if (!r.ok || data.error) {
-      document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#dc2626">' + (data.error || 'Erreur') + '</div>';
+      document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (data.error || 'Erreur') + '</div>';
       return;
     }
     var answer = data.response || data.answer || data.message || '';
     document.getElementById('adv-result').innerHTML =
       '<div class="result-card" style="white-space:pre-wrap;line-height:1.65">' + (answer || 'Pas de réponse') + '</div>';
   } catch(e) {
-    document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#dc2626">Erreur réseau</div>';
+    document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
 
@@ -1031,9 +1184,10 @@ async function runDarkWeb() {
       '<div class="result-card">' +
         '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + desc + '</div></div>' +
         (list ? '<div style="font-size:14px;line-height:1.6"><strong>Fuites :</strong><ul style="margin:8px 0 0 18px">' + list + '</ul></div>' : '') +
+        (n >= 1 ? '<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2)">👉 Changez le mot de passe des comptes concernés et activez la double authentification.</div>' : '') +
       '</div>';
   } catch(e) {
-    document.getElementById('hibp-result').innerHTML = '<div class="result-card" style="color:#dc2626">Erreur réseau</div>';
+    document.getElementById('hibp-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
 
@@ -1058,7 +1212,6 @@ function openAlertes() {
   }, 200);
 }
 
-// Helper : urlBase64ToUint8Array (pour la clé VAPID)
 function urlBase64ToUint8Array(base64String) {
   var padding = '='.repeat((4 - base64String.length % 4) % 4);
   var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -1070,23 +1223,13 @@ function urlBase64ToUint8Array(base64String) {
 
 async function requestPush() {
   try {
-    // 1. Demande permission
     var perm = await Notification.requestPermission();
     if (perm !== 'granted') return toast('Notifications refusées');
-
-    // 2. Récupère la clé VAPID publique
     var keyRes = await fetch('/.netlify/functions/push-key');
     var keyData = await keyRes.json();
-    if (!keyData.publicKey) {
-      toast('Erreur de configuration push');
-      return;
-    }
-
-    // 3. Enregistre le service worker (si pas déjà)
+    if (!keyData.publicKey) { toast('Erreur de configuration push'); return; }
     var reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
-
-    // 4. Souscription PushManager
     var sub = await reg.pushManager.getSubscription();
     if (!sub) {
       sub = await reg.pushManager.subscribe({
@@ -1094,15 +1237,12 @@ async function requestPush() {
         applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
       });
     }
-
-    // 5. Envoie la subscription au backend
     var s = session.get() || {};
     await fetch('/.netlify/functions/push-subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscription: sub, email: s.email })
     });
-
     toast('Alertes activées !');
     setTimeout(openAlertes, 500);
   } catch(e) {
@@ -1116,17 +1256,17 @@ function openSOS() {
   var _despyHelp = (_s && _s.subscribed)
     ? '<a href="tel:+33689148395" class="btn-primary" style="display:block;text-align:center;text-decoration:none">📞 Appeler Despy — 06 89 14 83 95</a>'
     : '<a href="mailto:contact@despy.fr" class="btn-secondary" style="display:block;text-align:center;text-decoration:none">✉️ Écrire à Despy — contact@despy.fr</a><div style="font-size:12px;color:#8a8a8e;text-align:center;margin-top:8px">L\'assistance téléphonique directe est incluse dans l\'abonnement Premium.</div>';
-  openSheet('J\'ai été arnaqué(e) — Plan d\'action',
-    '<div class="result-card" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;margin-bottom:14px"><strong>Restez calme.</strong> Plus vous agissez vite, plus vous limitez les dégâts.</div>' +
-    '<div class="section-label" style="padding:0 0 8px;margin-top:6px">Étape 1 — Sécuriser</div>' +
+  openSheet('J\'ai été arnaqué(e)',
+    '<div class="result-card" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;margin-top:0"><strong>Restez calme.</strong> Plus vous agissez vite, plus vous limitez les dégâts.</div>' +
+    '<div class="section-label" style="padding:16px 0 8px">Étape 1 — Sécuriser</div>' +
     '<div class="result-card" style="margin-top:0">📵 <strong>Coupez tout contact</strong> avec l\'arnaqueur (bloquez le numéro, supprimez l\'email)</div>' +
     '<div class="result-card" style="margin-top:8px">💳 <strong>Si paiement effectué :</strong> contactez immédiatement votre banque pour faire opposition</div>' +
     '<div class="result-card" style="margin-top:8px">🔒 <strong>Si mot de passe partagé :</strong> changez-le sur TOUS les sites où vous l\'utilisez</div>' +
-    '<div class="section-label" style="padding:0 0 8px;margin-top:18px">Étape 2 — Signaler</div>' +
+    '<div class="section-label" style="padding:18px 0 8px">Étape 2 — Signaler</div>' +
     '<a href="tel:17" class="btn-primary" style="display:block;text-align:center;margin-bottom:8px;text-decoration:none">📞 Police 17 (urgence)</a>' +
     '<a href="https://www.cybermalveillance.gouv.fr/" target="_blank" class="btn-secondary" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px">🚨 Cybermalveillance.gouv.fr</a>' +
     '<a href="https://www.internet-signalement.gouv.fr/" target="_blank" class="btn-secondary" style="display:block;text-align:center;text-decoration:none">⚖️ Signaler sur PHAROS</a>' +
-    '<div class="section-label" style="padding:0 0 8px;margin-top:18px">Étape 3 — Besoin d\'aide ?</div>' +
+    '<div class="section-label" style="padding:18px 0 8px">Étape 3 — Besoin d\'aide ?</div>' +
     _despyHelp
   );
 }
@@ -1171,134 +1311,326 @@ function copyRef(code) {
   if (navigator.clipboard) navigator.clipboard.writeText(code);
   toast('Code copié : ' + code);
 }
-
 function shareRef(code) {
   var txt = 'Rejoins-moi sur Despy pour te protéger des arnaques en ligne. Utilise mon code ' + code + ' et reçois 1 mois offert : https://despy.fr/?ref=' + code;
-  if (navigator.share) {
-    navigator.share({ title: 'Despy', text: txt }).catch(function(){});
-  } else {
-    copyRef(txt);
+  if (navigator.share) { navigator.share({ title: 'Despy', text: txt }).catch(function(){}); }
+  else { copyRef(txt); }
+}
+
+// ─── SCORE SÉCURITÉ ───
+function scoreRing(score, color) {
+  score = Math.max(0, Math.min(100, score || 0));
+  color = color || '#2D5BFF';
+  var c = 2 * Math.PI * 52;
+  var off = c * (1 - score / 100);
+  return '<svg width="148" height="148" viewBox="0 0 120 120">' +
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="#eef0f6" stroke-width="12"/>' +
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" transform="rotate(-90 60 60)"/>' +
+    '<text x="60" y="60" text-anchor="middle" dominant-baseline="central" font-size="32" font-weight="800" fill="' + color + '">' + score + '</text>' +
+    '</svg>';
+}
+
+function openScore() {
+  var s = session.get() || {};
+  openSheet('Mon score sécurité', '<div class="spinner"></div>');
+  if (!s.email) {
+    document.getElementById('sheet-body').innerHTML = '<div class="result-card">Connectez-vous pour voir votre score de sécurité.</div>';
+    return;
   }
+  fetch('/.netlify/functions/security-score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: s.email })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d.error) {
+      document.getElementById('sheet-body').innerHTML =
+        '<div class="result-card" style="text-align:center"><div style="font-size:40px">🛡️</div>' +
+        '<div style="font-weight:800;font-size:18px;margin-top:6px">Votre score se construit</div>' +
+        '<div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.5">Utilisez Despy (analyses, quiz, vérifications dark web) pour générer votre score de sécurité personnalisé et vos conseils.</div></div>';
+      return;
+    }
+    var tips = (d.tips || []).map(function(t){ return '<li style="margin-bottom:8px;line-height:1.45">' + t + '</li>'; }).join('');
+    var st = d.stats || {};
+    document.getElementById('sheet-body').innerHTML =
+      '<div class="result-card" style="text-align:center">' + scoreRing(d.score, d.color) +
+        '<div style="font-size:22px;font-weight:800;margin-top:6px;color:' + (d.color || '#2D5BFF') + '">' + (d.emoji || '') + ' ' + (d.label || '') + '</div>' +
+      '</div>' +
+      (tips ? '<div class="result-card" style="margin-top:12px"><div style="font-weight:800;margin-bottom:10px">Pour progresser</div><ul style="margin:0 0 0 18px;font-size:15px;color:var(--text2)">' + tips + '</ul></div>' : '') +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">' +
+        '<div class="result-card" style="text-align:center;margin:0"><div style="font-size:24px;font-weight:800">' + (st.quizzes_completed || 0) + '</div><div style="font-size:12px;color:var(--text3);font-weight:600">Quiz complétés</div></div>' +
+        '<div class="result-card" style="text-align:center;margin:0"><div style="font-size:24px;font-weight:800">' + (st.breach_count || 0) + '</div><div style="font-size:12px;color:var(--text3);font-weight:600">Fuites détectées</div></div>' +
+      '</div>';
+  }).catch(function(){
+    document.getElementById('sheet-body').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
+  });
+}
+
+// ─── SIGNALER UN NUMÉRO ───
+function openPhoneReport() {
+  var cats = [
+    ['faux_banque','Faux conseiller bancaire'],
+    ['faux_livraison','Fausse livraison / colis'],
+    ['faux_microsoft','Faux support (Microsoft, Apple…)'],
+    ['faux_ameli','Faux Ameli / Sécu'],
+    ['faux_caf','Faux CAF'],
+    ['faux_impots','Faux impôts'],
+    ['faux_cpf','Faux CPF / formation'],
+    ['vente_forcee','Démarchage / vente forcée'],
+    ['spam','Spam / publicité'],
+    ['autre','Autre']
+  ];
+  var opts = cats.map(function(c){ return '<option value="' + c[0] + '">' + c[1] + '</option>'; }).join('');
+  openSheet('Signaler un numéro',
+    '<p class="sheet-help">Aidez la communauté Despy : signalez un numéro d\'arnaqueur. Votre signalement protège les autres utilisateurs.</p>' +
+    '<input id="rep-phone" class="auth-input" type="tel" placeholder="Ex : 06 12 34 56 78" inputmode="tel">' +
+    '<select id="rep-cat" class="auth-input">' + opts + '</select>' +
+    '<textarea id="rep-comment" class="sheet-textarea" style="min-height:90px" placeholder="Précisez (optionnel) : ce qu\'on vous a dit ou demandé…"></textarea>' +
+    '<button class="btn-primary" onclick="runPhoneReport()" style="margin-top:12px">Envoyer le signalement</button>' +
+    '<div id="rep-result"></div>'
+  );
+}
+
+async function runPhoneReport() {
+  var phone = document.getElementById('rep-phone').value.trim();
+  var category = document.getElementById('rep-cat').value;
+  var comment = document.getElementById('rep-comment').value.trim();
+  if (phone.replace(/\D/g, '').length < 9) return toast('Numéro trop court');
+  document.getElementById('rep-result').innerHTML = '<div class="spinner"></div>';
+  try {
+    var r = await fetch('/.netlify/functions/phone-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, category: category, comment: comment, email: (session.get() || {}).email })
+    });
+    var d = await r.json();
+    if (!r.ok || d.error) {
+      document.getElementById('rep-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (d.error || 'Erreur') + '</div>';
+      return;
+    }
+    document.getElementById('rep-result').innerHTML =
+      '<div class="result-card"><div class="verdict-banner safe"><div class="verdict-title">✅ Merci !</div><div class="verdict-desc">' + (d.message || 'Signalement enregistré') + '</div></div></div>';
+  } catch(e) {
+    document.getElementById('rep-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
+  }
+}
+
+// ─── DÉFI CHRONO ───
+var _defi = { quiz: null, idx: 0, answers: [], start: 0 };
+
+function openDefi() {
+  openSheet('Défi chrono', '<div class="spinner"></div>');
+  fetch('/.netlify/functions/defi-chrono').then(function(r){ return r.json(); }).then(function(q){
+    if (!q || !q.questions) { document.getElementById('sheet-body').innerHTML = '<div class="result-card">Défi indisponible</div>'; return; }
+    _defi = { quiz: q, idx: 0, answers: [], start: 0 };
+    document.getElementById('sheet-body').innerHTML =
+      '<div class="result-card" style="text-align:center"><div style="font-size:44px">⏱️</div>' +
+      '<div style="font-weight:800;font-size:19px;margin-top:6px">' + q.titre + '</div>' +
+      '<div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.5">' + q.questions.length + ' questions chronométrées. Plus vous répondez vite et juste, plus vous gagnez de points (XP).</div>' +
+      '<button class="btn-primary" onclick="startDefi()" style="margin-top:16px">Démarrer le défi</button></div>';
+  }).catch(function(){
+    document.getElementById('sheet-body').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur de chargement</div>';
+  });
+}
+
+function startDefi() {
+  _defi.start = Date.now(); _defi.idx = 0; _defi.answers = [];
+  renderDefiQuestion();
+}
+
+function renderDefiQuestion() {
+  var q = _defi.quiz.questions[_defi.idx];
+  var opts = q.choices.map(function(c, i){
+    return '<button class="quiz-opt" onclick="answerDefi(' + i + ')" style="width:100%;padding:15px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:14px;text-align:left;font-size:16px;color:var(--text);line-height:1.4;cursor:pointer">' + c + '</button>';
+  }).join('');
+  document.getElementById('sheet-body').innerHTML =
+    '<div style="font-size:13px;color:var(--blue);font-weight:800;margin-bottom:10px">Question ' + (_defi.idx + 1) + '/' + _defi.quiz.questions.length + '</div>' +
+    '<div style="font-size:18px;font-weight:600;line-height:1.5;margin-bottom:18px;color:var(--text)">' + q.q + '</div>' + opts;
+}
+
+function answerDefi(i) {
+  _defi.answers.push(i);
+  if (_defi.idx < _defi.quiz.questions.length - 1) { _defi.idx++; renderDefiQuestion(); }
+  else { submitDefi(); }
+  if (navigator.vibrate) navigator.vibrate(8);
+}
+
+async function submitDefi() {
+  document.getElementById('sheet-body').innerHTML = '<div class="spinner"></div>';
+  var timeSeconds = Math.round((Date.now() - _defi.start) / 1000);
+  try {
+    var r = await fetch('/.netlify/functions/defi-chrono', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: (session.get() || {}).email, answers: _defi.answers, timeSeconds: timeSeconds })
+    });
+    var d = await r.json();
+    if (d.error) { document.getElementById('sheet-body').innerHTML = '<div class="result-card" style="color:#991b1b">' + d.error + '</div>'; return; }
+    var det = (d.results || []).map(function(rr){
+      return '<div class="result-card" style="margin-top:10px;border-left:4px solid ' + (rr.correct ? '#34C759' : '#FF3B30') + '">' +
+        '<div style="font-weight:800;color:' + (rr.correct ? '#03543F' : '#991B1B') + '">' + (rr.correct ? '✅ Bonne réponse' : '❌ Bonne réponse : ' + rr.bonne_reponse) + '</div>' +
+        '<div style="font-size:14px;color:var(--text2);margin-top:6px;line-height:1.5">' + rr.explication + '</div></div>';
+    }).join('');
+    document.getElementById('sheet-body').innerHTML =
+      '<div class="result-card" style="text-align:center"><div style="font-size:44px">' + (d.score === d.total ? '🏆' : d.score >= d.total / 2 ? '👏' : '💪') + '</div>' +
+      '<div style="font-size:30px;font-weight:800;margin-top:4px">' + d.score + '/' + d.total + '</div>' +
+      '<div style="font-size:14px;color:var(--text3);margin-top:4px">+' + d.xp + ' XP · ' + timeSeconds + 's</div>' +
+      '<div style="font-size:16px;color:var(--text);margin-top:10px;font-weight:600">' + d.message + '</div></div>' +
+      det +
+      '<button class="btn-secondary" onclick="closeSheet()" style="margin-top:14px">Fermer</button>';
+  } catch(e) {
+    document.getElementById('sheet-body').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
+  }
+}
+
+// ─── PRIVACY CLEANUP (Premium) ───
+function privacyPremiumPitch() {
+  return '<div class="result-card"><div style="font-weight:800;font-size:18px;margin-bottom:8px">🛡️ Privacy Cleanup</div>' +
+    '<div style="font-size:15px;color:var(--text2);line-height:1.55">Nos experts recherchent vos données personnelles (nom, email, téléphone, adresse) exposées sur les annuaires en ligne et sites de revente de données, puis demandent leur retrait. Vous recevez un compte-rendu par email.</div></div>' +
+    '<div class="result-card" style="margin-top:12px;background:#F0F4FF;font-size:14px;color:var(--text2);line-height:1.5">Cette fonctionnalité est réservée aux abonnés <strong>Premium</strong>.</div>' +
+    '<button class="btn-primary" style="margin-top:14px" onclick="openPaywall()">Passer en Premium</button>';
+}
+
+function privacyForm(s) {
+  return '<p class="sheet-help">Renseignez les informations que vous souhaitez faire retirer du web. Notre équipe lance le nettoyage et vous tient informé(e) par email.</p>' +
+    '<input id="pc-prenom" class="auth-input" type="text" placeholder="Prénom" value="' + ((s && s.prenom) || '') + '">' +
+    '<input id="pc-nom" class="auth-input" type="text" placeholder="Nom" value="' + ((s && s.nom) || '') + '">' +
+    '<input id="pc-target" class="auth-input" type="email" placeholder="Email à protéger" value="' + ((s && s.email) || '') + '">' +
+    '<input id="pc-phone" class="auth-input" type="tel" placeholder="Téléphone" inputmode="tel" value="' + ((s && s.telephone) || '') + '">' +
+    '<input id="pc-ville" class="auth-input" type="text" placeholder="Ville">' +
+    '<button class="btn-primary" onclick="runPrivacy()" style="margin-top:8px">Lancer le nettoyage</button>' +
+    '<div id="pc-result"></div>';
+}
+
+function openPrivacy() {
+  var s = session.get() || {};
+  if (!s.email) { openSheet('Privacy Cleanup', '<div class="result-card">Connectez-vous d\'abord.</div>'); return; }
+  openSheet('Privacy Cleanup', '<div class="spinner"></div>');
+  fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email))
+    .then(function(r){ return r.json(); }).then(function(d){
+      if (d && d.active) {
+        document.getElementById('sheet-body').innerHTML =
+          '<div class="result-card"><div class="verdict-banner safe"><div class="verdict-title">🛡️ Nettoyage actif</div><div class="verdict-desc">Votre demande est en cours de traitement par notre équipe.</div></div>' +
+          '<p style="font-size:15px;color:var(--text2);line-height:1.5;margin-top:6px">Nous surveillons et demandons le retrait de vos données personnelles. Vous recevrez un compte-rendu par email.</p></div>';
+        return;
+      }
+      document.getElementById('sheet-body').innerHTML = s.subscribed ? privacyForm(s) : privacyPremiumPitch();
+    }).catch(function(){
+      document.getElementById('sheet-body').innerHTML = s.subscribed ? privacyForm(s) : privacyPremiumPitch();
+    });
+}
+
+async function runPrivacy() {
+  var s = session.get() || {};
+  var prenom = document.getElementById('pc-prenom').value.trim();
+  var nom = document.getElementById('pc-nom').value.trim();
+  var target = document.getElementById('pc-target').value.trim().toLowerCase();
+  var phone = document.getElementById('pc-phone').value.trim();
+  var ville = document.getElementById('pc-ville').value.trim();
+  if (!prenom || !nom || !target || !phone || !ville) return toast('Tous les champs sont requis');
+  document.getElementById('pc-result').innerHTML = '<div class="spinner"></div>';
+  try {
+    var r = await fetch('/.netlify/functions/privacy-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_email: s.email, prenom: prenom, nom: nom, target_email: target, phone: phone, ville: ville, activated_at: new Date().toISOString() })
+    });
+    var d = await r.json();
+    if (!r.ok || d.error) { document.getElementById('pc-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (d.error || 'Erreur') + '</div>'; return; }
+    document.getElementById('pc-result').innerHTML =
+      '<div class="result-card"><div class="verdict-banner safe"><div class="verdict-title">✅ Demande envoyée</div><div class="verdict-desc">Notre équipe lance le nettoyage de vos données. Vous recevrez un compte-rendu par email.</div></div></div>';
+  } catch(e) {
+    document.getElementById('pc-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
+  }
+}
+
+// ─── ABONNEMENT / PAIEMENT STRIPE ───
+function openPaywall() {
+  openSheet('Passer en Premium',
+    '<p class="sheet-help">Débloquez l\'accès illimité : analyses sans limite, conseiller IA, quiz, alertes nationales, assistance téléphonique et Privacy Cleanup.</p>' +
+    '<div class="result-card" style="border:2px solid var(--blue);margin-top:0">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Mensuel</div><div style="font-size:13px;color:var(--text3)">Sans engagement</div></div>' +
+      '<div style="font-size:22px;font-weight:800;color:var(--blue)">9,99€<span style="font-size:13px;color:var(--text3)">/mois</span></div></div>' +
+      '<button class="btn-primary" style="margin-top:12px" onclick="startCheckout(\'monthly\')">Choisir le mensuel</button></div>' +
+    '<div class="result-card" style="margin-top:12px;border:2px solid #16A34A;position:relative">' +
+      '<div style="position:absolute;top:-11px;right:14px;background:#16A34A;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px">ÉCONOMIE</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Annuel</div><div style="font-size:13px;color:var(--text3)">Le plus avantageux</div></div>' +
+      '<div style="font-size:22px;font-weight:800;color:#16A34A">89€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
+      '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'annual\')">Choisir l\'annuel</button></div>' +
+    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Paiement sécurisé par Stripe · résiliable à tout moment</div>'
+  );
+}
+
+async function startCheckout(plan) {
+  var s = session.get() || {};
+  if (!s.email) { toast('Connectez-vous d\'abord'); return; }
+  toast('Redirection vers le paiement…');
+  try {
+    var r = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email, name: s.name, plan: plan, source: 'app' })
+    });
+    var d = await r.json();
+    if (d.url) { window.location = d.url; }
+    else { toast(d.error || 'Erreur de paiement'); }
+  } catch(e) { toast('Erreur réseau'); }
 }
 
 // ── QUIZ NATIF ──
 var QUIZ_BANK = [
-  {
-    q: "Vous recevez ce SMS : « Votre colis La Poste est en attente, payez 1,99€ pour la livraison : laposte-livraison-fr.com ». Que faites-vous ?",
+  { q: "Vous recevez ce SMS : « Votre colis La Poste est en attente, payez 1,99€ pour la livraison : laposte-livraison-fr.com ». Que faites-vous ?",
     opts: ["Je clique et je paie pour récupérer mon colis", "Je signale au 33700 et je supprime", "Je rappelle le numéro qui m'a envoyé le SMS"],
-    answer: 1,
-    expl: "C'est une arnaque classique. La Poste utilise toujours laposte.fr, jamais des sous-domaines suspects. Signalez au 33700 (gratuit, anti-spam SMS) puis supprimez."
-  },
-  {
-    q: "Un appel : « Bonjour, je suis votre conseiller bancaire, votre compte a été piraté, donnez-moi le code reçu par SMS pour bloquer la fraude. »",
+    answer: 1, expl: "C'est une arnaque classique. La Poste utilise toujours laposte.fr, jamais des sous-domaines suspects. Signalez au 33700 (gratuit, anti-spam SMS) puis supprimez." },
+  { q: "Un appel : « Bonjour, je suis votre conseiller bancaire, votre compte a été piraté, donnez-moi le code reçu par SMS pour bloquer la fraude. »",
     opts: ["Je donne le code, c'est urgent", "Je raccroche et j'appelle ma banque sur le numéro au dos de ma carte", "Je demande son nom et son matricule"],
-    answer: 1,
-    expl: "Aucune banque ne demande jamais votre code SMS au téléphone. C'est ce code qui valide les paiements. Raccrochez et rappelez vous-même le numéro officiel au dos de votre carte."
-  },
-  {
-    q: "Combien de caractères minimum pour un mot de passe robuste en 2026 ?",
+    answer: 1, expl: "Aucune banque ne demande jamais votre code SMS au téléphone. C'est ce code qui valide les paiements. Raccrochez et rappelez vous-même le numéro officiel au dos de votre carte." },
+  { q: "Combien de caractères minimum pour un mot de passe robuste en 2026 ?",
     opts: ["6 caractères", "8 caractères", "12 caractères ou plus"],
-    answer: 2,
-    expl: "Les recommandations actuelles de l'ANSSI sont 12 caractères minimum, mélangeant majuscules, minuscules, chiffres et symboles. Un mot de passe de 8 caractères se casse en quelques heures."
-  },
-  {
-    q: "Vous recevez un email d'« Ameli » qui vous demande de cliquer sur un lien pour mettre à jour vos coordonnées bancaires. Que faites-vous ?",
+    answer: 2, expl: "Les recommandations actuelles de l'ANSSI sont 12 caractères minimum, mélangeant majuscules, minuscules, chiffres et symboles. Un mot de passe de 8 caractères se casse en quelques heures." },
+  { q: "Vous recevez un email d'« Ameli » qui vous demande de cliquer sur un lien pour mettre à jour vos coordonnées bancaires. Que faites-vous ?",
     opts: ["Je clique et je remplis le formulaire", "J'ignore et je vais directement sur ameli.fr en tapant l'adresse moi-même", "Je transfère l'email à Ameli pour confirmer"],
-    answer: 1,
-    expl: "Ameli ne demande JAMAIS vos coordonnées bancaires par email avec un lien. En cas de doute, tapez vous-même ameli.fr dans votre navigateur — jamais via un lien reçu."
-  },
-  {
-    q: "À quoi sert la double authentification (2FA) ?",
+    answer: 1, expl: "Ameli ne demande JAMAIS vos coordonnées bancaires par email avec un lien. En cas de doute, tapez vous-même ameli.fr dans votre navigateur — jamais via un lien reçu." },
+  { q: "À quoi sert la double authentification (2FA) ?",
     opts: ["À se connecter plus vite", "À ajouter une deuxième sécurité en plus du mot de passe", "À récupérer un mot de passe perdu"],
-    answer: 1,
-    expl: "La double authentification (ou 2FA) exige un code reçu par SMS ou via une appli en plus du mot de passe. Même si quelqu'un vole votre mot de passe, il ne peut pas se connecter."
-  },
-  {
-    q: "Un site marchand inconnu propose un iPhone à -70 %. Quel est le bon réflexe ?",
+    answer: 1, expl: "La double authentification (ou 2FA) exige un code reçu par SMS ou via une appli en plus du mot de passe. Même si quelqu'un vole votre mot de passe, il ne peut pas se connecter." },
+  { q: "Un site marchand inconnu propose un iPhone à -70 %. Quel est le bon réflexe ?",
     opts: ["J'achète vite avant que ça parte", "Je vérifie l'ancienneté du site et les avis avant tout", "Je commande, si c'est une arnaque je porterai plainte"],
-    answer: 1,
-    expl: "Les promotions trop belles pour être vraies sont presque toujours des arnaques. Vérifiez l'ancienneté du domaine (sur despy.fr → vérificateur de site) et les avis avant de payer."
-  },
-  {
-    q: "Vous installez une nouvelle application sur votre téléphone. Elle vous demande l'accès à vos contacts, photos, micro, position. Que faites-vous ?",
+    answer: 1, expl: "Les promotions trop belles pour être vraies sont presque toujours des arnaques. Vérifiez l'ancienneté du domaine (sur despy.fr → vérificateur de site) et les avis avant de payer." },
+  { q: "Vous installez une nouvelle application sur votre téléphone. Elle vous demande l'accès à vos contacts, photos, micro, position. Que faites-vous ?",
     opts: ["J'accepte tout pour que l'app fonctionne", "Je refuse les permissions inutiles (par exemple, pas besoin du micro pour une calculatrice)", "Je désinstalle l'app"],
-    answer: 1,
-    expl: "Accordez uniquement les permissions cohérentes avec l'usage de l'app. Une calculatrice n'a aucune raison d'accéder à vos contacts. iOS et Android permettent de refuser certaines permissions."
-  },
-  {
-    q: "Vous voyez sur Facebook une publicité « Voyance gratuite, juste votre date de naissance et numéro de carte pour vérifier votre âge ». Vrai ou arnaque ?",
+    answer: 1, expl: "Accordez uniquement les permissions cohérentes avec l'usage de l'app. Une calculatrice n'a aucune raison d'accéder à vos contacts. iOS et Android permettent de refuser certaines permissions." },
+  { q: "Vous voyez sur Facebook une publicité « Voyance gratuite, juste votre date de naissance et numéro de carte pour vérifier votre âge ». Vrai ou arnaque ?",
     opts: ["Vrai, c'est juste pour vérifier mon âge", "Arnaque évidente, on ne donne jamais sa CB pour ça", "Vrai si la pub a beaucoup de likes"],
-    answer: 1,
-    expl: "Une vérification d'âge ne nécessite JAMAIS de carte bancaire. Aucun service légitime ne fonctionne ainsi. C'est de l'hameçonnage."
-  },
-  {
-    q: "Votre petit-fils vous envoie un message WhatsApp : « Mamie, c'est mon nouveau numéro. Tu peux m'envoyer 300€ en urgence, je t'expliquerai. »",
+    answer: 1, expl: "Une vérification d'âge ne nécessite JAMAIS de carte bancaire. Aucun service légitime ne fonctionne ainsi. C'est de l'hameçonnage." },
+  { q: "Votre petit-fils vous envoie un message WhatsApp : « Mamie, c'est mon nouveau numéro. Tu peux m'envoyer 300€ en urgence, je t'expliquerai. »",
     opts: ["Je transfère l'argent tout de suite", "J'appelle son ancien numéro pour vérifier que c'est bien lui", "Je demande un selfie pour confirmer"],
-    answer: 1,
-    expl: "Arnaque « SMS au proche » très courante en 2026. Appelez TOUJOURS le proche sur son numéro habituel avant d'envoyer de l'argent. Un selfie peut être falsifié par IA."
-  },
-  {
-    q: "Comment savoir si un site est sécurisé pour acheter en ligne ?",
+    answer: 1, expl: "Arnaque « SMS au proche » très courante en 2026. Appelez TOUJOURS le proche sur son numéro habituel avant d'envoyer de l'argent. Un selfie peut être falsifié par IA." },
+  { q: "Comment savoir si un site est sécurisé pour acheter en ligne ?",
     opts: ["Si le site est joli", "Si l'URL commence par https:// avec un cadenas", "Si je peux payer en plusieurs fois"],
-    answer: 1,
-    expl: "Le https:// + cadenas garantit que la connexion est chiffrée (vos données sont protégées). MAIS attention : ça ne garantit pas que le site est honnête. Vérifiez aussi l'ancienneté et les avis."
-  },
-  {
-    q: "Vous recevez un email parfaitement rédigé, sans aucune faute, qui semble venir de votre banque. L'absence de fautes prouve-t-elle que c'est fiable ?",
+    answer: 1, expl: "Le https:// + cadenas garantit que la connexion est chiffrée (vos données sont protégées). MAIS attention : ça ne garantit pas que le site est honnête. Vérifiez aussi l'ancienneté et les avis." },
+  { q: "Vous recevez un email parfaitement rédigé, sans aucune faute, qui semble venir de votre banque. L'absence de fautes prouve-t-elle que c'est fiable ?",
     opts: ["Oui, un escroc ferait toujours des fautes", "Non : aujourd'hui l'IA écrit des messages parfaits, c'est le contenu qui compte", "Oui, si le logo est présent"],
-    answer: 1,
-    expl: "L'IA permet aux escrocs d'écrire des messages parfaits, sans la moindre faute. Le vieux réflexe « il y a des fautes donc c'est faux » ne marche plus. Jugez le contenu (on vous demande des infos sensibles ? on vous presse ?) et vérifiez l'adresse exacte de l'expéditeur."
-  },
-  {
-    q: "Au téléphone, vous reconnaissez parfaitement la voix de votre fils qui réclame de l'argent en urgence. Pouvez-vous vous y fier ?",
+    answer: 1, expl: "L'IA permet aux escrocs d'écrire des messages parfaits, sans la moindre faute. Le vieux réflexe « il y a des fautes donc c'est faux » ne marche plus. Jugez le contenu (on vous demande des infos sensibles ? on vous presse ?) et vérifiez l'adresse exacte de l'expéditeur." },
+  { q: "Au téléphone, vous reconnaissez parfaitement la voix de votre fils qui réclame de l'argent en urgence. Pouvez-vous vous y fier ?",
     opts: ["Oui, on ne peut pas imiter une voix", "Non : l'IA clone une voix en quelques secondes — je rappelle sur son vrai numéro", "Oui, si le numéro ressemble au sien"],
-    answer: 1,
-    expl: "L'IA peut cloner une voix à partir de quelques secondes de vidéo trouvée en ligne. La voix n'est plus une preuve. Raccrochez et rappelez la personne sur son numéro habituel. Astuce : convenez en famille d'un mot de passe secret à demander en cas de doute."
-  }
+    answer: 1, expl: "L'IA peut cloner une voix à partir de quelques secondes de vidéo trouvée en ligne. La voix n'est plus une preuve. Raccrochez et rappelez la personne sur son numéro habituel. Astuce : convenez en famille d'un mot de passe secret à demander en cas de doute." }
 ];
-
-function getQuizQuota() {
-  try {
-    var key = 'despy_app_quiz_quota';
-    var raw = localStorage.getItem(key);
-    var data = raw ? JSON.parse(raw) : { used: 0, month: '' };
-    var now = new Date();
-    var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
-    if (data.month !== currentMonth) {
-      data = { used: 0, month: currentMonth };
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-    return data;
-  } catch(e) { return { used: 0, month: '' }; }
-}
-function incrQuizQuota() {
-  var d = getQuizQuota();
-  d.used++;
-  localStorage.setItem('despy_app_quiz_quota', JSON.stringify(d));
-}
 
 var _quizState = { idx: 0, score: 0, answered: false };
 
 function openQuiz() {
   var s = session.get();
-  if (!s || !s.email) {
-    openSheet('Quiz cybersécurité', '<div class="result-card">Connectez-vous pour accéder au quiz.</div>');
-    return;
-  }
+  if (!s || !s.email) { openSheet('Quiz cybersécurité', '<div class="result-card">Connectez-vous pour accéder au quiz.</div>'); return; }
   var quota = getQuizQuota();
   var isPaid = !!s.subscribed;
   if (!isPaid && quota.used >= 5) {
     openSheet('Quota atteint',
-      '<div class="result-card" style="text-align:center">' +
-        '<div style="font-size:48px;margin-bottom:8px">🔒</div>' +
+      '<div class="result-card" style="text-align:center"><div style="font-size:48px;margin-bottom:8px">🔒</div>' +
         '<div style="font-weight:800;font-size:18px;margin-bottom:8px;color:var(--text)">Quota mensuel atteint</div>' +
-        '<div style="font-size:14px;color:var(--text3);margin-bottom:18px;line-height:1.5">Vous avez utilisé vos 5 questions découverte ce mois. Abonnez-vous pour un accès illimité au quiz, conseiller IA et toutes les fonctionnalités.</div>' +
-        '<a href="/#tarifs" class="btn-primary" style="display:inline-block;text-decoration:none">Voir les forfaits</a>' +
-      '</div>'
-    );
+        '<div style="font-size:15px;color:var(--text3);margin-bottom:18px;line-height:1.5">Vous avez utilisé vos 5 questions découverte ce mois. Abonnez-vous pour un accès illimité au quiz, conseiller IA et toutes les fonctionnalités.</div>' +
+        '<button class="btn-primary" onclick="openPaywall()">Passer en Premium</button></div>');
     return;
   }
-  // Pick random question (or by index)
   _quizState = { idx: Math.floor(Math.random() * QUIZ_BANK.length), score: 0, answered: false };
   renderQuizQuestion();
 }
@@ -1308,18 +1640,16 @@ function renderQuizQuestion() {
   var quota = getQuizQuota();
   var s = session.get() || {};
   var isPaid = !!s.subscribed;
-  var counterHtml = isPaid
-    ? ''
-    : '<div style="background:#FFF7E5;border:1px solid #FFCC00;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400E;font-weight:600">⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci</div>';
+  var counterHtml = isPaid ? '' :
+    '<div style="background:#FFF7E5;border:1px solid #FFCC00;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:#92400E;font-weight:600">⭐ Question découverte ' + (quota.used + 1) + '/5 ce mois-ci</div>';
   var optsHtml = q.opts.map(function(o, i){
-    return '<button class="quiz-opt" data-idx="' + i + '" onclick="answerQuiz(' + i + ')" style="width:100%;padding:14px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;text-align:left;font-size:15px;color:var(--text);line-height:1.4;transition:all .15s;cursor:pointer">' + o + '</button>';
+    return '<button class="quiz-opt" data-idx="' + i + '" onclick="answerQuiz(' + i + ')" style="width:100%;padding:15px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:14px;text-align:left;font-size:16px;color:var(--text);line-height:1.4;transition:all .15s;cursor:pointer">' + o + '</button>';
   }).join('');
   openSheet('Quiz cybersécurité',
     counterHtml +
-    '<div style="font-size:17px;font-weight:600;line-height:1.5;margin-bottom:18px;color:var(--text)">' + q.q + '</div>' +
+    '<div style="font-size:18px;font-weight:600;line-height:1.5;margin-bottom:18px;color:var(--text)">' + q.q + '</div>' +
     '<div id="quiz-opts">' + optsHtml + '</div>' +
-    '<div id="quiz-expl"></div>'
-  );
+    '<div id="quiz-expl"></div>');
 }
 
 function answerQuiz(idx) {
@@ -1329,29 +1659,22 @@ function answerQuiz(idx) {
   var correct = idx === q.answer;
   if (correct) _quizState.score++;
   if (!session.get().subscribed) incrQuizQuota();
-
-  // Highlight all options
   var opts = document.querySelectorAll('.quiz-opt');
   opts.forEach(function(b, i){
-    b.disabled = true;
-    b.style.cursor = 'default';
+    b.disabled = true; b.style.cursor = 'default';
     if (i === q.answer) { b.style.background = '#DEF7EC'; b.style.borderColor = '#34C759'; b.style.color = '#03543F'; }
     else if (i === idx) { b.style.background = '#FEE2E2'; b.style.borderColor = '#FF3B30'; b.style.color = '#991B1B'; }
     else { b.style.opacity = '.5'; }
   });
-
-  // Show explanation
   var verdict = correct ? '✅ Bonne réponse !' : '❌ Mauvaise réponse';
   var verdictColor = correct ? '#03543F' : '#991B1B';
   var verdictBg = correct ? '#DEF7EC' : '#FEE2E2';
   document.getElementById('quiz-expl').innerHTML =
-    '<div style="background:' + verdictBg + ';border-radius:12px;padding:14px;margin-top:18px">' +
-      '<div style="font-weight:700;font-size:15px;color:' + verdictColor + ';margin-bottom:6px">' + verdict + '</div>' +
-      '<div style="font-size:14px;color:' + verdictColor + ';line-height:1.5">' + q.expl + '</div>' +
-    '</div>' +
+    '<div style="background:' + verdictBg + ';border-radius:14px;padding:14px;margin-top:18px">' +
+      '<div style="font-weight:800;font-size:15px;color:' + verdictColor + ';margin-bottom:6px">' + verdict + '</div>' +
+      '<div style="font-size:14px;color:' + verdictColor + ';line-height:1.5">' + q.expl + '</div></div>' +
     '<button class="btn-primary" onclick="nextQuizQuestion()" style="margin-top:14px">Question suivante →</button>' +
     '<button class="btn-secondary" onclick="closeSheet()" style="margin-top:8px">Fermer</button>';
-
   if (navigator.vibrate) navigator.vibrate(correct ? [10, 50, 10] : [50]);
 }
 
@@ -1359,11 +1682,7 @@ function nextQuizQuestion() {
   var s = session.get() || {};
   var isPaid = !!s.subscribed;
   var quota = getQuizQuota();
-  if (!isPaid && quota.used >= 5) {
-    openQuiz(); // déclenchera le paywall
-    return;
-  }
-  // Pick a different random question
+  if (!isPaid && quota.used >= 5) { openQuiz(); return; }
   var newIdx;
   do { newIdx = Math.floor(Math.random() * QUIZ_BANK.length); } while (newIdx === _quizState.idx && QUIZ_BANK.length > 1);
   _quizState = { idx: newIdx, score: _quizState.score, answered: false };
@@ -1373,42 +1692,49 @@ function nextQuizQuestion() {
 function openBilan() {
   openSheet('Bilan mensuel',
     '<p class="sheet-help">Statistiques personnalisées de votre protection chaque mois.</p>' +
-    '<div class="result-card" style="text-align:center">' +
-      '<div style="font-size:36px;margin-bottom:6px">📊</div>' +
-      '<div style="font-weight:700;font-size:16px;margin-bottom:6px">Bilan envoyé par email</div>' +
-      '<div style="font-size:14px;color:var(--text3);line-height:1.5">Votre bilan mensuel personnalisé arrive directement dans votre boîte email le 1er de chaque mois. Vérifiez vos spams si vous ne le voyez pas.</div>' +
-    '</div>'
-  );
+    '<div class="result-card" style="text-align:center"><div style="font-size:36px;margin-bottom:6px">📊</div>' +
+      '<div style="font-weight:800;font-size:17px;margin-bottom:6px">Bilan envoyé par email</div>' +
+      '<div style="font-size:15px;color:var(--text3);line-height:1.5">Votre bilan mensuel personnalisé arrive directement dans votre boîte email le 1er de chaque mois. Vérifiez vos spams si vous ne le voyez pas.</div></div>');
 }
 
-// ─── PWA install (depuis /app) ───
+function getQuizQuota() {
+  try {
+    var key = 'despy_app_quiz_quota';
+    var raw = localStorage.getItem(key);
+    var data = raw ? JSON.parse(raw) : { used: 0, month: '' };
+    var now = new Date();
+    var currentMonth = now.getFullYear() + '-' + (now.getMonth() + 1);
+    if (data.month !== currentMonth) { data = { used: 0, month: currentMonth }; localStorage.setItem(key, JSON.stringify(data)); }
+    return data;
+  } catch(e) { return { used: 0, month: '' }; }
+}
+function incrQuizQuota() {
+  var d = getQuizQuota(); d.used++;
+  localStorage.setItem('despy_app_quiz_quota', JSON.stringify(d));
+}
+
+// ─── PWA install ───
 var _pwaPromptApp = null;
 window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); _pwaPromptApp = e; });
 
 function isStandaloneApp() {
-  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-      || window.navigator.standalone === true;
+  return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
 }
-
 function showInstallBanner() {
-  if (isStandaloneApp()) return; // déjà installée
+  if (isStandaloneApp()) return;
   try { if (localStorage.getItem('despy_install_dismissed') === '1') return; } catch(e){}
   var banner = document.getElementById('install-banner');
   if (banner) banner.style.display = 'flex';
 }
-
 function showInstallInstructions() {
   var ua = (navigator.userAgent || '').toLowerCase();
   var isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var isAndroid = /android/.test(ua);
-
-  // Android avec prompt natif
   if (_pwaPromptApp) {
     _pwaPromptApp.prompt();
     _pwaPromptApp.userChoice.then(function(c){ _pwaPromptApp = null; if (c.outcome === 'accepted') document.getElementById('install-banner').style.display = 'none'; });
     return;
   }
-
   var content;
   if (isIOS) {
     content =
@@ -1435,25 +1761,15 @@ document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
-
-  // Banner d'install (visible si pas installé et pas masqué)
   setTimeout(showInstallBanner, 1500);
-
-  // Enregistre le service worker pour PWA + push
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(e){ console.warn('SW register failed:', e.message); });
   }
-
-  // Détecte les raccourcis PWA (?tool=analyseur, etc.)
   try {
     var params = new URLSearchParams(window.location.search);
     var tool = params.get('tool');
-    if (tool && s && s.email) {
-      setTimeout(function(){ openTool(tool); }, 300);
-    }
+    if (tool && s && s.email) { setTimeout(function(){ openTool(tool); }, 300); }
   } catch(e){}
-
-  // Swipe-to-close pour les sheets
   var startY = 0;
   var sheet = document.getElementById('sheet');
   sheet.addEventListener('touchstart', function(e){ startY = e.touches[0].clientY; }, { passive: true });
