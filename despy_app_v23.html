@@ -1550,18 +1550,20 @@ async function runPrivacy() {
 }
 
 // ─── DIAGNOSTIC TÉLÉPHONE ───
-// 10 questions, score de risque calculé localement (aucune donnée envoyée).
+// Questionnaire catégorisé, score + profil calculés localement (aucune donnée envoyée).
+// cat : 'controle' (vol argent/données) · 'pollution' (apps indésirables/pub) · 'perf' (symptôme)
 var DIAG_Q = [
-  { q: "Avez-vous installé une application après qu'on vous l'ait demandé par téléphone, SMS ou email ?", hint: "Les faux conseillers font souvent installer une app pour prendre le contrôle.", w: 25 },
-  { q: "Une personne a-t-elle déjà pu voir ou piloter votre écran à distance ?", hint: "AnyDesk, TeamViewer… détournés par les arnaqueurs.", w: 25 },
-  { q: "Avez-vous donné un code reçu par SMS à quelqu'un au téléphone ?", hint: "Aucun organisme sérieux ne demande votre code par téléphone.", w: 22 },
-  { q: "Voyez-vous des prélèvements ou abonnements que vous ne reconnaissez pas ?", hint: "Sur votre compte bancaire ou dans le store.", w: 20 },
-  { q: "Des applications inconnues sont-elles apparues sans que vous les installiez ?", w: 15 },
-  { q: "Avez-vous installé une application en dehors de l'App Store / Google Play (lien, fichier reçu) ?", w: 15 },
-  { q: "Une application a-t-elle l'autorisation de lire vos SMS ou « l'accessibilité » sans raison claire ?", hint: "Réglage très sensible, à vérifier.", w: 14 },
-  { q: "Recevez-vous des fenêtres « Virus détecté », « Batterie endommagée » ou alertes alarmantes ?", w: 8 },
-  { q: "Votre téléphone affiche-t-il des publicités même quand vous n'utilisez aucune application ?", w: 8 },
-  { q: "Votre téléphone est-il anormalement lent, chaud, ou la batterie se vide-t-elle très vite ?", hint: "Peut aussi venir d'un appareil ancien.", w: 6 }
+  { q: "Avez-vous installé une application après qu'on vous l'ait demandé par téléphone, SMS ou email ?", hint: "Les faux conseillers font souvent installer une app pour prendre le contrôle.", w: 25, cat: 'controle' },
+  { q: "Une personne a-t-elle déjà pu voir ou piloter votre écran à distance ?", hint: "AnyDesk, TeamViewer… détournés par les arnaqueurs.", w: 25, cat: 'controle' },
+  { q: "Avez-vous donné un code reçu par SMS à quelqu'un au téléphone ?", hint: "Aucun organisme sérieux ne demande votre code par téléphone.", w: 22, cat: 'controle' },
+  { q: "Voyez-vous des prélèvements ou abonnements que vous ne reconnaissez pas ?", hint: "Sur votre compte bancaire ou dans le store.", w: 20, cat: 'controle' },
+  { q: "Une application a-t-elle l'autorisation de lire vos SMS ou « l'accessibilité » sans raison claire ?", hint: "Réglage très sensible, à vérifier.", w: 14, cat: 'controle' },
+  { q: "Voyez-vous des publicités sur votre écran d'accueil, ou quand vous appuyez sur une icône ?", hint: "Signe d'une appli qui s'affiche « par-dessus les autres » — typique des téléphones pollués.", w: 14, cat: 'pollution' },
+  { q: "Avez-vous plusieurs applications « nettoyeur », « antivirus », « booster » ou « accélérateur » ?", hint: "Ces apps causent souvent le problème au lieu de le régler.", w: 12, cat: 'pollution' },
+  { q: "Des applications inconnues sont-elles apparues sans que vous les installiez ?", w: 12, cat: 'pollution' },
+  { q: "Avez-vous installé une application en dehors de l'App Store / Google Play (lien, fichier reçu) ?", w: 12, cat: 'pollution' },
+  { q: "Recevez-vous des fenêtres « Virus détecté », « Batterie endommagée » ou alertes alarmantes ?", w: 8, cat: 'pollution' },
+  { q: "Votre téléphone est-il anormalement lent, chaud, ou la batterie se vide-t-elle très vite ?", hint: "Peut aussi venir d'un appareil ancien.", w: 6, cat: 'perf' }
 ];
 var DIAG_MAX = DIAG_Q.reduce(function(a, x){ return a + x.w; }, 0);
 var _diag = null;
@@ -1570,7 +1572,7 @@ function openDiag() {
   openSheet('Diagnostic du téléphone',
     '<div class="result-card" style="text-align:center"><div style="font-size:44px">📱</div>' +
     '<div style="font-weight:800;font-size:19px;margin-top:6px">Votre téléphone est-il sain ?</div>' +
-    '<div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.55">10 questions simples pour repérer une prise de contrôle, une application piégée ou une arnaque en cours. Vous obtenez un score de risque et un guide de nettoyage.</div>' +
+    '<div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.55">' + DIAG_Q.length + ' questions simples pour repérer une prise de contrôle, des applications indésirables ou une arnaque en cours. Vous obtenez un diagnostic clair et un guide de nettoyage adapté.</div>' +
     '<div style="font-size:12px;color:var(--text3);margin-top:10px">🔒 Tout est calculé sur votre téléphone, aucune donnée envoyée.</div>' +
     '<button class="btn-primary" onclick="startDiag()" style="margin-top:16px">Commencer le diagnostic</button></div>');
 }
@@ -1604,36 +1606,69 @@ function answerDiag(val) {
 
 function finishDiag() {
   var pts = 0, flags = [];
+  var sub = { controle: 0, pollution: 0, perf: 0 };
+  var subMax = { controle: 0, pollution: 0, perf: 0 };
+  DIAG_Q.forEach(function(it){ subMax[it.cat] += it.w; });
   _diag.answers.forEach(function(a, i){
-    if (a === 'oui') { pts += DIAG_Q[i].w; flags.push({ q: DIAG_Q[i].q, sure: true }); }
-    else if (a === 'idk') { pts += DIAG_Q[i].w * 0.5; flags.push({ q: DIAG_Q[i].q, sure: false }); }
+    var it = DIAG_Q[i];
+    if (a === 'oui') { pts += it.w; sub[it.cat] += it.w; flags.push({ q: it.q, cat: it.cat, sure: true }); }
+    else if (a === 'idk') { pts += it.w * 0.5; sub[it.cat] += it.w * 0.5; flags.push({ q: it.q, cat: it.cat, sure: false }); }
   });
   var risk = Math.min(100, Math.round((pts / DIAG_MAX) * 100));
-  var level, cls, emoji, title, desc;
-  if (risk <= 15) { level = 'faible'; cls = 'safe'; emoji = '✅'; title = 'Risque faible'; desc = "Aucun signe d'infection ou de prise de contrôle évident. Continuez vos bons réflexes."; }
-  else if (risk <= 45) { level = 'modéré'; cls = 'doubt'; emoji = '⚠️'; title = 'Risque modéré'; desc = "Quelques signaux à surveiller. Suivez le guide de nettoyage par précaution."; }
-  else { level = 'élevé'; cls = 'scam'; emoji = '🚨'; title = 'Risque élevé'; desc = "Plusieurs signes inquiétants. Agissez maintenant : suivez le guide et, en cas de doute sur votre argent, contactez votre banque."; }
 
+  // Profil dominant — le contrôle prime (danger argent/données), puis pollution, puis perf.
+  var profile;
+  if (sub.controle > 0) profile = 'controle';
+  else if (sub.pollution > 0 && sub.pollution >= sub.perf) profile = 'pollution';
+  else if (sub.perf > 0) profile = 'perf';
+  else profile = 'sain';
+
+  var P = {
+    controle: { cls: 'scam', emoji: '🚨', ring: '#FF3B30', title: 'Risque pour votre argent ou vos données',
+      desc: "Un ou plusieurs signes de prise de contrôle sont présents. Agissez maintenant : suivez le guide, et si vous avez un doute sur votre argent, appelez votre banque." },
+    pollution: { cls: 'doubt', emoji: '🧹', ring: '#F59E0B', title: 'Applications indésirables',
+      desc: "Bonne nouvelle : aucun signe de vol d'argent. En revanche, votre téléphone semble pollué par des applications qui affichent des pubs et le ralentissent. Ça se nettoie — sans installer quoi que ce soit de plus." },
+    perf: { cls: 'doubt', emoji: '🐌', ring: '#F59E0B', title: 'Téléphone fatigué',
+      desc: "Aucun signe d'arnaque ni d'application indésirable. Votre téléphone montre surtout des signes de fatigue. Quelques gestes simples peuvent l'aider." },
+    sain: { cls: 'safe', emoji: '✅', ring: '#16A34A', title: 'Téléphone sain',
+      desc: "Aucun signe de prise de contrôle ni d'application indésirable. Continuez vos bons réflexes." }
+  }[profile];
+
+  var catLabel = { controle: 'Sécurité', pollution: 'Pollution', perf: 'Performance' };
   var flagsHtml = flags.length
     ? '<div class="section-label" style="padding:14px 0 8px">Points d\'attention</div>' +
       flags.map(function(f){
-        return '<div class="result-card" style="margin-top:8px;border-left:4px solid ' + (f.sure ? '#FF3B30' : '#F59E0B') + '">' +
-          '<div style="font-size:14px;color:var(--text);line-height:1.45">' + (f.sure ? '🔴 ' : '🟠 ') + f.q + '</div></div>';
+        var col = f.cat === 'controle' ? '#FF3B30' : f.cat === 'pollution' ? '#F59E0B' : '#8A91A6';
+        return '<div class="result-card" style="margin-top:8px;border-left:4px solid ' + col + '">' +
+          '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><div style="font-size:14px;color:var(--text);line-height:1.45">' + (f.sure ? '🔴 ' : '🟠 ') + f.q + '</div>' +
+          '<div style="font-size:10px;font-weight:700;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.3px">' + catLabel[f.cat] + '</div></div></div>';
       }).join('')
     : '<div class="result-card" style="margin-top:10px;background:#F0FDF4;color:#03543F;font-size:14px;line-height:1.5">Aucun point d\'attention relevé. 👍</div>';
 
+  // Actions adaptées au profil détecté.
+  var actions = '';
+  if (profile === 'controle') {
+    actions += '<button class="btn-primary" onclick="openSOS()" style="margin-bottom:10px">🚨 J\'ai été arnaqué(e) — plan d\'urgence</button>';
+  } else if (profile === 'pollution') {
+    actions += '<button class="btn-primary" onclick="diagGuide(\'adware\')" style="margin-bottom:10px;background:#0EA5A4">🧹 Stopper les pubs intempestives</button>';
+  }
+  actions +=
+    '<button class="btn-secondary" onclick="diagApps()" style="margin-bottom:10px">📋 Applications à surveiller</button>' +
+    '<button class="btn-secondary" onclick="diagGuide(\'android\')" style="margin-bottom:10px">🤖 Guide de nettoyage Android</button>' +
+    '<button class="btn-secondary" onclick="diagGuide(\'ios\')" style="margin-bottom:10px"> Guide de nettoyage iPhone (iOS)</button>';
+  if (profile !== 'sain') {
+    actions += '<button class="btn-primary" onclick="window.location=\'tel:+33689148395\'" style="margin-top:4px;background:var(--navy)">📞 Me faire aider par Despy</button>';
+  }
+  actions += '<button class="btn-secondary" onclick="startDiag()" style="margin-top:10px">Refaire le diagnostic</button>';
+
   document.getElementById('sheet-body').innerHTML =
-    '<div class="result-card" style="text-align:center"><div style="margin:4px auto 0">' + scoreRing(100 - risk, cls === 'safe' ? '#16A34A' : cls === 'doubt' ? '#F59E0B' : '#FF3B30') + '</div>' +
-    '<div style="font-size:13px;color:var(--text3);margin-top:-6px">Niveau de risque : <strong>' + level + '</strong> (' + risk + '/100)</div></div>' +
-    '<div class="result-card" style="margin-top:12px"><div class="verdict-banner ' + cls + '"><div class="verdict-title">' + emoji + ' ' + title + '</div><div class="verdict-desc">' + desc + '</div></div></div>' +
+    '<div class="result-card" style="text-align:center"><div style="margin:4px auto 0">' + scoreRing(100 - risk, P.ring) + '</div>' +
+    '<div style="font-size:13px;color:var(--text3);margin-top:-6px">Niveau de risque global : <strong>' + risk + '/100</strong></div></div>' +
+    '<div class="result-card" style="margin-top:12px"><div class="verdict-banner ' + P.cls + '"><div class="verdict-title">' + P.emoji + ' ' + P.title + '</div><div class="verdict-desc">' + P.desc + '</div></div></div>' +
     flagsHtml +
     '<div class="section-label" style="padding:16px 0 8px">Et maintenant ?</div>' +
-    '<button class="btn-secondary" onclick="diagApps()" style="margin-bottom:10px">📋 Applications à surveiller</button>' +
-    '<button class="btn-secondary" onclick="diagGuide(\'ios\')" style="margin-bottom:10px"> Guide de nettoyage iPhone (iOS)</button>' +
-    '<button class="btn-secondary" onclick="diagGuide(\'android\')" style="margin-bottom:10px">🤖 Guide de nettoyage Android</button>' +
-    (risk > 45 ? '<button class="btn-primary" onclick="openSOS()" style="margin-top:6px">J\'ai été arnaqué(e) — plan d\'urgence</button>' : '') +
-    '<button class="btn-secondary" onclick="startDiag()" style="margin-top:10px">Refaire le diagnostic</button>';
-  if (navigator.vibrate) navigator.vibrate(risk > 45 ? [20, 60, 20] : 12);
+    actions;
+  if (navigator.vibrate) navigator.vibrate(profile === 'controle' ? [20, 60, 20] : 12);
 }
 
 function diagBackBtn() {
@@ -1646,50 +1681,70 @@ function diagApps() {
     { n: 'TeamViewer / QuickSupport', t: 'Contrôle à distance', d: "Permet de piloter votre écran à distance. À supprimer si vous ne l'utilisez pas vous-même avec un proche de confiance.", danger: true },
     { n: 'RustDesk, AweSun, RemotePC', t: 'Contrôle à distance', d: "Mêmes risques : un inconnu peut voir tout ce que vous tapez, y compris vos mots de passe.", danger: true },
     { n: 'Fausses apps bancaires', t: 'Hameçonnage', d: "Copies de l'app de votre banque, installées via un lien. Téléchargez toujours depuis l'App Store / Google Play officiels.", danger: true },
-    { n: 'Faux antivirus / « nettoyeurs »', t: 'Arnaque', d: "« Votre téléphone est infecté, installez ceci. » Ces apps ne nettoient rien et affichent des pubs ou volent des données.", danger: false },
+    { n: 'Faux antivirus, « nettoyeurs », « boosters »', t: 'Pollution', d: "Cleaner, Booster, Speed, Battery Saver, Phone Master… Ces apps ne nettoient rien : elles affichent des pubs en continu, ralentissent le téléphone et se réinstallent les unes les autres.", danger: false },
+    { n: 'Apps qui s\'affichent « par-dessus les autres »', t: 'Pollution', d: "Ce sont elles qui font apparaître des pubs sur l'écran d'accueil ou au lancement d'une icône. À repérer dans Paramètres › Accès spécial (voir le guide Android).", danger: false },
     { n: 'Apps installées hors store (.apk)', t: 'Sources inconnues', d: "Les fichiers reçus par SMS ou email peuvent contenir des virus (FluBot, Cerberus…). N'installez jamais hors store officiel.", danger: true }
   ];
   document.getElementById('sheet-body').innerHTML =
-    '<p class="sheet-help">Ces applications sont souvent utilisées dans les arnaques visant les seniors. Certaines sont des outils légitimes <strong>détournés</strong> — le danger vient de l\'usage qu\'un inconnu en fait.</p>' +
+    '<div class="result-card" style="background:#FEF2F2;border-left:4px solid #FF3B30"><div style="font-weight:800;color:#991B1B;font-size:15px">⚠️ Le piège le plus courant</div>' +
+    '<div style="font-size:14px;color:var(--text2);line-height:1.55;margin-top:6px">La solution n\'est <strong>jamais</strong> d\'installer un nouveau « nettoyeur » ou « antivirus ». Ce sont précisément ces applications qui créent les pubs et ralentissent le téléphone.</div></div>' +
+    '<p class="sheet-help" style="margin-top:12px">Certaines apps ci-dessous sont des outils légitimes <strong>détournés</strong> ; d\'autres sont des nuisances installées à votre insu.</p>' +
     apps.map(function(a){
       return '<div class="result-card" style="margin-top:10px;border-left:4px solid ' + (a.danger ? '#FF3B30' : '#F59E0B') + '">' +
         '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-weight:800;font-size:16px;color:var(--text)">' + a.n + '</div>' +
         '<div style="font-size:11px;font-weight:700;color:' + (a.danger ? '#991B1B' : '#92400E') + ';background:' + (a.danger ? '#FEE2E2' : '#FEF3C7') + ';padding:2px 8px;border-radius:8px;white-space:nowrap">' + a.t + '</div></div>' +
         '<div style="font-size:14px;color:var(--text2);line-height:1.5;margin-top:6px">' + a.d + '</div></div>';
     }).join('') +
-    '<div class="result-card" style="margin-top:12px;background:#F0F4FF;font-size:13px;color:var(--text2);line-height:1.55">⚠️ Cette liste n\'est pas exhaustive. En cas de doute sur une application installée, supprimez-la : si elle est légitime, vous pourrez toujours la réinstaller.</div>' +
+    '<div class="result-card" style="margin-top:12px;background:#F0F4FF;font-size:13px;color:var(--text2);line-height:1.55">ℹ️ Cette liste n\'est pas exhaustive. En cas de doute sur une application installée, supprimez-la : si elle est légitime, vous pourrez toujours la réinstaller.</div>' +
     diagBackBtn();
 }
 
 function diagGuide(os) {
-  var steps, titre, ic;
+  var steps, titre, ic, intro = '', warn = '';
   if (os === 'ios') {
     titre = 'Nettoyer un iPhone (iOS)'; ic = '';
     steps = [
       "Réglages › Général › <strong>VPN et gestion de l'appareil</strong> : supprimez tout « profil de configuration » que vous ne reconnaissez pas.",
       "Repérez les applications inconnues : appui long sur l'icône › <strong>Supprimer l'app</strong>. Désinstallez en priorité les outils de contrôle à distance.",
-      "Réglages › <strong>Safari</strong> › Effacer historique, données de sites.",
+      "Réglages › <strong>Safari</strong> › Effacer historique, données de sites (stoppe les pop-ups et redirections).",
+      "Calendrier envahi de pubs ? Ouvrez l'app Calendrier › appuyez sur le <strong>calendrier indésirable</strong> › Supprimer l'abonnement.",
       "Vérifiez vos abonnements : Réglages › <strong>[votre nom]</strong> › Abonnements. Annulez ceux que vous ne connaissez pas.",
       "Mettez à jour : Réglages › Général › <strong>Mise à jour logicielle</strong>.",
       "Changez votre mot de passe iCloud et activez la <strong>double authentification</strong>.",
       "En dernier recours : Réglages › Général › Transférer ou <strong>réinitialiser l'iPhone</strong> (sauvegardez vos photos avant)."
     ];
+  } else if (os === 'adware') {
+    titre = 'Stopper les pubs intempestives'; ic = '🧹';
+    intro = "Des pubs apparaissent sur l'écran d'accueil ou en ouvrant une appli ? C'est presque toujours une application installée qui en est la cause. Voici comment la trouver et la supprimer (Android).";
+    warn = "N'installez surtout PAS un nouveau « nettoyeur » ou « antivirus » pour régler ça : ce sont justement ces apps qui créent les pubs.";
+    steps = [
+      "Redémarrez en <strong>mode sans échec</strong> : appui long sur « Éteindre » › maintenez « Mode sans échec » › OK. Si les pubs <strong>disparaissent</strong>, c'est bien une appli installée qui les provoque.",
+      "Paramètres › Applications › (menu ⋮) › <strong>Accès spécial</strong> › <strong>« Affichage par-dessus les autres applications »</strong> : désactivez ce droit pour toute appli que vous ne reconnaissez pas. C'est de là que viennent les pubs en plein écran.",
+      "Désinstallez en priorité tout ce qui s'appelle <strong>« Cleaner », « Booster », « Speed », « Battery », « Antivirus », « Phone Master »</strong>… et les apps que vous n'avez pas choisies.",
+      "Vérifiez l'écran d'accueil par défaut : Paramètres › Applications › <strong>Applications par défaut</strong> › Écran d'accueil. Remettez celui de votre marque (Samsung One UI, Pixel…) si un launcher inconnu l'a remplacé.",
+      "Coupez les notifications publicitaires : appui long sur une notification de pub › <strong>désactiver</strong> pour cette application.",
+      "Lancez une analyse : Play Store › votre profil › <strong>Play Protect</strong> › Analyser.",
+      "Si les pubs persistent : sauvegardez vos photos et contacts, puis <strong>réinitialisation d'usine</strong> — ou faites-vous accompagner par Despy."
+    ];
   } else {
     titre = 'Nettoyer un téléphone Android'; ic = '🤖';
+    warn = "Évitez d'installer un « nettoyeur » ou « antivirus » de plus : ces apps font souvent partie du problème.";
     steps = [
-      "Paramètres › <strong>Applications</strong> : désinstallez AnyDesk, TeamViewer et toute application inconnue.",
+      "Paramètres › <strong>Applications</strong> : désinstallez AnyDesk, TeamViewer et toute application inconnue ou de type « cleaner/booster ».",
       "Paramètres › <strong>Accessibilité</strong> : désactivez l'accès des applications que vous ne reconnaissez pas (c'est par là que les pirates espionnent).",
+      "Paramètres › Applications › Accès spécial › <strong>« Affichage par-dessus les autres apps »</strong> : retirez ce droit aux apps suspectes (cause des pubs plein écran).",
       "Paramètres › Sécurité › <strong>Applications d'administration</strong> : retirez les droits aux apps suspectes.",
       "Désactivez l'<strong>installation depuis des sources inconnues</strong> pour tous les navigateurs.",
       "Ouvrez le Play Store › votre profil › <strong>Play Protect</strong> › Analyser l'appareil.",
       "Play Store › profil › <strong>Paiements et abonnements</strong> : annulez les abonnements non reconnus.",
-      "Redémarrez en <strong>mode sans échec</strong> (appui long sur Éteindre) pour repérer les apps malveillantes.",
+      "Redémarrez en <strong>mode sans échec</strong> (appui long sur Éteindre) pour repérer les apps fautives.",
       "En dernier recours : Paramètres › Système › <strong>Réinitialisation d'usine</strong> (sauvegardez vos données avant)."
     ];
   }
   document.getElementById('sheet-body').innerHTML =
     '<div style="font-weight:800;font-size:18px;margin-bottom:4px">' + ic + ' ' + titre + '</div>' +
-    '<p class="sheet-help" style="margin-top:6px">Suivez les étapes dans l\'ordre. En cas de blocage, appelez l\'assistance Despy.</p>' +
+    (intro ? '<p class="sheet-help" style="margin-top:6px">' + intro + '</p>' : '<p class="sheet-help" style="margin-top:6px">Suivez les étapes dans l\'ordre. En cas de blocage, appelez l\'assistance Despy.</p>') +
+    (warn ? '<div class="result-card" style="margin-top:4px;background:#FEF2F2;border-left:4px solid #FF3B30;font-size:14px;color:#991B1B;line-height:1.5">⚠️ ' + warn + '</div>' : '') +
     steps.map(function(s, i){
       return '<div class="result-card" style="margin-top:10px;display:flex;gap:12px;align-items:flex-start">' +
         '<div style="flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:#0EA5A4;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center">' + (i + 1) + '</div>' +
