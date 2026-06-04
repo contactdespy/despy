@@ -43,7 +43,7 @@ exports.handler = async (event) => {
 
     const { data: client, error } = await supabase
       .from('clients')
-      .select('email, name, prenom, nom, telephone, plan, subscribed, password_hash, created_at')
+      .select('email, name, prenom, nom, telephone, plan, subscribed, password_hash, created_at, questions_used')
       .eq('email', email.toLowerCase().trim())
       .maybeSingle();
 
@@ -52,28 +52,50 @@ exports.handler = async (event) => {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erreur serveur' }) };
     }
 
-    // Réponse identique que le compte existe ou non (anti-énumération)
-    if (!client || (password && !verifyPassword(password, client.password_hash))) {
+    const hasPassword = typeof password === 'string' && password.length > 0;
+
+    // ── Cas 1 : connexion avec mot de passe ──
+    if (hasPassword) {
+      // Réponse identique que le compte existe ou non (anti-énumération)
+      if (!client || !verifyPassword(password, client.password_hash)) {
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ exists: false, error: 'Email ou mot de passe incorrect' })
+        };
+      }
+      // Mot de passe valide → on renvoie les données personnelles
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ exists: false, error: 'Email ou mot de passe incorrect' })
+        body: JSON.stringify({
+          exists: true,
+          email: client.email,
+          name: client.name,
+          prenom: client.prenom,
+          nom: client.nom,
+          telephone: client.telephone,
+          plan: client.plan || 'free',
+          subscribed: client.subscribed || false,
+          created_at: client.created_at,
+          questions_used: client.questions_used || 0
+        })
       };
     }
 
+    // ── Cas 2 : appel sans mot de passe (statut quota/abonnement uniquement) ──
+    // On ne divulgue AUCUNE donnée personnelle (nom, téléphone, email…).
+    if (!client) {
+      return { statusCode: 200, headers, body: JSON.stringify({ exists: false }) };
+    }
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         exists: true,
-        email: client.email,
-        name: client.name,
-        prenom: client.prenom,
-        nom: client.nom,
-        telephone: client.telephone,
         plan: client.plan || 'free',
         subscribed: client.subscribed || false,
-        created_at: client.created_at
+        questions_used: client.questions_used || 0
       })
     };
 
