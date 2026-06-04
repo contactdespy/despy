@@ -1817,6 +1817,28 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
+<!-- ── DIAGNOSTIC TÉLÉPHONE (teaser gratuit) ── -->
+<section id="diag-tel" style="background:#fff;padding:5rem 0;border-bottom:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag" style="background:#E6FAF8;color:#0E7C7B;border-color:#9CE0DC">🩺 Diagnostic gratuit</div>
+      <h2 class="sh2">Votre téléphone est-il sain ?</h2>
+      <p class="sdesc">Des pubs qui s'affichent partout, des applications inconnues, des lenteurs… En quelques questions, découvrez si votre téléphone est sous contrôle d'un tiers, pollué par des applications indésirables, ou simplement fatigué. Gratuit, sans inscription.</p>
+    </div>
+    <div class="reveal" style="max-width:680px;margin:0 auto">
+      <div id="dweb-card" style="background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:28px 24px">
+        <div style="text-align:center">
+          <div style="font-size:46px">📱</div>
+          <div style="font-weight:800;font-size:20px;margin-top:6px;color:var(--text)">Faites le test en 1 minute</div>
+          <div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto">11 questions simples. Vous obtenez un diagnostic clair — sécurité, pollution publicitaire ou performance — et les premières actions à mener.</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:12px">🔒 Tout est calculé dans votre navigateur. Aucune donnée envoyée.</div>
+          <button class="btn-primary" onclick="dwebStart()" style="margin-top:18px">Commencer le diagnostic</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── ALERTES PUSH NATIONALES ── -->
 <section id="push-alerts" style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:4rem 0;color:#fff">
   <div class="wrap">
@@ -9952,6 +9974,118 @@ function switchTool(name) {
     activeTab.style.fontWeight = '800';
   }
   if (activePanel) activePanel.style.display = 'block';
+}
+
+// ── Diagnostic téléphone (teaser gratuit, 100% côté navigateur) ──
+var DWEB_Q = [
+  { q: "Avez-vous installé une application après qu'on vous l'ait demandé par téléphone, SMS ou email ?", hint: "Les faux conseillers font souvent installer une app pour prendre le contrôle.", w: 25, cat: 'controle' },
+  { q: "Une personne a-t-elle déjà pu voir ou piloter votre écran à distance ?", hint: "AnyDesk, TeamViewer… détournés par les arnaqueurs.", w: 25, cat: 'controle' },
+  { q: "Avez-vous donné un code reçu par SMS à quelqu'un au téléphone ?", hint: "Aucun organisme sérieux ne demande votre code par téléphone.", w: 22, cat: 'controle' },
+  { q: "Voyez-vous des prélèvements ou abonnements que vous ne reconnaissez pas ?", hint: "Sur votre compte bancaire ou dans le store.", w: 20, cat: 'controle' },
+  { q: "Une application a-t-elle l'autorisation de lire vos SMS ou « l'accessibilité » sans raison claire ?", hint: "Réglage très sensible, à vérifier.", w: 14, cat: 'controle' },
+  { q: "Voyez-vous des publicités sur votre écran d'accueil, ou quand vous appuyez sur une icône ?", hint: "Signe d'une appli qui s'affiche « par-dessus les autres » — typique des téléphones pollués.", w: 14, cat: 'pollution' },
+  { q: "Avez-vous plusieurs applications « nettoyeur », « antivirus », « booster » ou « accélérateur » ?", hint: "Ces apps causent souvent le problème au lieu de le régler.", w: 12, cat: 'pollution' },
+  { q: "Des applications inconnues sont-elles apparues sans que vous les installiez ?", w: 12, cat: 'pollution' },
+  { q: "Avez-vous installé une application en dehors de l'App Store / Google Play (lien, fichier reçu) ?", w: 12, cat: 'pollution' },
+  { q: "Recevez-vous des fenêtres « Virus détecté », « Batterie endommagée » ou alertes alarmantes ?", w: 8, cat: 'pollution' },
+  { q: "Votre téléphone est-il anormalement lent, chaud, ou la batterie se vide-t-elle très vite ?", hint: "Peut aussi venir d'un appareil ancien.", w: 6, cat: 'perf' }
+];
+var DWEB_MAX = DWEB_Q.reduce(function(a, x){ return a + x.w; }, 0);
+var _dweb = null;
+
+function dwebCard() { return document.getElementById('dweb-card'); }
+
+function dwebStart() {
+  _dweb = { idx: 0, answers: [] };
+  dwebRender();
+  var c = dwebCard(); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function dwebRender() {
+  var item = DWEB_Q[_dweb.idx];
+  function opt(val, label, color) {
+    return '<button onclick="dwebAnswer(\'' + val + '\')" style="width:100%;padding:15px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:14px;text-align:left;font-size:16px;font-weight:600;color:' + color + ';line-height:1.4;cursor:pointer;font-family:inherit" onmouseover="this.style.borderColor=\'var(--blue)\'" onmouseout="this.style.borderColor=\'var(--border)\'">' + label + '</button>';
+  }
+  dwebCard().innerHTML =
+    '<div style="font-size:13px;color:#0E7C7B;font-weight:800;margin-bottom:10px">Question ' + (_dweb.idx + 1) + '/' + DWEB_Q.length + '</div>' +
+    '<div style="height:6px;background:var(--border);border-radius:6px;margin-bottom:18px;overflow:hidden"><div style="height:100%;width:' + Math.round((_dweb.idx / DWEB_Q.length) * 100) + '%;background:#0EA5A4;border-radius:6px;transition:width .3s"></div></div>' +
+    '<div style="font-size:18px;font-weight:700;line-height:1.5;margin-bottom:' + (item.hint ? '8px' : '18px') + ';color:var(--text)">' + item.q + '</div>' +
+    (item.hint ? '<div style="font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:18px">💡 ' + item.hint + '</div>' : '') +
+    opt('oui', 'Oui', '#dc2626') + opt('non', 'Non', '#16a34a') + opt('idk', 'Je ne sais pas', 'var(--text2)');
+}
+
+function dwebAnswer(val) {
+  _dweb.answers.push(val);
+  if (_dweb.idx < DWEB_Q.length - 1) { _dweb.idx++; dwebRender(); }
+  else { dwebFinish(); }
+}
+
+function dwebRing(score, color) {
+  var r = 52, c = 2 * Math.PI * r, off = c * (1 - score / 100);
+  return '<svg width="120" height="120" viewBox="0 0 120 120">' +
+    '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="#EEF1F6" stroke-width="11"/>' +
+    '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" transform="rotate(-90 60 60)"/>' +
+    '<text x="60" y="60" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="800" fill="' + color + '" font-family="inherit">' + score + '</text>' +
+    '</svg>';
+}
+
+function dwebFinish() {
+  var pts = 0, flags = [];
+  var sub = { controle: 0, pollution: 0, perf: 0 }, subMax = { controle: 0, pollution: 0, perf: 0 };
+  DWEB_Q.forEach(function(it){ subMax[it.cat] += it.w; });
+  _dweb.answers.forEach(function(a, i){
+    var it = DWEB_Q[i];
+    if (a === 'oui') { pts += it.w; sub[it.cat] += it.w; flags.push({ q: it.q, cat: it.cat, sure: true }); }
+    else if (a === 'idk') { pts += it.w * 0.5; sub[it.cat] += it.w * 0.5; flags.push({ q: it.q, cat: it.cat, sure: false }); }
+  });
+  var risk = Math.min(100, Math.round((pts / DWEB_MAX) * 100));
+  var profile;
+  if (sub.controle > 0) profile = 'controle';
+  else if (sub.pollution > 0 && sub.pollution >= sub.perf) profile = 'pollution';
+  else if (sub.perf > 0) profile = 'perf';
+  else profile = 'sain';
+
+  var P = {
+    controle: { bg: '#FEF2F2', bd: '#dc2626', tc: '#991B1B', ring: '#dc2626', emoji: '🚨', title: 'Risque pour votre argent ou vos données',
+      desc: "Un ou plusieurs signes de prise de contrôle sont présents. Il faut agir : suivez le guide de nettoyage, et en cas de doute sur votre argent, contactez votre banque." },
+    pollution: { bg: '#FFFBEB', bd: '#F59E0B', tc: '#92400E', ring: '#F59E0B', emoji: '🧹', title: 'Applications indésirables',
+      desc: "Bonne nouvelle : aucun signe de vol d'argent. En revanche, votre téléphone semble pollué par des applications qui affichent des pubs et le ralentissent. Ça se nettoie — sans installer quoi que ce soit de plus." },
+    perf: { bg: '#FFFBEB', bd: '#F59E0B', tc: '#92400E', ring: '#F59E0B', emoji: '🐌', title: 'Téléphone fatigué',
+      desc: "Aucun signe d'arnaque ni d'application indésirable. Votre téléphone montre surtout des signes de fatigue. Quelques gestes simples peuvent l'aider." },
+    sain: { bg: '#F0FDF4', bd: '#16a34a', tc: '#03543F', ring: '#16a34a', emoji: '✅', title: 'Téléphone sain',
+      desc: "Aucun signe de prise de contrôle ni d'application indésirable. Continuez vos bons réflexes." }
+  }[profile];
+
+  var catLabel = { controle: 'Sécurité', pollution: 'Pollution', perf: 'Performance' };
+  var flagsHtml = flags.length
+    ? '<div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin:18px 0 8px">Points d\'attention</div>' +
+      flags.map(function(f){
+        var col = f.cat === 'controle' ? '#dc2626' : f.cat === 'pollution' ? '#F59E0B' : '#8A91A6';
+        return '<div style="background:var(--bg2);border-left:4px solid ' + col + ';border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;gap:8px;align-items:baseline">' +
+          '<div style="font-size:14px;color:var(--text);line-height:1.45">' + (f.sure ? '🔴 ' : '🟠 ') + f.q + '</div>' +
+          '<div style="font-size:10px;font-weight:700;color:var(--text3);white-space:nowrap;text-transform:uppercase;letter-spacing:.3px">' + catLabel[f.cat] + '</div></div>';
+      }).join('')
+    : '<div style="background:#F0FDF4;color:#03543F;border-radius:12px;padding:14px;font-size:14px;line-height:1.5;margin-top:16px">Aucun point d\'attention relevé. 👍</div>';
+
+  var ctaTitle = profile === 'controle' ? 'Recevez votre plan d\'action complet' : profile === 'sain' ? 'Gardez une longueur d\'avance' : 'Recevez le guide de nettoyage détaillé';
+  var ctaDesc = profile === 'sain'
+    ? "Dans l'application Despy : analyse de messages, alertes nationales, conseiller IA et bien plus — gratuit."
+    : "Le guide de nettoyage pas-à-pas (iPhone & Android), la liste des applications à surveiller et l'assistance humaine vous attendent dans l'application Despy.";
+
+  dwebCard().innerHTML =
+    '<div style="text-align:center"><div>' + dwebRing(100 - risk, P.ring) + '</div>' +
+    '<div style="font-size:13px;color:var(--text3);margin-top:2px">Niveau de risque global : <strong>' + risk + '/100</strong></div></div>' +
+    '<div style="background:' + P.bg + ';border:1px solid ' + P.bd + ';border-radius:14px;padding:16px 18px;margin-top:14px">' +
+      '<div style="font-weight:800;font-size:17px;color:' + P.tc + '">' + P.emoji + ' ' + P.title + '</div>' +
+      '<div style="font-size:14px;color:var(--text2);line-height:1.55;margin-top:6px">' + P.desc + '</div></div>' +
+    flagsHtml +
+    '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:20px;margin-top:18px;color:#fff;text-align:center">' +
+      '<div style="font-weight:800;font-size:17px">' + ctaTitle + '</div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.55;margin-top:6px">' + ctaDesc + '</div>' +
+      '<button onclick="window.location=\'/app\'" style="margin-top:14px;padding:13px 26px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">Ouvrir l\'application Despy</button>' +
+      '<div style="margin-top:10px"><a onclick="showPage(\'tarifs\')" style="color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;opacity:.9">Voir les offres Despy →</a></div></div>' +
+    '<button onclick="dwebStart()" style="width:100%;margin-top:12px;padding:12px;background:transparent;border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:14px;color:var(--text2);cursor:pointer;font-family:inherit">Refaire le test</button>';
+  dwebCard().scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── Analyseur SMS / email / lien public ──
