@@ -10101,10 +10101,25 @@ function dwebFinish() {
     '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:20px;margin-top:18px;color:#fff;text-align:center">' +
       '<div style="font-weight:800;font-size:17px">' + ctaTitle + '</div>' +
       '<div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.55;margin-top:6px">' + ctaDesc + '</div>' +
-      '<button onclick="window.location=\'/app\'" style="margin-top:14px;padding:13px 26px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">Ouvrir l\'application Despy</button>' +
+      '<button onclick="dwebGoToApp()" style="margin-top:14px;padding:13px 26px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">Ouvrir l\'application Despy</button>' +
       '<div style="margin-top:10px"><a onclick="showPage(\'tarifs\')" style="color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-decoration:underline;opacity:.9">Voir les offres Despy →</a></div></div>' +
     '<button onclick="dwebStart()" style="width:100%;margin-top:12px;padding:12px;background:transparent;border:1.5px solid var(--border);border-radius:12px;font-weight:700;font-size:14px;color:var(--text2);cursor:pointer;font-family:inherit">Refaire le test</button>';
   dwebCard().scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Transmet les réponses du diagnostic à l'application pour y afficher
+// directement la solution (sans refaire les questions). DWEB_Q et DIAG_Q
+// sont identiques, l'app peut donc rejouer les réponses telles quelles.
+function dwebGoToApp() {
+  try {
+    if (_dweb && _dweb.answers && _dweb.answers.length) {
+      localStorage.setItem('despy_diag_handoff', JSON.stringify({
+        answers: _dweb.answers,
+        ts: Date.now()
+      }));
+    }
+  } catch (e) {}
+  window.location = '/app?diag=1';
 }
 
 // ── Analyseur SMS / email / lien public ──

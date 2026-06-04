@@ -1792,6 +1792,36 @@ var DIAG_Q = [
 var DIAG_MAX = DIAG_Q.reduce(function(a, x){ return a + x.w; }, 0);
 var _diag = null;
 
+// Récupère un diagnostic réalisé sur le site (teaser despy.fr) et affiche
+// directement la solution dans l'app, sans refaire les questions.
+// DWEB_Q (site) et DIAG_Q (app) sont identiques → réponses rejouables telles quelles.
+function consumeDiagHandoff() {
+  var raw = null;
+  try { raw = localStorage.getItem('despy_diag_handoff'); } catch(e) {}
+  // Nettoie l'URL (retire ?diag=1 / #diag) dans tous les cas.
+  try {
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  } catch(e) {}
+  if (!raw) { openDiag(); return; }
+  try { localStorage.removeItem('despy_diag_handoff'); } catch(e) {}
+
+  var data = null;
+  try { data = JSON.parse(raw); } catch(e) {}
+  // Handoff valide : tableau de réponses complet et récent (< 30 min).
+  var fresh = data && data.ts && (Date.now() - data.ts < 30 * 60 * 1000);
+  if (data && Array.isArray(data.answers) && data.answers.length === DIAG_Q.length && fresh) {
+    _diag = { idx: DIAG_Q.length - 1, answers: data.answers };
+    openSheet('Diagnostic du téléphone',
+      '<div style="text-align:center;padding:30px 0"><div class="spinner"></div>' +
+      '<div style="font-size:14px;color:var(--text2);margin-top:14px">Analyse de votre diagnostic…</div></div>');
+    setTimeout(finishDiag, 250);
+  } else {
+    openDiag();
+  }
+}
+
 function openDiag() {
   openSheet('Diagnostic du téléphone',
     '<div class="result-card" style="text-align:center"><div style="font-size:44px">📱</div>' +
@@ -2204,6 +2234,9 @@ document.addEventListener('DOMContentLoaded', function(){
     var params = new URLSearchParams(window.location.search);
     var tool = params.get('tool');
     if (tool && s && s.email) { setTimeout(function(){ openTool(tool); }, 300); }
+    if (params.get('diag') === '1' || window.location.hash === '#diag') {
+      setTimeout(consumeDiagHandoff, 300);
+    }
   } catch(e){}
   var startY = 0;
   var sheet = document.getElementById('sheet');
