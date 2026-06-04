@@ -459,6 +459,11 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
       <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
 
+    <div class="section" id="home-activity-section" style="display:none">
+      <div class="section-label">Activité récente</div>
+      <div class="list-group" id="home-activity-list"></div>
+    </div>
+
     <div class="section">
       <div class="section-label">Outils du quotidien</div>
       <div class="tile-grid">
@@ -821,6 +826,7 @@ function enterApp() {
   document.getElementById('app-view').classList.add('active');
   refreshProfile();
   refreshHomeScore();
+  refreshHomeActivity();
   revalidateSession();
 }
 
@@ -1386,6 +1392,80 @@ function refreshHomeScore() {
     }
   }).catch(function(){
     ringEl.innerHTML = heroPlaceholderRing();
+  });
+}
+
+// ── Fil d'activité récente (accueil) ──
+function timeAgoFr(iso) {
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  var sec = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (sec < 60) return "à l'instant";
+  var min = Math.floor(sec / 60);
+  if (min < 60) return 'il y a ' + min + ' min';
+  var h = Math.floor(min / 60);
+  if (h < 24) return 'il y a ' + h + ' h';
+  var j = Math.floor(h / 24);
+  if (j === 1) return 'hier';
+  if (j < 7) return 'il y a ' + j + ' j';
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function activityRow(it) {
+  var icon = '📌', bg = 'rgba(45,91,255,.12)', title = 'Activité', desc = '';
+  if (it.type === 'analyse') {
+    title = 'Message analysé';
+    if (it.verdict === 'safe')        { icon = '✅'; bg = 'rgba(52,199,89,.14)';  desc = 'Sans danger'; }
+    else if (it.verdict === 'scam')   { icon = '🚨'; bg = 'rgba(255,59,48,.14)';  desc = 'Arnaque détectée'; }
+    else                              { icon = '⚠️'; bg = 'rgba(255,149,0,.14)';  desc = 'Message suspect'; }
+    if (it.snippet) desc += ' · « ' + it.snippet + (it.snippet.length >= 60 ? '…' : '') + ' »';
+  } else if (it.type === 'quiz') {
+    icon = '🎓'; bg = 'rgba(175,82,222,.14)';
+    title = it.title || 'Quiz';
+    if (typeof it.score === 'number' && typeof it.total === 'number') desc = 'Score ' + it.score + '/' + it.total;
+    else desc = 'Quiz terminé';
+  } else if (it.type === 'phone') {
+    icon = '📞'; bg = 'rgba(0,122,255,.12)';
+    title = 'Numéro signalé';
+    desc = it.phone ? it.phone : 'Signalement enregistré';
+  } else if (it.type === 'hibp') {
+    icon = '🛡️'; bg = 'rgba(14,165,164,.14)';
+    title = 'Vérification dark web';
+    desc = (it.breachCount > 0)
+      ? (it.breachCount + ' fuite' + (it.breachCount > 1 ? 's' : '') + ' détectée' + (it.breachCount > 1 ? 's' : ''))
+      : 'Aucune fuite trouvée';
+  }
+  return '<div class="list-row">' +
+    '<div class="row-icon-lg" style="background:' + bg + ';font-size:19px">' + icon + '</div>' +
+    '<div class="row-text"><div class="row-title">' + escapeHtmlA(title) + '</div>' +
+    '<div class="row-desc">' + escapeHtmlA(desc) + '</div></div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-left:8px;flex-shrink:0;white-space:nowrap">' + timeAgoFr(it.ts) + '</div>' +
+    '</div>';
+}
+
+function escapeHtmlA(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function refreshHomeActivity() {
+  var section = document.getElementById('home-activity-section');
+  var list = document.getElementById('home-activity-list');
+  if (!section || !list) return;
+  var s = session.get() || {};
+  if (!s.email) { section.style.display = 'none'; return; }
+  fetch('/.netlify/functions/recent-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: s.email })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    var items = (d && Array.isArray(d.activity)) ? d.activity : [];
+    if (!items.length) { section.style.display = 'none'; return; }
+    list.innerHTML = items.map(activityRow).join('');
+    section.style.display = '';
+  }).catch(function(){
+    section.style.display = 'none';
   });
 }
 
