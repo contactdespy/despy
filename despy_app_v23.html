@@ -757,21 +757,9 @@ async function doLoginApp() {
   if (!email || email.indexOf('@') === -1) return showAuthErr('Email invalide');
   if (!pwd) return showAuthErr('Mot de passe requis');
 
-  try {
-    var stored = JSON.parse(localStorage.getItem('despy_account_' + email) || 'null');
-    if (stored && stored.password === pwd) {
-      session.set({
-        email: email,
-        name: stored.name || email.split('@')[0],
-        prenom: stored.prenom || '', nom: stored.nom || '',
-        telephone: stored.telephone || stored.tel || '',
-        subscribed: !!stored.subscribed, plan: stored.plan || 'free',
-        created_at: stored.created_at
-      });
-      return enterApp();
-    }
-  } catch(e){}
-
+  // Authentification toujours côté serveur (mot de passe vérifié contre le hash scrypt).
+  // Le mot de passe n'est jamais stocké sur l'appareil.
+  showAuthErr('');
   try {
     var r = await fetch('/.netlify/functions/check-subscription', {
       method: 'POST',
@@ -780,7 +768,7 @@ async function doLoginApp() {
     });
     var data = await r.json();
     if (!r.ok || data.error) return showAuthErr(data.error || 'Identifiants incorrects');
-    if (!data.exists) return showAuthErr('Compte introuvable');
+    if (!data.exists) return showAuthErr('Email ou mot de passe incorrect');
     session.set({
       email: email,
       name: data.name || email.split('@')[0],
@@ -801,29 +789,31 @@ async function doSignupApp() {
   if (!prenom || !nom) return showAuthErr('Prénom et nom requis');
   if (!email || email.indexOf('@') === -1) return showAuthErr('Email invalide');
   if (pwd.length < 8) return showAuthErr('Mot de passe minimum 8 caractères');
+  showAuthErr('');
 
   var name = prenom + ' ' + nom;
-  var account = {
-    email: email, name: name, prenom: prenom, nom: nom,
-    password: pwd, subscribed: false, plan: 'free',
-    created_at: new Date().toISOString()
-  };
-  localStorage.setItem('despy_account_' + email, JSON.stringify(account));
-  session.set({
-    email: email, name: name, prenom: prenom, nom: nom,
-    subscribed: false, plan: 'free', created_at: account.created_at
-  });
-
   try {
-    fetch('/.netlify/functions/register-free', {
+    var r = await fetch('/.netlify/functions/register-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, password: pwd, prenom: prenom, nom: nom })
-    }).catch(function(){});
-  } catch(e){}
-
-  enterApp();
-  toast('Bienvenue chez Despy !');
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) return showAuthErr(data.error || 'Création impossible');
+    session.set({
+      email: email,
+      name: data.name || name,
+      prenom: data.prenom || prenom,
+      nom: data.nom || nom,
+      subscribed: false,
+      plan: data.plan || 'free',
+      created_at: new Date().toISOString()
+    });
+    enterApp();
+    toast('Bienvenue chez Despy !');
+  } catch(e) {
+    showAuthErr('Erreur réseau, réessayez');
+  }
 }
 
 function enterApp() {
