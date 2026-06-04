@@ -442,18 +442,12 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
     <button class="hero" onclick="openTool('score')">
       <div class="hero-left">
         <div class="hero-label">Votre protection</div>
-        <div class="hero-title">Voir mon score sécurité</div>
+        <div class="hero-title" id="home-score-title">Voir mon score sécurité</div>
         <span class="hero-btn">Consulter
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </span>
       </div>
-      <div class="hero-ring">
-        <svg width="86" height="86" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>
-          <circle cx="60" cy="60" r="50" fill="none" stroke="#5BE3F5" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="78" transform="rotate(-90 60 60)"/>
-          <g><svg x="42" y="42" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></g>
-        </svg>
-      </div>
+      <div class="hero-ring" id="home-score-ring"></div>
     </button>
 
     <button class="quick-action" onclick="openTool('analyseur')">
@@ -506,7 +500,7 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
         </button>
         <button class="list-row" onclick="openTool('diag')">
           <div class="row-icon-lg" style="background:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M9 6h6"/></svg></div>
-          <div class="row-text"><div class="row-title">Diagnostic du téléphone</div><div class="row-desc">10 questions · score de risque · nettoyage</div></div>
+          <div class="row-text"><div class="row-title">Diagnostic du téléphone</div><div class="row-desc">11 questions · score de risque · nettoyage</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="list-row" onclick="openTool('privacy')">
@@ -836,6 +830,7 @@ function enterApp() {
   document.getElementById('auth-view').classList.remove('active');
   document.getElementById('app-view').classList.add('active');
   refreshProfile();
+  refreshHomeScore();
 }
 
 function appLogout() {
@@ -1324,6 +1319,52 @@ function shareRef(code) {
 }
 
 // ─── SCORE SÉCURITÉ ───
+// ─── Anneau de score sur l'accueil (réel, branché sur security-score) ───
+function heroScoreRing(score, color) {
+  score = Math.max(0, Math.min(100, Math.round(score || 0)));
+  color = color || '#5BE3F5';
+  var c = 2 * Math.PI * 50;
+  var off = c * (1 - score / 100);
+  return '<svg width="86" height="86" viewBox="0 0 120 120">' +
+    '<circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>' +
+    '<circle cx="60" cy="60" r="50" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>' +
+    '<text x="60" y="60" text-anchor="middle" dominant-baseline="central" font-size="34" font-weight="800" fill="#fff">' + score + '</text>' +
+    '</svg>';
+}
+
+// État « pas encore de score » : anneau neutre avec bouclier (pas de chiffre factice).
+function heroPlaceholderRing() {
+  return '<svg width="86" height="86" viewBox="0 0 120 120">' +
+    '<circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>' +
+    '<svg x="42" y="42" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+    '</svg>';
+}
+
+function refreshHomeScore() {
+  var ringEl = document.getElementById('home-score-ring');
+  if (!ringEl) return;
+  var titleEl = document.getElementById('home-score-title');
+  var s = session.get() || {};
+  // État par défaut tant qu'on n'a pas la donnée réelle.
+  ringEl.innerHTML = heroPlaceholderRing();
+  if (!s.email) return;
+  fetch('/.netlify/functions/security-score', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: s.email })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d && typeof d.score === 'number' && !d.error) {
+      ringEl.innerHTML = heroScoreRing(d.score, d.color);
+      if (titleEl) titleEl.textContent = d.label ? ((d.emoji ? d.emoji + ' ' : '') + d.label) : 'Voir mon score sécurité';
+    } else {
+      ringEl.innerHTML = heroPlaceholderRing();
+      if (titleEl) titleEl.textContent = 'Construire mon score';
+    }
+  }).catch(function(){
+    ringEl.innerHTML = heroPlaceholderRing();
+  });
+}
+
 function scoreRing(score, color) {
   score = Math.max(0, Math.min(100, score || 0));
   color = color || '#2D5BFF';
