@@ -5712,8 +5712,38 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showClientArea() {
-  if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); }
+  if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); revalidateSiteSession(); }
   else { showPage('login'); }
+}
+
+// Revalide l'abonnement auprès du serveur (source de vérité) — évite
+// de se fier à un plan/subscribed périmé dans le localStorage.
+async function revalidateSiteSession() {
+  var s = siteSession.get();
+  if (!s || !s.email) return;
+  try {
+    var r = await fetch('/.netlify/functions/check-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email })
+    });
+    var data = await r.json();
+    if (!r.ok) return; // erreur serveur : on garde la session locale
+    if (data.exists === false) {
+      // Compte supprimé côté serveur → déconnexion silencieuse
+      siteSession.clear();
+      if (typeof updateNavForSession === 'function') updateNavForSession();
+      showPage('login');
+      return;
+    }
+    var changed = false;
+    if (typeof data.subscribed === 'boolean' && data.subscribed !== s.subscribed) { s.subscribed = data.subscribed; changed = true; }
+    if (data.plan && data.plan !== s.plan) { s.plan = data.plan; changed = true; }
+    if (changed) {
+      siteSession.set(s);
+      if (typeof updateNavForSession === 'function') updateNavForSession();
+    }
+  } catch(e) { /* hors ligne : on garde la session locale */ }
 }
 
 async function siteLogin() {

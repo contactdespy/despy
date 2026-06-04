@@ -821,6 +821,40 @@ function enterApp() {
   document.getElementById('app-view').classList.add('active');
   refreshProfile();
   refreshHomeScore();
+  revalidateSession();
+}
+
+// Revalide l'abonnement auprès du serveur (source de vérité).
+// Évite de se fier à un plan/subscribed périmé dans le localStorage.
+async function revalidateSession() {
+  var s = session.get();
+  if (!s || !s.email) return;
+  try {
+    var r = await fetch('/.netlify/functions/check-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: s.email })
+    });
+    var data = await r.json();
+    if (!r.ok) return; // erreur serveur : on garde la session locale
+    // Compte supprimé côté serveur → déconnexion silencieuse
+    if (data.exists === false) {
+      session.clear();
+      document.getElementById('app-view').classList.remove('active');
+      document.getElementById('auth-view').classList.add('active');
+      toggleAuthMode('login');
+      return;
+    }
+    // Met à jour les champs sensibles si le serveur diffère
+    var changed = false;
+    if (typeof data.subscribed === 'boolean' && data.subscribed !== s.subscribed) { s.subscribed = data.subscribed; changed = true; }
+    if (data.plan && data.plan !== s.plan) { s.plan = data.plan; changed = true; }
+    if (changed) {
+      session.set(s);
+      refreshProfile();
+      refreshHomeScore();
+    }
+  } catch(e) { /* hors ligne : on garde la session locale */ }
 }
 
 function appLogout() {
