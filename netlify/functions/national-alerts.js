@@ -131,10 +131,8 @@ async function sendPushToAll(supabase, alert) {
 function isPublicRelevant(alert) {
   const source = (alert.source || '').toUpperCase();
   if (source.indexOf('ANSSI') === -1) return true; // vagues internes = pertinentes
-  const url = (alert.url || '').toLowerCase();
-  if (url.indexOf('/avis/') !== -1) return false;   // bulletins CVE techniques
-  // Sections ANSSI orientées grand public
-  if (/\/(alerte|actualite|menaces|cti)/.test(url)) return true;
+  // Pour l'ANSSI : uniquement le contenu qui parle réellement au grand public.
+  // Les bulletins/avis techniques (CVE, "Vulnérabilité dans X", etc.) sont écartés.
   const text = ((alert.title || '') + ' ' + (alert.body || '')).toLowerCase();
   const KEYWORDS = [
     'phishing', 'hameçonnage', 'hameconnage', 'arnaque', 'fraude', 'escroquerie', 'escroc',

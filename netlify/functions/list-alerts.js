@@ -13,9 +13,8 @@ const { createClient } = require('@supabase/supabase-js');
 function isPublicRelevant(alert) {
   const source = (alert.source || '').toUpperCase();
   if (source.indexOf('ANSSI') === -1) return true;
-  const url = (alert.url || '').toLowerCase();
-  if (url.indexOf('/avis/') !== -1) return false;
-  if (/\/(alerte|actualite|menaces|cti)/.test(url)) return true;
+  // Pour l'ANSSI : uniquement le contenu qui parle réellement au grand public.
+  // Les bulletins/avis techniques (CVE, "Vulnérabilité dans X", etc.) sont écartés.
   const text = ((alert.title || '') + ' ' + (alert.body || '')).toLowerCase();
   const KEYWORDS = [
     'phishing', 'hameçonnage', 'hameconnage', 'arnaque', 'fraude', 'escroquerie', 'escroc',
