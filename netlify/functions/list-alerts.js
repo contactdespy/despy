@@ -7,6 +7,26 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
+// Ne garder que les alertes pertinentes pour le grand public senior.
+// Les vagues d'arnaques internes passent toujours ; les avis ANSSI
+// purement techniques (CVE, vulnérabilités produits) sont écartés.
+function isPublicRelevant(alert) {
+  const source = (alert.source || '').toUpperCase();
+  if (source.indexOf('ANSSI') === -1) return true;
+  const url = (alert.url || '').toLowerCase();
+  if (url.indexOf('/avis/') !== -1) return false;
+  if (/\/(alerte|actualite|menaces|cti)/.test(url)) return true;
+  const text = ((alert.title || '') + ' ' + (alert.body || '')).toLowerCase();
+  const KEYWORDS = [
+    'phishing', 'hameçonnage', 'hameconnage', 'arnaque', 'fraude', 'escroquerie', 'escroc',
+    'smishing', 'vishing', 'faux sms', 'faux courriel', 'faux mail', 'usurpation',
+    'rançongiciel', 'rancongiciel', 'vol de données', 'vol de donnees',
+    'fuite de données', 'fuite de donnees', 'démarchage', 'demarchage',
+    'faux support', 'faux conseiller', 'carte bancaire', 'compte bancaire'
+  ];
+  return KEYWORDS.some(k => text.indexOf(k) !== -1);
+}
+
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
@@ -23,17 +43,19 @@ exports.handler = async (event) => {
       .from('national_alerts')
       .select('title, body, source, url, created_at')
       .order('created_at', { ascending: false })
-      .limit(15);
+      .limit(60);
 
     if (error) {
       console.error('list-alerts error:', error);
       return { statusCode: 200, headers, body: JSON.stringify({ alerts: [] }) };
     }
 
+    const alerts = (data || []).filter(isPublicRelevant).slice(0, 15);
+
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ alerts: data || [] })
+      body: JSON.stringify({ alerts })
     };
 
   } catch (err) {

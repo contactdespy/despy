@@ -125,6 +125,27 @@ async function sendPushToAll(supabase, alert) {
   return { sent, failed, cleaned: expiredEndpoints.length };
 }
 
+// Ne garder que les alertes pertinentes pour le grand public senior.
+// Les vagues d'arnaques détectées en interne passent toujours.
+// Les avis ANSSI purement techniques (CVE, vulnérabilités produits) sont écartés.
+function isPublicRelevant(alert) {
+  const source = (alert.source || '').toUpperCase();
+  if (source.indexOf('ANSSI') === -1) return true; // vagues internes = pertinentes
+  const url = (alert.url || '').toLowerCase();
+  if (url.indexOf('/avis/') !== -1) return false;   // bulletins CVE techniques
+  // Sections ANSSI orientées grand public
+  if (/\/(alerte|actualite|menaces|cti)/.test(url)) return true;
+  const text = ((alert.title || '') + ' ' + (alert.body || '')).toLowerCase();
+  const KEYWORDS = [
+    'phishing', 'hameçonnage', 'hameconnage', 'arnaque', 'fraude', 'escroquerie', 'escroc',
+    'smishing', 'vishing', 'faux sms', 'faux courriel', 'faux mail', 'usurpation',
+    'rançongiciel', 'rancongiciel', 'vol de données', 'vol de donnees',
+    'fuite de données', 'fuite de donnees', 'démarchage', 'demarchage',
+    'faux support', 'faux conseiller', 'carte bancaire', 'compte bancaire'
+  ];
+  return KEYWORDS.some(k => text.indexOf(k) !== -1);
+}
+
 exports.handler = async () => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
@@ -134,7 +155,8 @@ exports.handler = async () => {
       fetchAnssiRss(),
       detectInternalWaves(supabase)
     ]);
-    const allAlerts = [...internal, ...anssi];
+    // Filtre grand public : on écarte le jargon technique (CVE, etc.)
+    const allAlerts = [...internal, ...anssi].filter(isPublicRelevant);
 
     // 2. Filtrer celles déjà envoyées (basé sur table national_alerts)
     const newAlerts = [];
