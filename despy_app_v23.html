@@ -1251,16 +1251,16 @@ async function runDarkWeb() {
 
 function openAlertes() {
   openSheet('Alertes nationales',
-    '<p class="sheet-help">Recevez une notification quand une grosse arnaque circule en France (faux SMS Chronopost, fausse alerte Ameli, etc.). Service gratuit, désactivable à tout moment.</p>' +
-    '<div id="alertes-status">Vérification…</div>'
+    '<p class="sheet-help">Les arnaques qui circulent en France en ce moment (faux SMS Chronopost, fausse alerte Ameli, etc.). Activez les notifications pour être prévenu(e) en temps réel.</p>' +
+    '<div id="alertes-status">Vérification…</div>' +
+    '<div class="section-label" style="margin:18px 0 8px">Alertes récentes</div>' +
+    '<div id="alertes-feed"><div class="spinner"></div></div>'
   );
   setTimeout(function(){
     var el = document.getElementById('alertes-status');
     if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
       el.innerHTML = '<div class="result-card" style="color:#92400e;background:#fef3c7"><strong>Notifications non supportées</strong><br>Votre appareil ou navigateur ne permet pas les notifications push.</div>';
-      return;
-    }
-    if (Notification.permission === 'granted') {
+    } else if (Notification.permission === 'granted') {
       el.innerHTML = '<div class="result-card" style="color:#03543F;background:#DEF7EC">✅ <strong>Notifications activées</strong><br>Vous recevrez les alertes arnaques importantes.</div>';
     } else if (Notification.permission === 'denied') {
       el.innerHTML = '<div class="result-card" style="color:#991b1b;background:#fee2e2">❌ <strong>Notifications bloquées</strong><br>Activez-les dans les paramètres de votre navigateur.</div>';
@@ -1268,6 +1268,45 @@ function openAlertes() {
       el.innerHTML = '<button class="btn-primary" onclick="requestPush()">Activer les alertes</button>';
     }
   }, 200);
+  loadAlertesFeed();
+}
+
+function loadAlertesFeed() {
+  fetch('/.netlify/functions/list-alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      var feed = document.getElementById('alertes-feed');
+      if (!feed) return;
+      var alerts = (d && Array.isArray(d.alerts)) ? d.alerts : [];
+      if (!alerts.length) {
+        feed.innerHTML = '<div class="result-card" style="color:var(--text2)">Aucune alerte en cours. Tant mieux ! Activez les notifications pour être prévenu(e) dès qu\'une arnaque circule.</div>';
+        return;
+      }
+      feed.innerHTML = alerts.map(alerteCard).join('');
+    })
+    .catch(function(){
+      var feed = document.getElementById('alertes-feed');
+      if (feed) feed.innerHTML = '<div class="result-card" style="color:var(--text2)">Impossible de charger les alertes pour le moment.</div>';
+    });
+}
+
+function alerteCard(a) {
+  var isAnssi = (a.source || '').toUpperCase().indexOf('ANSSI') !== -1;
+  var badgeBg = isAnssi ? '#e0e7ff' : '#fee2e2';
+  var badgeColor = isAnssi ? '#3730a3' : '#991b1b';
+  var badgeText = isAnssi ? 'ANSSI · officiel' : 'Vague détectée';
+  var when = timeAgoFr(a.created_at);
+  var html = '<div class="result-card" style="text-align:left;margin-bottom:10px">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+    '<span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;background:' + badgeBg + ';color:' + badgeColor + '">' + escapeHtmlA(badgeText) + '</span>' +
+    '<span style="font-size:12px;color:var(--text3)">' + escapeHtmlA(when) + '</span></div>' +
+    '<div style="font-weight:700;font-size:15px;color:var(--text);line-height:1.35">' + escapeHtmlA(a.title || 'Alerte') + '</div>';
+  if (a.body) html += '<div style="font-size:14px;color:var(--text2);margin-top:5px;line-height:1.45">' + escapeHtmlA(a.body) + '</div>';
+  if (a.url && /^https?:\/\//i.test(a.url)) {
+    html += '<a href="' + escapeHtmlA(a.url) + '" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:8px;font-size:14px;font-weight:700;color:var(--blue);text-decoration:none">En savoir plus →</a>';
+  }
+  html += '</div>';
+  return html;
 }
 
 function urlBase64ToUint8Array(base64String) {
