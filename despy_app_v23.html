@@ -504,6 +504,11 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
           <div class="row-text"><div class="row-title">Alertes nationales</div><div class="row-desc">Notifications arnaques en cours</div></div>
           <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        <button class="list-row" onclick="openTool('diag')">
+          <div class="row-icon-lg" style="background:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M9 6h6"/></svg></div>
+          <div class="row-text"><div class="row-title">Diagnostic du téléphone</div><div class="row-desc">10 questions · score de risque · nettoyage</div></div>
+          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
         <button class="list-row" onclick="openTool('privacy')">
           <div class="row-icon-lg" style="background:#5856D6"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
           <div class="row-text"><div class="row-title">Effacer mes données</div><div class="row-desc">Privacy Cleanup · Premium</div></div>
@@ -920,6 +925,7 @@ function openTool(name) {
     case 'signaler':   return openPhoneReport();
     case 'defi':       return openDefi();
     case 'privacy':    return openPrivacy();
+    case 'diag':       return openDiag();
     default: toast('Outil bientôt disponible');
   }
 }
@@ -1541,6 +1547,156 @@ async function runPrivacy() {
   } catch(e) {
     document.getElementById('pc-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
+}
+
+// ─── DIAGNOSTIC TÉLÉPHONE ───
+// 10 questions, score de risque calculé localement (aucune donnée envoyée).
+var DIAG_Q = [
+  { q: "Avez-vous installé une application après qu'on vous l'ait demandé par téléphone, SMS ou email ?", hint: "Les faux conseillers font souvent installer une app pour prendre le contrôle.", w: 25 },
+  { q: "Une personne a-t-elle déjà pu voir ou piloter votre écran à distance ?", hint: "AnyDesk, TeamViewer… détournés par les arnaqueurs.", w: 25 },
+  { q: "Avez-vous donné un code reçu par SMS à quelqu'un au téléphone ?", hint: "Aucun organisme sérieux ne demande votre code par téléphone.", w: 22 },
+  { q: "Voyez-vous des prélèvements ou abonnements que vous ne reconnaissez pas ?", hint: "Sur votre compte bancaire ou dans le store.", w: 20 },
+  { q: "Des applications inconnues sont-elles apparues sans que vous les installiez ?", w: 15 },
+  { q: "Avez-vous installé une application en dehors de l'App Store / Google Play (lien, fichier reçu) ?", w: 15 },
+  { q: "Une application a-t-elle l'autorisation de lire vos SMS ou « l'accessibilité » sans raison claire ?", hint: "Réglage très sensible, à vérifier.", w: 14 },
+  { q: "Recevez-vous des fenêtres « Virus détecté », « Batterie endommagée » ou alertes alarmantes ?", w: 8 },
+  { q: "Votre téléphone affiche-t-il des publicités même quand vous n'utilisez aucune application ?", w: 8 },
+  { q: "Votre téléphone est-il anormalement lent, chaud, ou la batterie se vide-t-elle très vite ?", hint: "Peut aussi venir d'un appareil ancien.", w: 6 }
+];
+var DIAG_MAX = DIAG_Q.reduce(function(a, x){ return a + x.w; }, 0);
+var _diag = null;
+
+function openDiag() {
+  openSheet('Diagnostic du téléphone',
+    '<div class="result-card" style="text-align:center"><div style="font-size:44px">📱</div>' +
+    '<div style="font-weight:800;font-size:19px;margin-top:6px">Votre téléphone est-il sain ?</div>' +
+    '<div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.55">10 questions simples pour repérer une prise de contrôle, une application piégée ou une arnaque en cours. Vous obtenez un score de risque et un guide de nettoyage.</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-top:10px">🔒 Tout est calculé sur votre téléphone, aucune donnée envoyée.</div>' +
+    '<button class="btn-primary" onclick="startDiag()" style="margin-top:16px">Commencer le diagnostic</button></div>');
+}
+
+function startDiag() {
+  _diag = { idx: 0, answers: [] };
+  renderDiagQuestion();
+}
+
+function renderDiagQuestion() {
+  var item = DIAG_Q[_diag.idx];
+  function opt(val, label, color) {
+    return '<button class="quiz-opt" onclick="answerDiag(\'' + val + '\')" style="width:100%;padding:15px 16px;margin-bottom:10px;background:#fff;border:1.5px solid var(--border);border-radius:14px;text-align:left;font-size:16px;font-weight:600;color:' + color + ';line-height:1.4;cursor:pointer">' + label + '</button>';
+  }
+  document.getElementById('sheet-body').innerHTML =
+    '<div style="font-size:13px;color:#0EA5A4;font-weight:800;margin-bottom:10px">Question ' + (_diag.idx + 1) + '/' + DIAG_Q.length + '</div>' +
+    '<div style="height:6px;background:var(--border);border-radius:6px;margin-bottom:18px;overflow:hidden"><div style="height:100%;width:' + Math.round((_diag.idx / DIAG_Q.length) * 100) + '%;background:#0EA5A4;border-radius:6px;transition:width .3s"></div></div>' +
+    '<div style="font-size:18px;font-weight:600;line-height:1.5;margin-bottom:' + (item.hint ? '8px' : '18px') + ';color:var(--text)">' + item.q + '</div>' +
+    (item.hint ? '<div style="font-size:13px;color:var(--text3);line-height:1.5;margin-bottom:18px">💡 ' + item.hint + '</div>' : '') +
+    opt('oui', 'Oui', '#FF3B30') +
+    opt('non', 'Non', '#16A34A') +
+    opt('idk', 'Je ne sais pas', 'var(--text2)');
+}
+
+function answerDiag(val) {
+  _diag.answers.push(val);
+  if (navigator.vibrate) navigator.vibrate(8);
+  if (_diag.idx < DIAG_Q.length - 1) { _diag.idx++; renderDiagQuestion(); }
+  else { finishDiag(); }
+}
+
+function finishDiag() {
+  var pts = 0, flags = [];
+  _diag.answers.forEach(function(a, i){
+    if (a === 'oui') { pts += DIAG_Q[i].w; flags.push({ q: DIAG_Q[i].q, sure: true }); }
+    else if (a === 'idk') { pts += DIAG_Q[i].w * 0.5; flags.push({ q: DIAG_Q[i].q, sure: false }); }
+  });
+  var risk = Math.min(100, Math.round((pts / DIAG_MAX) * 100));
+  var level, cls, emoji, title, desc;
+  if (risk <= 15) { level = 'faible'; cls = 'safe'; emoji = '✅'; title = 'Risque faible'; desc = "Aucun signe d'infection ou de prise de contrôle évident. Continuez vos bons réflexes."; }
+  else if (risk <= 45) { level = 'modéré'; cls = 'doubt'; emoji = '⚠️'; title = 'Risque modéré'; desc = "Quelques signaux à surveiller. Suivez le guide de nettoyage par précaution."; }
+  else { level = 'élevé'; cls = 'scam'; emoji = '🚨'; title = 'Risque élevé'; desc = "Plusieurs signes inquiétants. Agissez maintenant : suivez le guide et, en cas de doute sur votre argent, contactez votre banque."; }
+
+  var flagsHtml = flags.length
+    ? '<div class="section-label" style="padding:14px 0 8px">Points d\'attention</div>' +
+      flags.map(function(f){
+        return '<div class="result-card" style="margin-top:8px;border-left:4px solid ' + (f.sure ? '#FF3B30' : '#F59E0B') + '">' +
+          '<div style="font-size:14px;color:var(--text);line-height:1.45">' + (f.sure ? '🔴 ' : '🟠 ') + f.q + '</div></div>';
+      }).join('')
+    : '<div class="result-card" style="margin-top:10px;background:#F0FDF4;color:#03543F;font-size:14px;line-height:1.5">Aucun point d\'attention relevé. 👍</div>';
+
+  document.getElementById('sheet-body').innerHTML =
+    '<div class="result-card" style="text-align:center"><div style="margin:4px auto 0">' + scoreRing(100 - risk, cls === 'safe' ? '#16A34A' : cls === 'doubt' ? '#F59E0B' : '#FF3B30') + '</div>' +
+    '<div style="font-size:13px;color:var(--text3);margin-top:-6px">Niveau de risque : <strong>' + level + '</strong> (' + risk + '/100)</div></div>' +
+    '<div class="result-card" style="margin-top:12px"><div class="verdict-banner ' + cls + '"><div class="verdict-title">' + emoji + ' ' + title + '</div><div class="verdict-desc">' + desc + '</div></div></div>' +
+    flagsHtml +
+    '<div class="section-label" style="padding:16px 0 8px">Et maintenant ?</div>' +
+    '<button class="btn-secondary" onclick="diagApps()" style="margin-bottom:10px">📋 Applications à surveiller</button>' +
+    '<button class="btn-secondary" onclick="diagGuide(\'ios\')" style="margin-bottom:10px"> Guide de nettoyage iPhone (iOS)</button>' +
+    '<button class="btn-secondary" onclick="diagGuide(\'android\')" style="margin-bottom:10px">🤖 Guide de nettoyage Android</button>' +
+    (risk > 45 ? '<button class="btn-primary" onclick="openSOS()" style="margin-top:6px">J\'ai été arnaqué(e) — plan d\'urgence</button>' : '') +
+    '<button class="btn-secondary" onclick="startDiag()" style="margin-top:10px">Refaire le diagnostic</button>';
+  if (navigator.vibrate) navigator.vibrate(risk > 45 ? [20, 60, 20] : 12);
+}
+
+function diagBackBtn() {
+  return '<button class="btn-secondary" onclick="finishDiag()" style="margin-top:14px">‹ Retour au résultat</button>';
+}
+
+function diagApps() {
+  var apps = [
+    { n: 'AnyDesk', t: 'Contrôle à distance', d: "Outil légitime, mais l'arme n°1 des faux conseillers bancaires et faux support Microsoft. Si un inconnu vous l'a fait installer : désinstallez-la immédiatement.", danger: true },
+    { n: 'TeamViewer / QuickSupport', t: 'Contrôle à distance', d: "Permet de piloter votre écran à distance. À supprimer si vous ne l'utilisez pas vous-même avec un proche de confiance.", danger: true },
+    { n: 'RustDesk, AweSun, RemotePC', t: 'Contrôle à distance', d: "Mêmes risques : un inconnu peut voir tout ce que vous tapez, y compris vos mots de passe.", danger: true },
+    { n: 'Fausses apps bancaires', t: 'Hameçonnage', d: "Copies de l'app de votre banque, installées via un lien. Téléchargez toujours depuis l'App Store / Google Play officiels.", danger: true },
+    { n: 'Faux antivirus / « nettoyeurs »', t: 'Arnaque', d: "« Votre téléphone est infecté, installez ceci. » Ces apps ne nettoient rien et affichent des pubs ou volent des données.", danger: false },
+    { n: 'Apps installées hors store (.apk)', t: 'Sources inconnues', d: "Les fichiers reçus par SMS ou email peuvent contenir des virus (FluBot, Cerberus…). N'installez jamais hors store officiel.", danger: true }
+  ];
+  document.getElementById('sheet-body').innerHTML =
+    '<p class="sheet-help">Ces applications sont souvent utilisées dans les arnaques visant les seniors. Certaines sont des outils légitimes <strong>détournés</strong> — le danger vient de l\'usage qu\'un inconnu en fait.</p>' +
+    apps.map(function(a){
+      return '<div class="result-card" style="margin-top:10px;border-left:4px solid ' + (a.danger ? '#FF3B30' : '#F59E0B') + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><div style="font-weight:800;font-size:16px;color:var(--text)">' + a.n + '</div>' +
+        '<div style="font-size:11px;font-weight:700;color:' + (a.danger ? '#991B1B' : '#92400E') + ';background:' + (a.danger ? '#FEE2E2' : '#FEF3C7') + ';padding:2px 8px;border-radius:8px;white-space:nowrap">' + a.t + '</div></div>' +
+        '<div style="font-size:14px;color:var(--text2);line-height:1.5;margin-top:6px">' + a.d + '</div></div>';
+    }).join('') +
+    '<div class="result-card" style="margin-top:12px;background:#F0F4FF;font-size:13px;color:var(--text2);line-height:1.55">⚠️ Cette liste n\'est pas exhaustive. En cas de doute sur une application installée, supprimez-la : si elle est légitime, vous pourrez toujours la réinstaller.</div>' +
+    diagBackBtn();
+}
+
+function diagGuide(os) {
+  var steps, titre, ic;
+  if (os === 'ios') {
+    titre = 'Nettoyer un iPhone (iOS)'; ic = '';
+    steps = [
+      "Réglages › Général › <strong>VPN et gestion de l'appareil</strong> : supprimez tout « profil de configuration » que vous ne reconnaissez pas.",
+      "Repérez les applications inconnues : appui long sur l'icône › <strong>Supprimer l'app</strong>. Désinstallez en priorité les outils de contrôle à distance.",
+      "Réglages › <strong>Safari</strong> › Effacer historique, données de sites.",
+      "Vérifiez vos abonnements : Réglages › <strong>[votre nom]</strong> › Abonnements. Annulez ceux que vous ne connaissez pas.",
+      "Mettez à jour : Réglages › Général › <strong>Mise à jour logicielle</strong>.",
+      "Changez votre mot de passe iCloud et activez la <strong>double authentification</strong>.",
+      "En dernier recours : Réglages › Général › Transférer ou <strong>réinitialiser l'iPhone</strong> (sauvegardez vos photos avant)."
+    ];
+  } else {
+    titre = 'Nettoyer un téléphone Android'; ic = '🤖';
+    steps = [
+      "Paramètres › <strong>Applications</strong> : désinstallez AnyDesk, TeamViewer et toute application inconnue.",
+      "Paramètres › <strong>Accessibilité</strong> : désactivez l'accès des applications que vous ne reconnaissez pas (c'est par là que les pirates espionnent).",
+      "Paramètres › Sécurité › <strong>Applications d'administration</strong> : retirez les droits aux apps suspectes.",
+      "Désactivez l'<strong>installation depuis des sources inconnues</strong> pour tous les navigateurs.",
+      "Ouvrez le Play Store › votre profil › <strong>Play Protect</strong> › Analyser l'appareil.",
+      "Play Store › profil › <strong>Paiements et abonnements</strong> : annulez les abonnements non reconnus.",
+      "Redémarrez en <strong>mode sans échec</strong> (appui long sur Éteindre) pour repérer les apps malveillantes.",
+      "En dernier recours : Paramètres › Système › <strong>Réinitialisation d'usine</strong> (sauvegardez vos données avant)."
+    ];
+  }
+  document.getElementById('sheet-body').innerHTML =
+    '<div style="font-weight:800;font-size:18px;margin-bottom:4px">' + ic + ' ' + titre + '</div>' +
+    '<p class="sheet-help" style="margin-top:6px">Suivez les étapes dans l\'ordre. En cas de blocage, appelez l\'assistance Despy.</p>' +
+    steps.map(function(s, i){
+      return '<div class="result-card" style="margin-top:10px;display:flex;gap:12px;align-items:flex-start">' +
+        '<div style="flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:#0EA5A4;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center">' + (i + 1) + '</div>' +
+        '<div style="font-size:14px;color:var(--text);line-height:1.55">' + s + '</div></div>';
+    }).join('') +
+    '<button class="btn-primary" onclick="window.location=\'tel:+33689148395\'" style="margin-top:14px">📞 Appeler l\'assistance Despy</button>' +
+    diagBackBtn();
 }
 
 // ─── ABONNEMENT / PAIEMENT STRIPE ───
