@@ -1772,69 +1772,57 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
 
 
 <!-- ════════════════════════════════════════ -->
-<!-- SCORE CYBER — Test gratuit en 60 secondes -->
+<!-- TESTS GRATUITS — Score Cyber + Diagnostic tél. -->
+<!-- (2 tests regroupés pour la lisibilité)        -->
 <!-- ════════════════════════════════════════ -->
-<section id="cyber-score" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
+<section id="tests-gratuits" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="wrap">
-    <div class="cs-card reveal" style="max-width:780px;margin:0 auto;background:linear-gradient(160deg,#ffffff 0%,#f7f9fc 100%);border:1px solid var(--border);border-radius:24px;padding:clamp(2rem,5vw,3.5rem);box-shadow:0 4px 24px rgba(45,91,255,.06);position:relative;overflow:hidden">
-      <!-- Halo décoratif -->
-      <div style="position:absolute;top:-60px;right:-60px;width:240px;height:240px;background:radial-gradient(circle,rgba(45,91,255,.12),transparent 70%);pointer-events:none"></div>
-      <div style="position:relative;display:grid;grid-template-columns:1fr;gap:2rem;align-items:center">
-        <div>
-          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px;letter-spacing:.02em">
+    <div class="text-center reveal" style="margin-bottom:2.5rem">
+      <div class="section-tag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">✅ 2 tests gratuits · sans inscription</div>
+      <h2 class="sh2">Faites le point en 1 minute</h2>
+      <p class="sdesc">Deux tests rapides et anonymes : évaluez votre niveau de sécurité, et vérifiez si votre téléphone est sain. Résultat immédiat, aucune création de compte.</p>
+    </div>
+    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:900px;margin:0 auto">
+
+      <!-- Carte 1 : Score Cyber -->
+      <div id="cyber-score" style="display:flex;flex-direction:column;background:linear-gradient(160deg,#ffffff 0%,#f7f9fc 100%);border:1px solid var(--border);border-radius:22px;padding:28px 26px;box-shadow:0 4px 24px rgba(45,91,255,.06);position:relative;overflow:hidden">
+        <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(45,91,255,.12),transparent 70%);pointer-events:none"></div>
+        <div style="position:relative;display:flex;flex-direction:column;flex:1">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px;width:fit-content">
             <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)"></span>
-            Test gratuit · 60 secondes
+            60 secondes
           </div>
-          <h2 style="font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;color:var(--text);margin:0 0 12px;letter-spacing:-.03em;line-height:1.1">
-            Connaissez-vous votre<br><span style="background:linear-gradient(120deg,var(--blue),#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Score Cyber</span> ?
-          </h2>
-          <p style="font-size:16px;color:var(--text2);line-height:1.6;margin:0 0 1.5rem;max-width:520px">
-            10 questions personnalisées pour évaluer votre niveau de sécurité numérique. Découvrez votre note A, B, C ou D et vos vulnérabilités. <strong style="color:var(--text)">Sans création de compte.</strong>
+          <h3 style="font-size:1.4rem;font-weight:900;color:var(--text);margin:0 0 10px;letter-spacing:-.02em;line-height:1.15">
+            Votre <span style="background:linear-gradient(120deg,var(--blue),#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Score Cyber</span>
+          </h3>
+          <p style="font-size:15px;color:var(--text2);line-height:1.6;margin:0 0 1.25rem">
+            10 questions pour évaluer votre sécurité numérique. Vous obtenez une note A, B, C ou D et vos points faibles à corriger.
           </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.75rem">
-            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Anonyme
-            </div>
-            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Résultat immédiat
-            </div>
-            <div style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);font-weight:600">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Conseils personnalisés
-            </div>
-          </div>
-          <button onclick="openCyberScore()" style="display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(17,17,17,.15)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(17,17,17,.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(17,17,17,.15)'">
+          <button onclick="openCyberScore()" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:var(--text);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(17,17,17,.15)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(17,17,17,.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(17,17,17,.15)'">
             Démarrer le test
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </button>
-          <div style="font-size:12px;color:var(--text3);margin-top:12px">Plus de 1 200 personnes ont déjà fait le test cette semaine.</div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
 
-
-<!-- ── DIAGNOSTIC TÉLÉPHONE (teaser gratuit) ── -->
-<section id="diag-tel" style="background:#fff;padding:5rem 0;border-bottom:1px solid var(--border)">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:2rem">
-      <div class="section-tag" style="background:#E6FAF8;color:#0E7C7B;border-color:#9CE0DC">🩺 Diagnostic gratuit</div>
-      <h2 class="sh2">Votre téléphone est-il sain ?</h2>
-      <p class="sdesc">Des pubs qui s'affichent partout, des applications inconnues, des lenteurs… En quelques questions, découvrez si votre téléphone est sous contrôle d'un tiers, pollué par des applications indésirables, ou simplement fatigué. Gratuit, sans inscription.</p>
-    </div>
-    <div class="reveal" style="max-width:680px;margin:0 auto">
-      <div id="dweb-card" style="background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:28px 24px">
-        <div style="text-align:center">
-          <div style="font-size:46px">📱</div>
-          <div style="font-weight:800;font-size:20px;margin-top:6px;color:var(--text)">Faites le test en 1 minute</div>
-          <div style="font-size:15px;color:var(--text2);margin-top:8px;line-height:1.6;max-width:480px;margin-left:auto;margin-right:auto">11 questions simples. Vous obtenez un diagnostic clair — sécurité, pollution publicitaire ou performance — et les premières actions à mener.</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:12px">🔒 Tout est calculé dans votre navigateur. Aucune donnée envoyée.</div>
-          <button class="btn-primary" onclick="dwebStart()" style="margin-top:18px">Commencer le diagnostic</button>
+      <!-- Carte 2 : Diagnostic téléphone -->
+      <div id="diag-tel" style="display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:22px;padding:28px 26px;box-shadow:0 4px 24px rgba(14,124,123,.06)">
+        <div id="dweb-card" style="display:flex;flex-direction:column;flex:1">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:#E6FAF8;border:1px solid #9CE0DC;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#0E7C7B;margin-bottom:14px;width:fit-content">
+            <span style="font-size:14px;line-height:1">📱</span>
+            Diagnostic
+          </div>
+          <h3 style="font-size:1.4rem;font-weight:900;color:var(--text);margin:0 0 10px;letter-spacing:-.02em;line-height:1.15">
+            Votre téléphone est-il sain ?
+          </h3>
+          <p style="font-size:15px;color:var(--text2);line-height:1.6;margin:0 0 1.25rem">
+            11 questions simples. Découvrez si votre téléphone est sous contrôle d'un tiers, pollué par des applis indésirables, ou juste fatigué — et quoi faire.
+          </p>
+          <div style="font-size:12px;color:var(--text3);margin:0 0 14px">🔒 Calculé dans votre navigateur. Aucune donnée envoyée.</div>
+          <button class="btn-primary" onclick="dwebStart()" style="margin-top:auto">Commencer le diagnostic</button>
         </div>
       </div>
+
     </div>
   </div>
 </section>
