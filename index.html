@@ -1295,13 +1295,13 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <h1 style="color:#fff">Ne tombez plus dans<br><span>les arnaques en ligne.</span></h1>
       <p class="hero-sub" style="color:rgba(255,255,255,0.75)">SMS suspects, faux sites, appels frauduleux... Despy protège les seniors et leurs proches : on vérifie pour vous et on vous guide pas à pas. Sans jargon, sans compétence technique.</p>
       <div class="hero-btns">
-        <button id="hero-cta-primary" class="btn-primary" onclick="showFreeSignup()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span id="hero-cta-primary-label">Créer mon compte gratuit</span>
+        <button id="hero-cta-primary" class="btn-primary" onclick="goToAnalyser()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span id="hero-cta-primary-label">Vérifier un message gratuitement</span>
         </button>
-        <button id="hero-cta-signup" class="btn-secondary" onclick="showPage('tarifs')" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Voir les tarifs
+        <button id="hero-cta-signup" class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Créer mon compte gratuit
         </button>
         <button class="btn-secondary" onclick="go('conseiller')" style="display:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -5695,12 +5695,16 @@ function updateNavForSession() {
         }
       }
     } else {
-      // NON CONNECTÉ (trafic froid) : bouton primaire = créer un compte gratuit,
-      // bouton secondaire = voir les tarifs.
-      if (heroSignup) heroSignup.style.display = '';
+      // NON CONNECTÉ (trafic froid) : bouton primaire = essayer l'analyseur
+      // tout de suite (sans inscription, comme promis par la pub),
+      // bouton secondaire = créer un compte gratuit.
+      if (heroSignup) {
+        heroSignup.style.display = '';
+        heroSignup.setAttribute('onclick', "showFreeSignup()");
+      }
       if (heroPrim && heroPrimLabel) {
-        heroPrimLabel.textContent = 'Créer mon compte gratuit';
-        heroPrim.setAttribute('onclick', "showFreeSignup()");
+        heroPrimLabel.textContent = 'Vérifier un message gratuitement';
+        heroPrim.setAttribute('onclick', "goToAnalyser()");
       }
     }
   } catch(e) { /* silencieux */ }
@@ -8584,32 +8588,15 @@ function showFreeSignup() {
   var emailField  = makeField('Email', 'free-email', 'email', 'votre@email.fr', true);
   var pwdField    = makeField('Mot de passe', 'free-password', 'password', '8 caractères minimum', true);
 
-  // Séparateur visuel : champs facultatifs (collectés pour info, non bloquants)
-  var optHint = document.createElement('div');
-  optHint.style.cssText = 'font-size:12px;color:var(--text3);margin:16px 0 6px;font-weight:600';
-  optHint.textContent = 'Facultatif — vous pourrez compléter plus tard';
-
-  var nomField = makeField('Nom', 'free-nom', 'text', 'Dupont', false);
-  var telField = makeField('Téléphone', 'free-tel', 'tel', '06 12 34 56 78', false);
-
-  // Code de parrainage / promo (optionnel)
-  var refWrap = document.createElement('div');
-  refWrap.className = 'field';
-  var refLbl = document.createElement('label');
-  refLbl.textContent = 'Code de parrainage ou promo (optionnel)';
-  refLbl.style.fontSize = '12px';
+  // Code de parrainage : conservé en champ caché, pré-rempli depuis l'URL (?ref=XXX).
+  // Plus affiché pour réduire les frictions, mais le parrainage reste fonctionnel.
   var refInp = document.createElement('input');
-  refInp.type = 'text'; refInp.id = 'free-ref'; refInp.maxLength = 12;
-  refInp.placeholder = 'EX: ABC123 — 1 mois offert';
-  refInp.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--text);outline:none;font-family:monospace;letter-spacing:2px;text-transform:uppercase;transition:border-color .2s';
-  refInp.addEventListener('input', function(){ refInp.value = refInp.value.toUpperCase(); });
-  // Pré-remplir si ?ref=XXX dans l'URL
+  refInp.type = 'hidden'; refInp.id = 'free-ref';
   try {
     var p = new URLSearchParams(window.location.search);
     var r = p.get('ref');
     if (r) refInp.value = r.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
   } catch(e){}
-  refWrap.appendChild(refLbl); refWrap.appendChild(refInp);
 
   // Erreur
   var errDiv = document.createElement('div');
@@ -8677,24 +8664,16 @@ function showFreeSignup() {
   trust.textContent = 'Données sécurisées · Conformément au RGPD · Jamais revendues';
 
   // Bloc Google (en haut, le plus visible — inscription en 1 clic, sans mot de passe)
+  // buildGoogleSection('signup') ajoute déjà son propre séparateur "ou avec un email".
   var googleSection = buildGoogleSection('signup');
 
-  // Séparateur entre Google et l'inscription par email
-  var emailSep = document.createElement('div');
-  emailSep.style.cssText = 'text-align:center;font-size:13px;color:var(--text3);margin:16px 0 8px';
-  emailSep.textContent = '— ou avec votre email —';
-
-  // Assembler : champs essentiels d'abord, facultatifs ensuite
+  // Assembler : uniquement l'essentiel (Prénom, Email, Mot de passe)
   box.appendChild(title); box.appendChild(sub);
   box.appendChild(googleSection);
-  box.appendChild(emailSep);
   box.appendChild(prenomField);
   box.appendChild(emailField);
   box.appendChild(pwdField);
-  box.appendChild(optHint);
-  box.appendChild(nomField);
-  box.appendChild(telField);
-  box.appendChild(refWrap);
+  box.appendChild(refInp);
   box.appendChild(errDiv); box.appendChild(cguWrap);
   box.appendChild(btn); box.appendChild(loginLink); box.appendChild(sep);
   box.appendChild(paidBtn); box.appendChild(cancel); box.appendChild(trust);
@@ -9993,6 +9972,25 @@ function switchTool(name) {
     activeTab.style.fontWeight = '800';
   }
   if (activePanel) activePanel.style.display = 'block';
+}
+
+// Amène le visiteur directement à l'analyseur gratuit (sans inscription),
+// comme promis par la publicité : il peut vérifier un message tout de suite.
+function goToAnalyser() {
+  try {
+    var section = document.getElementById('centre-outils');
+    if (!section) { showFreeSignup(); return; }
+    // S'assurer qu'on est bien sur la page d'accueil (et pas une sous-page).
+    try { if (_currentPage && _currentPage !== 'home' && typeof showPage === 'function') showPage('home'); } catch(e) {}
+    switchTool('analyse');
+    setTimeout(function() {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var ta = document.getElementById('analyse-input');
+      if (ta) setTimeout(function(){ try { ta.focus(); } catch(e){} }, 450);
+    }, 60);
+  } catch (e) {
+    try { showFreeSignup(); } catch(e2) {}
+  }
 }
 
 // ── Diagnostic téléphone (teaser gratuit, 100% côté navigateur) ──
