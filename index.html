@@ -4616,7 +4616,7 @@ function triggerPWAInstall() {
           <div style="font-size:13px;font-weight:700;color:var(--text)">SOS Urgence</div>
           <div style="font-size:14px;color:var(--text3);margin-top:2px">Plan d'action immédiat</div>
         </button>
-        <button onclick="var c=document.getElementById('darkweb-card');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});checkDarkWebNow()" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
+        <button onclick="switchTab('protection');setTimeout(function(){var c=document.getElementById('darkweb-card');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});checkDarkWebNow()},120)" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">🌑</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Dark Web</div>
           <div style="font-size:14px;color:var(--text3);margin-top:2px">Vérifier mes données</div>
