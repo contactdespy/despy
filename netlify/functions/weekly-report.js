@@ -62,6 +62,27 @@ exports.handler = async () => {
       (outs || []).forEach(o => optoutSet.add((o.email || '').toLowerCase()));
     } catch (e) { /* table absente : on ignore */ }
 
+    // Activité récente de CHAQUE abonné (7 derniers jours), en 2 requêtes
+    // groupées (pas une par abonné). Sert à personnaliser l'email avec un
+    // mot d'encouragement. Dégradation propre si une table manque.
+    const activityByEmail = {};
+    const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+    const bumpAct = (email, field) => {
+      const k = (email || '').toLowerCase();
+      if (!activityByEmail[k]) activityByEmail[k] = { analyses: 0, quiz: 0 };
+      activityByEmail[k][field]++;
+    };
+    try {
+      const { data: aRows } = await supabase
+        .from('analyses_history').select('email, created_at').gte('created_at', weekAgo);
+      (aRows || []).forEach(r => bumpAct(r.email, 'analyses'));
+    } catch (e) { /* table absente : on ignore */ }
+    try {
+      const { data: qRows } = await supabase
+        .from('quiz_history').select('email, created_at').gte('created_at', weekAgo);
+      (qRows || []).forEach(r => bumpAct(r.email, 'quiz'));
+    } catch (e) { /* table absente : on ignore */ }
+
     const weekNum = getIsoWeek(new Date());
     const start = (weekNum - 1 + N) % N;
     let sent = 0;
@@ -93,6 +114,17 @@ exports.handler = async () => {
         ? `<div style="background:#e9f9ef;border-left:4px solid #16a34a;border-radius:0 12px 12px 0;padding:18px;margin:0 0 20px">
              <p style="font-weight:800;color:#16a34a;margin:0 0 6px;font-size:16px">🎉 Bravo ${prenom} !</p>
              <p style="font-size:15px;color:#333;line-height:1.6;margin:0">Cette semaine, vous avez sécurisé : <strong>${recentTitles.join(' · ')}</strong>. Continuez comme ça, chaque geste compte.</p>
+           </div>`
+        : '';
+
+      // Bandeau d'engagement : si le membre a utilisé Despy cette semaine.
+      const act = activityByEmail[emailKey] || { analyses: 0, quiz: 0 };
+      const actParts = [];
+      if (act.analyses > 0) actParts.push(`<strong>${act.analyses}</strong> message${act.analyses > 1 ? 's' : ''} suspect${act.analyses > 1 ? 's' : ''} analysé${act.analyses > 1 ? 's' : ''}`);
+      if (act.quiz > 0) actParts.push(`<strong>${act.quiz}</strong> quiz`);
+      const activityBanner = actParts.length
+        ? `<div style="background:#eef4ff;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:16px;margin:0 0 20px">
+             <p style="font-size:15px;color:#333;line-height:1.6;margin:0">👏 Cette semaine, vous avez utilisé Despy : ${actParts.join(' et ')}. Bravo pour votre vigilance !</p>
            </div>`
         : '';
 
@@ -133,6 +165,7 @@ exports.handler = async () => {
                 <div style="padding:28px">
                   <p style="font-size:17px;color:#111">Bonjour <strong>${prenom}</strong> 👋</p>
                   ${congratsBanner}
+                  ${activityBanner}
                   <div style="background:#f0f3ff;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:22px;margin:20px 0">
                     <p style="font-weight:800;color:#2D5BFF;margin:0 0 14px;font-size:19px;line-height:1.4">${tip.titre}</p>
                     <p style="font-size:16px;color:#333;line-height:1.7;margin:0 0 14px"><strong style="color:#0a1f3a">C'est quoi&nbsp;?</strong> ${tip.quoi}</p>
