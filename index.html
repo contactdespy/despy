@@ -48,7 +48,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{overflow-x:hidden;max-width:100%}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;line-height:1.6;-webkit-font-smoothing:antialiased;font-size:16px}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:#2D5BFF;border-radius:2px}
 
@@ -2159,7 +2159,7 @@ function triggerPWAInstall() {
 
   // Cas spécial : navigateur in-app (Facebook, Insta, etc.)
   if (isInApp) {
-    alert('Pour installer Despy, ouvrez cette page dans Safari (iPhone) ou Chrome (Android).\n\nDans cette app, touchez le menu et choisissez « Ouvrir dans Safari » ou « Ouvrir dans Chrome ».');
+    despyNotify('Pour installer Despy, ouvrez cette page dans Safari (iPhone) ou Chrome (Android).\n\nDans cette app, touchez le menu et choisissez « Ouvrir dans Safari » ou « Ouvrir dans Chrome ».', 'info');
     return;
   }
 
@@ -2179,7 +2179,7 @@ function triggerPWAInstall() {
     var onAppPage = window.location.pathname.indexOf('despy_app_v') !== -1 || window.location.pathname === '/app';
     if (!onAppPage) {
       // Petite popup avant la redirection pour expliquer
-      alert('Pour bien installer l\'app, nous allons d\'abord vous emmener sur l\'écran de l\'app.\n\nUne fois sur la page de l\'app, touchez Partager ⬆️ en bas, puis « Sur l\'écran d\'accueil ».');
+      despyNotify('Pour bien installer l\'app, nous allons d\'abord vous emmener sur l\'écran de l\'app.\n\nUne fois sur la page de l\'app, touchez Partager ⬆️ en bas, puis « Sur l\'écran d\'accueil ».', 'info');
       window.location = '/app';
       return;
     }
@@ -2729,7 +2729,7 @@ function triggerPWAInstall() {
               </div>
             </div>
             <div style="margin-top:12px;padding:10px;background:var(--blue-light);border-radius:10px;text-align:center;font-size:12px;color:var(--text3)">
-              Votre position s'affichera ici apres votre premier quiz 🎯
+              Votre position s'affichera ici après votre premier quiz 🎯
             </div>
           </div>
         </div>
@@ -4609,22 +4609,22 @@ function triggerPWAInstall() {
         <button onclick="showPage('conseiller')" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">💬</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Conseiller IA</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px">Posez une question</div>
+          <div style="font-size:14px;color:var(--text3);margin-top:2px">Posez une question</div>
         </button>
         <button onclick="showSOS()" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">🚨</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">SOS Urgence</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px">Plan d'action immédiat</div>
+          <div style="font-size:14px;color:var(--text3);margin-top:2px">Plan d'action immédiat</div>
         </button>
         <button onclick="checkDarkWebNow()" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">🌑</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Dark Web</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px">Vérifier mes données</div>
+          <div style="font-size:14px;color:var(--text3);margin-top:2px">Vérifier mes données</div>
         </button>
         <button onclick="switchTab('formation')" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">🎯</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Quiz du jour</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px">Gagnez des XP</div>
+          <div style="font-size:14px;color:var(--text3);margin-top:2px">Gagnez des XP</div>
         </button>
       </div>
 
@@ -5589,12 +5589,12 @@ async function siteLogin() {
   var pwd = pwdEl ? (pwdEl.value || '').trim() : '';
 
   if (!email || !email.includes('@')) {
-    alert('Veuillez saisir un email valide.');
+    despyNotify('Veuillez saisir un email valide.', 'error');
     emailEl.focus();
     return;
   }
   if (!pwd) {
-    alert('Veuillez saisir votre mot de passe.');
+    despyNotify('Veuillez saisir votre mot de passe.', 'error');
     if (pwdEl) pwdEl.focus();
     return;
   }
@@ -5610,9 +5610,9 @@ async function siteLogin() {
       body: JSON.stringify({ email: email, password: pwd })
     });
     var data = await r.json();
-    if (!r.ok || data.error) { alert(data.error || 'Erreur, réessayez.'); return; }
+    if (!r.ok || data.error) { despyNotify(data.error || 'Erreur, réessayez.', 'error'); return; }
     if (!data.exists) {
-      alert('Email ou mot de passe incorrect.\n\nSi vous n\'avez pas encore de compte, créez-le gratuitement via "Compte gratuit".');
+      despyNotify('Email ou mot de passe incorrect.\n\nSi vous n\'avez pas encore de compte, créez-le gratuitement via "Compte gratuit".', 'error');
       if (pwdEl) { pwdEl.value = ''; pwdEl.focus(); }
       return;
     }
@@ -5629,7 +5629,7 @@ async function siteLogin() {
     showPage('client');
     updateNavForSession();
   } catch(e) {
-    alert('Erreur réseau, réessayez.');
+    despyNotify('Erreur réseau, réessayez.', 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = prevTxt; }
   }
@@ -5643,7 +5643,7 @@ var STRIPE_LIVRET_URL = 'https://buy.stripe.com/dRm4gB2Gx7fO6x80858AE04';
 
 function buyLivret() {
   if (!STRIPE_LIVRET_URL || STRIPE_LIVRET_URL.indexOf('__REMPLACER') !== -1) {
-    alert('⏳ Le paiement en ligne sera disponible très bientôt.\n\nEn attendant, vous pouvez réserver le livret par email à :\ncontact.despy@gmail.com');
+    despyNotify('⏳ Le paiement en ligne sera disponible très bientôt.\n\nEn attendant, vous pouvez réserver le livret par email à :\ncontact.despy@gmail.com', 'info');
     return;
   }
   window.open(STRIPE_LIVRET_URL, '_blank', 'noopener');
@@ -5722,7 +5722,7 @@ function siteDeleteAccount() {
   if (confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) {
     siteSession.clear();
     showPage('home');
-    alert('Compte supprimé. Vos données seront effacées sous 30 jours conformément au RGPD.');
+    despyNotify('Compte supprimé. Vos données seront effacées sous 30 jours conformément au RGPD.', 'info');
   }
 }
 
@@ -5730,7 +5730,7 @@ function shareRef() {
   var s = siteSession.get();
   var code = s ? ('DESPY-' + s.email.substring(0,4).toUpperCase() + '-2026') : 'DESPY-????-2026';
   if (navigator.share) { navigator.share({ title: 'Despy', text: 'Protégez votre vie numérique avec Despy — utilisez mon code ' + code, url: 'https://despy.fr' }); }
-  else { navigator.clipboard.writeText(code); alert('Code copié : ' + code); }
+  else { navigator.clipboard.writeText(code); despyNotify('Code copié : ' + code, 'success'); }
 }
 
 // ======================================
@@ -7255,7 +7255,7 @@ function renderJournal() {
     msgEl.style.cssText = 'font-size:13px;font-weight:600;color:var(--text)';
     msgEl.textContent = entry.message;
     var dateEl = document.createElement('div');
-    dateEl.style.cssText = 'font-size:11px;color:var(--text3);margin-top:2px';
+    dateEl.style.cssText = 'font-size:14px;color:var(--text3);margin-top:2px';
     dateEl.textContent = dateStr + ' \u00e0 ' + timeStr;
     textEl.appendChild(msgEl);
     textEl.appendChild(dateEl);
@@ -8280,7 +8280,7 @@ function renderGoogleButton(containerId, mode, plan) {
 
 async function handleGoogleAuth(response, mode, plan) {
   if (!response || !response.credential) {
-    alert('Connexion Google annulée.');
+    despyNotify('Connexion Google annulée.', 'info');
     return;
   }
 
@@ -8306,7 +8306,7 @@ async function handleGoogleAuth(response, mode, plan) {
 
     if (!r.ok || data.error) {
       loader.remove();
-      alert(data.error || 'Erreur lors de la connexion Google.');
+      despyNotify(data.error || 'Erreur lors de la connexion Google.', 'error');
       return;
     }
 
@@ -8352,7 +8352,7 @@ async function handleGoogleAuth(response, mode, plan) {
 
   } catch(e) {
     loader.remove();
-    alert('Erreur réseau. Réessayez.');
+    despyNotify('Erreur réseau. Réessayez.', 'error');
   }
 }
 
@@ -9346,7 +9346,7 @@ function showQuizModal() {
   // Vérifier la session
   var session = siteSession.get();
   if (!session || !session.email) {
-    alert('Connectez-vous ou créez un compte gratuit pour accéder au quiz.');
+    despyNotify('Connectez-vous ou créez un compte gratuit pour accéder au quiz.', 'info');
     showFreeSignup();
     return;
   }
@@ -9367,11 +9367,11 @@ function showQuizModal() {
     }
   } catch(e) {
     console.error('Quiz init error:', e);
-    alert('Erreur de chargement du quiz : ' + e.message);
+    despyNotify('Erreur de chargement du quiz : ' + e.message, 'error');
     return;
   }
   if (!QUIZZES || !QUIZZES.length) {
-    alert('Aucune question disponible pour ce module. Réessayez plus tard.');
+    despyNotify('Aucune question disponible pour ce module. Réessayez plus tard.', 'info');
     return;
   }
   window._quizIdx = 0;
@@ -9976,7 +9976,7 @@ var analyseImageData = null; // capture d'écran encodée (data URL JPEG) ou nul
 // Redimensionne l'image côté client (max 1280px, JPEG) pour un envoi léger
 function handleAnalyseImage(file) {
   if (!file || !file.type || file.type.indexOf('image/') !== 0) {
-    alert('Merci de choisir une image (capture d\'écran ou photo).');
+    despyNotify('Merci de choisir une image (capture d\'écran ou photo).', 'info');
     return;
   }
   var reader = new FileReader();
@@ -9992,7 +9992,7 @@ function handleAnalyseImage(file) {
       catch (err) { analyseImageData = e.target.result; }
       showAnalyseImagePreview(analyseImageData);
     };
-    img.onerror = function(){ alert('Image illisible, réessayez avec une autre.'); };
+    img.onerror = function(){ despyNotify('Image illisible, réessayez avec une autre.', 'error'); };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
@@ -10433,7 +10433,7 @@ var _defiStart = 0;
 async function startDefiChrono() {
   var session = siteSession.get();
   if (!session || !session.email) {
-    alert('Connectez-vous pour accéder au Défi Chrono.');
+    despyNotify('Connectez-vous pour accéder au Défi Chrono.', 'info');
     return;
   }
   // Réservé aux abonnés
@@ -10443,7 +10443,7 @@ async function startDefiChrono() {
     var res = await fetch('/.netlify/functions/defi-chrono');
     _defiQuiz = await res.json();
   } catch(e) {
-    alert('Impossible de charger le quiz. Réessayez.');
+    despyNotify('Impossible de charger le quiz. Réessayez.', 'error');
     return;
   }
 
@@ -11546,6 +11546,29 @@ function updateMobileNavActive(pageId) {
     <span>Compte</span>
   </button>
 </nav>
+
+<!-- Notification premium : remplace les alert() système (plus rassurant pour les seniors) -->
+<div id="despy-notify-overlay" style="display:none;position:fixed;inset:0;background:rgba(10,31,58,.45);z-index:99999;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)despyNotifyClose()">
+  <div role="alertdialog" aria-live="assertive" style="background:#fff;border-radius:18px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(10,31,58,.3);overflow:hidden;font-family:'Inter',-apple-system,sans-serif">
+    <div id="despy-notify-bar" style="height:6px;background:#2D5BFF"></div>
+    <div style="padding:28px 24px 24px;text-align:center">
+      <div id="despy-notify-icon" style="font-size:44px;line-height:1;margin-bottom:14px">ℹ️</div>
+      <p id="despy-notify-msg" style="font-size:16px;color:#222;line-height:1.6;margin:0 0 22px;white-space:pre-line"></p>
+      <button onclick="despyNotifyClose()" style="background:#2D5BFF;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;min-height:48px;min-width:120px">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+  function despyNotify(message, type){
+    var conf = ({error:{i:'⚠️',c:'#dc2626'},success:{i:'✅',c:'#16a34a'},info:{i:'ℹ️',c:'#2D5BFF'}})[type] || {i:'ℹ️',c:'#2D5BFF'};
+    document.getElementById('despy-notify-icon').textContent = conf.i;
+    document.getElementById('despy-notify-bar').style.background = conf.c;
+    document.getElementById('despy-notify-msg').textContent = message;
+    document.getElementById('despy-notify-overlay').style.display = 'flex';
+  }
+  function despyNotifyClose(){ document.getElementById('despy-notify-overlay').style.display = 'none'; }
+  window.despyNotify = despyNotify; window.despyNotifyClose = despyNotifyClose;
+</script>
 
 </body>
 </html>
