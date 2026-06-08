@@ -54,6 +54,14 @@ exports.handler = async () => {
       }
     } catch (e) { console.warn('weekly_tip_log absente, progression ignorée:', e.message); }
 
+    // Abonnés désinscrits des conseils (table dédiée — n'affecte PAS le
+    // statut d'abonné payant `subscribed`). Dégradation propre si absente.
+    const optoutSet = new Set();
+    try {
+      const { data: outs } = await supabase.from('email_optouts').select('email');
+      (outs || []).forEach(o => optoutSet.add((o.email || '').toLowerCase()));
+    } catch (e) { /* table absente : on ignore */ }
+
     const weekNum = getIsoWeek(new Date());
     const start = (weekNum - 1 + N) % N;
     let sent = 0;
@@ -61,6 +69,7 @@ exports.handler = async () => {
     for (const client of clients) {
       const prenom = client.prenom || client.name?.split(' ')[0] || 'cher membre';
       const emailKey = (client.email || '').toLowerCase();
+      if (optoutSet.has(emailKey)) continue; // désinscrit des conseils
       const prog = progressByEmail[emailKey] || { completed: new Set(), recent: [] };
 
       // Choisir le prochain conseil NON validé, à partir de la position de la semaine.
@@ -81,22 +90,26 @@ exports.handler = async () => {
         .map(id => TIPS_BY_ID[id] && TIPS_BY_ID[id].titre)
         .filter(Boolean);
       const congratsBanner = recentTitles.length
-        ? `<div style="background:#e9f9ef;border-left:4px solid #16a34a;border-radius:0 12px 12px 0;padding:16px;margin:0 0 20px">
-             <p style="font-weight:800;color:#16a34a;margin:0 0 6px;font-size:15px">🎉 Bravo ${prenom} !</p>
-             <p style="font-size:13px;color:#333;line-height:1.6;margin:0">Cette semaine, vous avez sécurisé : <strong>${recentTitles.join(' · ')}</strong>. Continuez comme ça, chaque geste compte.</p>
+        ? `<div style="background:#e9f9ef;border-left:4px solid #16a34a;border-radius:0 12px 12px 0;padding:18px;margin:0 0 20px">
+             <p style="font-weight:800;color:#16a34a;margin:0 0 6px;font-size:16px">🎉 Bravo ${prenom} !</p>
+             <p style="font-size:15px;color:#333;line-height:1.6;margin:0">Cette semaine, vous avez sécurisé : <strong>${recentTitles.join(' · ')}</strong>. Continuez comme ça, chaque geste compte.</p>
            </div>`
         : '';
 
       // Bloc d'action : bouton « C'est fait » (ou message si tout est validé).
       const token = makeToken(client.email, tip.id);
       const doneUrl = `${process.env.URL}/.netlify/functions/tip-done?e=${encodeURIComponent(client.email)}&t=${encodeURIComponent(tip.id)}&k=${token}`;
+      const unsubUrl = `${process.env.URL}/.netlify/functions/unsubscribe?e=${encodeURIComponent(client.email)}&k=${makeToken(client.email, 'unsub')}`;
+      const sujet = tip.titre.substring(tip.titre.indexOf(' ') + 1);
+      // Préheader : texte d'aperçu affiché dans la boîte de réception.
+      const preheader = `Votre conseil sécurité de la semaine : ${sujet}`;
       const actionBlock = allDone
-        ? `<p style="font-size:13px;color:#16a34a;text-align:center;font-weight:700;margin:8px 0 0">✅ Vous avez parcouru tous nos conseils essentiels. Voici un rappel utile !</p>`
+        ? `<p style="font-size:15px;color:#16a34a;text-align:center;font-weight:700;margin:8px 0 0">✅ Vous avez parcouru tous nos conseils essentiels. Voici un rappel utile !</p>`
         : `<div style="text-align:center;margin:4px 0 0">
-             <a href="${doneUrl}" style="background:#16a34a;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block">
+             <a href="${doneUrl}" style="background:#16a34a;color:#fff;padding:13px 26px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
                ✅ C'est fait, je l'ai mis en place
              </a>
-             <p style="font-size:11px;color:#999;margin:10px 0 0">En cliquant, Despy le note et ne vous renverra plus ce conseil.</p>
+             <p style="font-size:12px;color:#999;margin:10px 0 0">En cliquant, Despy le note et ne vous renverra plus ce conseil.</p>
            </div>`;
 
       try {
@@ -110,29 +123,31 @@ exports.handler = async () => {
             type: 'custom',
             data: {
               email: client.email,
-              subject: `🛡️ Conseil Despy : ${tip.titre.substring(tip.titre.indexOf(' ') + 1)}`,
+              subject: `🛡️ Conseil Despy : ${sujet}`,
               html: `<div style="font-family:Arial,sans-serif;max-width:580px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+                <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ffffff;opacity:0">${preheader}</div>
                 <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:28px;color:#fff;text-align:center">
                   <div style="font-size:11px;font-weight:700;opacity:.7;letter-spacing:2px">DESPY — CONSEIL HEBDOMADAIRE</div>
                   <div style="font-size:20px;font-weight:900;margin-top:8px">Semaine ${weekNum}</div>
                 </div>
                 <div style="padding:28px">
-                  <p style="font-size:16px;color:#111">Bonjour <strong>${prenom}</strong> 👋</p>
+                  <p style="font-size:17px;color:#111">Bonjour <strong>${prenom}</strong> 👋</p>
                   ${congratsBanner}
-                  <div style="background:#f0f3ff;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:20px;margin:20px 0">
-                    <p style="font-weight:800;color:#2D5BFF;margin:0 0 14px;font-size:17px;line-height:1.4">${tip.titre}</p>
-                    <p style="font-size:14px;color:#333;line-height:1.7;margin:0 0 12px"><strong style="color:#0a1f3a">C'est quoi&nbsp;?</strong> ${tip.quoi}</p>
-                    <p style="font-size:14px;color:#333;line-height:1.7;margin:0 0 12px"><strong style="color:#0a1f3a">Pourquoi c'est important&nbsp;?</strong> ${tip.pourquoi}</p>
-                    <p style="font-size:14px;color:#0a1f3a;font-weight:700;margin:0 0 8px">Comment faire&nbsp;:</p>
-                    <ul style="font-size:14px;color:#333;line-height:1.7;margin:0 0 16px;padding-left:20px">${commentList}</ul>
+                  <div style="background:#f0f3ff;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:22px;margin:20px 0">
+                    <p style="font-weight:800;color:#2D5BFF;margin:0 0 14px;font-size:19px;line-height:1.4">${tip.titre}</p>
+                    <p style="font-size:16px;color:#333;line-height:1.7;margin:0 0 14px"><strong style="color:#0a1f3a">C'est quoi&nbsp;?</strong> ${tip.quoi}</p>
+                    <p style="font-size:16px;color:#333;line-height:1.7;margin:0 0 14px"><strong style="color:#0a1f3a">Pourquoi c'est important&nbsp;?</strong> ${tip.pourquoi}</p>
+                    <p style="font-size:16px;color:#0a1f3a;font-weight:700;margin:0 0 8px">Comment faire&nbsp;:</p>
+                    <ul style="font-size:16px;color:#333;line-height:1.75;margin:0 0 18px;padding-left:22px">${commentList}</ul>
                     ${actionBlock}
                   </div>
                   <div style="text-align:center;margin:24px 0">
-                    <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">
+                    <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:13px 26px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">
                       Poser une question au Conseiller →
                     </a>
                   </div>
-                  <p style="font-size:11px;color:#aaa;text-align:center">Despy · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                  <p style="font-size:12px;color:#aaa;text-align:center;margin:0 0 6px">Despy · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                  <p style="font-size:12px;color:#bbb;text-align:center;line-height:1.6;margin:0">Vous recevez ce conseil car vous êtes membre Despy.<br><a href="${unsubUrl}" style="color:#999;text-decoration:underline">Se désabonner des conseils</a> (sans effet sur votre abonnement)</p>
                 </div>
               </div>`
             }
