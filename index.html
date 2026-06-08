@@ -6718,19 +6718,38 @@ async function checkDarkWebNow() {
     });
     var data = await r.json();
 
-    if (data.breachCount === 0) {
+    if (typeof data.breachCount !== 'number') {
+      // Service HIBP momentanément indisponible (clé, rate limit, réseau…)
+      if (result) result.innerHTML =
+        '<div style="color:var(--text2);font-size:14px">⏳ Vérification momentanément indisponible. Réessayez dans quelques minutes.</div>';
+    } else if (data.breachCount === 0) {
       if (result) result.innerHTML =
         '<div style="display:flex;align-items:center;gap:10px;color:var(--ok)">' +
         '<span style="font-size:24px">✅</span>' +
         '<div><div style="font-weight:700">Aucune fuite détectée</div>' +
-        '<div style="font-size:12px;color:var(--text3)">Votre email n’apparaît dans aucune fuite connue</div></div></div>';
+        '<div style="font-size:13px;color:var(--text3)">Votre email n’apparaît dans aucune fuite connue</div></div></div>';
     } else {
+      var n = data.breachCount;
+      var sLetter = n > 1 ? 's' : '';
+      var emailLine = data.emailSent
+        ? '<div style="font-size:13px;color:var(--text3);margin-top:2px">📧 Le détail complet vient de vous être envoyé à ' + session.email + '</div>'
+        : '';
       if (result) result.innerHTML =
         '<div style="display:flex;align-items:center;gap:10px;color:#dc2626">' +
         '<span style="font-size:24px">⚠️</span>' +
-        '<div><div style="font-weight:700">' + data.breachCount + ' fuite(s) détectée(s)</div>' +
-        '<div style="font-size:12px;color:var(--text3)">Un email de détail a été envoyé à ' + session.email + '</div></div></div>' +
-        '<button onclick="scrollToSection(&quot;conseiller-ia&quot;);showPage(&quot;home&quot;)" style="margin-top:10px;padding:8px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit;font-weight:700">Obtenir de l’aide →</button>';
+        '<div><div style="font-weight:700;font-size:15px">' + n + ' fuite' + sLetter + ' détectée' + sLetter + '</div>' +
+        '<div style="font-size:13px;color:var(--text3)">Votre email est apparu dans ' + n + ' base' + sLetter + ' de données piratée' + sLetter + '.</div>' +
+        emailLine + '</div></div>' +
+        '<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;margin-top:12px">' +
+          '<div style="font-weight:700;color:#d97706;font-size:14px;margin-bottom:8px">⚡ Que faire maintenant ?</div>' +
+          '<div style="font-size:14px;color:var(--text);line-height:1.7">' +
+            '1. <strong>Changez votre mot de passe</strong> sur les sites concernés.<br>' +
+            '2. <strong>N’utilisez jamais le même mot de passe</strong> sur plusieurs sites.<br>' +
+            '3. <strong>Activez la double authentification</strong> sur votre boîte mail.<br>' +
+            '4. <strong>Surveillez vos comptes bancaires</strong> les prochaines semaines.' +
+          '</div>' +
+        '</div>' +
+        '<button onclick="showPage(&quot;home&quot;);setTimeout(function(){scrollToSection(&quot;conseiller-ia&quot;)},150)" style="margin-top:12px;width:100%;padding:12px;background:#2D5BFF;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700;min-height:48px">Être guidé pas à pas par le Conseiller →</button>';
     }
   } catch(e) {
     if (result) result.innerHTML = '<div style="color:var(--text3)">Vérification momentanément indisponible. Réessayez dans quelques minutes.</div>';

@@ -139,11 +139,79 @@ function buildBreachAlertHTML(prenom, email, breaches, isNew) {
   `;
 }
 
+// ── Vérification MANUELLE à la demande, pour UN seul email ──
+// Appelée depuis le tableau de bord (bouton « Vérifier mon email »).
+// Renvoie { breachCount, emailSent } pour cet email précis.
+async function handleManualCheck(supabase, rawEmail) {
+  const json = (obj) => ({ statusCode: 200, body: JSON.stringify(obj) });
+  const email = (rawEmail || '').toLowerCase().trim();
+  if (!email || !email.includes('@')) return json({ error: 'invalid_email', breachCount: null });
+
+  try {
+    // Récupérer le client (pour le prénom + historiser le résultat)
+    const { data: client } = await supabase
+      .from('clients')
+      .select('email, name, prenom, known_breaches')
+      .eq('email', email)
+      .maybeSingle();
+
+    const breaches = await checkEmailBreaches(email);
+    if (breaches === null) return json({ error: 'unavailable', breachCount: null });
+
+    const breachCount = breaches.length;
+    const currentNames = breaches.map(b => b.Name);
+    const prenom = (client && (client.prenom || (client.name || '').split(' ')[0])) || 'cher membre';
+
+    // Historiser dans Supabase si le client existe
+    if (client) {
+      await supabase.from('clients').update({
+        last_hibp_check: new Date().toISOString(),
+        known_breaches: currentNames,
+        breach_count: breachCount,
+        updated_at: new Date().toISOString()
+      }).eq('email', email);
+    }
+
+    // Email de détail : on liste TOUTES les fuites trouvées (vérif à la demande)
+    let emailSent = false;
+    if (breachCount > 0) {
+      try {
+        const html = buildBreachAlertHTML(prenom, email, breaches, currentNames);
+        const r = await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_SECRET || ''
+          },
+          body: JSON.stringify({
+            type: 'custom',
+            data: {
+              email,
+              subject: `🚨 Despy — Votre email dans ${breachCount} fuite${breachCount > 1 ? 's' : ''} de données`,
+              html
+            }
+          })
+        });
+        emailSent = r.ok;
+      } catch (e) { console.error('send-email manuel HIBP:', e.message); }
+    }
+
+    return json({ breachCount, emailSent });
+  } catch (e) {
+    console.error('HIBP manuel error:', e.message);
+    return json({ error: 'server', breachCount: null });
+  }
+}
+
 exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-  // Permettre aussi les appels manuels
-  const isManual = event.httpMethod === 'POST';
+  // Appel manuel (POST avec un email) → on ne vérifie QUE cet email.
+  if (event.httpMethod === 'POST') {
+    let body = {};
+    try { body = JSON.parse(event.body || '{}'); } catch (e) {}
+    if (body.email) return await handleManualCheck(supabase, body.email);
+  }
 
   try {
     // Récupérer les abonnés actifs
