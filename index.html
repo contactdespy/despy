@@ -4606,7 +4606,7 @@ function triggerPWAInstall() {
 
       <!-- Actions rapides -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
-        <button onclick="showPage('conseiller')" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
+        <button onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">💬</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Conseiller IA</div>
           <div style="font-size:14px;color:var(--text3);margin-top:2px">Posez une question</div>
@@ -4616,7 +4616,7 @@ function triggerPWAInstall() {
           <div style="font-size:13px;font-weight:700;color:var(--text)">SOS Urgence</div>
           <div style="font-size:14px;color:var(--text3);margin-top:2px">Plan d'action immédiat</div>
         </button>
-        <button onclick="checkDarkWebNow()" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
+        <button onclick="var c=document.getElementById('darkweb-card');if(c)c.scrollIntoView({behavior:'smooth',block:'center'});checkDarkWebNow()" style="padding:16px;background:#fff;border:1px solid var(--border);border-radius:14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .2s">
           <div style="font-size:24px;margin-bottom:6px">🌑</div>
           <div style="font-size:13px;font-weight:700;color:var(--text)">Dark Web</div>
           <div style="font-size:14px;color:var(--text3);margin-top:2px">Vérifier mes données</div>
@@ -4750,7 +4750,8 @@ function triggerPWAInstall() {
             <div style="font-size:12px;color:var(--text3)">Vérifiez si votre email a fuité</div>
           </div>
         </div>
-        <button onclick="checkDarkWebNow()" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Vérifier mon email →</button>
+        <button id="darkweb-btn" onclick="checkDarkWebNow()" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Vérifier mon email →</button>
+        <div id="darkweb-result" style="margin-top:12px"></div>
       </div>
 
       <!-- Analyse de lien -->
@@ -4762,7 +4763,7 @@ function triggerPWAInstall() {
             <div style="font-size:12px;color:var(--text3)">Avant de cliquer, vérifiez avec notre IA</div>
           </div>
         </div>
-        <button onclick="showPage('conseiller')" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Ouvrir l'analyseur →</button>
+        <button onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Ouvrir l'analyseur →</button>
       </div>
 
       <!-- Notifications push (alertes nationales) -->
