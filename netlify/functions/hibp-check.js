@@ -42,28 +42,6 @@ async function checkEmailBreaches(email) {
   }
 }
 
-// Vérifier les mots de passe compromis via k-anonymity (sans envoyer le mot de passe)
-async function checkPasswordPwned(passwordHash) {
-  try {
-    const prefix = passwordHash.substring(0, 5).toUpperCase();
-    const suffix = passwordHash.substring(5).toUpperCase();
-
-    const res = await fetch(
-      `https://api.pwnedpasswords.com/range/${prefix}`,
-      { signal: AbortSignal.timeout(8000) }
-    );
-
-    if (!res.ok) return 0;
-    const text = await res.text();
-    const lines = text.split('\n');
-    const match = lines.find(l => l.startsWith(suffix));
-    return match ? parseInt(match.split(':')[1]) : 0;
-
-  } catch (err) {
-    return 0;
-  }
-}
-
 function buildBreachAlertHTML(prenom, email, breaches, isNew) {
   const newBreaches = breaches.filter(b => isNew.includes(b.Name));
   const allCount = breaches.length;

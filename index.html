@@ -4754,6 +4754,25 @@ function triggerPWAInstall() {
         <div id="darkweb-result" style="margin-top:12px"></div>
       </div>
 
+      <!-- Vérification mot de passe compromis (k-anonymity, 100% côté navigateur) -->
+      <div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.05)" id="pwcheck-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="font-size:22px">🔑</div>
+          <div>
+            <div style="font-weight:700;font-size:15px">Vérifier un mot de passe</div>
+            <div style="font-size:12px;color:var(--text3)">Est-il déjà connu des pirates&nbsp;?</div>
+          </div>
+        </div>
+        <form onsubmit="checkPasswordNow(event)" autocomplete="off">
+          <input id="pwcheck-input" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                 placeholder="Tapez un mot de passe à tester"
+                 style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:14px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;font-family:inherit">
+          <button id="pwcheck-btn" type="submit" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Vérifier ce mot de passe →</button>
+        </form>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">🔒 100&nbsp;% privé&nbsp;: votre mot de passe est chiffré sur votre appareil et n'est <strong>jamais</strong> envoyé. Seul un fragment anonyme part vers la base mondiale (méthode k-anonymity).</div>
+        <div id="pwcheck-result" style="margin-top:12px"></div>
+      </div>
+
       <!-- Analyse de lien -->
       <div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:1rem;box-shadow:0 2px 10px rgba(0,0,0,.05)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -6756,6 +6775,96 @@ async function checkDarkWebNow() {
   }
 
   if (btn) { btn.textContent = 'Vérifier à nouveau'; btn.disabled = false; }
+}
+
+
+// === VERIFICATION MOT DE PASSE COMPROMIS (k-anonymity, 100% côté navigateur) ===
+// Le mot de passe est haché en SHA-1 LOCALEMENT. On n'envoie que les 5 premiers
+// caractères du hash à l'API publique Pwned Passwords (aucune clé requise).
+// Le mot de passe et son hash complet ne quittent JAMAIS l'appareil.
+async function sha1Hex(str) {
+  var buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map(function(b){ return b.toString(16).padStart(2, '0'); })
+    .join('')
+    .toUpperCase();
+}
+
+async function checkPasswordNow(ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+
+  var session = siteSession.get();
+  if (!session || !session.email) { showFreeSignup(); return; }
+  if (!session.subscribed) { showChronoUpgradePrompt(); return; }
+
+  var input  = document.getElementById('pwcheck-input');
+  var btn    = document.getElementById('pwcheck-btn');
+  var result = document.getElementById('pwcheck-result');
+  var pwd    = input ? input.value : '';
+
+  if (!pwd) {
+    if (result) result.innerHTML = '<div style="color:var(--text3);font-size:13px">Tapez un mot de passe à tester.</div>';
+    return;
+  }
+  if (!(window.crypto && crypto.subtle)) {
+    if (result) result.innerHTML = '<div style="color:var(--text3);font-size:13px">Votre navigateur ne permet pas cette vérification sécurisée.</div>';
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Vérification...'; btn.disabled = true; }
+  if (result) result.innerHTML = '<div style="color:var(--text2);font-size:14px">🔍 Vérification sécurisée en cours...</div>';
+
+  try {
+    var hash   = await sha1Hex(pwd);
+    var prefix = hash.substring(0, 5);
+    var suffix = hash.substring(5);
+
+    var r = await fetch('https://api.pwnedpasswords.com/range/' + prefix, {
+      headers: { 'Add-Padding': 'true' }
+    });
+    if (!r.ok) throw new Error('api');
+    var text = await r.text();
+
+    var count = 0;
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      var parts = lines[i].split(':');
+      if (parts[0] && parts[0].trim().toUpperCase() === suffix) {
+        count = parseInt(parts[1], 10) || 0;
+        break;
+      }
+    }
+
+    if (count === 0) {
+      if (result) result.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;color:var(--ok)">' +
+        '<span style="font-size:24px">✅</span>' +
+        '<div><div style="font-weight:700">Mot de passe sûr</div>' +
+        '<div style="font-size:13px;color:var(--text3)">Il n’apparaît dans aucune fuite connue.</div></div></div>';
+    } else {
+      var times = count.toLocaleString('fr-FR');
+      if (result) result.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;color:#dc2626">' +
+        '<span style="font-size:24px">⚠️</span>' +
+        '<div><div style="font-weight:700;font-size:15px">Mot de passe compromis</div>' +
+        '<div style="font-size:13px;color:var(--text3)">Vu <strong>' + times + '</strong> fois dans des fuites de données. Ne l’utilisez nulle part.</div>' +
+        '</div></div>' +
+        '<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:14px;margin-top:12px">' +
+          '<div style="font-weight:700;color:#d97706;font-size:14px;margin-bottom:8px">⚡ Que faire&nbsp;?</div>' +
+          '<div style="font-size:14px;color:var(--text);line-height:1.7">' +
+            '1. <strong>Changez-le partout</strong> où vous l’utilisez.<br>' +
+            '2. Créez un mot de passe <strong>long et unique</strong> par site.<br>' +
+            '3. <strong>Activez la double authentification</strong> dès que possible.' +
+          '</div>' +
+        '</div>';
+    }
+  } catch (e) {
+    if (result) result.innerHTML = '<div style="color:var(--text3);font-size:13px">Vérification momentanément indisponible. Réessayez dans quelques instants.</div>';
+  } finally {
+    // On efface le mot de passe saisi : il n'est jamais conservé.
+    if (input) input.value = '';
+    if (btn) { btn.textContent = 'Vérifier un autre mot de passe →'; btn.disabled = false; }
+  }
 }
 
 
