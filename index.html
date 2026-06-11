@@ -11665,6 +11665,60 @@ function updateMobileNavActive(pageId) {
   } catch(e) {}
 })();
 
+// ─── Le bouton « retour » ferme la fenêtre ouverte (au lieu de quitter le site) ───
+// Sur mobile surtout, le geste « retour » doit fermer une modale (inscription,
+// connexion, mentions légales, quiz…) plutôt que d'éjecter l'utilisateur.
+// Fonctionne même pour un visiteur qui arrive directement de la pub (page unique) :
+// l'ouverture d'une fenêtre empile une entrée d'historique dédiée.
+(function modalBackButton() {
+  try {
+    if (!('MutationObserver' in window)) return;
+    var SEL = '.sub-modal-overlay, .modal-overlay, .cs-modal-overlay, #quiz-modal-overlay';
+    function topModal() {
+      var m = document.querySelectorAll(SEL);
+      return m.length ? m[m.length - 1] : null;
+    }
+    var pushed = 0;           // nb d'entrées d'historique « fenêtre » empilées
+    var closingByPop = false; // fermeture en cours via le bouton retour
+
+    var obs = new MutationObserver(function(muts) {
+      var openedNow = false, anyRemoved = false;
+      muts.forEach(function(m) {
+        [].forEach.call(m.addedNodes || [], function(n) {
+          if (n.nodeType === 1 && n.matches && n.matches(SEL)) openedNow = true;
+        });
+        [].forEach.call(m.removedNodes || [], function(n) {
+          if (n.nodeType === 1 && n.matches && n.matches(SEL)) anyRemoved = true;
+        });
+      });
+      // Ouverture d'une fenêtre → on empile une entrée pour que « retour » la ferme.
+      if (openedNow) {
+        try { history.pushState({ despyModal: true }, ''); pushed++; } catch(e) {}
+      }
+      // Fermeture via l'UI (clic croix / fond) → on retire l'entrée d'historique
+      // correspondante pour garder l'historique synchronisé.
+      if (anyRemoved && !closingByPop && pushed > 0 && !topModal()) {
+        pushed--;
+        try { history.back(); } catch(e) {}
+      }
+    });
+    obs.observe(document.body, { childList: true });
+
+    // Retour avec une fenêtre ouverte → on la ferme, on NE navigue PAS.
+    // Phase de capture : passe avant le routeur de pages.
+    window.addEventListener('popstate', function(ev) {
+      var t = topModal();
+      if (t) {
+        if (pushed > 0) pushed--;
+        closingByPop = true;
+        try { t.remove(); } catch(e) {}
+        setTimeout(function() { closingByPop = false; }, 0);
+        ev.stopImmediatePropagation();
+      }
+    }, true);
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- ════════════════════════════════════════════════════════ -->
