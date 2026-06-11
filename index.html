@@ -1299,14 +1299,14 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <span id="hero-cta-primary-label">Vérifier un message gratuitement</span>
         </button>
-        <button id="hero-cta-signup" class="btn-secondary" onclick="showFreeSignup()" style="background:var(--blue-light);border-color:var(--blue-mid);color:var(--blue)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Créer mon compte gratuit
-        </button>
         <button class="btn-secondary" onclick="go('conseiller')" style="display:none">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           Parler à un conseiller
         </button>
+      </div>
+      <!-- CTA secondaire discret : ne concurrence pas le bouton principal -->
+      <div id="hero-cta-signup" onclick="showFreeSignup()" style="margin:-0.75rem 0 2rem;font-size:14px;color:#7ca8ff;font-weight:700;cursor:pointer;text-decoration:underline;width:fit-content">
+        Ou créer mon compte gratuit →
       </div>
       <!-- Trust pack -->
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;width:fit-content">
@@ -1491,7 +1491,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
             <div id="analyse-image-preview" style="display:none;margin-top:12px"></div>
 
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;flex-wrap:wrap;gap:10px">
-              <div style="font-size:11px;color:var(--text3)"><span id="analyse-charcount">0</span>/4000 caractères · <span id="analyse-quota-display">3 analyses gratuites/jour</span></div>
+              <div style="font-size:11px;color:var(--text3)"><span id="analyse-charcount">0</span>/4000 caractères · <span id="analyse-quota-display">1 analyse gratuite</span></div>
               <button onclick="runAnalyse()" id="analyse-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 Analyser
@@ -10162,6 +10162,7 @@ async function runAnalyse() {
 
   try {
     var session = (typeof siteSession !== 'undefined') ? siteSession.get() : null;
+    var isLoggedIn = !!(session && session.email);
     var res = await fetch('/.netlify/functions/analyse-message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -10171,12 +10172,23 @@ async function runAnalyse() {
     result.style.display = 'block';
 
     if (res.status === 429 || data.limit_reached) {
-      result.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center">' +
-        '<div style="font-size:28px;margin-bottom:6px">⏱</div>' +
-        '<div style="font-weight:700;color:#92400e;font-size:15px;margin-bottom:6px">Limite atteinte</div>' +
-        '<div style="font-size:13px;color:#555;margin-bottom:12px">Vous avez utilisé vos 3 analyses gratuites aujourd\'hui. Créez un compte pour continuer.</div>' +
-        '<button onclick="showFreeSignup()" style="padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
-        '</div>';
+      if (isLoggedIn) {
+        // Compte gratuit ayant épuisé son quota du jour → on pousse vers l'abonnement.
+        result.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center">' +
+          '<div style="font-size:28px;margin-bottom:6px">⏱</div>' +
+          '<div style="font-weight:700;color:#92400e;font-size:15px;margin-bottom:6px">Analyses gratuites du jour épuisées</div>' +
+          '<div style="font-size:13px;color:#555;margin-bottom:12px">Passez à l\'abonnement Despy pour des analyses <strong>illimitées</strong>, le Conseiller et la surveillance dark web.</div>' +
+          '<button onclick="siteSubscribe(\'monthly\')" style="padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Analyses illimitées — 9,99€/mois →</button>' +
+          '</div>';
+      } else {
+        // Visiteur anonyme → on capture l'email avec le compte gratuit.
+        result.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center">' +
+          '<div style="font-size:28px;margin-bottom:6px">🔒</div>' +
+          '<div style="font-weight:700;color:#92400e;font-size:15px;margin-bottom:6px">Créez votre compte gratuit pour continuer</div>' +
+          '<div style="font-size:13px;color:#555;margin-bottom:12px">Vous avez utilisé votre analyse gratuite. Créez un compte <strong>gratuit</strong> (sans carte) pour analyser d\'autres messages.</div>' +
+          '<button onclick="showFreeSignup()" style="padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
+          '</div>';
+      }
       return;
     }
     if (!res.ok) {
@@ -10203,20 +10215,45 @@ async function runAnalyse() {
       reportLine = '<div style="background:#1f2937;color:#fff;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:10px">📢 ' + (reportMap[data.reportTo] || 'À signaler aux autorités') + '</div>';
     }
 
-    result.innerHTML =
-      '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
-        '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
-          '<div style="font-size:36px">' + v.icon + '</div>' +
-          '<div style="flex:1">' +
-            '<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:' + v.color + ';font-weight:800">' + v.label + ' · ' + data.score + '/100</div>' +
-            '<div style="font-size:16px;font-weight:800;color:#111;margin-top:2px">' + escapeHtml(data.title || '') + '</div>' +
-          '</div>' +
+    var headerHtml =
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
+        '<div style="font-size:36px">' + v.icon + '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:' + v.color + ';font-weight:800">' + v.label + ' · ' + data.score + '/100</div>' +
+          '<div style="font-size:16px;font-weight:800;color:#111;margin-top:2px">' + escapeHtml(data.title || '') + '</div>' +
         '</div>' +
-        (signalsHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">' + signalsHtml + '</div>' : '') +
-        (data.recommendation ? '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:13px;color:#111;line-height:1.5"><strong>👉 Que faire :</strong> ' + escapeHtml(data.recommendation) + '</div>' : '') +
-        reportLine +
-        (!data.is_subscribed ? '<div style="margin-top:14px;padding:12px;background:#fff;border:1px dashed var(--blue-mid);border-radius:10px;font-size:12px;color:#555;text-align:center">💡 Avec un abonnement Despy, analyses <strong>illimitées</strong> + alerte si le même domaine arnaque réapparaît. <a onclick="showPage(\'tarifs\')" style="color:var(--blue);font-weight:700;cursor:pointer">Découvrir →</a></div>' : '') +
       '</div>';
+
+    if (isLoggedIn) {
+      // Inscrit (gratuit ou abonné) : résultat complet (signaux + plan d'action).
+      result.innerHTML =
+        '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
+          headerHtml +
+          (signalsHtml ? '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">' + signalsHtml + '</div>' : '') +
+          (data.recommendation ? '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;font-size:13px;color:#111;line-height:1.5"><strong>👉 Que faire :</strong> ' + escapeHtml(data.recommendation) + '</div>' : '') +
+          reportLine +
+          (!data.is_subscribed ? '<div style="margin-top:14px;padding:12px;background:#fff;border:1px dashed var(--blue-mid);border-radius:10px;font-size:12px;color:#555;text-align:center">💡 Avec un abonnement Despy, analyses <strong>illimitées</strong> + alerte si le même domaine arnaque réapparaît. <a onclick="showPage(\'tarifs\')" style="color:var(--blue);font-weight:700;cursor:pointer">Découvrir →</a></div>' : '') +
+        '</div>';
+    } else {
+      // Visiteur non inscrit : on montre le VERDICT (preuve de valeur, instaure la
+      // confiance) mais on verrouille le détail des signaux + le plan d'action
+      // derrière le compte gratuit. C'est le moment de plus fort intérêt.
+      var nbSignals = (data.signals || []).length;
+      var teaser = nbSignals
+        ? '<div style="font-size:13.5px;color:#444;margin-bottom:14px;line-height:1.5">Nous avons détecté <strong style="color:' + v.color + '">' + nbSignals + ' signal' + (nbSignals > 1 ? 'aux' : '') + '</strong> dans ce message, et préparé les actions à faire.</div>'
+        : '';
+      result.innerHTML =
+        '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
+          headerHtml +
+          teaser +
+          '<div style="padding:18px;background:#f5f7ff;border:1px dashed var(--blue-mid);border-radius:12px;text-align:center">' +
+            '<div style="font-size:26px;margin-bottom:6px">🔒</div>' +
+            '<div style="font-weight:800;color:#111;font-size:15px;margin-bottom:6px">Votre plan d\'action est prêt</div>' +
+            '<div style="font-size:13px;color:#555;line-height:1.55;margin-bottom:14px">Créez votre compte <strong>gratuit</strong> pour voir le détail des signaux et surtout <strong>quoi faire maintenant</strong>. Sans carte bancaire, en 30 secondes.</div>' +
+            '<button onclick="showFreeSignup()" style="padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(45,91,255,.28)">Voir mon plan d\'action gratuit →</button>' +
+          '</div>' +
+        '</div>';
+    }
 
   } catch(e) {
     result.style.display = 'block';

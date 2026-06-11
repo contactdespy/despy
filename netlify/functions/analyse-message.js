@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════
 // DESPY — Analyseur SMS / email / lien
-// Public : 3 analyses/jour/IP · Abonnés : illimité + historique
+// Anonyme : 1 analyse/jour/IP · Compte gratuit : 3/jour · Abonnés : illimité + historique
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
@@ -120,23 +120,48 @@ exports.handler = async (event) => {
       isSubscribed = !!(client && client.subscribed);
     }
 
-    // Quota IP pour non-abonnés : 3/jour
+    // Quotas pour non-abonnés (capture du lead au bon moment) :
+    //  - Visiteur anonyme (sans compte) : 1 analyse/jour/IP → on l'incite à créer un compte gratuit
+    //  - Compte gratuit (connecté)      : 3 analyses/jour    → on l'incite à passer à l'abonnement
     if (!isSubscribed) {
       const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
-      const { count } = await supabase
-        .from('analyses_history')
-        .select('id', { count: 'exact', head: true })
-        .eq('ip', ip)
-        .gte('created_at', since);
-      if ((count || 0) >= 3) {
-        return {
-          statusCode: 429,
-          headers,
-          body: JSON.stringify({
-            limit_reached: true,
-            error: 'Limite de 3 analyses gratuites par jour atteinte. Créez un compte pour continuer.'
-          })
-        };
+      if (normEmail) {
+        // Compte gratuit : quota par email, 3/jour
+        const { count } = await supabase
+          .from('analyses_history')
+          .select('id', { count: 'exact', head: true })
+          .eq('email', normEmail)
+          .gte('created_at', since);
+        if ((count || 0) >= 3) {
+          return {
+            statusCode: 429,
+            headers,
+            body: JSON.stringify({
+              limit_reached: true,
+              tier: 'free',
+              error: 'Vous avez utilisé vos 3 analyses gratuites du jour. Passez à l\'illimité avec l\'abonnement Despy.'
+            })
+          };
+        }
+      } else {
+        // Visiteur anonyme : quota par IP, 1/jour
+        const { count } = await supabase
+          .from('analyses_history')
+          .select('id', { count: 'exact', head: true })
+          .eq('ip', ip)
+          .is('email', null)
+          .gte('created_at', since);
+        if ((count || 0) >= 1) {
+          return {
+            statusCode: 429,
+            headers,
+            body: JSON.stringify({
+              limit_reached: true,
+              tier: 'anon',
+              error: 'Vous avez utilisé votre analyse gratuite. Créez votre compte gratuit pour continuer.'
+            })
+          };
+        }
       }
     }
 
