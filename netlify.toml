@@ -87,6 +87,11 @@
   to = "/index.html"
   status = 200
 
+[[redirects]]
+  from = "/qui-sommes-nous"
+  to = "/index.html"
+  status = 200
+
 # ── Headers de sécurité ──
 [[headers]]
   for = "/*"
