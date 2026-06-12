@@ -1083,6 +1083,11 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     background: rgba(0, 0, 0, .35);
   }
 }
+
+/* Centre d'outils : 5 onglets → 2 rangées sur petit écran */
+@media (max-width:640px){
+  #outils-tabs{grid-template-columns:repeat(3,1fr)!important}
+}
 </style>
 
 <!-- ════════════════════════════════════════════════════════════ -->
@@ -1173,7 +1178,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
     </button>
     <button class="nav-link" onclick="showPage('livret')">Livret</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
-    <button class="nav-link" onclick="document.getElementById('pwa-install-section').scrollIntoView({behavior:'smooth'})" style="color:var(--blue);font-weight:700">📲 App mobile</button>
+    <button class="nav-link" onclick="triggerPWAInstall()" style="color:var(--blue);font-weight:700">📲 App mobile</button>
     <button class="nav-link" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">Conseiller IA</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
     <button class="nav-cta" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);margin-right:6px;font-size:13px" onclick="showLoginModal()">Connexion</button>
@@ -1452,7 +1457,7 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
       <div style="background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden">
 
         <!-- Onglets -->
-        <div role="tablist" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);background:var(--bg2)">
+        <div role="tablist" id="outils-tabs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;border-bottom:1px solid var(--border);background:var(--bg2)">
           <button onclick="switchTool('analyse')" id="tool-tab-analyse" class="tool-tab tool-tab-active" style="padding:16px 8px;background:#fff;border:none;border-bottom:3px solid var(--blue);font-family:inherit;font-weight:800;font-size:13px;color:var(--blue);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
             <span style="font-size:22px">🔍</span>
             <span>SMS / Email</span>
@@ -1468,6 +1473,10 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
           <button onclick="switchTool('site')" id="tool-tab-site" class="tool-tab" style="padding:16px 8px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
             <span style="font-size:22px">🛒</span>
             <span>Site marchand</span>
+          </button>
+          <button onclick="switchTool('mdp')" id="tool-tab-mdp" class="tool-tab" style="padding:16px 8px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;font-weight:700;font-size:13px;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s">
+            <span style="font-size:22px">🔑</span>
+            <span>Mot de passe</span>
           </button>
         </div>
 
@@ -1533,6 +1542,22 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
             <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Vérifications RDAP officielles + IA · Aucune donnée conservée</p>
           </div>
 
+          <!-- TOOL 5 : GÉNÉRATEUR DE MOT DE PASSE -->
+          <div id="tool-panel-mdp" class="tool-panel" style="display:none">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Créez un mot de passe <strong>fort et facile à retenir</strong>. Il est fabriqué directement sur votre appareil : il ne circule jamais sur internet.</div>
+            <div style="display:flex;gap:8px;margin-bottom:14px">
+              <button onclick="setMdpMode('memo')" id="mdp-mode-memo" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--blue);background:var(--blue-light);color:var(--blue);font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">😊 Facile à retenir</button>
+              <button onclick="setMdpMode('fort')" id="mdp-mode-fort" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">🔒 Ultra sécurisé</button>
+            </div>
+            <div id="mdp-output" style="padding:18px 16px;background:var(--bg2);border:1.5px dashed var(--border);border-radius:12px;font-size:clamp(16px,4.5vw,22px);font-weight:800;color:var(--text);text-align:center;letter-spacing:.5px;word-break:break-all;min-height:30px;user-select:all">Cliquez sur « Générer »</div>
+            <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+              <button onclick="genMdp()" style="flex:1;min-width:140px;padding:13px 18px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">🎲 Générer</button>
+              <button onclick="copyMdp(this)" id="mdp-copy-btn" style="flex:1;min-width:140px;padding:13px 18px;background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit">📋 Copier</button>
+            </div>
+            <div id="mdp-conseil" style="display:none;margin-top:14px;padding:12px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:13px;color:#166534;line-height:1.6"></div>
+            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Généré dans votre navigateur · Despy ne voit ni ne conserve jamais vos mots de passe</p>
+          </div>
+
         </div>
       </div>
 
@@ -1543,45 +1568,6 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
-<!-- ── LIVE ACTIVITY + GARANTIE ── -->
-<section id="live-activity" style="background:#fff;padding:3rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-  <div class="wrap" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;text-align:center">
-
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="width:8px;height:8px;background:#ef4444;border-radius:50%;animation:pulse 1.5s infinite"></span>
-        <span style="font-size:11px;letter-spacing:.12em;color:#ef4444;font-weight:800;text-transform:uppercase">Live</span>
-      </div>
-      <div id="live-breaches" style="font-size:32px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums">237</div>
-      <div style="font-size:13px;color:var(--text3)">fuites détectées<br>cette semaine</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span style="font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:800;text-transform:uppercase">Membres</span>
-      </div>
-      <div id="live-members" style="font-size:32px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums">—</div>
-      <div style="font-size:13px;color:var(--text3)">familles<br>protégées</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span style="font-size:11px;letter-spacing:.12em;color:#16a34a;font-weight:800;text-transform:uppercase">Aujourd'hui</span>
-      </div>
-      <div id="live-questions" style="font-size:32px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums">142</div>
-      <div style="font-size:13px;color:var(--text3)">questions<br>traitées</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(135deg,#f0fdf4,#fff);border:1.5px solid #bbf7d0;border-radius:14px;padding:14px 12px">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-      <div style="font-size:18px;font-weight:900;color:#16a34a">Garantie 30 jours</div>
-      <div style="font-size:12px;color:var(--text3);line-height:1.4">Satisfait ou remboursé,<br>sans condition</div>
-    </div>
-
-  </div>
-</section>
 
 <!-- ── SITUATIONS ── -->
 <section id="situations" style="background:var(--bg2)">
@@ -1638,194 +1624,9 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
-<!-- ════════════════════════════════════════ -->
-<!-- ARNAQUES PAR IA — menace 2026             -->
-<!-- ════════════════════════════════════════ -->
-<section id="ia-scams" style="background:linear-gradient(135deg,#050B1A 0%,#0a1f3a 55%,#1a3fd9 100%);padding:4rem 0;color:#fff;position:relative;overflow:hidden">
-  <div class="wrap">
-    <div class="text-center reveal" style="max-width:680px;margin:0 auto 3rem">
-      <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">🤖 Nouvelle menace 2026</div>
-      <h2 style="font-size:2rem;font-weight:900;letter-spacing:-1px;margin:0 0 12px;color:#fff">Les arnaques sont désormais<br><span style="color:#7da9ff">écrites par l'intelligence artificielle</span></h2>
-      <p style="font-size:15px;color:rgba(255,255,255,.8);line-height:1.7;margin:0">Faux emails sans aucune faute, SMS parfaitement crédibles, faux sites copiés à l'identique : l'IA rend les arnaques beaucoup plus difficiles à repérer à l'œil nu. Despy, lui, analyse le <strong style="color:#fff">contenu et l'intention</strong> du message — peu importe qui l'a écrit, un humain ou une IA.</p>
-    </div>
-
-    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;max-width:960px;margin:0 auto">
-      <!-- Carte 1 : emails/SMS par IA -->
-      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:24px">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(125,169,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7da9ff" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
-        </div>
-        <div style="font-weight:800;font-size:16px;margin-bottom:6px;color:#fff">Faux emails &amp; SMS générés par IA</div>
-        <div style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.6">Plus aucune faute d'orthographe pour vous mettre la puce à l'oreille. Copiez-collez le message dans Despy : on vous dit en quelques secondes si c'est une arnaque.</div>
-        <div style="margin-top:12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Détecté par Despy</div>
-      </div>
-      <!-- Carte 2 : faux sites clonés -->
-      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:24px">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(125,169,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7da9ff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        </div>
-        <div style="font-weight:800;font-size:16px;margin-bottom:6px;color:#fff">Faux sites copiés à l'identique</div>
-        <div style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.6">Banque, La Poste, impôts… L'IA recrée des sites quasi parfaits pour voler vos identifiants. Envoyez le lien à Despy avant de cliquer : on vérifie s'il est piégé.</div>
-        <div style="margin-top:12px;font-size:12px;font-weight:700;color:#4ade80;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Détecté par Despy</div>
-      </div>
-      <!-- Carte 3 : faux appels / voix clonée (éducation) -->
-      <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:24px">
-        <div style="width:44px;height:44px;border-radius:12px;background:rgba(251,191,36,.18);display:flex;align-items:center;justify-content:center;margin-bottom:14px">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        </div>
-        <div style="font-weight:800;font-size:16px;margin-bottom:6px;color:#fff">Faux appels &amp; voix clonée</div>
-        <div style="font-size:14px;color:rgba(255,255,255,.75);line-height:1.6">« Maman, c'est moi, j'ai un problème… » L'IA imite aujourd'hui la voix de vos proches. Despy vous <strong style="color:#fff">apprend à reconnaître ces appels</strong> et à réagir sans paniquer.</div>
-        <div style="margin-top:12px;font-size:12px;font-weight:700;color:#FBBF24;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Despy vous forme</div>
-      </div>
-    </div>
-
-    <div class="text-center reveal" style="margin-top:2.5rem">
-      <button onclick="showFreeSignup()" style="padding:14px 28px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(0,0,0,.2)">Créer mon compte gratuit</button>
-      <p style="font-size:12px;color:rgba(255,255,255,.55);margin:14px 0 0">Sans carte bancaire · Analyse de messages incluse</p>
-    </div>
-  </div>
-</section>
-
-<!-- ── FONCTIONNALITÉS ── -->
-<section id="features">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:3rem">
-      <div class="section-tag">Ce que fait Despy</div>
-      <h2 class="sh2">Tout ce dont vous avez besoin<br><span>pour vous protéger</span></h2>
-      <p class="sdesc">Accessible directement depuis votre navigateur — iPhone, Android, PC, Mac. Aucune installation requise.</p>
-    </div>
-    <div class="features-grid reveal">
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="feat-title">Audit de sécurité personnalisé</div>
-        <div class="feat-desc">Analysez vos appareils, permissions et comportements. Obtenez un score et des recommandations concrètes pour vous améliorer.</div>
-        <span class="feat-free">Inclus dans l'abonnement</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <div class="feat-title">Conseiller Despy 24h/24</div>
-        <div class="feat-desc">Un assistant intelligent répond à toutes vos questions en langage simple. "Ce SMS est-il une arnaque ?" — posez-le directement.</div>
-        <span class="feat-free">Illimité abonnés</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-        </div>
-        <div class="feat-title">SOS Urgence guidé</div>
-        <div class="feat-desc">Mot de passe volé, comportement suspect, arnaque en cours... Despy vous guide étape par étape pour limiter les dégâts immédiatement.</div>
-        <span class="feat-free">Inclus dans l'abonnement</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5"/></svg>
-        </div>
-        <div class="feat-title">Vérification dark web</div>
-        <div class="feat-desc">Vos emails ont-ils été compromis dans une fuite de données ? Despy vérifie en temps réel et vous alerte si vos informations circulent.</div>
-        <span class="feat-free">Inclus dans l'abonnement</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <div class="feat-title">Analyseur anti-arnaque</div>
-        <div class="feat-desc">Copiez-collez un SMS, email ou lien suspect. Despy analyse et vous dit en 3 secondes si c'est une arnaque ou non.</div>
-        <span class="feat-free">Inclus dans l'abonnement</span>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        </div>
-        <div class="feat-title">Formation + badges XP</div>
-        <div class="feat-desc">Apprenez à vous protéger à votre rythme. Modules courts, quiz, et badges de progression pour rester motivé.</div>
-        <span class="feat-free">Inclus dans l'abonnement</span>
-      </div>
-    </div>
-
-    <!-- CTA vers application -->
-    <div class="app-cta reveal" style="margin-top:3rem">
-      <div>
-        <div class="section-tag" style="margin-bottom:12px">Accessible partout</div>
-        <h3 style="font-size:1.5rem;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-.5px">Aucune installation requise</h3>
-        <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:1rem">Despy fonctionne directement dans votre navigateur. Ouvrez le lien, connectez-vous, c'est tout. Sur iPhone, Android, PC ou Mac.</p>
-        <div class="app-cta-badges">
-          <div class="app-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            iPhone & Android
-          </div>
-          <div class="app-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-            PC & Mac
-          </div>
-          <div class="app-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Aucune installation
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 
-<!-- ════════════════════════════════════════ -->
-<!-- TESTS GRATUITS — Score Cyber + Diagnostic tél. -->
-<!-- (2 tests regroupés pour la lisibilité)        -->
-<!-- ════════════════════════════════════════ -->
-<section id="tests-gratuits" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-  <div class="wrap">
-    <div class="text-center reveal" style="margin-bottom:2.5rem">
-      <div class="section-tag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">✅ 2 tests gratuits · sans inscription</div>
-      <h2 class="sh2">Faites le point en 1 minute</h2>
-      <p class="sdesc">Deux tests rapides et anonymes : évaluez votre niveau de sécurité, et vérifiez si votre téléphone est sain. Résultat immédiat, aucune création de compte.</p>
-    </div>
-    <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;max-width:900px;margin:0 auto">
 
-      <!-- Carte 1 : Score Cyber -->
-      <div id="cyber-score" style="display:flex;flex-direction:column;background:linear-gradient(160deg,#ffffff 0%,#f7f9fc 100%);border:1px solid var(--border);border-radius:22px;padding:28px 26px;box-shadow:0 4px 24px rgba(45,91,255,.06);position:relative;overflow:hidden">
-        <div style="position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(45,91,255,.12),transparent 70%);pointer-events:none"></div>
-        <div style="position:relative;display:flex;flex-direction:column;flex:1">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px;width:fit-content">
-            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue)"></span>
-            60 secondes
-          </div>
-          <h3 style="font-size:1.4rem;font-weight:900;color:var(--text);margin:0 0 10px;letter-spacing:-.02em;line-height:1.15">
-            Votre <span style="background:linear-gradient(120deg,var(--blue),#7c3aed);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Score Cyber</span>
-          </h3>
-          <p style="font-size:15px;color:var(--text2);line-height:1.6;margin:0 0 1.25rem">
-            10 questions pour évaluer votre sécurité numérique. Vous obtenez une note A, B, C ou D et vos points faibles à corriger.
-          </p>
-          <button onclick="openCyberScore()" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;background:var(--text);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s;box-shadow:0 2px 8px rgba(17,17,17,.15)" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(17,17,17,.2)'" onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(17,17,17,.15)'">
-            Démarrer le test
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Carte 2 : Diagnostic téléphone -->
-      <div id="diag-tel" style="display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:22px;padding:28px 26px;box-shadow:0 4px 24px rgba(14,124,123,.06)">
-        <div id="dweb-card" style="display:flex;flex-direction:column;flex:1">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:#E6FAF8;border:1px solid #9CE0DC;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#0E7C7B;margin-bottom:14px;width:fit-content">
-            <span style="font-size:14px;line-height:1">📱</span>
-            Diagnostic
-          </div>
-          <h3 style="font-size:1.4rem;font-weight:900;color:var(--text);margin:0 0 10px;letter-spacing:-.02em;line-height:1.15">
-            Votre téléphone est-il sain ?
-          </h3>
-          <p style="font-size:15px;color:var(--text2);line-height:1.6;margin:0 0 1.25rem">
-            11 questions simples. Découvrez si votre téléphone est sous contrôle d'un tiers, pollué par des applis indésirables, ou juste fatigué — et quoi faire.
-          </p>
-          <div style="font-size:12px;color:var(--text3);margin:0 0 14px">🔒 Calculé dans votre navigateur. Aucune donnée envoyée.</div>
-          <button class="btn-primary" onclick="dwebStart()" style="margin-top:auto">Commencer le diagnostic</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
 
 <!-- ── CONSEILLER IA ── -->
 <section id="conseiller-ia" style="background:var(--bg2)">
@@ -1889,15 +1690,6 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
-<!-- ── STATS ── -->
-<div class="stats-band reveal">
-  <div class="stats-grid">
-    <div class="stat-box"><div class="stat-n">504 000</div><div class="stat-l">Français victimes de cyberattaque en 2025 — cybermalveillance.gouv.fr</div></div>
-    <div class="stat-box"><div class="stat-n">10+</div><div class="stat-l">Ans d'expérience télécom & cybersécurité</div></div>
-    <div class="stat-box"><div class="stat-n">100%</div><div class="stat-l">Données hébergées en France — jamais revendues</div></div>
-    <div class="stat-box"><div class="stat-n">48h</div><div class="stat-l">Délai de réponse moyen pour le conseiller humain</div></div>
-  </div>
-</div>
 
 <!-- ── COMMENT ÇA MARCHE ── -->
 <section style="background:var(--bg2)" id="howit">
@@ -1927,89 +1719,123 @@ footer{background:#0f172a;padding:3.5rem clamp(1rem,6vw,6rem) 2rem}
   </div>
 </section>
 
-<!-- ══════════════════════════════════════════ -->
-<!-- SECTION : TÉLÉCHARGER L'APPLICATION       -->
-<!-- ══════════════════════════════════════════ -->
-<section id="pwa-install-section" style="background:linear-gradient(135deg,#0a1f3a 0%,#2D5BFF 100%);padding:4rem 0;position:relative;overflow:hidden;color:#fff">
-  <div style="position:absolute;top:-80px;right:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:-80px;left:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.08),transparent 70%);pointer-events:none"></div>
-  <div class="wrap" style="position:relative;z-index:1">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1100px;margin:0 auto" id="pwa-grid">
-
-      <!-- TEXTE -->
-      <div>
-        <div style="display:inline-block;padding:6px 14px;background:rgba(255,255,255,.15);border-radius:30px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:18px">📱 Nouveau · Application mobile</div>
-        <h2 style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.025em;line-height:1.15;margin:0 0 16px">Despy dans votre poche,<br><span style="background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent">en 30 secondes</span></h2>
-        <p style="font-size:17px;opacity:.92;line-height:1.5;margin:0 0 24px">Installez l'application Despy directement sur l'écran d'accueil de votre téléphone. Tous vos outils en 1 clic, même hors connexion.</p>
-
-        <!-- Bénéfices -->
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:30px">
-          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
-            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <span>Plein écran, sans barre de navigateur</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
-            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <span>Notifications d'alertes arnaque en temps réel</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;font-size:15px">
-            <div style="width:24px;height:24px;border-radius:6px;background:#34C759;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <span>Gratuit · sans app store · sans inscription forcée</span>
-          </div>
-        </div>
-
-        <!-- Bouton install -->
-        <button onclick="triggerPWAInstall()" id="pwa-install-btn" style="display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:#fff;color:#0a1f3a;border:none;border-radius:14px;font-weight:800;font-size:17px;cursor:pointer;font-family:inherit;box-shadow:0 8px 28px rgba(0,0,0,.25);transition:transform .15s">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Installer Despy
-        </button>
-        <div style="margin-top:14px;font-size:13px;opacity:.7" id="pwa-platform-hint">Compatible iPhone, Android et ordinateur</div>
+<!-- ── OFFRE / PRIX ── -->
+<section id="offre" style="background:#fff;border-top:1px solid var(--border)">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2.5rem">
+      <div class="section-tag">Tarif simple</div>
+      <h2 class="sh2">Une seule formule, <span>tout est inclus</span></h2>
+      <p class="sdesc">Pas d'option cachée, pas d'engagement. Vous arrêtez quand vous voulez, en 1 clic.</p>
+    </div>
+    <div class="reveal" style="max-width:520px;margin:0 auto;background:linear-gradient(180deg,#fff,#f7f9fc);border:2px solid var(--blue);border-radius:24px;padding:2rem clamp(1.25rem,5vw,2.25rem);box-shadow:0 20px 60px rgba(45,91,255,.12)">
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:6px">
+        <span style="font-size:52px;font-weight:900;color:var(--text);letter-spacing:-1px">9,99€</span>
+        <span style="font-size:18px;color:var(--text3);font-weight:700">/mois</span>
       </div>
-
-      <!-- MOCKUP TELEPHONE -->
-      <div style="display:flex;justify-content:center;align-items:center" id="pwa-mockup">
-        <div style="width:240px;height:480px;background:#1C1C1E;border-radius:38px;padding:8px;box-shadow:0 30px 70px rgba(0,0,0,.4),inset 0 0 0 2px #2a2a2c;position:relative">
-          <!-- Notch -->
-          <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:88px;height:24px;background:#1C1C1E;border-radius:14px;z-index:2"></div>
-          <!-- Screen content -->
-          <div style="width:100%;height:100%;background:linear-gradient(160deg,#2D5BFF 0%,#1a3fd9 100%);border-radius:30px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
-            <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;margin-bottom:14px;backdrop-filter:blur(10px)">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div style="font-size:28px;font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:4px">Despy</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.85);margin-bottom:22px;text-align:center">Cybersécurité simple</div>
-            <!-- Mock list rows -->
-            <div style="width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,.15)">
-              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
-                <div style="width:24px;height:24px;border-radius:6px;background:#007AFF;flex-shrink:0"></div>
-                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Vérifier un message</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
-                <div style="width:24px;height:24px;border-radius:6px;background:#34C759;flex-shrink:0"></div>
-                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Qui m'appelle ?</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:10px;border-bottom:.5px solid #E5E5EA">
-                <div style="width:24px;height:24px;border-radius:6px;background:#FF9500;flex-shrink:0"></div>
-                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Vérifier un site</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;padding:10px">
-                <div style="width:24px;height:24px;border-radius:6px;background:#AF52DE;flex-shrink:0"></div>
-                <div style="font-size:11px;color:#1C1C1E;font-weight:500">Conseiller IA</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div style="text-align:center;font-size:14px;color:var(--text3);margin:4px 0 1.5rem">Sans engagement · Résiliable en 1 clic</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:1.75rem;font-size:15px;color:var(--text2)">
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Analyses illimitées</strong> de SMS, emails et liens suspects</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Surveillance dark web</strong> de votre adresse email, en continu</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Conseiller Despy 7j/7</strong> qui répond à toutes vos questions</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Alerte immédiate</strong> si vos données fuitent sur internet</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Formation simple</strong> pour devenir autonome, à votre rythme</span></div>
       </div>
-
+      <button class="btn-primary" style="width:100%;justify-content:center;font-size:17px;padding:16px" onclick="siteSubscribe('monthly')">Je protège mon compte →</button>
+      <div style="text-align:center;margin-top:12px">
+        <button onclick="showPage('tarifs')" style="background:none;border:none;color:var(--blue);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;text-decoration:underline">Voir le détail complet des tarifs</button>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--text3);margin-top:10px">🇫🇷 Données hébergées en France · Paiement sécurisé Stripe</div>
     </div>
   </div>
 </section>
+
+  <!-- ═══ AVIS GOOGLE ═══ -->
+  <section id="reviews" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
+    <div class="wrap">
+      <div style="text-align:center;margin-bottom:3rem">
+        <h2 class="section-title">Ce que disent nos clients</h2>
+        <p class="section-sub" style="margin-bottom:24px">Avis vérifiés laissés sur notre fiche Google My Business</p>
+
+        <!-- Badge note Google agrégée -->
+        <a href="https://g.page/r/CVKTMKw67U7wEBI" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:18px;padding:18px 28px;background:#fff;border:2px solid #fbbf24;border-radius:18px;box-shadow:0 6px 20px rgba(251,191,36,.18);text-decoration:none;transition:transform .2s;flex-wrap:wrap;justify-content:center" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          <svg width="36" height="36" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          <div style="text-align:left">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
+              <span style="font-size:32px;font-weight:900;color:var(--text);line-height:1">4,9</span>
+              <span style="display:flex;gap:1px;color:#FBBF24;font-size:20px;letter-spacing:1px">★★★★★</span>
+            </div>
+            <div style="font-size:13px;color:var(--text3);font-weight:600">Note Google · <span style="color:var(--blue);text-decoration:underline">voir tous les avis →</span></div>
+          </div>
+        </a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;max-width:1100px;margin:0 auto" class="reviews-grid">
+
+        <!-- Avis 1 -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">M</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Marie L.</div>
+                <div style="font-size:11px;color:var(--text3)">Strasbourg</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Je me sens enfin protégée quand je reçois des SMS bizarres. L'équipe prend le temps d'expliquer simplement, c'est exactement ce qu'il me fallait."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 2 semaines</div>
+        </div>
+
+        <!-- Avis 2 -->
+        <div style="background:#fff;border:2px solid var(--blue);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(45,91,255,.12);position:relative">
+          <div style="position:absolute;top:-10px;right:14px;background:var(--blue);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:99px">⭐ COUP DE CŒUR</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">R</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Robert D.</div>
+                <div style="font-size:11px;color:var(--text3)">Schiltigheim</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Mon fils m'a abonné à Despy. Je sais maintenant quoi faire quand je reçois un mail bizarre. Service très professionnel et patient."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 1 mois</div>
+        </div>
+
+        <!-- Avis 3 -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">F</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:var(--text)">Françoise B.</div>
+                <div style="font-size:11px;color:var(--text3)">Illkirch</div>
+              </div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          </div>
+          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
+          <div style="font-size:14px;color:var(--text2);line-height:1.6">"L'assistant IA répond à toutes mes questions, même les plus basiques, sans jamais me faire sentir bête. Je recommande vivement Despy."</div>
+          <div style="font-size:11px;color:var(--text3)">il y a 3 semaines</div>
+        </div>
+
+      </div>
+
+      <!-- CTA voir tous les avis -->
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="https://g.page/r/CVKTMKw67U7wEBI/review" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#fff;border:1.5px solid var(--border);border-radius:99px;color:var(--text2);font-size:14px;font-weight:700;text-decoration:none;transition:all .2s">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Voir tous les avis sur Google →
+        </a>
+      </div>
+
+    </div>
+  </section>
+
 <style>
 @media (max-width:760px){
   #pwa-grid{grid-template-columns:1fr !important;gap:36px !important;text-align:center}
@@ -2201,168 +2027,6 @@ function triggerPWAInstall() {
 <!-- ── FAQ ── -->
 
   <!-- ═══ POURQUOI J'AI CRÉÉ DESPY ═══ -->
-  <section style="background:linear-gradient(160deg,#030810,#0a1f3a);padding:4rem 0;position:relative;overflow:hidden">
-    <!-- Décoration -->
-    <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:rgba(45,91,255,.08)"></div>
-    <div style="position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:rgba(45,91,255,.06)"></div>
-
-    <div class="wrap" style="position:relative;z-index:1">
-      <div style="max-width:760px;margin:0 auto">
-
-        <!-- Badge -->
-        <div style="margin-bottom:2rem">
-          <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(45,91,255,.2);border:1px solid rgba(45,91,255,.4);border-radius:20px">
-            <div style="width:8px;height:8px;border-radius:50%;background:#2D5BFF"></div>
-            <span style="font-size:13px;font-weight:700;color:#7ca8ff;letter-spacing:.5px">NOTRE HISTOIRE</span>
-          </div>
-        </div>
-
-        <!-- Titre -->
-        <h2 style="font-size:clamp(28px,4vw,42px);font-weight:900;color:#fff;line-height:1.2;margin-bottom:2rem">
-          Pourquoi Despy existe
-        </h2>
-
-        <!-- Citation forte -->
-        <div style="border-left:4px solid #2D5BFF;padding:20px 24px;background:rgba(45,91,255,.1);border-radius:0 12px 12px 0;margin-bottom:2.5rem">
-          <p style="font-size:18px;font-style:italic;color:rgba(255,255,255,.9);line-height:1.7;margin:0">
-            "J'ai vu des dizaines de personnes autour de moi se faire arnaquer. Des parents, des voisins, des amis. Pas parce qu'ils étaient naïfs — mais parce qu'ils n'avaient personne pour les guider."
-          </p>
-          <div style="margin-top:12px;font-size:13px;font-weight:700;color:#7ca8ff">— Le fondateur de Despy</div>
-        </div>
-
-        <!-- Corps du texte -->
-        <div style="display:flex;flex-direction:column;gap:24px">
-
-          <div style="display:flex;gap:16px;align-items:flex-start">
-            <div style="width:44px;height:44px;border-radius:12px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">😔</div>
-            <div>
-              <div style="font-weight:700;color:#fff;font-size:16px;margin-bottom:6px">Ce que j'ai observé</div>
-              <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.8;margin:0">
-                En France, <strong style="color:#fff">504 000 personnes</strong> sont victimes de cyberattaque chaque année. 
-                Des retraités qui perdent leurs économies sur de faux sites. Des parents qui se font voler 
-                leur identité. Des proches qui cliquent sur un lien et se retrouvent avec leur ordinateur bloqué.
-                La plupart auraient pu être protégés avec les bons réflexes.
-              </p>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:16px;align-items:flex-start">
-            <div style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">💡</div>
-            <div>
-              <div style="font-weight:700;color:#fff;font-size:16px;margin-bottom:6px">Le problème que j'ai identifié</div>
-              <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.8;margin:0">
-                Les solutions existantes sont soit trop techniques, soit trop chères, soit incompréhensibles 
-                pour les personnes qui en ont le plus besoin. Il manquait quelque chose de <strong style="color:#fff">simple, 
-                humain et accessible</strong> — un conseiller de confiance disponible à toute heure, 
-                qui parle sans jargon et guide pas à pas.
-              </p>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:16px;align-items:flex-start">
-            <div style="width:44px;height:44px;border-radius:12px;background:rgba(45,91,255,.2);border:1px solid rgba(45,91,255,.4);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛡️</div>
-            <div>
-              <div style="font-weight:700;color:#fff;font-size:16px;margin-bottom:6px">Ma réponse : Despy</div>
-              <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.8;margin:0">
-                Despy a été créé avec une conviction simple : <strong style="color:#fff">la protection numérique 
-                ne devrait pas être réservée aux experts</strong>. Avec plus de 10 ans d'expérience dans 
-                les télécommunications, j'ai conçu un service qui surveille, alerte et guide — 
-                même quand vous dormez. Parce qu'une arnaque peut arriver à n'importe qui, 
-                à n'importe quelle heure.
-              </p>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:16px;align-items:flex-start">
-            <div style="width:44px;height:44px;border-radius:12px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🤝</div>
-            <div>
-              <div style="font-weight:700;color:#fff;font-size:16px;margin-bottom:6px">Mon engagement envers vous</div>
-              <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.8;margin:0">
-                Despy n'est pas une grande entreprise anonyme. Le fondateur est joignable directement 
-                par email ou WhatsApp. Chaque fonctionnalité a été pensée pour vous — pas pour les 
-                investisseurs. <strong style="color:#fff">Votre sécurité numérique est ma priorité 
-                absolue.</strong>
-              </p>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Stats percutantes -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:3rem;padding-top:2.5rem;border-top:1px solid rgba(255,255,255,.1)">
-          <div style="text-align:center">
-            <div style="font-size:32px;font-weight:900;color:#2D5BFF">504K</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">victimes en France<br>chaque année</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:32px;font-weight:900;color:#2D5BFF">1/4</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">Français touché<br>par an</div>
-          </div>
-          <div style="text-align:center">
-            <div style="font-size:32px;font-weight:900;color:#2D5BFF">0,33€</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">par jour pour<br>être protégé</div>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div style="text-align:center;margin-top:2.5rem">
-          <button onclick="showPage('tarifs')" class="btn-primary" style="font-size:16px;padding:16px 36px">
-            Je rejoins la protection Despy →
-          </button>
-          <div style="margin-top:12px;font-size:13px;color:rgba(255,255,255,.4)">
-            Sans engagement · Résiliation en 1 clic
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ═══ DESPY VEILLE AUSSI SUR VOUS — 3 services regroupés ═══ -->
-  <section id="services-plus" style="background:var(--bg2);padding:5rem 0;border-top:1px solid var(--border)">
-    <div class="wrap">
-      <div class="text-center reveal" style="margin-bottom:2.5rem">
-        <div class="section-tag">Et ce n'est pas tout</div>
-        <h2 class="sh2">Despy veille aussi sur vous</h2>
-        <p class="sdesc">Trois protections en plus, pensées pour les seniors et leurs proches.</p>
-      </div>
-      <div class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px;max-width:1040px;margin:0 auto;align-items:stretch">
-
-        <!-- Carte 1 : Alertes nationales (gratuit) -->
-        <div id="push-alerts" style="display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:22px;padding:28px 26px;box-shadow:0 4px 24px rgba(45,91,255,.06)">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--blue);margin-bottom:14px;width:fit-content">🔔 Gratuit</div>
-          <h3 style="font-size:1.35rem;font-weight:900;color:var(--text);margin:0 0 10px;letter-spacing:-.02em">Alertes nationales</h3>
-          <p style="font-size:15px;color:var(--text2);line-height:1.6;margin:0 0 1.25rem;flex:1">Une notification dès qu'une nouvelle vague d'arnaque frappe la France : faux SMS, faux livreurs, faux supports. Sources officielles + détection communautaire.</p>
-          <div id="push-status" style="margin-bottom:12px"></div>
-          <button onclick="subscribePush()" id="push-btn" style="margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Activer les alertes
-          </button>
-          <p style="font-size:11px;color:var(--text3);margin:12px 0 0;text-align:center">Désactivable à tout moment · 1 à 3 alertes/semaine max</p>
-        </div>
-
-        <!-- Carte 2 : Privacy Cleanup -->
-        <div id="privacy-home-section" style="display:flex;flex-direction:column;background:linear-gradient(160deg,#0a1f3a,#1a3fd9);border:1px solid var(--border);border-radius:22px;padding:28px 26px;color:#fff;box-shadow:0 4px 24px rgba(45,91,255,.12)">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1c1c1e;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;width:fit-content">⚡ Exclusif Despy</div>
-          <h3 style="font-size:1.35rem;font-weight:900;margin:0 0 10px;letter-spacing:-.02em;color:#fff">Privacy Cleanup</h3>
-          <p style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.6;margin:0 0 1.25rem;flex:1">Vos nom, téléphone et adresse circulent sur +100 annuaires et courtiers de données. Despy envoie automatiquement les demandes RGPD d'effacement et surveille chaque mois qu'ils ne réapparaissent pas.</p>
-          <button onclick="showPage('privacy')" style="margin-top:auto;padding:14px 24px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">Découvrir Privacy Cleanup →</button>
-          <p style="font-size:11px;color:rgba(255,255,255,.6);margin:12px 0 0;text-align:center">Inclus dès 9,99 €/mois</p>
-        </div>
-
-        <!-- Carte 3 : SOS Humain -->
-        <div id="sos-home-section" style="display:flex;flex-direction:column;background:linear-gradient(160deg,#7f1d1d,#dc2626);border:1px solid var(--border);border-radius:22px;padding:28px 26px;color:#fff;box-shadow:0 4px 24px rgba(220,38,38,.18)">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,.25);color:#fef3c7;border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;width:fit-content">🆘 Service humain</div>
-          <h3 style="font-size:1.35rem;font-weight:900;margin:0 0 10px;letter-spacing:-.02em;color:#fff">SOS Humain</h3>
-          <p style="font-size:15px;color:rgba(255,255,255,.9);line-height:1.6;margin:0 0 1.25rem;flex:1">Vous vous faites pirater ? Pas un chatbot : une personne réelle vous rappelle (sous 30 min en soirée et week-end), rédige les démarches officielles à votre place et vous suit jusqu'à résolution.</p>
-          <button onclick="showPage('sos-humain')" style="margin-top:auto;padding:14px 24px;background:#fff;color:#dc2626;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">Découvrir SOS Humain →</button>
-          <p style="font-size:11px;color:rgba(255,255,255,.7);margin:12px 0 0;text-align:center">Inclus dès 9,99 €/mois</p>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
   <style>
     @keyframes sos-pulse {
@@ -2371,93 +2035,6 @@ function triggerPWAInstall() {
     }
   </style>
 
-
-  <!-- ═══ AVIS GOOGLE ═══ -->
-  <section id="reviews" style="background:#fff;padding:5rem 0;border-top:1px solid var(--border)">
-    <div class="wrap">
-      <div style="text-align:center;margin-bottom:3rem">
-        <h2 class="section-title">Ce que disent nos clients</h2>
-        <p class="section-sub" style="margin-bottom:24px">Avis vérifiés laissés sur notre fiche Google My Business</p>
-
-        <!-- Badge note Google agrégée -->
-        <a href="https://g.page/r/CVKTMKw67U7wEBI" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:18px;padding:18px 28px;background:#fff;border:2px solid #fbbf24;border-radius:18px;box-shadow:0 6px 20px rgba(251,191,36,.18);text-decoration:none;transition:transform .2s;flex-wrap:wrap;justify-content:center" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <svg width="36" height="36" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          <div style="text-align:left">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
-              <span style="font-size:32px;font-weight:900;color:var(--text);line-height:1">4,9</span>
-              <span style="display:flex;gap:1px;color:#FBBF24;font-size:20px;letter-spacing:1px">★★★★★</span>
-            </div>
-            <div style="font-size:13px;color:var(--text3);font-weight:600">Note Google · <span style="color:var(--blue);text-decoration:underline">voir tous les avis →</span></div>
-          </div>
-        </a>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;max-width:1100px;margin:0 auto" class="reviews-grid">
-
-        <!-- Avis 1 -->
-        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div style="display:flex;gap:10px;align-items:center">
-              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#2D5BFF,#1a3fd9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">M</div>
-              <div>
-                <div style="font-weight:700;font-size:14px;color:var(--text)">Marie L.</div>
-                <div style="font-size:11px;color:var(--text3)">Strasbourg</div>
-              </div>
-            </div>
-            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          </div>
-          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
-          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Je me sens enfin protégée quand je reçois des SMS bizarres. L'équipe prend le temps d'expliquer simplement, c'est exactement ce qu'il me fallait."</div>
-          <div style="font-size:11px;color:var(--text3)">il y a 2 semaines</div>
-        </div>
-
-        <!-- Avis 2 -->
-        <div style="background:#fff;border:2px solid var(--blue);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 24px rgba(45,91,255,.12);position:relative">
-          <div style="position:absolute;top:-10px;right:14px;background:var(--blue);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:99px">⭐ COUP DE CŒUR</div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div style="display:flex;gap:10px;align-items:center">
-              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">R</div>
-              <div>
-                <div style="font-weight:700;font-size:14px;color:var(--text)">Robert D.</div>
-                <div style="font-size:11px;color:var(--text3)">Schiltigheim</div>
-              </div>
-            </div>
-            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          </div>
-          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
-          <div style="font-size:14px;color:var(--text2);line-height:1.6">"Mon fils m'a abonné à Despy. Je sais maintenant quoi faire quand je reçois un mail bizarre. Service très professionnel et patient."</div>
-          <div style="font-size:11px;color:var(--text3)">il y a 1 mois</div>
-        </div>
-
-        <!-- Avis 3 -->
-        <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 12px rgba(0,0,0,.04)">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div style="display:flex;gap:10px;align-items:center">
-              <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6d28d9);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px">F</div>
-              <div>
-                <div style="font-weight:700;font-size:14px;color:var(--text)">Françoise B.</div>
-                <div style="font-size:11px;color:var(--text3)">Illkirch</div>
-              </div>
-            </div>
-            <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          </div>
-          <div style="display:flex;gap:2px;color:#FBBF24">★★★★★</div>
-          <div style="font-size:14px;color:var(--text2);line-height:1.6">"L'assistant IA répond à toutes mes questions, même les plus basiques, sans jamais me faire sentir bête. Je recommande vivement Despy."</div>
-          <div style="font-size:11px;color:var(--text3)">il y a 3 semaines</div>
-        </div>
-
-      </div>
-
-      <!-- CTA voir tous les avis -->
-      <div style="text-align:center;margin-top:2.5rem">
-        <a href="https://g.page/r/CVKTMKw67U7wEBI/review" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#fff;border:1.5px solid var(--border);border-radius:99px;color:var(--text2);font-size:14px;font-weight:700;text-decoration:none;transition:all .2s">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Voir tous les avis sur Google →
-        </a>
-      </div>
-
-    </div>
-  </section>
 
 <section id="faq">
   <div class="wrap">
@@ -2520,223 +2097,6 @@ function triggerPWAInstall() {
 </section>
 
 <!-- ── FIDÉLISATION ── -->
-<section id="fidelisation" style="background:var(--blue-light);border-top:1px solid var(--blue-mid)">
-    <div class="wrap">
-      <div style="text-align:center;margin-bottom:3rem">
-        <div class="section-badge">Progression</div>
-        <h2 class="section-title">Devenez un expert de votre protection</h2>
-        <p class="section-sub">9 modules · 45 questions · 6 niveaux · Classement en temps réel</p>
-      </div>
-
-      <!-- DEFI CHRONO — Hero -->
-      <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:20px;padding:28px;margin-bottom:2rem;color:#fff;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
-        <div style="position:absolute;bottom:-40px;left:-20px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.03)"></div>
-        <div style="position:relative;z-index:1">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="font-size:36px">⏱️</div>
-            <div>
-              <div style="font-size:20px;font-weight:900">Défi Chrono</div>
-              <div style="font-size:13px;color:rgba(255,255,255,.7)">5 questions · 30 secondes chacune · XP bonus selon la vitesse</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">100</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.6)">XP bonne réponse</div>
-            </div>
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">+150</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.6)">XP bonus vitesse</div>
-            </div>
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">🏆</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.6)">Badge Sans Faute</div>
-            </div>
-          </div>
-          <div id="chrono-zone" style="background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:16px;min-height:60px;display:flex;align-items:center;justify-content:center">
-            <div style="text-align:center;color:rgba(255,255,255,.6);font-size:14px">Prêt à relever le défi ?</div>
-          </div>
-          <button onclick="startChrono()" style="width:100%;padding:14px;background:#fff;color:var(--blue);border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#f0f3ff'" onmouseout="this.style.background='#fff'">
-            ⚡ Lancer le Défi Chrono
-          </button>
-        </div>
-      </div>
-
-      <!-- ═══ SIMULATEUR D'ARNAQUE ═══ -->
-      <div style="background:linear-gradient(135deg,#7c2d12,#dc2626);border-radius:20px;padding:28px;margin-bottom:2rem;color:#fff;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-30px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)"></div>
-        <div style="position:absolute;bottom:-40px;left:-20px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.03)"></div>
-        <div style="position:relative;z-index:1">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="font-size:36px">🎭</div>
-            <div>
-              <div style="font-size:20px;font-weight:900">Simulateur d'arnaque</div>
-              <div style="font-size:13px;color:rgba(255,255,255,.8)">Plongez dans des scénarios réalistes · Trouvez les indices · Gagnez des XP</div>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">5</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.7)">Scénarios réalistes</div>
-            </div>
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">3</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.7)">Indices à trouver</div>
-            </div>
-            <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:12px;text-align:center">
-              <div style="font-size:22px;font-weight:900">+200</div>
-              <div style="font-size:11px;color:rgba(255,255,255,.7)">XP bonus parfait</div>
-            </div>
-          </div>
-          <div style="background:rgba(255,255,255,.05);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center">
-            <div style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.6">
-              📧 SMS de banque · 📞 Faux support technique · 💌 Email de phishing<br>
-              🎁 Concours frauduleux · 💼 Arnaque LinkedIn
-            </div>
-          </div>
-          <button onclick="showSimulator()" style="width:100%;padding:14px;background:#fff;color:#dc2626;border:none;border-radius:12px;font-weight:900;font-size:15px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
-            🎬 Lancer une simulation
-          </button>
-        </div>
-      </div>
-
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start" class="formation-grid">
-
-        <!-- COLONNE GAUCHE : Progression + Quiz -->
-        <div>
-          <!-- Carte progression niveau -->
-          <div style="background:#fff;border-radius:16px;padding:24px;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(45,91,255,.08)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:700;font-size:15px;color:var(--text)">🎯 Votre progression</div>
-              <div id="site-level-badge" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;color:#94a3b8;border:1.5px solid #94a3b8">Niveau 1 — Novice</div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
-              <span id="site-xp-count">0 XP</span>
-              <span id="site-xp-goal">Prochain niveau : 500 XP</span>
-            </div>
-            <div style="background:#e2e8f0;border-radius:99px;height:10px;overflow:hidden">
-              <div id="site-xp-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#2D5BFF,#60a5fa);border-radius:99px;transition:width .6s ease"></div>
-            </div>
-
-            <!-- Les 6 niveaux -->
-            <!-- Score securite dynamique -->
-            <div style="margin:14px 0;padding:12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-                <span style="font-size:12px;font-weight:600;color:var(--text2)">🛡️ Score de sécurité</span>
-                <span id="dynamic-score" style="font-size:18px;font-weight:900;color:#ef4444">25</span>
-              </div>
-              <div style="background:#e2e8f0;border-radius:99px;height:8px;overflow:hidden;margin-bottom:5px">
-                <div id="dynamic-score-bar" style="height:100%;width:25%;background:#ef4444;border-radius:99px;transition:width .8s ease,background .5s"></div>
-              </div>
-              <div id="dynamic-score-msg" style="font-size:11px;color:var(--text3)">Continuez la formation pour améliorer votre score</div>
-            </div>
-
-            <div style="margin-top:4px;display:grid;grid-template-columns:repeat(6,1fr);gap:6px">
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#94a3b8;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N1</div><div style="font-size:9px;color:var(--text3)">Novice</div></div>
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#cd7f32;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N2</div><div style="font-size:9px;color:var(--text3)">Apprenti</div></div>
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#c0c0c0;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N3</div><div style="font-size:9px;color:var(--text3)">Vigilant</div></div>
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#ffd700;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N4</div><div style="font-size:9px;color:var(--text3)">Protégé</div></div>
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:#b0c4de;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N5</div><div style="font-size:9px;color:var(--text3)">Confirmé</div></div>
-              <div style="text-align:center"><div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2D5BFF,#60a5fa);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff">N6</div><div style="font-size:9px;color:var(--text3)">Expert</div></div>
-            </div>
-          </div>
-
-          <!-- Quiz du module -->
-          <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(45,91,255,.08)">
-            <div id="quiz-module-header" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;font-size:14px;color:var(--text2)">
-              📱 <span>Module de la semaine en cours...</span>
-            </div>
-            <div id="quiz-zone"></div>
-            <div id="quiz-opts"></div>
-          </div>
-        </div>
-
-        <!-- COLONNE DROITE : Badges + Classement -->
-        <div>
-          <!-- Badges spéciaux -->
-          <div style="background:#fff;border-radius:16px;padding:24px;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(45,91,255,.08)">
-            <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:14px">🏅 Badges à débloquer</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">🔰</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Premier Pas</div><div style="font-size:10px;color:var(--text3)">Compte créé</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">🛡️</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Blindé</div><div style="font-size:10px;color:var(--text3)">5 quiz terminés</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">⚡</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Sans Faute</div><div style="font-size:10px;color:var(--text3)">Module parfait 5/5</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">🔥</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Série de Feu</div><div style="font-size:10px;color:var(--text3)">3 modules parfaits</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">📱</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Vigilant Mobile</div><div style="font-size:10px;color:var(--text3)">Module SMS parfait</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">🎓</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Diplômé Despy</div><div style="font-size:10px;color:var(--text3)">9 modules terminés</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-                <span style="font-size:22px">🔐</span>
-                <div><div style="font-size:12px;font-weight:700;color:var(--text)">Maître des MDP</div><div style="font-size:10px;color:var(--text3)">Module MDP parfait</div></div>
-              </div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px;background:linear-gradient(135deg,#ffd70015,#ffd70030);border-radius:10px;border:1px solid #ffd700">
-                <span style="font-size:22px">🏆</span>
-                <div><div style="font-size:12px;font-weight:700;color:#b8860b">Champion</div><div style="font-size:10px;color:var(--text3)">Top 10 classement</div></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Classement -->
-          <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(45,91,255,.08)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-              <div style="font-weight:700;font-size:15px;color:var(--text)">🏆 Classement membres</div>
-              <div style="font-size:11px;color:var(--text3)">Temps réel</div>
-            </div>
-            <div id="leaderboard-list">
-              <!-- Classement simulé — à brancher sur Supabase -->
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:28px;height:28px;border-radius:8px;background:#ffd700;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0">1</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">Marie B. <span style="font-size:10px;font-weight:400;color:var(--text3)">N4 Protégé</span></div></div>
-                <div style="font-size:13px;font-weight:700;color:var(--blue)">4 250 XP</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:28px;height:28px;border-radius:8px;background:#c0c0c0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0">2</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">Jean-Pierre M. <span style="font-size:10px;font-weight:400;color:var(--text3)">N3 Vigilant</span></div></div>
-                <div style="font-size:13px;font-weight:700;color:var(--blue)">2 800 XP</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:28px;height:28px;border-radius:8px;background:#cd7f32;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0">3</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">Francoise D. <span style="font-size:10px;font-weight:400;color:var(--text3)">N3 Vigilant</span></div></div>
-                <div style="font-size:13px;font-weight:700;color:var(--blue)">2 150 XP</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:28px;height:28px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--text3);flex-shrink:0">4</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">Michel T. <span style="font-size:10px;font-weight:400;color:var(--text3)">N2 Apprenti</span></div></div>
-                <div style="font-size:13px;font-weight:700;color:var(--blue)">1 320 XP</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0">
-                <div style="width:28px;height:28px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:var(--text3);flex-shrink:0">5</div>
-                <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">Anne-Marie L. <span style="font-size:10px;font-weight:400;color:var(--text3)">N2 Apprenti</span></div></div>
-                <div style="font-size:13px;font-weight:700;color:var(--blue)">890 XP</div>
-              </div>
-            </div>
-            <div style="margin-top:12px;padding:10px;background:var(--blue-light);border-radius:10px;text-align:center;font-size:12px;color:var(--text3)">
-              Votre position s'affichera ici après votre premier quiz 🎯
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
 <!-- ── CTA FINAL ── -->
 <section style="background:var(--blue-light);border-top:1px solid var(--blue-mid)">
@@ -4771,6 +4131,7 @@ function triggerPWAInstall() {
         </form>
         <div style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.5">🔒 100&nbsp;% privé&nbsp;: votre mot de passe est chiffré sur votre appareil et n'est <strong>jamais</strong> envoyé. Seul un fragment anonyme part vers la base mondiale (méthode k-anonymity).</div>
         <div id="pwcheck-result" style="margin-top:12px"></div>
+        <button onclick="showPage('home');setTimeout(function(){switchTool('mdp');scrollToSection('centre-outils')},150)" style="margin-top:10px;width:100%;padding:10px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">🎲 Besoin d'un nouveau mot de passe ? Générez-en un fort →</button>
       </div>
 
       <!-- Analyse de lien -->
@@ -5056,7 +4417,7 @@ function triggerPWAInstall() {
     <div>
       <div class="footer-title">Navigation</div>
       <button class="footer-link" onclick="scrollToSection('situations')">Protection</button>
-      <button class="footer-link" onclick="scrollToSection('features')">Fonctionnalités</button>
+      <button class="footer-link" onclick="scrollToSection('centre-outils')">Fonctionnalités</button>
       <button class="footer-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
       <button class="footer-link" onclick="showPage('tarifs')">Tarifs</button>
       <button class="footer-link" onclick="scrollToSection('faq')">FAQ</button>
@@ -9714,7 +9075,7 @@ function answerQuiz(idx) {
   var nextBtn = document.createElement('button');
   nextBtn.textContent = 'Voir ma progression';
   nextBtn.style.cssText = 'margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit';
-  nextBtn.onclick = function() { updateSiteXP(); scrollToSection('fidelisation'); };
+  nextBtn.onclick = function() { updateSiteXP(); };
   fb.appendChild(nextBtn);
   zone.appendChild(fb);
   if (isCorrect) showXPToast(xpGained);
@@ -9912,7 +9273,7 @@ function updateChatQuotaDisplay(remaining) {
 
 // ── Centre d'outils : navigation onglets ──
 function switchTool(name) {
-  ['analyse','hibp','phone','site'].forEach(function(t){
+  ['analyse','hibp','phone','site','mdp'].forEach(function(t){
     var tab = document.getElementById('tool-tab-' + t);
     var panel = document.getElementById('tool-panel-' + t);
     if (tab) {
@@ -10505,6 +9866,95 @@ function urlBase64ToUint8Array(b64) {
   var arr = new Uint8Array(raw.length);
   for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
   return arr;
+}
+
+// ── Générateur de mot de passe (100% navigateur, rien n'est envoyé) ──
+var _mdpMode = 'memo';
+
+function _mdpRand(max) {
+  // Entier aléatoire cryptographique dans [0, max[
+  var buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0] % max;
+}
+
+function setMdpMode(mode) {
+  _mdpMode = mode;
+  ['memo','fort'].forEach(function(m){
+    var b = document.getElementById('mdp-mode-' + m);
+    if (!b) return;
+    var on = (m === mode);
+    b.style.border = '1.5px solid ' + (on ? 'var(--blue)' : 'var(--border)');
+    b.style.background = on ? 'var(--blue-light)' : '#fff';
+    b.style.color = on ? 'var(--blue)' : 'var(--text2)';
+    b.style.fontWeight = on ? '800' : '700';
+  });
+  genMdp();
+}
+
+function genMdp() {
+  var out = document.getElementById('mdp-output');
+  var conseil = document.getElementById('mdp-conseil');
+  if (!out) return;
+  var pwd;
+  if (_mdpMode === 'memo') {
+    // 3 mots simples + 2 chiffres + 1 symbole : long ET mémorisable
+    var MOTS = ['Avion','Banane','Bateau','Bonbon','Cadeau','Camion','Canard','Chapeau','Cheval','Citron','Coton','Dragon','Jardin','Lapin','Livre','Lune','Maison','Melon','Miroir','Montagne','Moulin','Mouton','Nuage','Oiseau','Orange','Panda','Papillon','Piano','Plage','Pomme','Renard','Requin','Sapin','Soleil','Tigre','Tulipe','Violon','Voiture','Volcan'];
+    var SYM = ['!','?','*','+'];
+    var m1 = MOTS[_mdpRand(MOTS.length)], m2 = MOTS[_mdpRand(MOTS.length)], m3 = MOTS[_mdpRand(MOTS.length)];
+    while (m2 === m1) m2 = MOTS[_mdpRand(MOTS.length)];
+    while (m3 === m1 || m3 === m2) m3 = MOTS[_mdpRand(MOTS.length)];
+    pwd = m1 + '-' + m2 + '-' + m3 + (10 + _mdpRand(90)) + SYM[_mdpRand(SYM.length)];
+    if (conseil) {
+      conseil.style.display = 'block';
+      conseil.innerHTML = '<strong>💡 Astuce pour le retenir :</strong> imaginez la scène ! Par exemple un <strong>' + m1.toLowerCase() + '</strong>, un <strong>' + m2.toLowerCase() + '</strong> et un <strong>' + m3.toLowerCase() + '</strong> réunis dans une histoire. Plus c\'est absurde, mieux on s\'en souvient.';
+    }
+  } else {
+    // 16 caractères aléatoires, avec au moins une majuscule, minuscule, chiffre et symbole
+    var MAJ = 'ABCDEFGHJKLMNPQRSTUVWXYZ', MIN = 'abcdefghijkmnpqrstuvwxyz', NUM = '23456789', SYMS = '!?*+-#%';
+    var ALL = MAJ + MIN + NUM + SYMS;
+    var chars = [MAJ[_mdpRand(MAJ.length)], MIN[_mdpRand(MIN.length)], NUM[_mdpRand(NUM.length)], SYMS[_mdpRand(SYMS.length)]];
+    for (var i = chars.length; i < 16; i++) chars.push(ALL[_mdpRand(ALL.length)]);
+    // Mélange (Fisher-Yates)
+    for (var j = chars.length - 1; j > 0; j--) {
+      var k = _mdpRand(j + 1);
+      var tmp = chars[j]; chars[j] = chars[k]; chars[k] = tmp;
+    }
+    pwd = chars.join('');
+    if (conseil) {
+      conseil.style.display = 'block';
+      conseil.innerHTML = '<strong>💡 Conseil :</strong> ce mot de passe est très difficile à deviner, mais aussi à retenir. Notez-le dans un carnet gardé chez vous, ou utilisez le mode « Facile à retenir ».';
+    }
+  }
+  out.textContent = pwd;
+  var copyBtn = document.getElementById('mdp-copy-btn');
+  if (copyBtn) copyBtn.innerHTML = '📋 Copier';
+}
+
+function copyMdp(btn) {
+  var out = document.getElementById('mdp-output');
+  if (!out) return;
+  var pwd = out.textContent || '';
+  if (!pwd || pwd.indexOf('Générer') !== -1) { genMdp(); pwd = out.textContent; }
+  function ok() { if (btn) { btn.innerHTML = '✅ Copié !'; setTimeout(function(){ btn.innerHTML = '📋 Copier'; }, 2500); } }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(pwd).then(ok).catch(function(){ _mdpCopyFallback(pwd, ok); });
+  } else {
+    _mdpCopyFallback(pwd, ok);
+  }
+}
+
+function _mdpCopyFallback(text, ok) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    ok();
+  } catch(e) {}
 }
 
 // ── Vérificateur HIBP public ──
