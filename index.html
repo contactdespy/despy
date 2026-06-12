@@ -1141,10 +1141,26 @@ body.despy-abonne #outils-upsell{display:none!important}
   };
 
   // Envoie un évènement de conversion — sans rien faire si pas de consentement.
-  window.despyTrack = function (eventName, params) {
+  window.despyTrack = function (eventName, params, eventId) {
     if (!window.despyAdConsent()) return;
     window.loadMetaPixel();
-    try { if (window.fbq) window.fbq('track', eventName, params || {}); } catch (e) {}
+    // eventId : déduplication avec l'envoi serveur (Conversions API)
+    try { if (window.fbq) window.fbq('track', eventName, params || {}, eventId ? { eventID: eventId } : undefined); } catch (e) {}
+  };
+
+  // Cookies Meta (_fbp/_fbc) : transmis au serveur pour améliorer la
+  // correspondance des conversions CAPI. Vides si pas de consentement.
+  window.despyFbCookies = function () {
+    if (!window.despyAdConsent()) return {};
+    try {
+      var out = {};
+      document.cookie.split(';').forEach(function (c) {
+        var p = c.trim().split('=');
+        if (p[0] === '_fbp') out.fbp = p[1];
+        if (p[0] === '_fbc') out.fbc = p[1];
+      });
+      return out;
+    } catch (e) { return {}; }
   };
 
   // Visiteur déjà consentant lors d'une visite précédente → charger immédiatement.
@@ -5481,7 +5497,7 @@ async function launchCheckout(email, name, plan) {
     var r = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site' })
+      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site', marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
     });
     if (!r.ok) {
       var err = await r.json();
@@ -5534,10 +5550,12 @@ function showCheckoutErrorToast(message) {
 function handleStripeReturn() {
   var params = new URLSearchParams(window.location.search);
   if (params.get('payment') === 'success') {
+    var stripeSessionId = params.get('session_id') || undefined;
     window.history.replaceState({}, '', window.location.pathname);
-    // Conversion Meta : abonnement payé
+    // Conversion Meta : abonnement payé (dédupliquée avec le webhook Stripe
+    // via l'id de session — le serveur envoie le même event_id en CAPI)
     if (typeof window.despyTrack === 'function') {
-      try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: 9.99 }); } catch(e){}
+      try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: 9.99 }, stripeSessionId); } catch(e){}
     }
         var modal = document.createElement('div');
     modal.className = 'sub-modal-overlay';
@@ -8174,10 +8192,13 @@ async function createFreeAccount() {
 
   // Création 100 % côté serveur (scrypt) — aucun mot de passe stocké en local
   try {
+    var _fbck = (typeof window.despyFbCookies === 'function') ? window.despyFbCookies() : {};
     var r = await fetch('/.netlify/functions/register-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob, referralCode: referralCode || undefined })
+      body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob, referralCode: referralCode || undefined,
+        fbp: _fbck.fbp, fbc: _fbck.fbc,
+        marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
     });
     var data = await r.json();
     if (!r.ok || data.error) {
@@ -8214,9 +8235,9 @@ async function createFreeAccount() {
     return;
   }
 
-  // Conversion Meta : compte gratuit créé
+  // Conversion Meta : compte gratuit créé (dédupliquée avec l'envoi serveur)
   if (typeof window.despyTrack === 'function') {
-    try { window.despyTrack('CompleteRegistration', { content_name: 'compte_gratuit', status: 'free' }); } catch(e){}
+    try { window.despyTrack('CompleteRegistration', { content_name: 'compte_gratuit', status: 'free' }, data.capiEventId || undefined); } catch(e){}
   }
 
   // Fermer modal et afficher espace client
@@ -9678,6 +9699,10 @@ async function runAnalyse() {
           '</div>';
       } else {
         // Visiteur anonyme → on capture l'email avec le compte gratuit.
+        // Signal Meta : ce visiteur a un vrai intérêt (quota épuisé)
+        if (typeof window.despyTrack === 'function') {
+          try { window.despyTrack('Lead', { content_name: 'quota_analyse_atteint' }); } catch(e){}
+        }
         result.innerHTML = '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:14px;padding:18px;text-align:center">' +
           '<div style="font-size:28px;margin-bottom:6px">🔒</div>' +
           '<div style="font-weight:700;color:#92400e;font-size:15px;margin-bottom:6px">Créez votre compte gratuit pour continuer</div>' +
@@ -9738,6 +9763,10 @@ async function runAnalyse() {
       var teaser = nbSignals
         ? '<div style="font-size:13.5px;color:#444;margin-bottom:14px;line-height:1.5">Nous avons détecté <strong style="color:' + v.color + '">' + nbSignals + ' signal' + (nbSignals > 1 ? 'aux' : '') + '</strong> dans ce message, et préparé les actions à faire.</div>'
         : '';
+      // Signal Meta : l'écran d'inscription post-analyse est affiché
+      if (typeof window.despyTrack === 'function') {
+        try { window.despyTrack('Lead', { content_name: 'plan_action_verrouille' }); } catch(e){}
+      }
       result.innerHTML =
         '<div style="background:' + v.bg + ';border:2px solid ' + v.border + ';border-radius:16px;padding:18px">' +
           headerHtml +

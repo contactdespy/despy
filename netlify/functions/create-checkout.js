@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email, name, plan, source } = JSON.parse(event.body || '{}');
+    const { email, name, plan, source, marketing_consent } = JSON.parse(event.body || '{}');
 
     // Validation
     if (!email || !email.includes('@')) {
@@ -128,7 +128,8 @@ exports.handler = async (event, context) => {
       metadata: {
         despy_email: email,
         despy_source: source || 'site',
-        despy_bonus_months_used: String(bonusMonths)
+        despy_bonus_months_used: String(bonusMonths),
+        despy_consent: marketing_consent ? '1' : '0'
       }
     });
 

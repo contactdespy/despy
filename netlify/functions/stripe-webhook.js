@@ -9,6 +9,37 @@
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
+
+// ── Meta Conversions API : achat confirmé côté serveur ──
+// Fiable même si le navigateur a un bloqueur de pub. Dédupliqué avec le
+// pixel via event_id = id de session Stripe. Soumis au consentement
+// marketing transmis dans les metadata du checkout (despy_consent).
+async function sendMetaPurchase(email, sessionId, value) {
+  const pixelId = process.env.META_PIXEL_ID;
+  const token = process.env.META_CAPI_TOKEN;
+  if (!pixelId || !token || !email) return;
+  const em = crypto.createHash('sha256').update(String(email).trim().toLowerCase()).digest('hex');
+  try {
+    const res = await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: [{
+          event_name: 'Purchase',
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: sessionId,
+          action_source: 'website',
+          event_source_url: 'https://despy.fr',
+          user_data: { em: [em] },
+          custom_data: { value: value, currency: 'EUR' }
+        }]
+      }),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!res.ok) console.warn('Meta CAPI Purchase:', (await res.text()).substring(0, 200));
+  } catch (e) { console.warn('Meta CAPI Purchase error:', e.message); }
+}
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -82,6 +113,11 @@ exports.handler = async (event) => {
 
       console.log(`✅ Abonnement activé : ${email} — ${plan}`);
       await sendEmail('welcome', { email, name, prenom, plan });
+
+      // Conversion Meta serveur (si consentement marketing donné au checkout)
+      if (session.metadata?.despy_consent === '1') {
+        await sendMetaPurchase(email, session.id, plan === 'annual' ? 89 : 9.99);
+      }
     }
   }
 

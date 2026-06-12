@@ -14,6 +14,41 @@ function hashPassword(password) {
   return `scrypt$${salt}$${hash}`;
 }
 
+// ── Meta Conversions API (CAPI) ──
+// Envoi serveur de la conversion : fiable même avec bloqueur de pub.
+// Ne s'exécute QUE si le visiteur a accepté le cookie marketing (RGPD)
+// et si META_PIXEL_ID + META_CAPI_TOKEN sont configurés dans Netlify.
+async function sendMetaCAPI(eventName, opts) {
+  const pixelId = process.env.META_PIXEL_ID;
+  const token = process.env.META_CAPI_TOKEN;
+  if (!pixelId || !token) return;
+  const sha = (s) => crypto.createHash('sha256').update(String(s).trim().toLowerCase()).digest('hex');
+  const userData = {};
+  if (opts.email) userData.em = [sha(opts.email)];
+  if (opts.ip) userData.client_ip_address = opts.ip;
+  if (opts.ua) userData.client_user_agent = opts.ua;
+  if (opts.fbp) userData.fbp = opts.fbp;
+  if (opts.fbc) userData.fbc = opts.fbc;
+  const evt = {
+    event_name: eventName,
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: opts.eventId,
+    action_source: 'website',
+    event_source_url: 'https://despy.fr',
+    user_data: userData
+  };
+  if (opts.value != null) evt.custom_data = { value: opts.value, currency: 'EUR' };
+  try {
+    const res = await fetch(`https://graph.facebook.com/v18.0/${pixelId}/events?access_token=${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: [evt] }),
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!res.ok) console.warn('Meta CAPI:', (await res.text()).substring(0, 200));
+  } catch (e) { console.warn('Meta CAPI error:', e.message); }
+}
+
 // Code 6 caractères, lisibles humains (pas de 0/O/1/I)
 function generateReferralCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -49,7 +84,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { email, password, prenom, nom, telephone, dob, referralCode } = body;
+    const { email, password, prenom, nom, telephone, dob, referralCode, fbp, fbc, marketing_consent } = body;
 
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email invalide' }) };
@@ -153,6 +188,21 @@ exports.handler = async (event) => {
       console.error('Email error:', e);
     }
 
+    // Conversion Meta côté serveur (dédupliquée avec le pixel navigateur
+    // via capiEventId) — uniquement si consentement marketing donné.
+    let capiEventId = null;
+    if (marketing_consent) {
+      capiEventId = 'reg_' + crypto.randomBytes(8).toString('hex');
+      await sendMetaCAPI('CompleteRegistration', {
+        email: email.toLowerCase().trim(),
+        eventId: capiEventId,
+        ip: (event.headers['x-forwarded-for'] || '').split(',')[0].trim() || undefined,
+        ua: event.headers['user-agent'] || undefined,
+        fbp: fbp || undefined,
+        fbc: fbc || undefined
+      });
+    }
+
     return {
       statusCode: 200,
       headers,
@@ -165,7 +215,8 @@ exports.handler = async (event) => {
         plan: 'free',
         referralCode: newReferralCode,
         referralBonusApplied,
-        bonusMonths: referrer ? 1 : 0
+        bonusMonths: referrer ? 1 : 0,
+        capiEventId
       })
     };
 
