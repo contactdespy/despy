@@ -7,6 +7,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const { issueToken, rateLimit } = require('./_auth');
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -83,6 +84,11 @@ exports.handler = async (event) => {
   }
 
   try {
+    // Anti-abus : 5 créations de compte / heure / IP
+    if (!rateLimit(event, 'register', 5, 60 * 60 * 1000)) {
+      return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de tentatives. Réessayez plus tard.' }) };
+    }
+
     const body = JSON.parse(event.body || '{}');
     const { email, password, prenom, nom, telephone, dob, referralCode, fbp, fbc, marketing_consent } = body;
 
@@ -208,6 +214,7 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: true,
+        token: issueToken(email),
         email,
         name: fullName,
         prenom,

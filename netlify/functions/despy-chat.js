@@ -5,11 +5,12 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth, rateLimit } = require('./_auth');
 
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json',
   };
 
@@ -17,9 +18,23 @@ exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
 
   try {
-    const { messages, email } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const { messages, email } = body;
     if (!messages || !Array.isArray(messages)) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Messages requis' }) };
+    }
+
+    // Le chat nécessite un compte connecté (jeton signé) — évite aussi
+    // l'utilisation de notre clé Anthropic par des tiers.
+    if (!email || !email.includes('@')) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Connexion requise', code: 'AUTH_REQUIRED' }) };
+    }
+    const auth = requireAuth(event, body, email, headers);
+    if (!auth.ok) return auth.response;
+
+    // Garde-fou coût IA : 30 messages / heure / IP
+    if (!rateLimit(event, 'chat', 30, 60 * 60 * 1000)) {
+      return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de messages d\'un coup. Réessayez dans quelques minutes.' }) };
     }
 
     // ── Vérification quota pour les comptes gratuits ──

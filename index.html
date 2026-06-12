@@ -4801,6 +4801,12 @@ var siteSession = {
   }
 };
 
+// En-tête d'authentification (jeton signé délivré à la connexion)
+function authHeaders() {
+  var s = siteSession.get();
+  return (s && s.token) ? { 'Authorization': 'Bearer ' + s.token } : {};
+}
+
 function updateNavForSession() {
   var s = siteSession.get();
   var navRight = document.querySelector('.nav-links');
@@ -5128,6 +5134,14 @@ function showClientArea() {
 async function revalidateSiteSession() {
   var s = siteSession.get();
   if (!s || !s.email) return;
+  // Ancienne session sans jeton de sécurité → reconnexion nécessaire (une seule fois)
+  if (!s.token) {
+    siteSession.clear();
+    if (typeof updateNavForSession === 'function') updateNavForSession();
+    despyNotify('Pour votre sécurité, merci de vous reconnecter.', 'info');
+    showPage('login');
+    return;
+  }
   try {
     var r = await fetch('/.netlify/functions/check-subscription', {
       method: 'POST',
@@ -5190,6 +5204,7 @@ async function siteLogin() {
     }
     siteSession.set({
       email: email,
+      token: data.token || null,
       name: data.name || email.split('@')[0],
       prenom: data.prenom || '',
       nom: data.nom || '',
@@ -5840,7 +5855,7 @@ async function sendChat() {
   try {
     var response = await fetch('/.netlify/functions/despy-chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ messages: _chatHistory, email: session ? session.email : null })
     });
 
@@ -6083,6 +6098,7 @@ async function doLogin() {
 
     siteSession.set({
       email: email,
+      token: data.token || null,
       name: data.name || email.split('@')[0],
       prenom: data.prenom || '',
       nom: data.nom || '',
@@ -6287,7 +6303,7 @@ async function checkDarkWebNow() {
   try {
     var r = await fetch('/.netlify/functions/hibp-check', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: session.email, manual: true })
     });
     var data = await r.json();
@@ -6469,7 +6485,7 @@ function loadTrustedContact() {
   if (!s || !s.email) return;
   fetch('/.netlify/functions/trusted-contact', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ action: 'get', email: s.email })
   }).then(function(r){ return r.json(); }).then(function(d) {
     var n = document.getElementById('tc-name');
@@ -6508,7 +6524,7 @@ function saveTrustedContact() {
   if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
   fetch('/.netlify/functions/trusted-contact', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ action: 'set', email: s.email, contact_name: name.trim(), contact_email: email })
   }).then(function(r){ return r.json(); }).then(function(d) {
     if (d.ok) {
@@ -7056,7 +7072,7 @@ async function loadReferralStatus() {
   try {
     var res = await fetch('/.netlify/functions/referral-status', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: s.email })
     });
     if (!res.ok) return;
@@ -7130,7 +7146,7 @@ async function applyReferralCode() {
   try {
     var res = await fetch('/.netlify/functions/apply-referral', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: s.email, code: code })
     });
     var data = await res.json();
@@ -7320,7 +7336,7 @@ async function submitPrivacyOnboarding() {
   try {
     await fetch('/.netlify/functions/privacy-request', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify(payload),
     });
   } catch(e) { console.warn('privacy-request failed:', e); }
@@ -7371,7 +7387,7 @@ async function syncPrivacyFromServer() {
     // (la source de vérité reste localStorage tant qu'on est connecté)
     if (local && local.activated && local.targets) return false;
 
-    var resp = await fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email));
+    var resp = await fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email), { headers: authHeaders() });
     if (!resp.ok) return false;
     var serverData = await resp.json();
     if (!serverData || !serverData.active) return false;
@@ -8073,6 +8089,7 @@ async function handleGoogleAuth(response, mode, plan) {
     // Créer la session
     siteSession.set({
       email: data.email,
+      token: data.token || null,
       name: data.name,
       prenom: data.prenom,
       nom: data.nom,
@@ -8327,6 +8344,7 @@ async function createFreeAccount() {
     // Session (aucune donnée sensible — pas de mot de passe)
     siteSession.set({
       email: email,
+      token: data.token || null,
       name: data.name || fullName,
       prenom: data.prenom || prenom,
       nom: data.nom || nom,
@@ -10302,7 +10320,7 @@ async function loadSecurityScore(email) {
   try {
     var res = await fetch('/.netlify/functions/security-score', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: email })
     });
     if (!res.ok) return;

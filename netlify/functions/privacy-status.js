@@ -4,12 +4,13 @@
 // ════════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('./_auth');
 
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Cache-Control': 'no-store'
   };
 
@@ -21,6 +22,9 @@ exports.handler = async (event) => {
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email invalide' }) };
     }
+
+    const auth = requireAuth(event, null, email, headers);
+    if (!auth.ok) return auth.response;
 
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
       // Pas de config Supabase → réponse "rien" silencieuse

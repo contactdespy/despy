@@ -6,12 +6,13 @@
 // ════════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('./_auth');
 
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
@@ -22,6 +23,9 @@ exports.handler = async (event) => {
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email requis' }) };
     }
+
+    const auth = requireAuth(event, body, email, headers);
+    if (!auth.ok) return auth.response;
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 

@@ -4,6 +4,7 @@
 // ════════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('./_auth');
 
 // Helper : envoi email via Resend
 async function sendResend(to, subject, html) {
@@ -31,7 +32,7 @@ exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   };
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
@@ -53,6 +54,9 @@ exports.handler = async (event) => {
     if (!user_email || !user_email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email utilisateur invalide' }) };
     }
+
+    const auth = requireAuth(event, body, user_email, headers);
+    if (!auth.ok) return auth.response;
     if (!prenom || !nom || !target_email || !phone || !ville) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Champs requis manquants' }) };
     }

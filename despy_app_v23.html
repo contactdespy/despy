@@ -725,6 +725,12 @@ var session = {
   }
 };
 
+// En-tête d'authentification (jeton signé délivré à la connexion)
+function authHeaders() {
+  var s = session.get();
+  return (s && s.token) ? { 'Authorization': 'Bearer ' + s.token } : {};
+}
+
 var GOOGLE_CLIENT_ID = '748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com';
 
 function toggleAuthMode(mode) {
@@ -775,7 +781,8 @@ async function handleGoogleAuth(resp) {
     var data = await r.json();
     if (!r.ok || data.error) { showAuthErr(data.error || 'Erreur Google'); return; }
     session.set({
-      email: data.email, name: data.name, prenom: data.prenom, nom: data.nom,
+      email: data.email, token: data.token || null,
+      name: data.name, prenom: data.prenom, nom: data.nom,
       telephone: data.telephone || '', subscribed: data.subscribed,
       plan: data.plan, created_at: data.created_at
     });
@@ -803,6 +810,7 @@ async function doLoginApp() {
     if (!data.exists) return showAuthErr('Email ou mot de passe incorrect');
     session.set({
       email: email,
+      token: data.token || null,
       name: data.name || email.split('@')[0],
       prenom: data.prenom || '', nom: data.nom || '',
       telephone: data.telephone || '',
@@ -834,6 +842,7 @@ async function doSignupApp() {
     if (!r.ok || data.error) return showAuthErr(data.error || 'Création impossible');
     session.set({
       email: email,
+      token: data.token || null,
       name: data.name || name,
       prenom: data.prenom || prenom,
       nom: data.nom || nom,
@@ -862,6 +871,15 @@ function enterApp() {
 async function revalidateSession() {
   var s = session.get();
   if (!s || !s.email) return;
+  // Ancienne session sans jeton de sécurité → reconnexion nécessaire (une seule fois)
+  if (!s.token) {
+    session.clear();
+    document.getElementById('app-view').classList.remove('active');
+    document.getElementById('auth-view').classList.add('active');
+    toggleAuthMode('login');
+    toast('Pour votre sécurité, merci de vous reconnecter.');
+    return;
+  }
   try {
     var r = await fetch('/.netlify/functions/check-subscription', {
       method: 'POST',
@@ -1195,7 +1213,7 @@ async function runConseiller() {
   try {
     var r = await fetch('/.netlify/functions/despy-chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ messages: [{ role: 'user', content: q }], email: (session.get() || {}).email })
     });
     var data = await r.json();
@@ -1228,7 +1246,7 @@ async function runDarkWeb() {
   try {
     var r = await fetch('/.netlify/functions/hibp-check', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: email })
     });
     var data = await r.json();
@@ -1381,7 +1399,7 @@ async function openParrainage() {
   try {
     var r = await fetch('/.netlify/functions/referral-status', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: s.email })
     });
     var data = await r.json();
@@ -1446,7 +1464,7 @@ function refreshHomeScore() {
   if (!s.email) return;
   fetch('/.netlify/functions/security-score', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ email: s.email })
   }).then(function(r){ return r.json(); }).then(function(d){
     if (d && typeof d.score === 'number' && !d.error) {
@@ -1528,7 +1546,7 @@ function refreshHomeActivity() {
   }
   fetch('/.netlify/functions/recent-activity', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ email: s.email })
   }).then(function(r){ return r.json(); }).then(function(d){
     var items = (d && Array.isArray(d.activity)) ? d.activity : [];
@@ -1569,7 +1587,7 @@ function openScore() {
   }
   fetch('/.netlify/functions/security-score', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ email: s.email })
   }).then(function(r){ return r.json(); }).then(function(d){
     if (d.error) {
@@ -1735,7 +1753,7 @@ function openPrivacy() {
   var s = session.get() || {};
   if (!s.email) { openSheet('Privacy Cleanup', '<div class="result-card">Connectez-vous d\'abord.</div>'); return; }
   openSheet('Privacy Cleanup', '<div class="spinner"></div>');
-  fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email))
+  fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email), { headers: authHeaders() })
     .then(function(r){ return r.json(); }).then(function(d){
       if (d && d.active) {
         document.getElementById('sheet-body').innerHTML =
@@ -1761,7 +1779,7 @@ async function runPrivacy() {
   try {
     var r = await fetch('/.netlify/functions/privacy-request', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ user_email: s.email, prenom: prenom, nom: nom, target_email: target, phone: phone, ville: ville, activated_at: new Date().toISOString() })
     });
     var d = await r.json();

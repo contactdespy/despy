@@ -5,21 +5,26 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('./_auth');
 
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
 
   try {
-    const { email, code } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const { email, code } = body;
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email requis' }) };
     }
+
+    const auth = requireAuth(event, body, email, headers);
+    if (!auth.ok) return auth.response;
     const cleanCode = (code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
     if (cleanCode.length < 4) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Code invalide' }) };

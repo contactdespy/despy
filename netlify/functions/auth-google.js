@@ -8,6 +8,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { OAuth2Client } = require('google-auth-library');
+const { issueToken } = require('./_auth');
 
 const GOOGLE_CLIENT_ID = '748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com';
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -100,6 +101,7 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           success: true,
           isNew: false,
+          token: issueToken(email),
           email,
           name: existing.name || fullName,
           prenom: existing.prenom || givenName,
@@ -194,6 +196,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         isNew: true,
+        token: issueToken(email),
         email,
         name: fullName,
         prenom: givenName,

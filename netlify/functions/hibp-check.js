@@ -243,7 +243,16 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'POST') {
     let body = {};
     try { body = JSON.parse(event.body || '{}'); } catch (e) {}
-    if (body.email) return await handleManualCheck(supabase, body.email);
+    if (body.email) {
+      const { requireAuth } = require('./_auth');
+      const auth = requireAuth(event, body, body.email, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      });
+      if (!auth.ok) return auth.response;
+      return await handleManualCheck(supabase, body.email);
+    }
   }
 
   try {

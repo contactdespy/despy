@@ -5,6 +5,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const { issueToken, rateLimit } = require('./_auth');
 
 // Vérifie le mot de passe — compatible scrypt (nouveau) et SHA-256 (legacy)
 function verifyPassword(password, stored) {
@@ -56,6 +57,10 @@ exports.handler = async (event) => {
 
     // ── Cas 1 : connexion avec mot de passe ──
     if (hasPassword) {
+      // Anti force brute : 10 tentatives / 10 min / IP
+      if (!rateLimit(event, 'login', 10, 10 * 60 * 1000)) {
+        return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de tentatives. Réessayez dans quelques minutes.' }) };
+      }
       // Réponse identique que le compte existe ou non (anti-énumération)
       if (!client || !verifyPassword(password, client.password_hash)) {
         return {
@@ -70,6 +75,7 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({
           exists: true,
+          token: issueToken(client.email),
           email: client.email,
           name: client.name,
           prenom: client.prenom,
