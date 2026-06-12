@@ -11719,6 +11719,56 @@ function updateMobileNavActive(pageId) {
   } catch(e) {}
 })();
 
+// ─── Le bouton « retour » revient à l'onglet « Tableau de bord » de l'espace membre ───
+// Quand on est sur un sous-onglet (Confidentialité, Protection, Formation, Parrainage,
+// Compte), le geste « retour » ramène au tableau de bord plutôt que de quitter l'espace.
+// On lit l'onglet actif dans le DOM (et non l'état d'historique) : ainsi ce bloc ne se
+// déclenche QUE dans l'espace membre et ne perturbe jamais le retour entre les pages.
+// Priorité des retours : fenêtre ouverte > onglet > page (ce bloc passe après celui des modales).
+(function tabBackButton() {
+  try {
+    var DEFAULT = 'dashboard';
+    var SUBTABS = ['privacy', 'protection', 'formation', 'parrainage', 'compte'];
+    var _orig = window.switchTab;
+    if (typeof _orig !== 'function') return;
+    var _byPop = false;
+
+    function visible(el) { return el && getComputedStyle(el).display !== 'none'; }
+
+    // Renvoie le sous-onglet actif si l'espace membre est ouvert dessus, sinon null.
+    function activeSubTab() {
+      if (!visible(document.getElementById('page-client'))) return null;
+      if (visible(document.getElementById('panel-' + DEFAULT))) return null; // sur le tableau de bord
+      for (var i = 0; i < SUBTABS.length; i++) {
+        if (visible(document.getElementById('panel-' + SUBTABS[i]))) return SUBTABS[i];
+      }
+      return null;
+    }
+
+    window.switchTab = function(name) {
+      var r = _orig.apply(this, arguments);
+      try {
+        // Entrée dans un sous-onglet : un seul repère d'historique (pas d'empilement).
+        if (!_byPop && name && name !== DEFAULT && !(history.state && history.state.spaTab)) {
+          history.pushState({ spaTab: true }, '');
+        }
+      } catch(e) {}
+      return r;
+    };
+
+    // Retour depuis un sous-onglet → tableau de bord, on NE quitte PAS l'espace.
+    // Phase de capture, après le bloc des modales : une fenêtre ouverte garde la priorité.
+    window.addEventListener('popstate', function(ev) {
+      if (activeSubTab()) {
+        _byPop = true;
+        try { window.switchTab(DEFAULT); } catch(e) {}
+        _byPop = false;
+        ev.stopImmediatePropagation();
+      }
+    }, true);
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- ════════════════════════════════════════════════════════ -->
