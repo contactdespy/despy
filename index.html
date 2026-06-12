@@ -1742,6 +1742,7 @@ body.despy-abonne #outils-upsell{display:none!important}
         <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Conseiller Despy 7j/7</strong> qui répond à toutes vos questions</span></div>
         <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Alerte immédiate</strong> si vos données fuitent sur internet</span></div>
         <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Formation simple</strong> pour devenir autonome, à votre rythme</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#16a34a;font-weight:900">✓</span><span><strong>Cercle de confiance</strong> : un proche est alerté en cas de danger</span></div>
       </div>
       <button class="btn-primary" style="width:100%;justify-content:center;font-size:17px;padding:16px" onclick="siteSubscribe('monthly')">Je protège mon compte →</button>
       <div style="text-align:center;margin-top:12px">
@@ -4292,6 +4293,23 @@ function triggerPWAInstall() {
         </div>
       </div>
 
+      <!-- Cercle de confiance -->
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem" id="cercle-confiance-card">
+        <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:6px">👥 Cercle de confiance</div>
+        <div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:14px">Désignez un proche (enfant, conjoint…) : il sera <strong>alerté par email</strong> si Despy détecte un danger pour vous — fuite de vos données, arnaque grave, ou si vous déclenchez un SOS. Il ne reçoit jamais vos messages ni vos informations personnelles.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input id="tc-name" type="text" maxlength="80" placeholder="Prénom du proche (ex : Julie, mon fils Marc…)"
+                 style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:14px;border:1px solid var(--border);border-radius:10px;font-family:inherit">
+          <input id="tc-email" type="email" maxlength="120" placeholder="Email du proche"
+                 style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:14px;border:1px solid var(--border);border-radius:10px;font-family:inherit">
+          <button onclick="saveTrustedContact()" id="tc-save-btn" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">
+            Enregistrer mon proche de confiance
+          </button>
+        </div>
+        <div id="tc-status" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600"></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">💡 Votre proche recevra un email l'informant de son rôle. Pour le retirer, videz les champs et enregistrez.</div>
+      </div>
+
       <!-- Parrainage -->
       <div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:1rem">
         <div style="font-weight:800;font-size:14px;color:var(--text);margin-bottom:6px">🎁 Parrainage</div>
@@ -6306,8 +6324,70 @@ function switchTab(tabName) {
 
   // Charger le contenu spécifique
   if (tabName === 'dashboard') { try { renderJournal(); } catch(e){} try { refreshSecurityScore(); } catch(e){} }
-  if (tabName === 'compte') { try { fillCompteInfo(); } catch(e){} }
+  if (tabName === 'compte') { try { fillCompteInfo(); } catch(e){} try { loadTrustedContact(); } catch(e){} }
   if (tabName === 'formation') { try { renderQuiz(); } catch(e){} }
+}
+
+// ── Cercle de confiance : charger / enregistrer la personne de confiance ──
+function loadTrustedContact() {
+  var s = siteSession.get();
+  if (!s || !s.email) return;
+  fetch('/.netlify/functions/trusted-contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'get', email: s.email })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    var n = document.getElementById('tc-name');
+    var e = document.getElementById('tc-email');
+    if (n && d.contact_name) n.value = d.contact_name;
+    if (e && d.contact_email) e.value = d.contact_email;
+    if (d.contact_email) tcStatus('✅ ' + (d.contact_name || 'Votre proche') + ' veille sur vous.', true);
+  }).catch(function(){ /* silencieux : champ simplement vide */ });
+}
+
+function tcStatus(msg, ok) {
+  var st = document.getElementById('tc-status');
+  if (!st) return;
+  st.style.display = 'block';
+  st.style.background = ok ? '#f0fdf4' : '#fef2f2';
+  st.style.border = '1px solid ' + (ok ? '#bbf7d0' : '#fca5a5');
+  st.style.color = ok ? '#166534' : '#991b1b';
+  st.textContent = msg;
+}
+
+function saveTrustedContact() {
+  var s = siteSession.get();
+  if (!s || !s.email) { tcStatus('Connectez-vous pour utiliser le Cercle de confiance.', false); return; }
+  var name = (document.getElementById('tc-name') || {}).value || '';
+  var email = (document.getElementById('tc-email') || {}).value || '';
+  email = email.trim();
+  if (email && (email.indexOf('@') === -1 || email.indexOf('.') === -1)) {
+    tcStatus('L\'email du proche ne semble pas valide.', false);
+    return;
+  }
+  if (email && email.toLowerCase() === s.email.toLowerCase()) {
+    tcStatus('Indiquez l\'email d\'une autre personne que vous.', false);
+    return;
+  }
+  var btn = document.getElementById('tc-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+  fetch('/.netlify/functions/trusted-contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'set', email: s.email, contact_name: name.trim(), contact_email: email })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.ok) {
+      tcStatus(email
+        ? '✅ C\'est fait ! ' + (name.trim() || 'Votre proche') + ' sera alerté en cas de danger. Un email vient de l\'en informer.'
+        : 'Personne de confiance retirée.', !!email || true);
+    } else {
+      tcStatus(d.error || 'Enregistrement impossible. Réessayez.', false);
+    }
+  }).catch(function() {
+    tcStatus('Connexion impossible. Vérifiez votre réseau et réessayez.', false);
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer mon proche de confiance'; }
+  });
 }
 
 function fillCompteInfo() {
@@ -7636,6 +7716,19 @@ function renderAccountPanel() {
   }
   html += '</div>';
 
+  // ── Cercle de confiance ──
+  html += '<div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)" id="cercle-confiance-card">';
+  html += '<div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:10px">👥 Cercle de confiance</div>';
+  html += '<div style="font-size:13px;color:var(--text3);line-height:1.6;margin-bottom:14px">Désignez un proche (enfant, conjoint…) : il sera <strong>alerté par email</strong> si Despy détecte un danger pour vous — fuite de vos données, arnaque grave, ou si vous déclenchez un SOS. Il ne reçoit jamais vos messages ni vos informations personnelles.</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px">';
+  html += '<input id="tc-name" type="text" maxlength="80" placeholder="Prénom du proche (ex : Julie, mon fils Marc…)" style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:14px;border:1px solid var(--border);border-radius:10px;font-family:inherit">';
+  html += '<input id="tc-email" type="email" maxlength="120" placeholder="Email du proche" style="width:100%;box-sizing:border-box;padding:11px 12px;font-size:14px;border:1px solid var(--border);border-radius:10px;font-family:inherit">';
+  html += '<button onclick="saveTrustedContact()" id="tc-save-btn" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">Enregistrer mon proche de confiance</button>';
+  html += '</div>';
+  html += '<div id="tc-status" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600"></div>';
+  html += '<div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">💡 Votre proche recevra un email l\'informant de son rôle. Pour le retirer, videz les champs et enregistrez.</div>';
+  html += '</div>';
+
   html += '<div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
   html += '<div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:14px">Aide & support</div>';
   html += '<div style="display:flex;flex-direction:column;gap:8px">';
@@ -7645,6 +7738,7 @@ function renderAccountPanel() {
   html += '</div></div>';
 
   panel.innerHTML = html;
+  try { loadTrustedContact(); } catch(e) {}
 }
 
 // Surcharger showPage pour init client

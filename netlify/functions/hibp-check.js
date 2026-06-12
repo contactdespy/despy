@@ -117,6 +117,58 @@ function buildBreachAlertHTML(prenom, email, breaches, isNew) {
   `;
 }
 
+// ── Cercle de confiance : alerte simplifiée envoyée au proche ──
+// On ne transmet PAS le détail des fuites, seulement le fait qu'il
+// y a un danger et comment aider — sobriété volontaire (vie privée).
+async function alertTrustedContact(client, breachCount) {
+  const contactEmail = client && client.trusted_contact_email;
+  if (!contactEmail) return false;
+  const prenom = (client.prenom || (client.name || '').split(' ')[0]) || 'votre proche';
+  const contactName = client.trusted_contact_name || '';
+  try {
+    const r = await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.INTERNAL_SECRET || ''
+      },
+      body: JSON.stringify({
+        type: 'custom',
+        data: {
+          email: contactEmail,
+          subject: `⚠️ Despy — Alerte concernant ${prenom} : données trouvées dans une fuite`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+              <div style="background:#d97706;padding:24px 28px;color:#fff">
+                <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
+                <div style="font-size:21px;font-weight:900;margin-top:6px">⚠️ Alerte concernant ${prenom}</div>
+              </div>
+              <div style="padding:28px">
+                <p style="font-size:15px;color:#333;line-height:1.7">Bonjour${contactName ? ' ' + contactName : ''},</p>
+                <p style="font-size:14px;color:#555;line-height:1.7">Vous êtes la personne de confiance de <strong>${prenom}</strong> sur Despy. Notre surveillance vient de détecter que ses données personnelles apparaissent dans <strong>${breachCount} fuite${breachCount > 1 ? 's' : ''} de données</strong> (sites piratés).</p>
+                <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px;margin:18px 0">
+                  <p style="font-weight:700;color:#d97706;margin:0 0 10px;font-size:14px">💛 Comment aider ${prenom}</p>
+                  <div style="font-size:13px;color:#555;line-height:1.9">
+                    1. <strong>Appelez-le/la</strong> pour l'informer calmement — ${prenom} a reçu le détail par email<br>
+                    2. Aidez-le/la à <strong>changer ses mots de passe</strong> sur les sites concernés<br>
+                    3. Rappelez-lui de <strong>ne jamais donner un code reçu par SMS</strong>, même à un « conseiller bancaire »<br>
+                    4. Surveillez ensemble ses relevés bancaires ces prochaines semaines
+                  </div>
+                </div>
+                <p style="font-size:12px;color:#888;line-height:1.6">Par respect de sa vie privée, le détail des fuites n'est envoyé qu'à ${prenom}. Cette alerte vous est adressée car ${prenom} vous a désigné comme personne de confiance dans son espace Despy.</p>
+                <p style="font-size:11px;color:#aaa;text-align:center;margin-top:20px">Despy · Surveillance dark web · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+              </div>
+            </div>`
+        }
+      })
+    });
+    return r.ok;
+  } catch (e) {
+    console.error('Alerte proche HIBP:', e.message);
+    return false;
+  }
+}
+
 // ── Vérification MANUELLE à la demande, pour UN seul email ──
 // Appelée depuis le tableau de bord (bouton « Vérifier mon email »).
 // Renvoie { breachCount, emailSent } pour cet email précis.
@@ -129,7 +181,7 @@ async function handleManualCheck(supabase, rawEmail) {
     // Récupérer le client (pour le prénom + historiser le résultat)
     const { data: client } = await supabase
       .from('clients')
-      .select('email, name, prenom, known_breaches')
+      .select('email, name, prenom, known_breaches, trusted_contact_name, trusted_contact_email')
       .eq('email', email)
       .maybeSingle();
 
@@ -172,6 +224,9 @@ async function handleManualCheck(supabase, rawEmail) {
         });
         emailSent = r.ok;
       } catch (e) { console.error('send-email manuel HIBP:', e.message); }
+
+      // Cercle de confiance : alerter le proche désigné
+      if (client) await alertTrustedContact(client, breachCount);
     }
 
     return json({ breachCount, emailSent });
@@ -195,7 +250,7 @@ exports.handler = async (event) => {
     // Récupérer les abonnés actifs
     const { data: clients } = await supabase
       .from('clients')
-      .select('email, name, prenom, last_hibp_check, known_breaches')
+      .select('email, name, prenom, last_hibp_check, known_breaches, trusted_contact_name, trusted_contact_email')
       .eq('subscribed', true);
 
     if (!clients || clients.length === 0) {
@@ -250,6 +305,9 @@ exports.handler = async (event) => {
 
           alerts++;
           console.log(`Alerte HIBP envoyée: ${client.email} — ${newBreaches.length} nouvelles fuites`);
+
+          // Cercle de confiance : alerter le proche désigné
+          await alertTrustedContact(client, newBreaches.length);
         }
 
         // Pause entre chaque requête HIBP (rate limit = 1 req/1.5s)

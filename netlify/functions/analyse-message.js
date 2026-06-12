@@ -110,13 +110,15 @@ exports.handler = async (event) => {
     // Vérifier abonnement et quota
     let isSubscribed = false;
     let normEmail = null;
+    let clientRow = null;
     if (email && email.includes('@')) {
       normEmail = email.toLowerCase().trim();
       const { data: client } = await supabase
         .from('clients')
-        .select('subscribed')
+        .select('subscribed, prenom, name, trusted_contact_name, trusted_contact_email')
         .eq('email', normEmail)
         .maybeSingle();
+      clientRow = client;
       isSubscribed = !!(client && client.subscribed);
     }
 
@@ -183,6 +185,51 @@ exports.handler = async (event) => {
       signals,
       created_at: new Date().toISOString()
     });
+
+    // Cercle de confiance : si une arnaque est détectée pour un compte
+    // ayant désigné un proche, ce dernier est alerté (sans le contenu
+    // du message — uniquement le type de menace et les bons réflexes).
+    if (verdict === 'scam' && clientRow && clientRow.trusted_contact_email) {
+      try {
+        const prenom = clientRow.prenom || (clientRow.name || '').split(' ')[0] || 'votre proche';
+        const cName = clientRow.trusted_contact_name || '';
+        await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_SECRET || ''
+          },
+          body: JSON.stringify({
+            type: 'custom',
+            data: {
+              email: clientRow.trusted_contact_email,
+              subject: `🚨 Despy — Une arnaque visant ${prenom} vient d'être bloquée`,
+              html: `
+                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+                  <div style="background:#dc2626;padding:24px 28px;color:#fff">
+                    <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
+                    <div style="font-size:21px;font-weight:900;margin-top:6px">🚨 Arnaque détectée pour ${prenom}</div>
+                  </div>
+                  <div style="padding:28px">
+                    <p style="font-size:15px;color:#333;line-height:1.7">Bonjour${cName ? ' ' + cName : ''},</p>
+                    <p style="font-size:14px;color:#555;line-height:1.7"><strong>${prenom}</strong> vient de faire vérifier un message suspect sur Despy. Verdict : <strong style="color:#dc2626">${result.title || 'arnaque détectée'}</strong> (niveau de danger ${score}/100). La bonne nouvelle : ${prenom} a eu le bon réflexe de vérifier <em>avant</em> de cliquer.</p>
+                    <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin:18px 0">
+                      <p style="font-weight:700;color:#dc2626;margin:0 0 10px;font-size:14px">💛 Ce que vous pouvez faire</p>
+                      <div style="font-size:13px;color:#555;line-height:1.9">
+                        1. <strong>Appelez ${prenom}</strong> pour en parler — les arnaqueurs réessaient souvent<br>
+                        2. Vérifiez ensemble qu'il/elle n'a <strong>ni cliqué, ni payé, ni répondu</strong><br>
+                        3. Rappelez-lui : en cas de doute, on vérifie sur Despy <em>avant</em> d'agir
+                      </div>
+                    </div>
+                    <p style="font-size:12px;color:#888;line-height:1.6">Par respect de sa vie privée, le contenu exact du message n'est pas transmis. Vous recevez cette alerte car ${prenom} vous a désigné comme personne de confiance sur Despy.</p>
+                    <p style="font-size:11px;color:#aaa;text-align:center;margin-top:20px">Despy · Analyse anti-arnaque · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                  </div>
+                </div>`
+            }
+          })
+        });
+      } catch (e) { console.warn('Alerte proche analyse échouée:', e.message); }
+    }
 
     // Incrémenter compteur abonné
     if (normEmail && isSubscribed) {

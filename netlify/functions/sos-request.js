@@ -205,6 +205,46 @@ exports.handler = async (event) => {
       } catch (e) {
         console.warn('Resend client email failed:', e.message);
       }
+
+      // ── Cercle de confiance : prévenir le proche désigné ──
+      try {
+        const supabase2 = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+        const { data: cli } = await supabase2
+          .from('clients')
+          .select('prenom, name, trusted_contact_name, trusted_contact_email')
+          .eq('email', user_email.toLowerCase().trim())
+          .maybeSingle();
+        if (cli && cli.trusted_contact_email) {
+          const prenom = cli.prenom || (cli.name || '').split(' ')[0] || 'votre proche';
+          const cName = cli.trusted_contact_name || '';
+          await sendResend(
+            cli.trusted_contact_email,
+            `🆘 Despy — ${prenom} vient de demander de l'aide`,
+            `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+              <div style="background:linear-gradient(135deg,#7f1d1d,#dc2626);padding:24px 28px;color:#fff">
+                <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
+                <div style="font-size:21px;font-weight:900;margin-top:6px">🆘 ${prenom} a déclenché un SOS</div>
+              </div>
+              <div style="padding:28px">
+                <p style="font-size:15px;color:#333;line-height:1.7">Bonjour${cName ? ' ' + cName : ''},</p>
+                <p style="font-size:14px;color:#555;line-height:1.7"><strong>${prenom}</strong> vient d'utiliser le bouton SOS de Despy (motif : <strong>${type_label || type}</strong>). Un conseiller Despy va le/la rappeler très rapidement${is_critical ? ' — cas traité en priorité (15 min)' : ''}.</p>
+                <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;margin:18px 0">
+                  <p style="font-weight:700;color:#dc2626;margin:0 0 10px;font-size:14px">💛 Ce que vous pouvez faire maintenant</p>
+                  <div style="font-size:13px;color:#555;line-height:1.9">
+                    1. <strong>Appelez ${prenom}</strong> pour le/la rassurer — c'est le plus important<br>
+                    2. Dites-lui de <strong>ne rien payer et ne rien signer</strong> sous la pression<br>
+                    3. S'il s'agit de sa banque, aidez-le/la à appeler le <strong>numéro officiel au dos de sa carte</strong> (jamais un numéro reçu par message)
+                  </div>
+                </div>
+                <p style="font-size:12px;color:#888;line-height:1.6">Vous recevez cette alerte car ${prenom} vous a désigné comme personne de confiance sur Despy.</p>
+                <p style="font-size:11px;color:#aaa;text-align:center;margin-top:20px">Despy · SOS Humain · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+              </div>
+            </div>`
+          );
+        }
+      } catch (e) {
+        console.warn('Alerte proche SOS échouée:', e.message);
+      }
     }
 
     return {
