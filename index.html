@@ -1463,6 +1463,25 @@ body.despy-abonne #outils-upsell{display:none!important}
 </div>
 
 <!-- ════════════════════════════════════════ -->
+<!-- ALERTES ARNAQUES EN CIRCULATION          -->
+<!-- Alimentée en direct (list-alerts) avec   -->
+<!-- repli sur les arnaques les plus signalées -->
+<!-- ════════════════════════════════════════ -->
+<section id="alertes-arnaques" style="background:#fff;padding:4rem 0">
+  <div class="wrap">
+    <div class="text-center reveal" style="margin-bottom:2rem">
+      <div class="section-tag" style="background:#fef2f2;color:#dc2626;border-color:#fecaca">🚨 Vigilance en France</div>
+      <h2 class="sh2">Arnaques en <span>circulation</span></h2>
+      <p class="sdesc">Les escroqueries qui visent les Français en ce moment. Vous avez reçu un message qui ressemble à ça ? Ne cliquez sur rien — vérifiez-le gratuitement juste en dessous.</p>
+    </div>
+    <div id="alertes-list" class="reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:980px;margin:0 auto"></div>
+    <div class="text-center reveal" style="margin-top:1.8rem">
+      <button onclick="document.getElementById('centre-outils').scrollIntoView({behavior:'smooth'})" style="background:var(--blue);color:#fff;border:none;border-radius:14px;padding:14px 26px;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer">Vérifier un message suspect →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════ -->
 <!-- CENTRE D'OUTILS DESPY — 4 outils dans 1 -->
 <!-- ════════════════════════════════════════ -->
 <section id="centre-outils" style="background:linear-gradient(180deg,#fff,#f7f9fc);padding:4rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
@@ -5122,7 +5141,68 @@ function updateNavForSession() {
 // Appel initial au chargement
 document.addEventListener('DOMContentLoaded', function() {
   try { updateNavForSession(); } catch(e) {}
+  try { loadHomeAlerts(); } catch(e) {}
 });
+
+// ══════════════════════════════════════════
+// ALERTES ARNAQUES — accueil (public)
+// Alertes en direct (cron national-alerts) complétées par
+// les arnaques les plus signalées en France (Cybermalveillance).
+// ══════════════════════════════════════════
+var DESPY_COMMON_SCAMS = [
+  { icon:'🏦', tag:'Téléphone', title:'Faux conseiller bancaire', body:'On vous appelle « de la part de votre banque » pour soi-disant bloquer une fraude, et on vous fait valider des virements. Votre banque ne vous demandera jamais ça par téléphone. Raccrochez et rappelez le numéro officiel.' },
+  { icon:'📦', tag:'SMS', title:'Faux SMS de livraison', body:'« Votre colis est en attente, réglez 1,95 € de frais ». Le lien mène à un faux site La Poste ou Chronopost qui copie votre carte bancaire. Ne payez jamais une livraison par SMS.' },
+  { icon:'🏥', tag:'Email', title:'Faux remboursement Ameli', body:'Un email promet un remboursement de l’Assurance Maladie et demande votre carte vitale ou votre RIB. Ameli ne demande jamais vos coordonnées bancaires par email.' },
+  { icon:'💻', tag:'Internet', title:'Faux support technique', body:'Une fenêtre alarmante bloque votre écran : « Virus détecté, appelez Microsoft ». N’appelez jamais ce numéro — éteignez simplement votre navigateur. Microsoft n’affiche jamais ce genre de message.' },
+  { icon:'👮', tag:'Téléphone', title:'Arnaque au faux policier', body:'Un faux policier ou gendarme vous demande de l’argent ou vos codes bancaires « pour les besoins d’une enquête ». Les forces de l’ordre ne demandent jamais ça. Raccrochez et composez le 17 en cas de doute.' },
+  { icon:'⚡', tag:'Téléphone', title:'Démarchage CPF et énergie', body:'Appels insistants pour « utiliser vos droits à la formation » ou « réduire vos factures ». Ne donnez jamais votre numéro de sécurité sociale au téléphone : c’est la porte d’entrée des fraudeurs.' }
+];
+
+async function loadHomeAlerts() {
+  var box = document.getElementById('alertes-list');
+  if (!box) return;
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+  function card(icon, tag, title, body, dateLabel) {
+    return '<div style="background:#fff;border:1px solid #fecaca;border-left:5px solid #dc2626;border-radius:16px;padding:20px;text-align:left;box-shadow:0 2px 10px rgba(220,38,38,.06)">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+        '<span style="font-size:26px">' + icon + '</span>' +
+        '<span style="background:#fef2f2;color:#dc2626;font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:99px;letter-spacing:.4px">' + esc(tag) + '</span>' +
+        (dateLabel ? '<span style="margin-left:auto;font-size:12px;color:var(--text3);font-weight:600">' + esc(dateLabel) + '</span>' : '') +
+      '</div>' +
+      '<div style="font-weight:800;font-size:15.5px;color:var(--text);margin-bottom:6px">' + esc(title) + '</div>' +
+      '<div style="font-size:14px;color:var(--text2);line-height:1.65">' + esc(body) + '</div>' +
+    '</div>';
+  }
+
+  // 1. Alertes en direct (si le cron en a détecté)
+  var live = [];
+  try {
+    var r = await fetch('/.netlify/functions/list-alerts');
+    var d = await r.json();
+    live = (d && d.alerts) ? d.alerts.slice(0, 3) : [];
+  } catch(e) {}
+
+  var html = '';
+  live.forEach(function(a) {
+    var dt = '';
+    try { dt = new Date(a.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'long' }); } catch(e) {}
+    html += card('🚨', a.source === 'Despy Community' ? 'Détectée par Despy' : (a.source || 'Alerte'), a.title, a.body || 'Alerte officielle en cours. Redoublez de vigilance.', dt);
+  });
+
+  // 2. Compléter jusqu'à 3 cartes avec les arnaques les plus signalées
+  //    (rotation quotidienne pour garder l'accueil vivant)
+  var need = 3 - live.length;
+  if (need > 0) {
+    var day = Math.floor(Date.now() / 86400000);
+    for (var i = 0; i < need; i++) {
+      var s = DESPY_COMMON_SCAMS[(day + i) % DESPY_COMMON_SCAMS.length];
+      html += card(s.icon, s.tag, s.title, s.body, 'Très signalée');
+    }
+  }
+
+  box.innerHTML = html;
+}
 
 function showClientArea() {
   if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); revalidateSiteSession(); }
