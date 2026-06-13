@@ -9,8 +9,10 @@ const { createClient } = require('@supabase/supabase-js');
 // IDs des produits Stripe (à créer dans le dashboard Stripe)
 // stripe.com/dashboard → Products → Add product
 const PRICE_IDS = {
-  monthly: process.env.STRIPE_PRICE_MONTHLY, // ex: price_1OxxxxxxxxxxxMONTHLY
-  annual:  process.env.STRIPE_PRICE_ANNUAL,  // ex: price_1OxxxxxxxxxxxANNUAL
+  monthly:        process.env.STRIPE_PRICE_MONTHLY,         // solo mensuel — 9,99€
+  annual:         process.env.STRIPE_PRICE_ANNUAL,          // solo annuel — 89€
+  family_monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY,  // famille mensuel — 14,99€
+  family_annual:  process.env.STRIPE_PRICE_FAMILY_ANNUAL,   // famille annuel — 139€
 };
 
 exports.handler = async (event, context) => {
@@ -38,7 +40,7 @@ exports.handler = async (event, context) => {
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email invalide' }) };
     }
-    if (!plan || !['monthly', 'annual'].includes(plan)) {
+    if (!plan || !['monthly', 'annual', 'family_monthly', 'family_annual'].includes(plan)) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Plan invalide' }) };
     }
     const priceId = PRICE_IDS[plan];
