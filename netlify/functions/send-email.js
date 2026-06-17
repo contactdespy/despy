@@ -280,21 +280,35 @@ const templates = {
   guide_delivery: ({ prenom, guideUrl }) => ({
     subject: "Votre guide Despy : les 5 arnaques qui visent vos parents",
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
-      ${brandHeader("Votre guide gratuit")}
-      <div style="background:#fff;padding:34px 32px">
-        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour${prenom ? " " + prenom : ""},</p>
-        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 22px">Merci ! Voici votre guide <strong>« Les 5 arnaques qui visent vos parents »</strong>. Prenez 5 minutes pour le lire, puis parlez-en avec vos proches : c'est souvent ce qui suffit à éviter le piège.</p>
-        <div style="text-align:center;margin:0 0 26px">
-          <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">📄 Télécharger mon guide (PDF)</a>
+      ${brandHeader("Votre guide est prêt")}
+      <div style="background:#fff;padding:36px 32px 30px">
+        <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a;line-height:1.3">Voici votre guide${prenom ? ", " + prenom : ""} 🎁</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 26px">Merci de votre confiance. Prenez 5 minutes pour le lire, puis parlez-en avec vos proches : c'est souvent ce simple échange qui suffit à éviter le piège.</p>
+
+        <div style="background:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px;margin:0 0 28px;text-align:center">
+          <img src="https://despy.fr/assets/guide-cover.png" width="190" alt="Couverture — Les 5 arnaques qui visent vos parents" style="width:190px;max-width:58%;height:auto;border-radius:10px;display:block;margin:0 auto 22px;box-shadow:0 14px 36px rgba(0,0,0,.5)">
+          <div style="font-size:12px;color:#5BE3F5;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:7px">Guide PDF · 6 pages · gratuit</div>
+          <div style="font-size:19px;color:#fff;font-weight:800;line-height:1.35;margin-bottom:22px">Les 5 arnaques qui visent vos parents</div>
+          <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Télécharger le guide</a>
         </div>
-        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:22px;margin:0 0 22px">
-          <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:8px">Vous ne pouvez pas être derrière eux 24h/24. Despy, si.</div>
-          <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 14px">Vos proches nous envoient un message douteux, on leur dit en quelques secondes si c'est une arnaque. Un conseiller humain les accompagne. À partir de <strong>9,99€/mois</strong>, ou <strong>14,99€/mois en offre Famille</strong> (jusqu'à 4 proches).</p>
-          <div style="text-align:center">
-            <a href="https://despy.fr/tarifs" style="display:inline-block;background:#0a1f3a;color:#fff;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Protéger mes proches</a>
-          </div>
+
+        <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 0 14px">Au programme</div>
+        <div style="border:1px solid #edf0f5;border-radius:14px;overflow:hidden;margin:0 0 28px">
+          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">1</strong>&nbsp;&nbsp;Le faux SMS de colis</div>
+          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">2</strong>&nbsp;&nbsp;Le faux conseiller bancaire</div>
+          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">3</strong>&nbsp;&nbsp;Le faux support informatique</div>
+          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">4</strong>&nbsp;&nbsp;L'arnaque au faux proche</div>
+          <div style="padding:14px 18px;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">5</strong>&nbsp;&nbsp;Le faux gain / faux cadeau&nbsp; <span style="color:#888;font-size:13.5px">+ la règle d'or</span></div>
         </div>
-        <p style="font-size:13px;color:#888;line-height:1.6;margin:0">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br><a href="${guideUrl}" style="color:#2D5BFF;word-break:break-all">${guideUrl}</a></p>
+
+        ${founderNote()}
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:24px;margin:26px 0 0;text-align:center">
+          <div style="font-size:17px;color:#1a3fd9;font-weight:800;margin-bottom:8px">Vous ne pouvez pas être derrière eux 24h/24.</div>
+          <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 18px">Despy, si. Vos proches envoient un message douteux, on leur dit en quelques secondes si c'est une arnaque — avec un conseiller humain. Dès <strong>9,99€/mois</strong>, ou <strong>14,99€/mois en Famille</strong> (jusqu'à 4 proches).</p>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#0a1f3a;color:#fff;padding:14px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Protéger mes proches</a>
+        </div>
+
         ${trustStrip()}
       </div>
       ${brandFooter()}
