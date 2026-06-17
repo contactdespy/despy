@@ -48,6 +48,13 @@
   to = "/assets/og.png"
   status = 200
 
+# Landing page dédiée (aimant à leads — campagnes Facebook) : page autonome,
+# servie telle quelle (PAS le SPA index.html), pour une conversion maximale.
+[[redirects]]
+  from = "/guide"
+  to = "/guide.html"
+  status = 200
+
 # ── URLs propres pour les pages internes (SPA routing) ──
 # Ces rewrites servent index.html, et le JS au chargement détecte le path
 # et appelle showPage() avec la bonne page. URL conservée dans la barre.

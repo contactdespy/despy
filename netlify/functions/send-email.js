@@ -276,6 +276,31 @@ const templates = {
     </div>`
   }),
 
+  // Livraison de l'aimant à leads : le guide PDF "5 arnaques qui visent vos parents"
+  guide_delivery: ({ prenom, guideUrl }) => ({
+    subject: "Votre guide Despy : les 5 arnaques qui visent vos parents",
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Votre guide gratuit")}
+      <div style="background:#fff;padding:34px 32px">
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour${prenom ? " " + prenom : ""},</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 22px">Merci ! Voici votre guide <strong>« Les 5 arnaques qui visent vos parents »</strong>. Prenez 5 minutes pour le lire, puis parlez-en avec vos proches : c'est souvent ce qui suffit à éviter le piège.</p>
+        <div style="text-align:center;margin:0 0 26px">
+          <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">📄 Télécharger mon guide (PDF)</a>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:22px;margin:0 0 22px">
+          <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:8px">Vous ne pouvez pas être derrière eux 24h/24. Despy, si.</div>
+          <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 14px">Vos proches nous envoient un message douteux, on leur dit en quelques secondes si c'est une arnaque. Un conseiller humain les accompagne. À partir de <strong>9,99€/mois</strong>, ou <strong>14,99€/mois en offre Famille</strong> (jusqu'à 4 proches).</p>
+          <div style="text-align:center">
+            <a href="https://despy.fr/tarifs" style="display:inline-block;background:#0a1f3a;color:#fff;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Protéger mes proches</a>
+          </div>
+        </div>
+        <p style="font-size:13px;color:#888;line-height:1.6;margin:0">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br><a href="${guideUrl}" style="color:#2D5BFF;word-break:break-all">${guideUrl}</a></p>
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
   // Template passthrough : html et subject fournis directement par l'appelant
   custom: ({ subject, html }) => ({ subject, html })
 };
