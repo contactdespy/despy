@@ -32,7 +32,7 @@ const trustStrip = () => `<p style="font-size:13px;color:#999;line-height:1.6;te
 const founderNote = () => `
   <div style="background:#f7f9fc;border-radius:14px;padding:20px 22px;margin:26px 0">
     <p style="font-size:15px;color:#444;line-height:1.65;margin:0;font-style:italic">« J'ai créé Despy parce que mes proches se faisaient piéger par des arnaques de plus en plus crédibles. Mon objectif : que vous ne soyez plus jamais seul face à un doute. »</p>
-    <div style="font-size:14px;color:#0a1f3a;font-weight:700;margin-top:12px">Yacine — fondateur de Despy, Strasbourg</div>
+    <div style="font-size:14px;color:#0a1f3a;font-weight:700;margin-top:12px">Le fondateur de Despy, Strasbourg</div>
   </div>`;
 
 const referralBlock = (code) => code ? `
