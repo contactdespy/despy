@@ -7,7 +7,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
-const { byId, pickRandom } = require('./training-templates');
+const { byId, pickRandom, renderEmail } = require('./training-templates');
 
 const sendResend = async (fromName, to, subject, html) => {
   const res = await fetch('https://api.resend.com/emails', {
@@ -29,14 +29,6 @@ const sendResend = async (fromName, to, subject, html) => {
   if (!res.ok) throw new Error(JSON.stringify(await res.json()));
   return res.json();
 };
-
-// Met en forme le corps : remplace {{BUTTON:Label}} par un vrai bouton vers le lien
-function renderBody(body, link) {
-  const withButton = body.replace(/\{\{BUTTON:([^}]+)\}\}/g, (_, label) =>
-    `<div style="text-align:center;margin:22px 0"><a href="${link}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:13px 26px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">${label.trim()}</a></div>`
-  );
-  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#222;line-height:1.6">${withButton}</div>`;
-}
 
 exports.handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' };
@@ -74,7 +66,7 @@ exports.handler = async (event) => {
       sent_at: new Date().toISOString()
     });
 
-    await sendResend(tpl.brand, email.toLowerCase().trim(), tpl.subject, renderBody(tpl.body, link));
+    await sendResend(tpl.brand, email.toLowerCase().trim(), tpl.subject, renderEmail(tpl, link));
 
     return { statusCode: 200, headers, body: JSON.stringify({ success: true, token, template: tpl.id }) };
   } catch (err) {
