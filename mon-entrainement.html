@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon entraînement anti-arnaque — Despy</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/icon-192.png">
+<style>
+  :root{--dark:#0A1F3A;--blue:#2D5BFF;--cyan:#5EE4FF;--ink:#111827;--grey:#6B7280;--green:#16A34A;--soft:#E3E8F0;--pale:#F5F8FF;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#f3f6fb;line-height:1.6}
+  .wrap{max-width:540px;margin:0 auto;padding:0 18px}
+  header{background:var(--dark);padding:16px 0;text-align:center}
+  .logo{color:#fff;font-weight:900;font-size:20px}.logo span{color:var(--cyan)}
+  .card{background:#fff;border-radius:18px;box-shadow:0 10px 30px rgba(10,31,58,.12);margin:24px auto;padding:26px 24px}
+  h1{font-size:23px;color:var(--dark);margin-bottom:8px}
+  .sub{font-size:15px;color:var(--grey);margin-bottom:22px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--dark);margin:0 0 6px}
+  select{width:100%;font-size:16px;padding:13px;border:1.5px solid var(--soft);border-radius:11px;margin-bottom:16px;background:#fff;font-family:inherit}
+  button{width:100%;background:var(--blue);color:#fff;font-size:17px;font-weight:800;border:none;padding:16px;border-radius:12px;cursor:pointer;font-family:inherit}
+  button:hover{background:#1f49e0}button:disabled{opacity:.6;cursor:not-allowed}
+  .me{font-size:13px;color:var(--grey);margin-bottom:18px}
+  .me b{color:var(--dark)}
+  .msg{display:none;margin-top:18px;padding:14px 16px;border-radius:11px;font-size:15px;line-height:1.55}
+  .ok{background:#EAF7EF;color:#0f5132}.err{background:#fef2f2;color:#b91c1c}
+  .steps{background:var(--pale);border-radius:12px;padding:16px 18px;margin-top:18px;font-size:14px;color:#334;line-height:1.7}
+  .steps b{color:var(--dark)}
+  .login{text-align:center}
+  .login a{display:inline-block;margin-top:14px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:11px}
+  footer{text-align:center;font-size:12px;color:var(--grey);padding:6px 0 26px}
+  footer a{color:var(--blue);text-decoration:none}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="logo">Despy<span>.</span></div></div></header>
+
+<div class="wrap">
+  <div class="card" id="app">
+    <h1>Testez-vous</h1>
+    <p class="sub">Despy va vous envoyer une fausse arnaque, totalement sans danger. Le but : voir si vous repérez le piège. Le lien ne mène que vers une page de coaching Despy.</p>
+    <div id="logged-out" class="login" style="display:none">
+      <p style="font-size:15px;color:var(--grey)">Vous devez être connecté à votre compte Despy pour vous envoyer un test.</p>
+      <a href="https://despy.fr">Se connecter sur Despy</a>
+    </div>
+    <div id="logged-in" style="display:none">
+      <div class="me">Test envoyé à : <b id="me-email"></b></div>
+      <label for="tpl">Quel test voulez-vous recevoir ?</label>
+      <select id="tpl">
+        <option value="">Au hasard (surprise)</option>
+        <option value="colis_laposte">Colis La Poste (frais à payer)</option>
+        <option value="chronopost">Chronopost (reprogrammer la livraison)</option>
+        <option value="ameli">Ameli (faux remboursement)</option>
+        <option value="impots">Impôts (faux remboursement)</option>
+        <option value="caf">CAF (mise à jour du dossier)</option>
+        <option value="banque">Banque (connexion suspecte)</option>
+        <option value="netflix">Netflix (paiement refusé)</option>
+        <option value="amazon">Amazon (fausse commande)</option>
+        <option value="edf">EDF (facture impayée)</option>
+        <option value="faux_proche">Faux proche (message SMS)</option>
+      </select>
+      <button id="send">M'envoyer le test maintenant</button>
+      <div class="msg ok" id="ok"></div>
+      <div class="msg err" id="err"></div>
+      <div class="steps" id="steps" style="display:none">
+        <b>Et maintenant ?</b><br>
+        1. Ouvrez votre boîte mail (pensez à l'onglet <b>Promotions</b> / les spams).<br>
+        2. Le message ressemble à une vraie arnaque — cliquez sur son bouton comme vous le feriez.<br>
+        3. Vous arrivez sur la page de coaching Despy : c'était un test 🎉
+      </div>
+    </div>
+  </div>
+  <footer>Despy · Entraînement anti-arnaque · <a href="https://despy.fr">despy.fr</a></footer>
+</div>
+
+<script>
+  function getSession(){
+    try{ var d = localStorage.getItem('despy_session') || localStorage.getItem('despy_site_session'); return d ? JSON.parse(d) : null; }catch(e){ return null; }
+  }
+  var s = getSession();
+  if (!s || !s.token || !s.email) {
+    document.getElementById('logged-out').style.display = 'block';
+  } else {
+    document.getElementById('logged-in').style.display = 'block';
+    document.getElementById('me-email').textContent = s.email;
+    var btn = document.getElementById('send');
+    var ok = document.getElementById('ok'), err = document.getElementById('err'), steps = document.getElementById('steps');
+    btn.addEventListener('click', function(){
+      ok.style.display='none'; err.style.display='none'; steps.style.display='none';
+      btn.disabled = true; btn.textContent = 'Envoi en cours…';
+      fetch('/.netlify/functions/training-selftest', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.token },
+        body: JSON.stringify({ email: s.email, templateId: document.getElementById('tpl').value || undefined })
+      })
+      .then(function(r){ return r.text().then(function(t){ var d={}; try{ d=JSON.parse(t); }catch(e){} return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        if(!res.ok) throw new Error(res.d && res.d.error ? res.d.error : 'Une erreur est survenue.');
+        ok.textContent = 'C\'est envoyé ! Allez voir votre boîte mail.';
+        ok.style.display='block'; steps.style.display='block';
+        btn.disabled=false; btn.textContent='M\'envoyer un autre test';
+      })
+      .catch(function(e){
+        err.textContent = e.message || 'Une erreur est survenue. Réessayez.';
+        err.style.display='block';
+        btn.disabled=false; btn.textContent='M\'envoyer le test maintenant';
+      });
+    });
+  }
+</script>
+</body>
+</html>
