@@ -55,6 +55,12 @@
   to = "/guide.html"
   status = 200
 
+# Page de coaching de l'entraînement anti-arnaque (page autonome)
+[[redirects]]
+  from = "/entrainement"
+  to = "/entrainement.html"
+  status = 200
+
 # ── URLs propres pour les pages internes (SPA routing) ──
 # Ces rewrites servent index.html, et le JS au chargement détecte le path
 # et appelle showPage() avec la bonne page. URL conservée dans la barre.
