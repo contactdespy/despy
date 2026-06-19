@@ -494,6 +494,11 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
     <div class="section">
       <div class="section-label">Outils du quotidien</div>
       <div class="tile-grid">
+        <button class="tile" onclick="openTool('entrainement')">
+          <div class="tile-icon" style="background:rgba(45,91,255,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg></div>
+          <div class="tile-title">Entraînement</div>
+          <div class="tile-sub">Testez-vous face à une fausse arnaque</div>
+        </button>
         <button class="tile" onclick="openTool('annuaire')">
           <div class="tile-icon" style="background:rgba(52,199,89,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
           <div class="tile-title">Qui m'appelle ?</div>
@@ -996,6 +1001,7 @@ function openTool(name) {
     case 'defi':       return openDefi();
     case 'privacy':    return openPrivacy();
     case 'diag':       return openDiag();
+    case 'entrainement': window.location.href = '/mon-entrainement'; return;
     default: toast('Outil bientôt disponible');
   }
 }
