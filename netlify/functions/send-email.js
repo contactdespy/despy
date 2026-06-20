@@ -112,9 +112,30 @@ const templates = {
     html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><p>Bonjour ${name},</p><p>Votre abonnement Despy a bien été résilié. Accès conservé jusqu'à la fin de la période payée.</p><a href="https://despy.fr" style="color:#2D5BFF">Se réabonner</a></div>`
   }),
 
-  payment_failed: ({ name, attemptCount, invoiceUrl }) => ({
-    subject: "Problème de paiement Despy — Action requise",
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><h2 style="color:#dc2626">Paiement échoué</h2><p>Bonjour ${name},</p><p>Tentative ${attemptCount}/3 échouée. Mettez à jour votre moyen de paiement.</p>${invoiceUrl ? `<a href="${invoiceUrl}" style="background:#dc2626;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Régulariser mon paiement</a>` : ""}</div>`
+  payment_failed: ({ name, prenom, attemptCount, invoiceUrl }) => ({
+    subject: "Votre paiement Despy n'a pas abouti — réglons ça en 1 minute",
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Paiement à mettre à jour")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Un petit souci avec votre paiement</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour ${prenom || name || ''},</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Votre dernier paiement n'a pas pu être validé par votre banque — le plus souvent une carte expirée ou un plafond atteint. Pas d'inquiétude, ça se règle en une minute.</p>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:16px 20px;margin:0 0 24px">
+          <div style="font-size:14px;color:#92400e;line-height:1.6"><strong>Tentative ${attemptCount || 1}/3.</strong> Votre protection Despy <strong>reste active</strong> pour le moment. Le plus simple est de mettre à jour votre moyen de paiement dès maintenant.</div>
+        </div>
+        ${invoiceUrl ? `<div style="text-align:center;margin:0 0 26px"><a href="${invoiceUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Mettre à jour mon paiement</a></div>` : ""}
+        <div style="border-top:1px solid #eee;padding-top:20px">
+          <p style="font-size:15px;color:#444;line-height:1.65;margin:0 0 6px"><strong>Pourquoi ça arrive&nbsp;?</strong></p>
+          <p style="font-size:14px;color:#666;line-height:1.7;margin:0">Carte arrivée à expiration, plafond mensuel atteint, ou simple refus temporaire de la banque. Une fois la carte mise à jour, tout repart normalement — sans coupure.</p>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:18px 20px;margin:22px 0">
+          <div style="font-size:14px;color:#1a3fd9;font-weight:700;margin-bottom:6px">Un doute&nbsp;? Un humain vous aide</div>
+          <div style="font-size:14px;color:#444;line-height:1.6">Répondez simplement à cet email, ou appelez-nous. On vous accompagne, sans jargon.</div>
+        </div>
+        ${trustStrip()}
+      </div>
+      ${brandFooter(true)}
+    </div>`
   }),
 
   relance_lead: ({ name, prenom }) => ({
