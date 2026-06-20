@@ -19,7 +19,7 @@ const sendResend = async (fromName, to, subject, html) => {
     // Domaine vérifié Despy ; le nom d'affichage mime la marque pour le réalisme
     // du test (sensibilisation opt-in). Reply-To Despy.
     body: JSON.stringify({
-      from: `${fromName} <contact@despy.fr>`,
+      from: `${fromName} <${process.env.TRAINING_FROM_EMAIL || 'contact@despy.fr'}>`,
       reply_to: 'contact@despy.fr',
       to: [to],
       subject,

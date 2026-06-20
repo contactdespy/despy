@@ -172,13 +172,20 @@ function renderEmail(tpl, link) {
       </div></div>`;
   }
   const b = tpl.btn || { bg: '#2D5BFF', color: '#fff' };
+  const pre = tpl.bodyInner.replace(/\{\{BUTTON[^}]*\}\}/g, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 110);
   const inner = tpl.bodyInner.replace(/\{\{BUTTON:([^}]+)\}\}/g, (_, l) =>
     `<div style="text-align:center;margin:24px 0"><a href="${link}" style="display:inline-block;background:${b.bg};color:${b.color};padding:14px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px">${l.trim()}</a></div>`);
+  const yr = new Date().getFullYear();
   return `<div style="background:#f0f0f0;padding:20px 0;font-family:Arial,Helvetica,sans-serif">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f0f0f0;font-size:1px;line-height:1px">${pre}</div>
     <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e3e3e3">
       <div style="background:${tpl.header.bg};padding:18px 24px">${tpl.header.html}</div>
       <div style="padding:26px 24px;font-size:15px;color:#222;line-height:1.6">${inner}</div>
-      <div style="padding:16px 24px;background:#fafafa;border-top:1px solid #eee;font-size:11px;color:#999;line-height:1.5">${tpl.footer || ''}</div>
+      <div style="padding:18px 24px;background:#fafafa;border-top:1px solid #eee;font-size:11px;color:#999;line-height:1.6">
+        ${tpl.footer || ''}<br><br>
+        <a href="${link}" style="color:#999;text-decoration:underline">Se désabonner</a> &nbsp;·&nbsp; <a href="${link}" style="color:#999;text-decoration:underline">Gérer mes préférences</a> &nbsp;·&nbsp; Aide<br>
+        © ${yr} ${tpl.brand}. Tous droits réservés.
+      </div>
     </div></div>`;
 }
 
