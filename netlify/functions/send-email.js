@@ -7,14 +7,38 @@
 // Protégé par INTERNAL_SECRET
 // ════════════════════════════════════════════
 
+const crypto = require("crypto");
+
+// Jeton de désinscription (identique à unsubscribe.js) pour le lien 1-clic.
+function unsubToken(email) {
+  const secret = process.env.INTERNAL_SECRET || process.env.SUPABASE_SERVICE_KEY || "despy";
+  return crypto.createHmac("sha256", secret)
+    .update((email || "").toLowerCase() + "|unsub")
+    .digest("hex")
+    .slice(0, 32);
+}
+
 const sendResend = async (to, subject, html) => {
+  // En-tête List-Unsubscribe : améliore l'arrivée en boîte principale (Gmail
+  // valorise les expéditeurs avec une désinscription en 1 clic) + conforme RGPD.
+  const base = process.env.URL || "https://despy.fr";
+  const unsubUrl = `${base}/.netlify/functions/unsubscribe?e=${encodeURIComponent(to)}&k=${unsubToken(to)}`;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ from: "Despy <contact@despy.fr>", to: [to], subject, html })
+    body: JSON.stringify({
+      from: "Despy <contact@despy.fr>",
+      to: [to],
+      subject,
+      html,
+      headers: {
+        "List-Unsubscribe": `<${unsubUrl}>, <mailto:contact@despy.fr?subject=unsubscribe>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+      }
+    })
   });
   if (!res.ok) throw new Error(JSON.stringify(await res.json()));
   return res.json();

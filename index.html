@@ -5741,9 +5741,13 @@ async function launchCheckout(email, name, plan) {
   }
   document.body.appendChild(loader);
 
+  // Valeur de l'abonnement selon le plan (pour des conversions Meta justes)
+  var planValue = ({ monthly: 9.99, annual: 89, family_monthly: 14.99, family_annual: 139 })[plan] || 9.99;
+  try { localStorage.setItem('despy_pending_value', String(planValue)); } catch(e){}
+
   // Conversion Meta : début du paiement
   if (typeof window.despyTrack === 'function') {
-    try { window.despyTrack('InitiateCheckout', { content_name: plan || 'abonnement', currency: 'EUR', value: 9.99 }); } catch(e){}
+    try { window.despyTrack('InitiateCheckout', { content_name: plan || 'abonnement', currency: 'EUR', value: planValue }); } catch(e){}
   }
 
   try {
@@ -5808,7 +5812,8 @@ function handleStripeReturn() {
     // Conversion Meta : abonnement payé (dédupliquée avec le webhook Stripe
     // via l'id de session — le serveur envoie le même event_id en CAPI)
     if (typeof window.despyTrack === 'function') {
-      try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: 9.99 }, stripeSessionId); } catch(e){}
+      var pv = 9.99; try { pv = parseFloat(localStorage.getItem('despy_pending_value')) || 9.99; localStorage.removeItem('despy_pending_value'); } catch(e){}
+      try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: pv }, stripeSessionId); } catch(e){}
     }
         var modal = document.createElement('div');
     modal.className = 'sub-modal-overlay';
