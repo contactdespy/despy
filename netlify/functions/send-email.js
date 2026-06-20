@@ -107,9 +107,30 @@ const templates = {
     </div>`
   }),
 
-  cancelled: ({ name }) => ({
-    subject: "Votre abonnement Despy a été résilié",
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><p>Bonjour ${name},</p><p>Votre abonnement Despy a bien été résilié. Accès conservé jusqu'à la fin de la période payée.</p><a href="https://despy.fr" style="color:#2D5BFF">Se réabonner</a></div>`
+  cancelled: ({ name, prenom }) => ({
+    subject: "Votre résiliation est prise en compte — la porte reste ouverte",
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("À bientôt, on l'espère")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Votre résiliation est bien prise en compte</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour ${prenom || name || ''},</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 18px">C'est fait, sans engagement : vous conservez votre <strong>accès complet jusqu'à la fin de la période déjà payée</strong>, et aucun nouveau prélèvement ne sera effectué.</p>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:18px 20px;margin:0 0 22px">
+          <div style="font-size:14px;color:#9a3412;font-weight:700;margin-bottom:8px">Ensuite, vous n'aurez plus :</div>
+          <div style="font-size:14px;color:#7c2d12;line-height:1.9">• le Conseiller pour vérifier vos messages douteux<br>• les alertes des arnaques en circulation<br>• le SOS humain en cas de problème<br>• le nettoyage de vos données personnelles</div>
+        </div>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 4px">Les arnaques, elles, ne prennent pas de pause. <strong>La porte reste grande ouverte</strong> : revenez quand vous voulez, en un clic, et tout repart comme avant.</p>
+        <div style="text-align:center;margin:24px 0">
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Réactiver ma protection</a>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:18px 20px">
+          <div style="font-size:14px;color:#1a3fd9;font-weight:700;margin-bottom:6px">Une remarque, un souci ?</div>
+          <div style="font-size:14px;color:#444;line-height:1.6">Dites-nous en deux mots ce qui n'a pas été — on lit tout, et ça nous aide à nous améliorer. Répondez simplement à cet email.</div>
+        </div>
+        ${trustStrip()}
+      </div>
+      ${brandFooter(true)}
+    </div>`
   }),
 
   payment_failed: ({ name, prenom, attemptCount, invoiceUrl }) => ({
@@ -139,8 +160,27 @@ const templates = {
   }),
 
   relance_lead: ({ name, prenom }) => ({
-    subject: "Despy — Protégez-vous dès aujourd'hui",
-    html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px"><p>Bonjour ${prenom || name},</p><p>504 000 Français victimes de cyberattaque l'an dernier. Avec Despy, vous êtes guidé.</p><p><strong>Offre spéciale : 89€/an — 2 mois offerts</strong></p><a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Je me protège maintenant</a></div>`
+    subject: "Et si on vérifiait les messages douteux à votre place ?",
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Votre protection vous attend")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Vous avez fait le premier pas 👏</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 18px">Bonjour ${prenom || name || ''},</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Vous vous êtes intéressé à Despy — et vous avez bien fait. En 2023, <strong>411 700 personnes</strong> ont été victimes d'escroqueries en France, et les arnaques sont de plus en plus crédibles (SMS, faux conseiller, voix clonée par IA…).</p>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px;margin:0 0 22px">
+          <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:10px">Avec Despy, vous n'êtes plus seul face au doute</div>
+          <div style="font-size:15px;color:#333;line-height:1.9">✅ Un message suspect&nbsp;? On vous dit en 10 sec si c'est une arnaque<br>✅ Un conseiller humain qui vous guide<br>✅ Des alertes sur les arnaques du moment<br>✅ Le nettoyage de vos données personnelles</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:22px;text-align:center">
+          <div style="font-size:13px;color:#5BE3F5;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Offre de lancement</div>
+          <div style="font-size:22px;color:#fff;font-weight:900;margin-bottom:4px">89€/an — 2 mois offerts</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.78);margin-bottom:16px">Soit 7,42€/mois · sans engagement · résiliable en 1 clic</div>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#fff;color:#1a3fd9;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:800;font-size:15px">Je me protège maintenant</a>
+        </div>
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
   }),
 
   monthly_report: ({ name, prenom, monthName, stats }) => {
