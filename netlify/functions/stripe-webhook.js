@@ -116,7 +116,8 @@ exports.handler = async (event) => {
 
       // Conversion Meta serveur (si consentement marketing donné au checkout)
       if (session.metadata?.despy_consent === '1') {
-        await sendMetaPurchase(email, session.id, plan === 'annual' ? 89 : 9.99);
+        const PLAN_VALUE = { monthly: 9.99, annual: 89, family_monthly: 14.99, family_annual: 139 };
+        await sendMetaPurchase(email, session.id, PLAN_VALUE[plan] || 9.99);
       }
     }
   }
