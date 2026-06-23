@@ -89,18 +89,19 @@ exports.handler = async (event, context) => {
     }
 
     // Créer la session Checkout Stripe
-    // payment_method_types: ['card'] couvre déjà :
-    //   • Carte bancaire (Visa, Mastercard, Amex…)
-    //   • Apple Pay (auto sur iPhone/Safari)
-    //   • Google Pay (auto sur Android/Chrome)
-    // PayPal nécessite une activation séparée dans Stripe Dashboard
-    // (Payments → Settings → Payment methods → PayPal). À activer puis
-    // rajouter 'paypal' ici quand ce sera fait.
-    // ⚠️ Ne PAS combiner payment_method_types avec payment_method_configuration
-    // (même à null) — Stripe refuse les deux paramètres simultanément.
+    // Moyens de paiement proposés :
+    //   • 'card'       → Carte bancaire (Visa, Mastercard, Amex…), Apple Pay, Google Pay
+    //   • 'sepa_debit' → Prélèvement SEPA : le client donne son IBAN une fois,
+    //                    puis prélèvement automatique chaque mois. PAS de double
+    //                    authentification 3-D Secure → idéal pour les seniors.
+    // ⚠️ IMPORTANT : 'sepa_debit' doit d'abord être ACTIVÉ dans le Dashboard Stripe
+    //    (Réglages → Moyens de paiement → Prélèvement SEPA). Sans ça, Stripe
+    //    rejette la création de session.
+    // PayPal : activer dans le Dashboard puis ajouter 'paypal' ici.
+    // ⚠️ Ne PAS combiner payment_method_types avec payment_method_configuration.
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'sepa_debit'],
       payment_method_options: {
         card: {
           request_three_d_secure: 'automatic',
