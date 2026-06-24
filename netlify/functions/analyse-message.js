@@ -187,11 +187,17 @@ exports.handler = async (event) => {
     const score = Math.max(0, Math.min(100, parseInt(result.score) || 50));
     const signals = Array.isArray(result.signals) ? result.signals.slice(0, 6) : [];
 
-    // Sauver en base
+    // Sauver en base.
+    // Pour l'historique : si du texte a été collé, on garde le texte ; sinon
+    // (capture d'écran) on garde le VERDICT de l'IA (ex. « Faux SMS de colis »)
+    // plutôt qu'un générique — sans jamais stocker l'image (vie privée).
+    const histContent = (textContent && textContent.trim().length >= 5)
+      ? textContent.trim()
+      : (result.title || 'Capture d\'écran analysée');
     await supabase.from('analyses_history').insert({
       email: normEmail,
       ip,
-      content: (textContent || (hasImage ? '[Capture d\'écran analysée]' : '')).substring(0, 2000),
+      content: histContent.substring(0, 2000),
       verdict,
       score,
       signals,
