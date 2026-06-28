@@ -76,20 +76,40 @@ const brandFooter = (showPhone) => `
 
 const templates = {
 
-  welcome: ({ name, prenom, plan, referralCode }) => ({
-    subject: `${prenom || name}, votre protection Despy est active ✅`,
+  welcome: ({ name, prenom, plan, referralCode }) => {
+    const PLAN_INFO = {
+      monthly:        { label: 'Solo — Mensuel',    price: '9,99 €/mois',  cycle: 'chaque mois' },
+      annual:         { label: 'Solo — Annuel',     price: '89 €/an',      cycle: 'chaque année' },
+      family_monthly: { label: 'Famille — Mensuel', price: '14,99 €/mois', cycle: 'chaque mois' },
+      family_annual:  { label: 'Famille — Annuel',  price: '139 €/an',     cycle: 'chaque année' }
+    };
+    const info = PLAN_INFO[plan] || PLAN_INFO.monthly;
+    return {
+    subject: `${prenom || name}, votre abonnement Despy est confirmé ✅`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
-      ${brandHeader("Votre protection est active")}
+      ${brandHeader("Abonnement confirmé")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Bienvenue ${prenom || name} 🎉</h1>
-        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Votre abonnement <strong>${plan === "annual" ? "Annuel" : "Mensuel"}</strong> est actif. Vous êtes désormais protégé et accompagné, chaque jour, en toute simplicité.</p>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 20px">Votre abonnement <strong>${info.label}</strong> est actif. Vous êtes désormais protégé et accompagné, chaque jour, en toute simplicité. Voici le récapitulatif :</p>
+
+        <div style="border:1px solid #e3e8f0;border-radius:14px;overflow:hidden;margin:22px 0">
+          <div style="background:#0a1f3a;padding:13px 22px"><div style="font-size:13px;color:#5BE3F5;text-transform:uppercase;letter-spacing:.1em;font-weight:700">Récapitulatif de votre abonnement</div></div>
+          <table style="width:100%;border-collapse:collapse;font-size:15px;color:#333">
+            <tr><td style="padding:12px 22px;color:#777;border-bottom:1px solid #f0f0f0">Formule</td><td style="padding:12px 22px;text-align:right;font-weight:700;border-bottom:1px solid #f0f0f0">${info.label}</td></tr>
+            <tr><td style="padding:12px 22px;color:#777;border-bottom:1px solid #f0f0f0">Montant</td><td style="padding:12px 22px;text-align:right;font-weight:700;border-bottom:1px solid #f0f0f0">${info.price}</td></tr>
+            <tr><td style="padding:12px 22px;color:#777;border-bottom:1px solid #f0f0f0">Renouvellement</td><td style="padding:12px 22px;text-align:right;border-bottom:1px solid #f0f0f0">Automatique, ${info.cycle}</td></tr>
+            <tr><td style="padding:12px 22px;color:#777">Engagement</td><td style="padding:12px 22px;text-align:right;color:#16a34a;font-weight:700">Aucun · résiliable en 1 clic</td></tr>
+          </table>
+        </div>
 
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px 22px;margin:22px 0">
           <div style="font-size:14px;color:#1a3fd9;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Tout est inclus</div>
           <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
         </div>
 
-        <div style="text-align:center;margin:28px 0">
+        <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 22px">Vous restez <strong>libre</strong> : résiliez à tout moment, en 1 clic, depuis votre espace (onglet « Mon compte »). Une question ? Répondez simplement à cet email, un humain vous répond.</p>
+
+        <div style="text-align:center;margin:8px 0 28px">
           <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Accéder à mon espace</a>
         </div>
 
@@ -99,7 +119,8 @@ const templates = {
       </div>
       ${brandFooter(true)}
     </div>`
-  }),
+    };
+  },
 
   welcome_free: ({ name, prenom, referralCode }) => ({
     subject: `${prenom || name}, bienvenue chez Despy — votre compte est prêt`,
