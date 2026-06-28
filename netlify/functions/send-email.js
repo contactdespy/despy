@@ -46,9 +46,9 @@ const sendResend = async (to, subject, html) => {
 
 // ── Briques réutilisables (cohérence visuelle entre emails) ──
 const brandHeader = (tagline) => `
-  <div style="background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);padding:38px 32px;text-align:center">
-    <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:.5px">Despy</div>
-    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:6px">${tagline || "Votre sécurité numérique, simplement"}</div>
+  <div style="background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);padding:30px 32px 26px;text-align:center">
+    <img src="https://despy.fr/assets/logo-despy-email.png" alt="Despy" width="150" style="width:150px;max-width:62%;height:auto;display:inline-block;border:0">
+    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:10px">${tagline || "Votre sécurité numérique, simplement"}</div>
   </div>`;
 
 const trustStrip = () => `<p style="font-size:13px;color:#999;line-height:1.6;text-align:center;margin:26px 0 0">🔒 Vos données sont hébergées en France 🇫🇷, chiffrées et jamais revendues. Conforme RGPD.</p>`;
