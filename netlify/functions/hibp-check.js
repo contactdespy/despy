@@ -169,6 +169,28 @@ async function alertTrustedContact(client, breachCount) {
   }
 }
 
+// ── Alerte push instantanée (en plus de l'email) ──
+// Prévient le membre sur son téléphone dès qu'une NOUVELLE fuite est
+// détectée par la surveillance de fond. N'échoue jamais bruyamment :
+// l'email reste le canal fiable, la push est un bonus de rapidité.
+async function sendBreachPush(email, newCount) {
+  try {
+    await fetch(`${process.env.URL}/.netlify/functions/send-push`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.INTERNAL_SECRET || ''
+      },
+      body: JSON.stringify({
+        email,
+        title: '🚨 Despy — Nouvelle fuite de données',
+        body: `Votre email apparaît dans ${newCount} nouvelle${newCount > 1 ? 's' : ''} fuite${newCount > 1 ? 's' : ''}. Ouvrez votre email Despy pour les détails et la marche à suivre.`,
+        url: 'https://despy.fr'
+      })
+    });
+  } catch (e) { console.error('push HIBP:', e.message); }
+}
+
 // ── Vérification MANUELLE à la demande, pour UN seul email ──
 // Appelée depuis le tableau de bord (bouton « Vérifier mon email »).
 // Renvoie { breachCount, emailSent } pour cet email précis.
@@ -314,6 +336,9 @@ exports.handler = async (event) => {
 
           alerts++;
           console.log(`Alerte HIBP envoyée: ${client.email} — ${newBreaches.length} nouvelles fuites`);
+
+          // Alerte push instantanée sur le téléphone (en plus de l'email)
+          await sendBreachPush(client.email, newBreaches.length);
 
           // Cercle de confiance : alerter le proche désigné
           await alertTrustedContact(client, newBreaches.length);

@@ -156,6 +156,27 @@ async function alertTrustedContact(client, count) {
   }
 }
 
+// ── Alerte push instantanée (en plus de l'email) ──
+// Prévient le membre sur son téléphone dès qu'une NOUVELLE infection est
+// détectée. Échec silencieux : l'email reste le canal fiable.
+async function sendStealerPush(email, newCount) {
+  try {
+    await fetch(`${process.env.URL}/.netlify/functions/send-push`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.INTERNAL_SECRET || ''
+      },
+      body: JSON.stringify({
+        email,
+        title: '🦠 Despy — Appareil infecté détecté',
+        body: `Un virus voleur de mots de passe a été repéré sur ${newCount > 1 ? newCount + ' de vos appareils' : 'un de vos appareils'}. Ouvrez votre email Despy pour la marche à suivre.`,
+        url: 'https://despy.fr'
+      })
+    });
+  } catch (e) { console.error('push infostealer:', e.message); }
+}
+
 // ── Vérification MANUELLE à la demande pour UN email (authentifiée) ──
 async function handleManualCheck(supabase, rawEmail) {
   const json = (obj) => ({ statusCode: 200, body: JSON.stringify(obj) });
@@ -287,6 +308,10 @@ exports.handler = async (event) => {
           });
           alerts++;
           console.log(`Alerte infostealer envoyée: ${client.email} — ${newKeys.length} nouvelle(s) infection(s)`);
+
+          // Alerte push instantanée sur le téléphone (en plus de l'email)
+          await sendStealerPush(client.email, newKeys.length);
+
           await alertTrustedContact(client, newKeys.length);
         }
 
