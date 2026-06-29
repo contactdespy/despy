@@ -141,7 +141,10 @@
   schedule = "0 9,18 * * *"        # 2×/jour (matin + soir) au lieu de 4×/jour
 
 [functions.hibp-check]
-  schedule = "0 7 1 * *"           # 1er du mois 7h
+  schedule = "0 7 1 * *"           # 1er du mois 7h — fuites de données (HIBP)
+
+[functions.hudsonrock-check]
+  schedule = "0 7 15 * *"          # 15 du mois 7h — appareils infectés (infostealer)
 
 # Marketing — fréquence réduite
 [functions.relance-leads]

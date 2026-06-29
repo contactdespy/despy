@@ -1551,13 +1551,13 @@ body.despy-abonne #outils-upsell{display:none!important}
 
           <!-- TOOL 2 : HIBP -->
           <div id="tool-panel-hibp" class="tool-panel" style="display:none">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Vérifiez si votre adresse email a été compromise dans une fuite de données.</div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Vérifiez en une fois si votre email a fuité dans une base de données <strong>et</strong> si l'un de vos appareils a été infecté par un virus voleur de mots de passe.</div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <input type="email" id="hibp-email-input" placeholder="votre@email.fr" style="flex:1;min-width:200px;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')checkHIBP()">
               <button onclick="checkHIBP()" id="hibp-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit">Vérifier</button>
             </div>
             <div id="hibp-result" style="display:none;margin-top:16px"></div>
-            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Source : HaveIBeenPwned.com · Aucune donnée conservée</p>
+            <p style="font-size:11px;color:var(--text3);margin:14px 0 0">Sources : HaveIBeenPwned + Hudson Rock · Aucune donnée conservée</p>
           </div>
 
           <!-- TOOL 3 : ANNUAIRE INVERSÉ -->
@@ -4295,7 +4295,7 @@ function triggerPWAInstall() {
           <div style="font-size:22px">🌑</div>
           <div>
             <div style="font-weight:700;font-size:15px">Surveillance dark web</div>
-            <div style="font-size:12px;color:var(--text3)">Vérifiez si votre email a fuité</div>
+            <div style="font-size:12px;color:var(--text3)">Fuites de données + appareils infectés</div>
           </div>
         </div>
         <button id="darkweb-btn" onclick="checkDarkWebNow()" class="sub-btn" style="width:100%;padding:11px;font-size:13px">Vérifier mon email →</button>
@@ -6467,6 +6467,10 @@ async function checkDarkWebNow() {
         '</div>' +
         '<button onclick="showPage(&quot;home&quot;);setTimeout(function(){scrollToSection(&quot;conseiller-ia&quot;)},150)" style="margin-top:12px;width:100%;padding:12px;background:#2D5BFF;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700;min-height:48px">Être guidé pas à pas par le Conseiller →</button>';
     }
+
+    // 2ᵉ couche : appareil infecté par un infostealer (Hudson Rock)
+    checkDeviceInfected(session.email, result,
+      '<button onclick="showPage(&quot;home&quot;);setTimeout(function(){scrollToSection(&quot;conseiller-ia&quot;)},150)" style="margin-top:12px;width:100%;padding:12px;background:#2D5BFF;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:700;min-height:48px">Être guidé pas à pas par le Conseiller →</button>');
   } catch(e) {
     if (result) result.innerHTML = '<div style="color:var(--text3)">Vérification momentanément indisponible. Réessayez dans quelques minutes.</div>';
   }
@@ -10421,6 +10425,65 @@ async function checkHIBP() {
   result.style.display = 'block';
   btn.textContent = 'Vérifier';
   btn.disabled = false;
+
+  // 2ᵉ couche : appareil infecté par un infostealer (Hudson Rock)
+  checkDeviceInfected(email, result,
+    '<button onclick="showFreeSignup()" style="margin-top:12px;width:100%;padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Être protégé par Despy →</button>');
+}
+
+// ════════════════════════════════════════════
+// « Votre appareil a-t-il été infecté ? » (infostealer / Hudson Rock)
+// 2ᵉ couche, complémentaire du HIBP : HIBP = fuites de sites,
+// Hudson Rock = appareil infecté (= tous les mots de passe volés).
+// On AJOUTE une carte sous le résultat HIBP existant. Silencieux si erreur.
+// ════════════════════════════════════════════
+async function checkDeviceInfected(email, containerEl, ctaHtml) {
+  if (!containerEl || !email) return;
+
+  var slot = document.createElement('div');
+  slot.style.marginTop = '12px';
+  slot.innerHTML = '<div style="font-size:12px;color:var(--text3)">🦠 Vérification des appareils infectés…</div>';
+  containerEl.appendChild(slot);
+
+  try {
+    var r = await fetch('/.netlify/functions/hudsonrock-public', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await r.json();
+
+    if (d.infected === true) {
+      var comps = (d.computers || []).map(function(c){
+        var dlabel = '';
+        try { if (c.date) dlabel = ' · infecté en ' + new Date(c.date).toLocaleDateString('fr-FR', { month:'long', year:'numeric' }); } catch(e) {}
+        return '<div style="font-size:12px;color:#7f1d1d;padding:6px 10px;background:#fff;border:1px solid #fecaca;border-radius:8px;margin-top:6px">🖥️ ' + (c.os || 'Appareil') + dlabel + '</div>';
+      }).join('');
+
+      slot.innerHTML =
+        '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:14px">' +
+          '<div style="font-weight:800;color:#dc2626;font-size:15px">🦠 Appareil infecté détecté</div>' +
+          '<div style="font-size:13px;color:#555;margin-top:6px">Un virus voleur de mots de passe (« infostealer ») a été repéré sur <strong>' + d.count + ' appareil' + (d.count > 1 ? 's' : '') + '</strong> lié' + (d.count > 1 ? 's' : '') + ' à cet email. Les mots de passe enregistrés sur cet appareil peuvent être entre les mains de pirates — c\'est <strong>plus grave qu\'une simple fuite</strong>.</div>' +
+          comps +
+          '<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-top:10px">' +
+            '<div style="font-weight:700;color:#d97706;font-size:13px;margin-bottom:6px">⚡ À faire en priorité</div>' +
+            '<div style="font-size:12.5px;color:var(--text);line-height:1.7">1. <strong>Lancez un antivirus</strong> sur l\'appareil concerné.<br>2. <strong>Changez vos mots de passe importants</strong> (email, banque) depuis un <strong>autre</strong> appareil sain.<br>3. <strong>Activez la double authentification.</strong></div>' +
+          '</div>' +
+          (ctaHtml || '') +
+        '</div>';
+
+    } else if (d.infected === false) {
+      slot.innerHTML =
+        '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px">' +
+          '<div style="font-weight:700;color:#16a34a;font-size:14px">✅ Aucun appareil infecté</div>' +
+          '<div style="font-size:12px;color:#555;margin-top:4px">Aucun de vos appareils n\'apparaît dans les bases de virus voleurs de mots de passe.</div>' +
+        '</div>';
+    } else {
+      slot.remove(); // service indisponible → on n'affiche rien
+    }
+  } catch(e) {
+    slot.remove();
+  }
 }
 
 // ── Score de sécurité — chargement depuis l'API ──
