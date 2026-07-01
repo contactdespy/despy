@@ -3918,7 +3918,31 @@ function triggerPWAInstall() {
       </div>
     </div>
     <button onclick="siteLogin()" style="width:100%;padding:13px;border-radius:10px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:8px">Se connecter →</button>
-    <p style="font-size:12px;color:var(--text3);margin-top:12px">Pas encore abonné ? <span onclick="showPage('tarifs')" style="color:var(--blue);font-weight:600;cursor:pointer">Voir les offres</span></p>
+    <button type="button" onclick="showForgotPassword()" style="background:none;border:none;color:var(--blue);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:underline;padding:12px 8px;margin-top:4px">Mot de passe oublié ?</button>
+    <p style="font-size:12px;color:var(--text3);margin-top:8px">Pas encore abonné ? <span onclick="showPage('tarifs')" style="color:var(--blue);font-weight:600;cursor:pointer">Voir les offres</span></p>
+  </div>
+
+  <!-- Formulaire « mot de passe oublié » (masqué par défaut) -->
+  <div id="forgot-box" style="display:none;background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:16px;text-align:left">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px">🔑 Recevoir un lien par email</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px">Indiquez l'email de votre compte Despy. Nous vous enverrons un lien pour choisir un nouveau mot de passe (valable 30 minutes).</p>
+    <div class="field"><label>Votre email</label><input type="email" id="forgot-email" placeholder="votre@email.com" autocomplete="email"></div>
+    <button id="forgot-btn" onclick="requestPasswordReset()" style="width:100%;padding:13px;border-radius:10px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:12px">Envoyer le lien →</button>
+    <div id="forgot-status" style="margin-top:12px"></div>
+  </div>
+
+  <!-- Formulaire « nouveau mot de passe » (affiché quand on arrive via ?reset=TOKEN) -->
+  <div id="reset-box" style="display:none;background:#fff;border:1px solid var(--border);border-radius:16px;padding:24px;margin-top:16px;text-align:left">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px">🔑 Choisissez votre nouveau mot de passe</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:14px">8 caractères minimum. Astuce : une phrase courte facile à retenir, par exemple <em>MonChatDort2026</em>.</p>
+    <div class="field"><label>Nouveau mot de passe</label>
+      <div style="position:relative">
+        <input type="password" id="reset-password-input" placeholder="Votre nouveau mot de passe" autocomplete="new-password" style="padding-right:52px;width:100%">
+        <button type="button" onclick="var i=document.getElementById('reset-password-input');var show=i.type==='password';i.type=show?'text':'password';this.textContent=show?'🙈':'👁️'" aria-label="Afficher le mot de passe" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:20px;padding:10px 12px;cursor:pointer;line-height:1">👁️</button>
+      </div>
+    </div>
+    <button id="reset-btn" onclick="submitPasswordReset()" style="width:100%;padding:13px;border-radius:10px;background:var(--blue);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;margin-top:12px">Enregistrer mon nouveau mot de passe →</button>
+    <div id="reset-status" style="margin-top:12px"></div>
   </div>
 </section>
 </div><!-- /page-login -->
@@ -5348,6 +5372,108 @@ async function siteLogin() {
     if (btn) { btn.disabled = false; btn.textContent = prevTxt; }
   }
 }
+
+// ════════════════════════════════════════
+// MOT DE PASSE OUBLIÉ
+// ════════════════════════════════════════
+function showForgotPassword() {
+  var box = document.getElementById('forgot-box');
+  if (!box) return;
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (box.style.display === 'block') {
+    // pré-remplir avec l'email déjà saisi sur le login
+    var le = document.getElementById('login-email');
+    var fe = document.getElementById('forgot-email');
+    if (le && fe && le.value && !fe.value) fe.value = le.value;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+async function requestPasswordReset() {
+  var input = document.getElementById('forgot-email');
+  var status = document.getElementById('forgot-status');
+  var btn = document.getElementById('forgot-btn');
+  var email = input ? (input.value || '').trim().toLowerCase() : '';
+  if (!email || !email.includes('@')) {
+    despyNotify('Veuillez saisir un email valide.', 'error');
+    if (input) input.focus();
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi en cours…'; }
+  try {
+    var r = await fetch('/.netlify/functions/request-password-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    if (r.status === 429) {
+      var d429 = await r.json();
+      if (status) status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (d429.error || 'Trop de demandes, réessayez plus tard.') + '</div>';
+      return;
+    }
+    // Réponse volontairement neutre côté serveur
+    if (status) status.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;font-size:13px;color:#166534;line-height:1.6"><strong>✓ C\'est envoyé.</strong> Si un compte existe avec cet email, vous allez recevoir un lien dans quelques minutes. Pensez à vérifier le dossier <strong>spam / courrier indésirable</strong>.</div>';
+    if (btn) btn.textContent = 'Renvoyer le lien';
+  } catch(e) {
+    despyNotify('Erreur réseau, réessayez.', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; if (btn.textContent === 'Envoi en cours…') btn.textContent = 'Envoyer le lien →'; }
+  }
+}
+
+async function submitPasswordReset() {
+  var input = document.getElementById('reset-password-input');
+  var status = document.getElementById('reset-status');
+  var btn = document.getElementById('reset-btn');
+  var pwd = input ? (input.value || '') : '';
+  if (pwd.length < 8) {
+    despyNotify('Le mot de passe doit contenir au moins 8 caractères.', 'error');
+    if (input) input.focus();
+    return;
+  }
+  var token = window._despyResetToken || '';
+  if (!token) { despyNotify('Lien invalide. Refaites une demande depuis « Mot de passe oublié ».', 'error'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+  try {
+    var r = await fetch('/.netlify/functions/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token, password: pwd })
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      if (status) status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (data.error || 'Erreur, réessayez.') + '</div>';
+      return;
+    }
+    window._despyResetToken = '';
+    var box = document.getElementById('reset-box');
+    if (box) box.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:18px;font-size:14px;color:#166534;line-height:1.7;text-align:center"><div style="font-size:34px;margin-bottom:8px">✅</div><strong>Votre mot de passe est changé !</strong><br>Connectez-vous ci-dessus avec votre email et votre nouveau mot de passe.</div>';
+    var le = document.getElementById('login-email'); if (le) le.focus();
+  } catch(e) {
+    despyNotify('Erreur réseau, réessayez.', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer mon nouveau mot de passe →'; }
+  }
+}
+
+// Arrivée depuis l'email (?reset=TOKEN) → page login + formulaire nouveau mot de passe
+(function handlePasswordResetReturn() {
+  try {
+    var params = new URLSearchParams(location.search);
+    var token = params.get('reset');
+    if (!token) return;
+    window._despyResetToken = token;
+    setTimeout(function() {
+      if (typeof showPage === 'function') showPage('login');
+      var box = document.getElementById('reset-box');
+      if (box) { box.style.display = 'block'; box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      var input = document.getElementById('reset-password-input');
+      if (input) input.focus();
+      // nettoyer l'URL (le jeton ne doit pas traîner dans l'historique)
+      history.replaceState(null, '', location.pathname);
+    }, 200);
+  } catch(e) {}
+})();
 
 
 // ════════════════════════════════════════
