@@ -104,6 +104,24 @@ exports.handler = async (event) => {
       if (d.ok) {
         const result = await d.json();
         console.log(`Privacy dispatch OK: ${result.sent} envoyés`);
+
+        // Agent de scan d'empreinte (best-effort — inactif tant que la clé
+        // Google CSE n'est pas configurée, sans faire échouer l'activation)
+        try {
+          await fetch(`${process.env.URL}/.netlify/functions/privacy-scan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
+            body: JSON.stringify({
+              user_email: insertPayload.user_email,
+              prenom: insertPayload.prenom,
+              nom: insertPayload.nom,
+              target_email: insertPayload.target_email,
+              phone: insertPayload.phone,
+              ville: insertPayload.ville
+            })
+          });
+        } catch (e) { console.warn('scan non lancé:', e.message); }
+
         return {
           statusCode: 200,
           headers,
