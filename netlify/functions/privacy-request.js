@@ -105,10 +105,11 @@ exports.handler = async (event) => {
         const result = await d.json();
         console.log(`Privacy dispatch OK: ${result.sent} envoyés`);
 
-        // Agent de scan d'empreinte (best-effort — inactif tant que la clé
-        // Google CSE n'est pas configurée, sans faire échouer l'activation)
+        // Agent de scan d'empreinte (fonction background : répond 202 aussitôt
+        // et travaille jusqu'à 15 min ; inactif proprement tant que la clé
+        // BRAVE_SEARCH_KEY n'est pas configurée)
         try {
-          await fetch(`${process.env.URL}/.netlify/functions/privacy-scan`, {
+          await fetch(`${process.env.URL}/.netlify/functions/privacy-scan-background`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
             body: JSON.stringify({

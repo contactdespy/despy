@@ -2,11 +2,15 @@
 // DESPY — Privacy Cleanup : agent de scan d'empreinte numérique
 // POST interne (x-internal-secret) { user_email, prenom, nom, target_email, phone, ville }
 //
-// Étage 1 (yeux)   : recherches Google via l'API Custom Search
-//                    (env : GOOGLE_CSE_KEY + GOOGLE_CSE_ID)
+// Fonction BACKGROUND Netlify (suffixe -background) : répond 202 tout de
+// suite et peut travailler jusqu'à 15 min — un scan complet (8 recherches
+// espacées + classification IA) dépasse la limite des fonctions classiques.
+//
+// Étage 1 (yeux)   : recherches via l'API Brave Search (env : BRAVE_SEARCH_KEY)
+//                    — le dernier index indépendant accessible aux développeurs
+//                    (Google et Bing ont fermé les leurs en 2025/2026).
 // Étage 2 (cerveau): classification de chaque résultat par Claude
 //                    (annuaire / réseau social / presse / homonyme / autre)
-//                    + action recommandée
 // Étage 3 (mains)  : stockage privacy_findings + rapport détaillé à l'équipe
 //                    (les demandes RGPD annuaires partent déjà via
 //                    privacy-dispatch.js ; ici on découvre le RESTE)
@@ -35,18 +39,25 @@ function buildQueries(c) {
     queries.add(`"${phone.replace(/(\d{2})(?=\d)/g, '$1 ').trim()}"`);
   }
   if (c.target_email) queries.add(`"${c.target_email}"`);
-  return [...queries].slice(0, 8); // maîtrise du quota API
+  return [...queries].slice(0, 8); // maîtrise du budget API
 }
 
-async function googleSearch(query) {
-  const url = `https://www.googleapis.com/customsearch/v1?key=${process.env.GOOGLE_CSE_KEY}&cx=${process.env.GOOGLE_CSE_ID}&q=${encodeURIComponent(query)}&num=10&gl=fr&hl=fr`;
-  const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+async function braveSearch(query) {
+  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=10&country=FR&search_lang=fr`;
+  const res = await fetch(url, {
+    headers: {
+      'Accept': 'application/json',
+      'X-Subscription-Token': process.env.BRAVE_SEARCH_KEY
+    },
+    signal: AbortSignal.timeout(10000)
+  });
   if (!res.ok) {
-    console.warn(`CSE ${query}: HTTP ${res.status}`);
+    console.warn(`Brave "${query}": HTTP ${res.status}`);
     return [];
   }
   const data = await res.json();
-  return (data.items || []).map(i => ({ url: i.link, title: i.title || '', snippet: i.snippet || '', query }));
+  const items = (data.web && data.web.results) || [];
+  return items.map(i => ({ url: i.url, title: i.title || '', snippet: i.description || '', query }));
 }
 
 // ── Étage 2 : classification par Claude ──
@@ -56,7 +67,7 @@ async function classifyResults(c, results) {
 
 CLIENT : ${c.prenom} ${c.nom}, ville ${c.ville}, email ${c.target_email}, téléphone ${c.phone}.
 
-Voici les résultats de recherche Google le concernant potentiellement :
+Voici les résultats de recherche le concernant potentiellement :
 ${list}
 
 Pour CHAQUE résultat, classe-le. Réponds UNIQUEMENT avec un tableau JSON valide, un objet par résultat :
@@ -82,7 +93,7 @@ Règles :
       max_tokens: 2500,
       messages: [{ role: 'user', content: prompt }]
     }),
-    signal: AbortSignal.timeout(25000)
+    signal: AbortSignal.timeout(30000)
   });
   if (!res.ok) throw new Error(`Anthropic HTTP ${res.status}`);
   const data = await res.json();
@@ -115,36 +126,40 @@ function buildReportHTML(c, findings, queries) {
       ${rows(actionable)}</div>` : '<p>✅ Rien à traiter — empreinte déjà propre sur ces recherches.</p>'}
     ${ignored.length ? `<details><summary style="cursor:pointer;color:#888;font-size:13px">${ignored.length} résultat(s) écarté(s) (homonymes / non pertinents)</summary>
       <div style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin:10px 0">${rows(ignored)}</div></details>` : ''}
-    <p style="color:#888;font-size:12px;margin-top:18px">Règle : confiance &lt; 50% = valider avant d'agir. Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
+    <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Règle : confiance &lt; 50% = valider avant d'agir. Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
   </div>`;
 }
 
 exports.handler = async (event) => {
-  const headers = { 'Content-Type': 'application/json' };
-  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
+  // Fonction background : la réponse HTTP est toujours 202, on garde
+  // néanmoins tous les garde-fous internes avant de travailler.
+  if (event.httpMethod !== 'POST') return;
 
   const secret = event.headers['x-internal-secret'] || event.headers['X-Internal-Secret'];
   if (!process.env.INTERNAL_SECRET || secret !== process.env.INTERNAL_SECRET) {
-    return { statusCode: 401, headers, body: JSON.stringify({ error: 'unauthorized' }) };
+    console.warn('privacy-scan: appel non autorisé, ignoré');
+    return;
   }
-  if (!process.env.GOOGLE_CSE_KEY || !process.env.GOOGLE_CSE_ID) {
-    return { statusCode: 200, headers, body: JSON.stringify({ error: 'cse_unconfigured', hint: 'Ajouter GOOGLE_CSE_KEY et GOOGLE_CSE_ID dans Netlify' }) };
+  if (!process.env.BRAVE_SEARCH_KEY) {
+    console.warn('privacy-scan: BRAVE_SEARCH_KEY absente — scan inactif');
+    return;
   }
 
   let c = {};
   try { c = JSON.parse(event.body || '{}'); } catch (e) {}
   const required = ['user_email', 'prenom', 'nom', 'target_email', 'phone', 'ville'];
   if (required.some(k => !c[k])) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'missing_fields' }) };
+    console.warn('privacy-scan: champs manquants, ignoré');
+    return;
   }
 
   try {
-    // 1. Recherches
+    // 1. Recherches (Brave : 1 requête/seconde sur l'offre de base)
     const queries = buildQueries(c);
     const all = [];
     for (const q of queries) {
-      all.push(...await googleSearch(q));
-      await new Promise(r => setTimeout(r, 300));
+      all.push(...await braveSearch(q));
+      await new Promise(r => setTimeout(r, 1100));
     }
     // Dédoublonnage par URL
     const seen = new Set();
@@ -183,9 +198,7 @@ exports.handler = async (event) => {
     } catch (e) { console.error('rapport scan:', e.message); }
 
     console.log(`Scan ${c.user_email}: ${queries.length} requêtes, ${findings.length} résultats`);
-    return { statusCode: 200, headers, body: JSON.stringify({ queries: queries.length, results: findings.length, actionable: findings.filter(f => f.action !== 'rien').length }) };
   } catch (err) {
     console.error('privacy-scan error:', err.message);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) };
   }
 };
