@@ -108,7 +108,7 @@ const templates = {
 
         <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:20px 22px;margin:22px 0">
           <div style="font-size:14px;color:#1a3fd9;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Tout est inclus</div>
-          <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
+          <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ <strong>Surveillance dark web chaque semaine</strong> : fuites + appareils infectés, alerte immédiate<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
         </div>
 
         <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 22px">Vous restez <strong>libre</strong> : résiliez à tout moment, en 1 clic, depuis votre espace (onglet « Mon compte »). Une question ? Répondez simplement à cet email, un humain vous répond.</p>
