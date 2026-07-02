@@ -53,15 +53,36 @@ exports.handler = async (event) => {
 
     const req = data[0];
 
-    // Calcul des stats : on simule un suivi par défaut si pas de table de sites
-    // 30 sites suivis, X cleaned, Y pending selon le temps écoulé
     const activatedAt = new Date(req.activated_at);
     const daysElapsed = Math.floor((Date.now() - activatedAt.getTime()) / 86400000);
-    const totalSites = 30;
-    // Approximation linéaire : 30 jours = tous cleaned. Sites cleaned = min(30, daysElapsed)
-    const cleaned = Math.min(totalSites, Math.max(0, daysElapsed - 7)); // démarre après 7j
-    const pending = Math.max(0, totalSites - cleaned);
     const nextScan = new Date(activatedAt.getTime() + 30 * 86400000).toISOString();
+
+    // Suivi RÉEL si le journal d'envoi existe (privacy_dispatch_log, rempli par
+    // privacy-dispatch.js) : total = demandes réellement envoyées + formulaires.
+    // « cleaned » progresse sur la fenêtre légale de 30 jours (art. 12.3) tant
+    // qu'on ne traite pas encore les confirmations des brokers.
+    let totalSites = 30, cleaned, pending;
+    try {
+      const { data: logs } = await supabase
+        .from('privacy_dispatch_log')
+        .select('broker_id, status')
+        .eq('user_email', email);
+      if (logs && logs.length > 0) {
+        const FORM_COUNT = 4; // brokers traités via formulaire par l'équipe
+        totalSites = logs.length + FORM_COUNT;
+        const confirmed = logs.filter(l => l.status === 'confirmed').length;
+        // Progression : confirmés réels + estimation sur le délai légal de 30 j
+        const estimated = Math.round(totalSites * Math.min(1, Math.max(0, daysElapsed / 30)));
+        cleaned = Math.min(totalSites, Math.max(confirmed, estimated));
+        pending = Math.max(0, totalSites - cleaned);
+      }
+    } catch (e) { console.warn('dispatch log read:', e.message); }
+
+    // Repli (journal absent) : estimation linéaire comme avant
+    if (cleaned === undefined) {
+      cleaned = Math.min(totalSites, Math.max(0, daysElapsed - 7));
+      pending = Math.max(0, totalSites - cleaned);
+    }
 
     return {
       statusCode: 200,

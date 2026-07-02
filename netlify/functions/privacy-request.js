@@ -82,7 +82,40 @@ exports.handler = async (event) => {
       console.warn('Supabase insert failed (table may not exist yet):', e.message);
     }
 
-    // Envoi email de notification à Yacine
+    // ── Envoi AUTOMATIQUE des demandes RGPD (privacy-dispatch.js) ──
+    // Le dispatch envoie : les demandes art. 17 aux brokers, le récap au client
+    // (« vos demandes sont parties ») et le récap équipe (formulaires restants).
+    // S'il réussit, plus rien à faire ici. S'il échoue, on retombe sur
+    // l'ancienne notification manuelle ci-dessous pour ne rien perdre.
+    try {
+      const d = await fetch(`${process.env.URL}/.netlify/functions/privacy-dispatch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
+        body: JSON.stringify({
+          user_email: insertPayload.user_email,
+          prenom: insertPayload.prenom,
+          nom: insertPayload.nom,
+          target_email: insertPayload.target_email,
+          phone: insertPayload.phone,
+          ville: insertPayload.ville,
+          activated_at: insertPayload.activated_at
+        })
+      });
+      if (d.ok) {
+        const result = await d.json();
+        console.log(`Privacy dispatch OK: ${result.sent} envoyés`);
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ success: true, message: 'Demandes de suppression envoyées.', dispatched: result.sent })
+        };
+      }
+      console.error('Dispatch non-ok:', d.status);
+    } catch (e) {
+      console.error('Dispatch failed, fallback notification manuelle:', e.message);
+    }
+
+    // Envoi email de notification à Yacine (repli si le dispatch a échoué)
     const adminEmail = "contact.despy@gmail.com";
     const subject = `🕵️ Nouvelle demande Privacy Cleanup — ${prenom} ${nom}`;
     const html = `
