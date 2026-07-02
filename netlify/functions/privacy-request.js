@@ -105,11 +105,11 @@ exports.handler = async (event) => {
     <div style="background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:6px;margin-bottom:18px">
       <div style="font-weight:700;color:#78350f;margin-bottom:6px">📋 Actions à faire</div>
       <div style="font-size:13px;color:#78350f;line-height:1.6">
-        1. Connexion Supabase → table <code>privacy_requests</code> pour récupérer la demande<br>
-        2. Lancer le script de scan Python sur les 30 data brokers<br>
-        3. Envoyer les demandes RGPD article 17 (templates dans /scripts/privacy/)<br>
-        4. Mettre à jour le statut de chaque site dans Supabase<br>
-        5. Le client verra l'avancement dans son espace
+        1. Scanner Google avec : nom + ville, nom + téléphone, "email" (entre guillemets)<br>
+        2. Parcourir la liste des sites : <code>scripts/privacy/sites-france.md</code> (annuaires d'abord)<br>
+        3. Envoyer les demandes d'effacement : gabarit <code>scripts/privacy/template-rgpd-art17.md</code><br>
+        4. Mettre à jour la ligne dans Supabase → <code>privacy_requests</code> (status + notes)<br>
+        5. Le client voit l'avancement dans son espace · ~30 min le 1er, ~10 min ensuite
       </div>
     </div>
 
