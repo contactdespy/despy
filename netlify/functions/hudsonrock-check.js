@@ -60,7 +60,10 @@ function buildStealerAlertHTML(prenom, email, stealers, newKeys) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
 
-      <div style="background:#dc2626;padding:24px 28px;color:#fff">
+      <div style="background:#010410;padding:16px 28px;text-align:center">
+        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="width:100px;max-width:42%;height:auto;display:inline-block;border:0">
+      </div>
+      <div style="background:#dc2626;padding:22px 28px;color:#fff">
         <div style="font-size:11px;font-weight:700;opacity:.8;letter-spacing:2px">DESPY — ALERTE APPAREIL INFECTÉ</div>
         <div style="font-size:22px;font-weight:900;margin-top:6px">🦠 Un de vos appareils a été infecté</div>
       </div>
@@ -126,7 +129,10 @@ async function alertTrustedContact(client, count) {
           subject: `⚠️ Despy — Alerte concernant ${prenom} : un appareil infecté détecté`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
-              <div style="background:#d97706;padding:24px 28px;color:#fff">
+              <div style="background:#010410;padding:16px 28px;text-align:center">
+                <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="width:100px;max-width:42%;height:auto;display:inline-block;border:0">
+              </div>
+              <div style="background:#d97706;padding:22px 28px;color:#fff">
                 <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
                 <div style="font-size:21px;font-weight:900;margin-top:6px">⚠️ Alerte concernant ${prenom}</div>
               </div>

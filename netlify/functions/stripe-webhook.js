@@ -113,6 +113,9 @@ exports.handler = async (event) => {
 
       console.log(`✅ Abonnement activé : ${email} — ${plan}`);
       await sendEmail('welcome', { email, name, prenom, plan });
+      // Puis le mode d'emploi complet (guide de démarrage) — email séparé
+      // pour que la confirmation reste courte et que le guide soit gardable.
+      await sendEmail('welcome_guide', { email, name, prenom });
 
       // Conversion Meta serveur (si consentement marketing donné au checkout)
       if (session.metadata?.despy_consent === '1') {

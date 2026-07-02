@@ -33,7 +33,11 @@ function issueResetToken(email) {
 function buildResetEmailHTML(prenom, link) {
   return `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
-      <div style="background:#0b1230;padding:24px 28px;color:#fff">
+      <div style="background:#010410;padding:18px 28px;text-align:center">
+        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="110" style="width:110px;max-width:45%;height:auto;display:inline-block;border:0">
+      </div>
+      <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
+      <div style="background:#0b1230;padding:22px 28px;color:#fff">
         <div style="font-size:11px;font-weight:700;opacity:.8;letter-spacing:2px">DESPY — VOTRE COMPTE</div>
         <div style="font-size:22px;font-weight:900;margin-top:6px">🔑 Réinitialiser votre mot de passe</div>
       </div>

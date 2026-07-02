@@ -45,11 +45,14 @@ const sendResend = async (to, subject, html) => {
 };
 
 // ── Briques réutilisables (cohérence visuelle entre emails) ──
+// L'en-tête reprend EXACTEMENT la couleur de fond du logo officiel (#010410) :
+// le logo se fond parfaitement, quel que soit le client mail.
 const brandHeader = (tagline) => `
-  <div style="background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);padding:30px 32px 26px;text-align:center">
-    <img src="https://despy.fr/assets/logo-despy-email.png" alt="Despy" width="150" style="width:150px;max-width:62%;height:auto;display:inline-block;border:0">
-    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:10px">${tagline || "Votre sécurité numérique, simplement"}</div>
-  </div>`;
+  <div style="background:#010410;padding:28px 32px 22px;text-align:center">
+    <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="150" style="width:150px;max-width:55%;height:auto;display:inline-block;border:0">
+    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:12px">${tagline || "Votre sécurité numérique, simplement"}</div>
+  </div>
+  <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>`;
 
 const trustStrip = () => `<p style="font-size:13px;color:#999;line-height:1.6;text-align:center;margin:26px 0 0">🔒 Vos données sont hébergées en France 🇫🇷, chiffrées et jamais revendues. Conforme RGPD.</p>`;
 
@@ -68,10 +71,11 @@ const referralBlock = (code) => code ? `
 // showPhone = true uniquement dans les emails destinés aux abonnés
 // (le 06 personnel n'est pas exposé aux prospects/comptes gratuits).
 const brandFooter = (showPhone) => `
-  <div style="padding:26px 32px;text-align:center;background:#0a1f3a">
-    <p style="font-size:14px;color:rgba(255,255,255,.7);margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
+  <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
+  <div style="padding:26px 32px;text-align:center;background:#010410">
+    <p style="font-size:14px;color:rgba(255,255,255,.75);margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
     <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr${showPhone ? ' · 06 89 14 83 95' : ''}</p>
-    <p style="font-size:11px;color:rgba(255,255,255,.4);margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
+    <p style="font-size:11px;color:rgba(255,255,255,.45);margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
   </div>`;
 
 const templates = {
@@ -244,12 +248,10 @@ const templates = {
     return {
       subject: `Votre bilan Despy — ${monthName}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
-        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:36px 24px;color:#fff;text-align:center">
-          <div style="font-size:11px;letter-spacing:.18em;opacity:.7;text-transform:uppercase;margin-bottom:6px">Bilan mensuel</div>
-          <h1 style="margin:0;font-size:26px">Votre mois Despy</h1>
-          <p style="margin:6px 0 0;opacity:.8">${monthName}</p>
-        </div>
-        <div style="background:#fff;padding:28px 24px">
+        ${brandHeader("Votre bilan mensuel")}
+        <div style="background:#fff;padding:32px 24px 28px">
+          <h1 style="margin:0 0 4px;font-size:24px;color:#0a1f3a">Votre mois Despy</h1>
+          <p style="margin:0 0 18px;font-size:14px;color:#888">${monthName}</p>
           <p>Bonjour ${prenom || name},</p>
           <p>${intro}</p>
 
@@ -285,8 +287,9 @@ const templates = {
           <div style="text-align:center;margin:24px 0">
             <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Ouvrir mon espace</a>
           </div>
-          <p style="font-size:11px;color:#aaa;text-align:center">Despy · cybersécurité simple · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+          ${trustStrip()}
         </div>
+        ${brandFooter(true)}
       </div>`
     };
   },
@@ -294,7 +297,10 @@ const templates = {
   cyber_alert: ({ prenom, alertTitle, alertDesc, alertLink, alertSource }) => ({
     subject: `🔴 Alerte Despy — ${(alertTitle || "").substring(0, 60)}`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
-      <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:30px 32px;text-align:center">
+      <div style="background:#010410;padding:16px 32px;text-align:center">
+        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="width:92px;max-width:38%;height:auto;display:inline-block;border:0">
+      </div>
+      <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:26px 32px;text-align:center">
         <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fecaca;font-weight:700">Alerte cybersécurité · ${alertSource || "ANSSI"}</div>
         <div style="font-size:22px;font-weight:900;color:#fff;margin-top:8px;line-height:1.3">${alertTitle || "Nouvelle menace détectée"}</div>
       </div>
@@ -420,6 +426,72 @@ const templates = {
       ${brandFooter()}
     </div>`
   }),
+
+  // Guide de démarrage : le « mode d'emploi » complet de Despy, envoyé aux
+  // nouveaux abonnés juste après la confirmation. À garder précieusement.
+  welcome_guide: ({ name, prenom, referralCode }) => {
+    const feat = (icon, iconBg, title, desc, how) => `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 10px">
+        <tr>
+          <td width="46" valign="top" style="padding:14px 0 14px 16px">
+            <div style="width:40px;height:40px;border-radius:10px;background:${iconBg};text-align:center;line-height:40px;font-size:19px">${icon}</div>
+          </td>
+          <td valign="top" style="padding:13px 16px 13px 14px">
+            <div style="font-size:15.5px;font-weight:800;color:#0a1f3a;line-height:1.35">${title}</div>
+            <div style="font-size:13.5px;color:#555;line-height:1.55;margin-top:3px">${desc}</div>
+            <div style="font-size:12.5px;color:#2D5BFF;font-weight:700;margin-top:5px">→ ${how}</div>
+          </td>
+        </tr>
+      </table>`;
+    const section = (label, rows) => `
+      <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.14em;font-weight:800;margin:26px 0 10px">${label}</div>
+      <div style="border:1px solid #e8ecf3;border-radius:16px;background:#fcfdff">${rows}</div>`;
+    return {
+      subject: `${prenom || name}, voici tout ce que Despy sait faire pour vous 📖`,
+      html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Votre guide de démarrage")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Votre mode d'emploi, ${prenom || name} 📖</h1>
+        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 6px">Despy fait beaucoup de choses pour vous — et le plus important tourne <strong>tout seul, sans rien faire</strong>. Voici le tour complet, en 2 minutes.</p>
+        <p style="font-size:13.5px;color:#888;line-height:1.6;margin:0 0 8px">💡 Gardez cet email : c'est votre pense-bête Despy.</p>
+
+        ${section("🚨 Un doute ? Trois réflexes", `
+          ${feat("🔍", "#eef4ff", "L'Analyseur de messages", "Un SMS, un email ou un lien vous semble louche&nbsp;? Copiez-collez-le (ou envoyez une capture d'écran) : verdict clair en quelques secondes.", "despy.fr → « Vérifier un message »")}
+          ${feat("💬", "#eef4ff", "Le Conseiller Despy — illimité", "Une question, même toute simple&nbsp;? Il répond 24h/24, en français clair, sans jargon, sans jugement.", "le bouton bleu « Aide » en bas à droite")}
+          ${feat("🆘", "#fdeeee", "SOS Humain", "Compte piraté, carte volée, arnaque en cours&nbsp;: un humain vous rappelle et vous guide pas à pas, démarches comprises.", "le bouton rouge SOS, en bas de l'écran")}
+        `)}
+
+        ${section("🧰 Vos outils du quotidien", `
+          ${feat("📞", "#f0fdf6", "L'annuaire inversé", "Un numéro inconnu vous a appelé&nbsp;? Vérifiez qui c'est avant de rappeler.", "Outils → « Numéro »")}
+          ${feat("🛒", "#f0fdf6", "Le vérificateur de site marchand", "Avant d'acheter sur un site que vous ne connaissez pas, vérifiez qu'il est fiable.", "Outils → « Site marchand »")}
+          ${feat("🔑", "#f0fdf6", "Vos mots de passe", "Vérifiez si un mot de passe a fuité (sans jamais nous l'envoyer) et générez-en des solides et faciles à retenir.", "Outils → « Mot de passe »")}
+        `)}
+
+        ${section("🛡️ Ce qui tourne tout seul pour vous", `
+          ${feat("🕵️", "#f3f0ff", "Surveillance dark web — chaque semaine", "Nous vérifions si votre email apparaît dans une fuite de données ou si un de vos appareils est infecté par un virus voleur de mots de passe. Alerte immédiate par email et sur votre téléphone.", "rien à faire, on veille")}
+          ${feat("🔔", "#f3f0ff", "Alertes arnaques nationales", "Quand une vague d'arnaque circule en France, vous êtes prévenu avant qu'elle ne vous atteigne.", "activez les notifications dans votre espace")}
+          ${feat("🧹", "#f3f0ff", "Privacy Cleanup", "Vos nom, adresse et téléphone traînent sur des sites de données&nbsp;: nous envoyons les demandes légales d'effacement à votre place.", "espace Despy → « Effacer mes traces »")}
+          ${feat("📊", "#f3f0ff", "Votre bilan mensuel", "Chaque mois, un récapitulatif personnalisé&nbsp;: ce qui a été bloqué, vérifié, nettoyé.", "directement dans votre boîte mail")}
+        `)}
+
+        ${section("🎓 Pour devenir imbattable", `
+          ${feat("🏆", "#fff8ec", "La formation anti-arnaque", "9 modules simples, 45 quiz, des badges&nbsp;: apprenez à repérer tous les pièges, à votre rythme.", "espace Despy → « Formation »")}
+          ${feat("🎭", "#fff8ec", "L'entraînement grandeur nature", "Despy vous envoie de fausses arnaques (sans danger) pour tester vos réflexes. Le meilleur exercice qui existe.", "espace Despy → « Entraînement »")}
+          ${feat("👨‍👩‍👧", "#fff8ec", "Le cercle de confiance", "Désignez un proche&nbsp;: en cas d'alerte sérieuse, il est prévenu aussi. Personne ne reste seul face au doute.", "espace Despy → « Mon compte »")}
+        `)}
+
+        <div style="text-align:center;margin:30px 0 6px">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Ouvrir mon espace Despy</a>
+        </div>
+
+        ${referralBlock(referralCode)}
+        ${founderNote()}
+        ${trustStrip()}
+      </div>
+      ${brandFooter(true)}
+    </div>`
+    };
+  },
 
   // Template passthrough : html et subject fournis directement par l'appelant
   custom: ({ subject, html }) => ({ subject, html })
