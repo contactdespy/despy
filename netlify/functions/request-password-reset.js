@@ -18,6 +18,19 @@ const { rateLimit } = require('./_auth');
 const SECRET = process.env.AUTH_TOKEN_SECRET || process.env.INTERNAL_SECRET || '';
 const RESET_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
+// ── Limite par email (en plus de la limite par IP) ──
+// Évite qu'on inonde la boîte d'un client en demandant des liens en boucle
+// depuis plusieurs IP. En mémoire, comme rateLimit() de _auth.js.
+const _emailBuckets = new Map();
+function emailRateLimit(email, max, windowMs) {
+  const now = Date.now();
+  let b = _emailBuckets.get(email);
+  if (!b || now > b.reset) { b = { count: 0, reset: now + windowMs }; _emailBuckets.set(email, b); }
+  b.count++;
+  if (_emailBuckets.size > 5000) _emailBuckets.clear();
+  return b.count <= max;
+}
+
 function b64url(buf) {
   return Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -98,6 +111,10 @@ exports.handler = async (event) => {
       .maybeSingle();
 
     if (!client) return neutral; // on ne révèle rien
+
+    // 3 emails max / 30 min pour une même adresse — au-delà on répond
+    // le message neutre sans envoyer (ne révèle rien, n'inonde pas la boîte)
+    if (!emailRateLimit(norm, 3, 30 * 60 * 1000)) return neutral;
 
     const token = issueResetToken(norm);
     const link = `https://despy.fr/?reset=${encodeURIComponent(token)}`;
