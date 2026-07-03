@@ -75,9 +75,11 @@ exports.handler = async (event) => {
       from: 'Despy <contact@despy.fr>',
       to: [EMAIL],
       subject: `${PRENOM}, une petite vérification pour votre Privacy Cleanup`,
-      html: buildConsultHTML(EMAIL, PRENOM, items)
+      html: buildConsultHTML(EMAIL, PRENOM, items),
+      scheduled_at: '2026-07-04T08:00:00+02:00' // demain 8h00, heure de Paris
     })
   });
 
-  return { statusCode: 200, body: JSON.stringify({ sent: r.ok ? items.length : 0, items: items.map(i => i.id) }) };
+  const body = await r.text();
+  return { statusCode: 200, body: JSON.stringify({ ok: r.ok, scheduled_for: '2026-07-04 08:00 Paris', count: items.length, resend: body.slice(0, 200) }) };
 };
