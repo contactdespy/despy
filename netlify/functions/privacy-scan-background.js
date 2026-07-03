@@ -114,9 +114,12 @@ function buildReportHTML(c, findings, queries) {
   const email = c.user_email.toLowerCase().trim();
   const ICONS = { annuaire: '📒', reseau_social: '📱', presse_blog: '📰', donnees_legales: '⚖️', homonyme_probable: '👤', autre: '❓' };
   const ACTIONS = { formulaire: 'Formulaire de suppression', rgpd_email: 'Demande RGPD par email', guide_client: 'Guider le client (son compte)', humain: 'À évaluer par un humain', rien: 'Rien à faire' };
-  const actionable = findings.filter(f => f.action !== 'rien' && f.action !== 'demander_client');
-  const consulted = findings.filter(f => f.action === 'demander_client');
-  const ignored = findings.filter(f => f.action === 'rien');
+  // On ne rapporte que les NOUVELLES trouvailles (les doublons déjà traités
+  // lors d'un scan précédent sont ignorés silencieusement).
+  const fresh = findings.filter(f => !f.duplicate);
+  const actionable = fresh.filter(f => f.action !== 'rien' && f.action !== 'demander_client');
+  const consulted = fresh.filter(f => f.action === 'demander_client');
+  const ignored = fresh.filter(f => f.action === 'rien');
 
   const validationButtons = (f) => {
     if (!f.id) return '<div style="font-size:11px;color:#c00">⚠️ non enregistré (validation SQL manquante ?)</div>';
@@ -251,11 +254,22 @@ exports.handler = async (event) => {
 
     // 3. Stockage minimal + récupération de l'id (pour les boutons de validation)
     // status 'found' = pas encore visible du client ; le devient si validé.
+    // Dédoublonnage par URL : on ne ré-insère jamais une fiche déjà connue,
+    // ce qui préserve les décisions passées (validé/ignoré) et évite les
+    // doublons quand un re-scan retombe sur les mêmes résultats.
+    const emailKey = c.user_email.toLowerCase().trim();
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    let knownUrls = new Set();
+    try {
+      const { data: existing } = await supabase.from('privacy_findings').select('url').eq('user_email', emailKey);
+      knownUrls = new Set((existing || []).map(r => r.url));
+    } catch (e) { console.warn('lecture findings existants:', e.message); }
+
     for (const f of findings) {
+      if (knownUrls.has(f.url)) { f.duplicate = true; continue; } // déjà traité
       try {
         const { data: inserted } = await supabase.from('privacy_findings').insert({
-          user_email: c.user_email.toLowerCase().trim(),
+          user_email: emailKey,
           url: f.url, title: (f.title || '').slice(0, 200),
           category: f.category, action: f.action,
           confidence: f.confidence, reason: (f.reason || '').slice(0, 300),
@@ -273,7 +287,7 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           from: 'Despy — Agent Privacy <contact@despy.fr>',
           to: ['contact.despy@gmail.com'],
-          subject: `🕵️ Scan ${c.prenom} ${c.nom} : ${findings.filter(f => f.action !== 'rien').length} action(s) sur ${findings.length} résultat(s)`,
+          subject: `🕵️ Scan ${c.prenom} ${c.nom} : ${findings.filter(f => !f.duplicate && f.action !== 'rien').length} nouvelle(s) action(s) sur ${findings.length} résultat(s)`,
           html: buildReportHTML(c, findings, queries)
         })
       });
