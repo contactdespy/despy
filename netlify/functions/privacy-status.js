@@ -54,35 +54,60 @@ exports.handler = async (event) => {
     const req = data[0];
 
     const activatedAt = new Date(req.activated_at);
-    const daysElapsed = Math.floor((Date.now() - activatedAt.getTime()) / 86400000);
     const nextScan = new Date(activatedAt.getTime() + 30 * 86400000).toISOString();
 
-    // Suivi RÉEL si le journal d'envoi existe (privacy_dispatch_log, rempli par
-    // privacy-dispatch.js) : total = demandes réellement envoyées + formulaires.
-    // « cleaned » progresse sur la fenêtre légale de 30 jours (art. 12.3) tant
-    // qu'on ne traite pas encore les confirmations des brokers.
-    let totalSites = 30, cleaned, pending;
+    // ── Construction des ÉLÉMENTS RÉELS visibles par le client ──
+    // Deux sources, toutes deux factuelles / validées :
+    //   1. Demandes RGPD réellement envoyées (privacy_dispatch_log)
+    //   2. Trouvailles du scan VALIDÉES par l'équipe (privacy_findings status=validated)
+    // Rien d'autre n'est exposé (les trouvailles non validées / ignorées restent invisibles).
+    const domainOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+    const CAT_LABEL = { annuaire: 'Annuaire', reseau_social: 'Réseau social', presse_blog: 'Article / blog', donnees_legales: 'Registre légal', autre: 'Site web' };
+    const items = [];
+
+    // 1. Demandes RGPD envoyées
     try {
       const { data: logs } = await supabase
         .from('privacy_dispatch_log')
-        .select('broker_id, status')
+        .select('broker_name, status, sent_at')
         .eq('user_email', email);
-      if (logs && logs.length > 0) {
-        const FORM_COUNT = 4; // brokers traités via formulaire par l'équipe
-        totalSites = logs.length + FORM_COUNT;
-        const confirmed = logs.filter(l => l.status === 'confirmed').length;
-        // Progression : confirmés réels + estimation sur le délai légal de 30 j
-        const estimated = Math.round(totalSites * Math.min(1, Math.max(0, daysElapsed / 30)));
-        cleaned = Math.min(totalSites, Math.max(confirmed, estimated));
-        pending = Math.max(0, totalSites - cleaned);
-      }
+      (logs || []).forEach(l => items.push({
+        name: l.broker_name || 'Annuaire',
+        kind: 'Demande de suppression envoyée',
+        status: l.status === 'confirmed' ? 'supprime' : 'encours',
+        date: l.sent_at
+      }));
     } catch (e) { console.warn('dispatch log read:', e.message); }
 
-    // Repli (journal absent) : estimation linéaire comme avant
-    if (cleaned === undefined) {
-      cleaned = Math.min(totalSites, Math.max(0, daysElapsed - 7));
-      pending = Math.max(0, totalSites - cleaned);
-    }
+    // 2. Trouvailles validées
+    try {
+      const { data: finds } = await supabase
+        .from('privacy_findings')
+        .select('url, category, action, status, reason, found_at')
+        .eq('user_email', email)
+        .eq('status', 'validated');
+      (finds || []).forEach(f => {
+        const dom = domainOf(f.url);
+        const label = CAT_LABEL[f.category] || 'Site web';
+        // guide_client = une action côté client (ex. profil LinkedIn) ; sinon suppression en cours
+        const status = f.action === 'guide_client' ? 'action' : 'encours';
+        items.push({
+          name: dom ? `${label} · ${dom}` : label,
+          kind: f.action === 'guide_client' ? 'Une action de votre part' : 'Suppression en cours',
+          status,
+          hint: f.action === 'guide_client' ? (f.reason || '') : '',
+          url: f.url,
+          date: f.found_at
+        });
+      });
+    } catch (e) { console.warn('findings read:', e.message); }
+
+    const stats = {
+      supprime: items.filter(i => i.status === 'supprime').length,
+      encours:  items.filter(i => i.status === 'encours').length,
+      action:   items.filter(i => i.status === 'action').length,
+      total:    items.length
+    };
 
     return {
       statusCode: 200,
@@ -96,12 +121,8 @@ exports.handler = async (event) => {
         phone: req.phone,
         ville: req.ville,
         status: req.status || 'pending',
-        stats: {
-          total_sites: totalSites,
-          cleaned,
-          pending,
-          days_elapsed: daysElapsed
-        },
+        items,
+        stats,
         next_scan: nextScan
       })
     };

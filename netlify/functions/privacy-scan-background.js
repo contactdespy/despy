@@ -21,6 +21,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { signFinding } = require('./_privacy-sign');
 
 // ── Étage 1 : recherches ──
 function buildQueries(c) {
@@ -106,27 +107,45 @@ Règles :
   });
 }
 
-// ── Rapport pour l'équipe ──
+// ── Rapport pour l'équipe (avec boutons de validation par trouvaille) ──
 function buildReportHTML(c, findings, queries) {
+  const base = process.env.URL || 'https://despy.fr';
+  const email = c.user_email.toLowerCase().trim();
   const ICONS = { annuaire: '📒', reseau_social: '📱', presse_blog: '📰', donnees_legales: '⚖️', homonyme_probable: '👤', autre: '❓' };
   const ACTIONS = { formulaire: 'Formulaire de suppression', rgpd_email: 'Demande RGPD par email', guide_client: 'Guider le client (son compte)', humain: 'À évaluer par un humain', rien: 'Rien à faire' };
   const actionable = findings.filter(f => f.action !== 'rien');
   const ignored = findings.filter(f => f.action === 'rien');
-  const rows = (list) => list.map(f => `
-    <div style="padding:12px 14px;border-bottom:1px solid #f0f0f0;font-size:13.5px;line-height:1.6">
-      ${ICONS[f.category] || '❓'} <a href="${f.url}" style="color:#2D5BFF;font-weight:600">${f.title.slice(0, 80) || f.url.slice(0, 80)}</a><br>
+
+  const validationButtons = (f) => {
+    if (!f.id) return '<div style="font-size:11px;color:#c00">⚠️ non enregistré (validation SQL manquante ?)</div>';
+    const showUrl = `${base}/.netlify/functions/privacy-validate?e=${encodeURIComponent(email)}&f=${f.id}&a=show&k=${signFinding(email, f.id, 'show')}`;
+    const ignoreUrl = `${base}/.netlify/functions/privacy-validate?e=${encodeURIComponent(email)}&f=${f.id}&a=ignore&k=${signFinding(email, f.id, 'ignore')}`;
+    return `<div style="margin-top:10px">
+      <a href="${showUrl}" style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;margin-right:8px">✅ Afficher au client</a>
+      <a href="${ignoreUrl}" style="display:inline-block;background:#eef1f5;color:#555;text-decoration:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700">🚫 Ignorer</a>
+    </div>`;
+  };
+
+  const row = (f, withButtons) => `
+    <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;font-size:13.5px;line-height:1.6">
+      ${ICONS[f.category] || '❓'} <a href="${f.url}" style="color:#2D5BFF;font-weight:600">${(f.title || f.url).slice(0, 80)}</a><br>
       <span style="color:#666">→ <strong>${ACTIONS[f.action] || f.action}</strong> · confiance ${(f.confidence * 100).toFixed(0)}% · ${f.reason}</span>
-    </div>`).join('');
+      ${withButtons ? validationButtons(f) : ''}
+    </div>`;
+
   return `
   <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;font-size:14px;color:#333">
     <h2 style="color:#0a1f3a">🕵️ Scan d'empreinte — ${c.prenom} ${c.nom} (${c.user_email})</h2>
-    <p>${queries.length} recherches effectuées · <strong>${findings.length} résultats analysés</strong> · ${actionable.length} nécessitent une action.</p>
+    <p>${queries.length} recherches effectuées · <strong>${findings.length} résultats analysés</strong> · ${actionable.length} à valider.</p>
+    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:13px;color:#1a3fd9;margin:0 0 16px">
+      👉 Pour chaque trouvaille : <strong>« Afficher au client »</strong> la rend visible dans son espace Despy · <strong>« Ignorer »</strong> la masque (homonyme, faux positif). Rien n'apparaît chez le client sans votre clic.
+    </div>
     ${actionable.length ? `<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:16px 0">
-      <div style="background:#0a1f3a;color:#5BE3F5;padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">À traiter</div>
-      ${rows(actionable)}</div>` : '<p>✅ Rien à traiter — empreinte déjà propre sur ces recherches.</p>'}
-    ${ignored.length ? `<details><summary style="cursor:pointer;color:#888;font-size:13px">${ignored.length} résultat(s) écarté(s) (homonymes / non pertinents)</summary>
-      <div style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin:10px 0">${rows(ignored)}</div></details>` : ''}
-    <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Règle : confiance &lt; 50% = valider avant d'agir. Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
+      <div style="background:#0a1f3a;color:#5BE3F5;padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">À valider</div>
+      ${actionable.map(f => row(f, true)).join('')}</div>` : '<p>✅ Rien à traiter — empreinte déjà propre sur ces recherches.</p>'}
+    ${ignored.length ? `<details><summary style="cursor:pointer;color:#888;font-size:13px">${ignored.length} résultat(s) écarté(s) automatiquement (homonymes / non pertinents)</summary>
+      <div style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin:10px 0">${ignored.map(f => row(f, false)).join('')}</div></details>` : ''}
+    <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
   </div>`;
 }
 
@@ -169,17 +188,19 @@ exports.handler = async (event) => {
     let findings = [];
     if (unique.length > 0) findings = await classifyResults(c, unique);
 
-    // 3. Stockage minimal, best-effort
+    // 3. Stockage minimal + récupération de l'id (pour les boutons de validation)
+    // status 'found' = pas encore visible du client ; le devient si validé.
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     for (const f of findings) {
       try {
-        await supabase.from('privacy_findings').insert({
+        const { data: inserted } = await supabase.from('privacy_findings').insert({
           user_email: c.user_email.toLowerCase().trim(),
-          url: f.url, title: f.title.slice(0, 200),
+          url: f.url, title: (f.title || '').slice(0, 200),
           category: f.category, action: f.action,
-          confidence: f.confidence, reason: f.reason.slice(0, 300),
+          confidence: f.confidence, reason: (f.reason || '').slice(0, 300),
           status: 'found'
-        });
+        }).select('id').single();
+        if (inserted) f.id = inserted.id;
       } catch (e) { console.warn('finding insert:', e.message); }
     }
 

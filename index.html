@@ -4249,7 +4249,7 @@ function triggerPWAInstall() {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               Lancer mon premier audit
             </button>
-            <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.6)">⏱ Premier rapport sous 7 jours · Re-scan mensuel automatique</div>
+            <div style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.6)">⏱ Demandes envoyées dès l'activation · Surveillance mensuelle automatique</div>
           </div>
 
           <!-- État ACTIF (montré après onboarding) -->
@@ -4264,11 +4264,11 @@ function triggerPWAInstall() {
                 <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">En cours</div>
               </div>
               <div>
-                <div id="privacy-stat-total" style="font-size:28px;font-weight:900;color:#fff">30</div>
-                <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Sites suivis</div>
+                <div id="privacy-stat-total" style="font-size:28px;font-weight:900;color:#5ee4ff">0</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Votre part</div>
               </div>
             </div>
-            <div id="privacy-next-scan" style="font-size:12px;color:rgba(255,255,255,.65)">📅 Prochain re-scan : dans 28 jours</div>
+            <div id="privacy-next-scan" style="font-size:12px;color:rgba(255,255,255,.65)">📅 Surveillance mensuelle active</div>
           </div>
         </div>
       </div>
@@ -4295,7 +4295,7 @@ function triggerPWAInstall() {
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">2</div>
-            <div><strong style="color:var(--text)">Despy scanne 30+ sites</strong> où vos données peuvent apparaître (annuaires, brokers, archives).</div>
+            <div><strong style="color:var(--text)">Despy recherche votre empreinte</strong> sur les annuaires, moteurs de recherche et sites où vos données peuvent apparaître.</div>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0">3</div>
@@ -7591,15 +7591,15 @@ async function submitPrivacyOnboarding() {
     activated_at: new Date().toISOString(),
   };
 
-  // Sauvegarder localement (état activé)
+  // Sauvegarder localement (état activé). Les vrais éléments (demandes
+  // envoyées + trouvailles validées) arrivent ensuite via syncPrivacyFromServer.
   var data = {
     activated: true,
     targets: payload,
-    sites: PRIVACY_TARGETS.map(function(t) {
-      return { name: t.name, category: t.category, priority: t.priority, status: 'pending', sent_at: null, cleaned_at: null };
-    }),
+    items: [],
+    stats: { supprime: 0, encours: 0, action: 0, total: 0 },
     last_scan: new Date().toISOString(),
-    next_scan: new Date(Date.now() + 7 * 86400000).toISOString(),
+    next_scan: new Date(Date.now() + 30 * 86400000).toISOString(),
   };
   savePrivacyData(data);
 
@@ -7649,48 +7649,31 @@ function savePrivacyData(data) {
 // Synchronise l'état Privacy avec le serveur (Supabase) — appelé en
 // arrière-plan au render. Si une demande active existe côté serveur mais
 // pas en local, on reconstruit le localStorage à partir des données serveur.
+// Source de vérité = le serveur. On récupère les VRAIS éléments (demandes
+// RGPD envoyées + trouvailles validées par l'équipe) et on met à jour le cache.
 async function syncPrivacyFromServer() {
   try {
     var s = siteSession.get();
     if (!s || !s.email) return false;
-    var local = getPrivacyData();
-    // Si on a déjà des données locales actives, pas besoin de re-fetch
-    // (la source de vérité reste localStorage tant qu'on est connecté)
-    if (local && local.activated && local.targets) return false;
 
     var resp = await fetch('/.netlify/functions/privacy-status?email=' + encodeURIComponent(s.email), { headers: authHeaders() });
     if (!resp.ok) return false;
-    var serverData = await resp.json();
-    if (!serverData || !serverData.active) return false;
+    var sd = await resp.json();
+    if (!sd || !sd.active) return false;
 
-    // Reconstruire l'objet local depuis les données serveur
-    var sites = (typeof PRIVACY_TARGETS !== 'undefined' ? PRIVACY_TARGETS : []).map(function(t, i) {
-      var cleaned = i < (serverData.stats && serverData.stats.cleaned || 0);
-      return {
-        name: t.name,
-        category: t.category,
-        priority: t.priority,
-        status: cleaned ? 'cleaned' : 'sent',
-        sent_at: serverData.activated_at,
-        cleaned_at: cleaned ? new Date().toISOString() : null
-      };
-    });
     var rebuilt = {
       activated: true,
       targets: {
-        prenom: serverData.prenom,
-        nom: serverData.nom,
-        target_email: serverData.target_email,
-        phone: serverData.phone,
-        ville: serverData.ville,
-        activated_at: serverData.activated_at
+        prenom: sd.prenom, nom: sd.nom, target_email: sd.target_email,
+        phone: sd.phone, ville: sd.ville, activated_at: sd.activated_at
       },
-      sites: sites,
-      last_scan: serverData.activated_at,
-      next_scan: serverData.next_scan
+      items: sd.items || [],
+      stats: sd.stats || { supprime: 0, encours: 0, action: 0, total: 0 },
+      last_scan: sd.activated_at,
+      next_scan: sd.next_scan
     };
     savePrivacyData(rebuilt);
-    return true; // données rechargées
+    return true;
   } catch(e) {
     console.warn('syncPrivacyFromServer error:', e);
     return false;
@@ -7698,25 +7681,23 @@ async function syncPrivacyFromServer() {
 }
 
 function renderPrivacyPanel() {
-  var data = getPrivacyData();
+  // Affiche le cache tout de suite (rapide), puis rafraîchit depuis le
+  // serveur et repeint quand les vraies données arrivent (sans reboucler).
+  paintPrivacy(getPrivacyData());
+  syncPrivacyFromServer().then(function(changed){ if (changed) paintPrivacy(getPrivacyData()); });
+}
+
+function paintPrivacy(data) {
   var inactive = document.getElementById('privacy-state-inactive');
   var active   = document.getElementById('privacy-state-active');
   var statusText = document.getElementById('privacy-status-text');
   var sitesList = document.getElementById('privacy-sites-list');
 
-  // Si localStorage est vide, on tente une récupération serveur en arrière-plan
-  // (asynchrone : si données trouvées côté serveur, on re-render le panel)
-  if (!data || !data.activated) {
-    syncPrivacyFromServer().then(function(restored){
-      if (restored) renderPrivacyPanel();
-    });
-  }
-
   if (!data || !data.activated) {
     if (inactive) inactive.style.display = 'block';
     if (active)   active.style.display = 'none';
     if (sitesList) sitesList.style.display = 'none';
-    if (statusText) statusText.textContent = 'Activez le service en 2 minutes. Despy va scanner les 30 plus grands data brokers et envoyer les demandes RGPD d\'effacement.';
+    if (statusText) statusText.textContent = 'Activez le service en 2 minutes. Despy envoie les demandes légales d\'effacement à votre place et surveille vos données en continu.';
     return;
   }
 
@@ -7724,32 +7705,26 @@ function renderPrivacyPanel() {
   if (active)   active.style.display = 'block';
   if (sitesList) sitesList.style.display = 'block';
 
-  // Compteurs
-  var cleaned = (data.sites || []).filter(function(s){ return s.status === 'cleaned'; }).length;
-  var pending = (data.sites || []).filter(function(s){ return s.status === 'sent' || s.status === 'cnil'; }).length;
-  var total   = (data.sites || []).length;
-
+  var stats = data.stats || { supprime: 0, encours: 0, action: 0, total: 0 };
   var cleanedEl = document.getElementById('privacy-stat-cleaned');
   var pendingEl = document.getElementById('privacy-stat-pending');
   var totalEl   = document.getElementById('privacy-stat-total');
-  if (cleanedEl) cleanedEl.textContent = cleaned;
-  if (pendingEl) pendingEl.textContent = pending;
-  if (totalEl)   totalEl.textContent   = total;
+  if (cleanedEl) cleanedEl.textContent = stats.supprime || 0;
+  if (pendingEl) pendingEl.textContent = stats.encours || 0;
+  if (totalEl)   totalEl.textContent   = stats.action || 0;
 
   if (statusText) {
     var firstName = (data.targets && data.targets.prenom) ? data.targets.prenom : '';
-    statusText.innerHTML = 'Bonjour ' + (firstName || 'à vous') + ' 👋 — Despy travaille en arrière-plan pour faire disparaître vos données.';
+    statusText.innerHTML = 'Bonjour ' + (firstName || 'à vous') + ' 👋 — Despy travaille en arrière-plan pour faire disparaître vos données personnelles d\'internet.';
   }
 
-  // Date prochain re-scan
   var nextScanEl = document.getElementById('privacy-next-scan');
   if (nextScanEl && data.next_scan) {
     var ns = new Date(data.next_scan);
     var diffDays = Math.max(0, Math.ceil((ns - new Date()) / 86400000));
-    nextScanEl.textContent = '📅 Prochain re-scan : dans ' + diffDays + ' jour' + (diffDays > 1 ? 's' : '');
+    nextScanEl.textContent = '📅 Nouvelle vérification dans ' + diffDays + ' jour' + (diffDays > 1 ? 's' : '');
   }
 
-  // Liste des sites
   renderPrivacySites(data);
 }
 
@@ -7757,61 +7732,51 @@ function renderPrivacySites(data) {
   var container = document.getElementById('privacy-sites-container');
   if (!container) return;
   container.innerHTML = '';
+  var items = data.items || [];
 
-  (data.sites || []).forEach(function(site) {
+  if (items.length === 0) {
+    container.innerHTML =
+      '<div style="text-align:center;padding:30px 16px;color:var(--text2)">' +
+        '<div style="font-size:34px;margin-bottom:10px">🛡️</div>' +
+        '<div style="font-weight:800;color:var(--text);font-size:15px;margin-bottom:6px">Surveillance active</div>' +
+        '<div style="font-size:13.5px;line-height:1.6;max-width:340px;margin:0 auto">Rien à signaler pour le moment. Dès qu\'une donnée vous concernant est repérée, elle apparaît ici avec son suivi.</div>' +
+      '</div>';
+    return;
+  }
+
+  var STYLES = {
+    supprime: { bg: 'rgba(34,197,94,.06)', border: 'rgba(34,197,94,.22)', icon: '#22c55e', badge: '#22c55e', label: 'Supprimé',
+      svg: '<polyline points="20 6 9 17 4 12"/>' },
+    encours:  { bg: 'rgba(245,158,11,.06)', border: 'rgba(245,158,11,.22)', icon: '#f59e0b', badge: '#f59e0b', label: 'En cours',
+      svg: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' },
+    action:   { bg: 'rgba(45,91,255,.05)', border: 'rgba(45,91,255,.22)', icon: '#2D5BFF', badge: '#2D5BFF', label: 'Votre part',
+      svg: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' }
+  };
+
+  items.forEach(function(it) {
+    var st = STYLES[it.status] || STYLES.encours;
     var card = document.createElement('div');
-    var iconBg, iconSvg, badgeBg, badgeText, infoText;
-
-    if (site.status === 'cleaned') {
-      iconBg = '#22c55e'; badgeBg = '#22c55e'; badgeText = 'Supprimé';
-      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      infoText = site.category + ' · Supprimé' + (site.cleaned_at ? ' le ' + new Date(site.cleaned_at).toLocaleDateString('fr-FR') : '');
-      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:10px';
-    } else if (site.status === 'sent') {
-      iconBg = '#f59e0b'; badgeBg = '#f59e0b'; badgeText = 'En cours';
-      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
-      infoText = site.category + ' · Demande envoyée' + (site.sent_at ? ' le ' + new Date(site.sent_at).toLocaleDateString('fr-FR') : '');
-      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:10px';
-    } else if (site.status === 'cnil') {
-      iconBg = '#dc2626'; badgeBg = '#dc2626'; badgeText = 'CNIL';
-      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>';
-      infoText = site.category + ' · Saisie CNIL en cours';
-      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);border-radius:10px';
-    } else {
-      // pending
-      iconBg = '#9ca3af'; badgeBg = '#9ca3af'; badgeText = 'À scanner';
-      iconSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
-      infoText = site.category + ' · Programmé pour scan';
-      card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:#f9fafb;border:1px solid var(--border);border-radius:10px';
-    }
-
+    card.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:14px;background:' + st.bg + ';border:1px solid ' + st.border + ';border-radius:12px';
+    var sub = it.kind || '';
+    if (it.date) sub += ' · ' + new Date(it.date).toLocaleDateString('fr-FR');
+    var hint = (it.status === 'action' && it.hint)
+      ? '<div style="font-size:12px;color:#1a3fd9;margin-top:6px;line-height:1.5;background:rgba(45,91,255,.06);border-radius:8px;padding:8px 10px">💡 ' + it.hint + '</div>'
+      : '';
     card.innerHTML =
-      '<div style="width:30px;height:30px;border-radius:8px;background:' + iconBg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' + iconSvg + '</div>' +
+      '<div style="width:32px;height:32px;border-radius:9px;background:' + st.icon + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+        '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' + st.svg + '</svg></div>' +
       '<div style="flex:1;min-width:0">' +
-        '<div style="font-weight:700;font-size:13.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis">' + site.name + '</div>' +
-        '<div style="font-size:11.5px;color:var(--text3);margin-top:2px">' + infoText + '</div>' +
+        '<div style="font-weight:700;font-size:14px;color:var(--text)">' + it.name + '</div>' +
+        '<div style="font-size:12px;color:var(--text3);margin-top:2px">' + sub + '</div>' + hint +
       '</div>' +
-      '<span style="font-size:10px;font-weight:700;background:' + badgeBg + ';color:#fff;padding:4px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0">' + badgeText + '</span>';
+      '<span style="font-size:10px;font-weight:800;background:' + st.badge + ';color:#fff;padding:4px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;white-space:nowrap">' + st.label + '</span>';
     container.appendChild(card);
   });
 }
 
-// ── Actualiser (simulation MVP : avance l'état) ──
+// ── Actualiser : force une relecture des vraies données serveur ──
 function refreshPrivacyScan() {
-  var data = getPrivacyData();
-  if (!data) return;
-  // Simulation : pour chaque site pending sans sent_at, on passe à sent
-  // (À remplacer par un vrai fetch backend quand le backend sera prêt)
-  var now = new Date();
-  (data.sites || []).forEach(function(s) {
-    if (s.status === 'pending' && !s.sent_at) {
-      s.status = 'sent';
-      s.sent_at = now.toISOString();
-    }
-  });
-  data.last_scan = now.toISOString();
-  savePrivacyData(data);
-  renderPrivacyPanel();
+  syncPrivacyFromServer().then(function(){ paintPrivacy(getPrivacyData()); });
 
   // Toast
   var t = document.createElement('div');
