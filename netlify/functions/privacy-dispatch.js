@@ -84,7 +84,7 @@ function buildClientRecapHTML(c, sentBrokers) {
   return `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
     <div style="background:#010410;padding:24px 32px;text-align:center">
-      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="130" style="width:130px;max-width:50%;height:auto;display:inline-block;border:0">
+      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="130" style="color:#fff;font-size:22px;font-weight:900;width:130px;max-width:50%;height:auto;display:inline-block;border:0">
       <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:10px">Privacy Cleanup — c'est parti</div>
     </div>
     <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>

@@ -64,7 +64,7 @@ function buildBreachAlertHTML(prenom, email, breaches, isNew) {
 
       <!-- Bandeau de marque (fond identique au logo officiel) -->
       <div style="background:#010410;padding:16px 28px;text-align:center">
-        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="width:100px;max-width:42%;height:auto;display:inline-block;border:0">
+        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="color:#fff;font-size:22px;font-weight:900;width:100px;max-width:42%;height:auto;display:inline-block;border:0">
       </div>
 
       <!-- Header alerte -->
@@ -145,7 +145,7 @@ async function alertTrustedContact(client, breachCount) {
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
               <div style="background:#010410;padding:16px 28px;text-align:center">
-                <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="width:100px;max-width:42%;height:auto;display:inline-block;border:0">
+                <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="100" style="color:#fff;font-size:22px;font-weight:900;width:100px;max-width:42%;height:auto;display:inline-block;border:0">
               </div>
               <div style="background:#d97706;padding:22px 28px;color:#fff">
                 <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>

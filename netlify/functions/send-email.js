@@ -49,7 +49,7 @@ const sendResend = async (to, subject, html) => {
 // le logo se fond parfaitement, quel que soit le client mail.
 const brandHeader = (tagline) => `
   <div style="background:#010410;padding:28px 32px 22px;text-align:center">
-    <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="150" style="width:150px;max-width:55%;height:auto;display:inline-block;border:0">
+    <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="150" style="color:#fff;font-size:22px;font-weight:900;width:150px;max-width:55%;height:auto;display:inline-block;border:0">
     <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:12px">${tagline || "Votre sécurité numérique, simplement"}</div>
   </div>
   <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>`;
@@ -298,7 +298,7 @@ const templates = {
     subject: `🔴 Alerte Despy — ${(alertTitle || "").substring(0, 60)}`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       <div style="background:#010410;padding:16px 32px;text-align:center">
-        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="width:92px;max-width:38%;height:auto;display:inline-block;border:0">
+        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="color:#fff;font-size:22px;font-weight:900;width:92px;max-width:38%;height:auto;display:inline-block;border:0">
       </div>
       <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:26px 32px;text-align:center">
         <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fecaca;font-weight:700">Alerte cybersécurité · ${alertSource || "ANSSI"}</div>

@@ -1,4 +1,4 @@
 # Outils de développement locaux — ne jamais déployer
-_mail_preview.html
+_mail_preview*.html
 .claude/
 .DS_Store

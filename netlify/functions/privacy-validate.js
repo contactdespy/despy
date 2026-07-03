@@ -21,7 +21,7 @@ function page(title, message, color) {
 <body style="margin:0;background:#f7f9fc;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:460px;margin:60px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.08)">
     <div style="background:#010410;padding:22px;text-align:center">
-      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="120" style="width:120px;height:auto;border:0">
+      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="120" style="color:#fff;font-size:22px;font-weight:900;width:120px;height:auto;border:0">
     </div>
     <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF)"></div>
     <div style="padding:34px 30px;text-align:center">

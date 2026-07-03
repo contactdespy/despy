@@ -22,7 +22,7 @@ function page(emoji, title, message) {
 <body style="margin:0;background:#f7f9fc;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:480px;margin:50px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.08)">
     <div style="background:#010410;padding:24px;text-align:center">
-      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="130" style="width:130px;height:auto;border:0">
+      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="130" style="color:#fff;font-size:22px;font-weight:900;width:130px;height:auto;border:0">
     </div>
     <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF)"></div>
     <div style="padding:38px 32px;text-align:center">
