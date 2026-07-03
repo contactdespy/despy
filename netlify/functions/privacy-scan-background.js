@@ -72,14 +72,15 @@ Voici les résultats de recherche le concernant potentiellement :
 ${list}
 
 Pour CHAQUE résultat, classe-le. Réponds UNIQUEMENT avec un tableau JSON valide, un objet par résultat :
-[{"i": 0, "category": "annuaire|reseau_social|presse_blog|donnees_legales|homonyme_probable|autre", "action": "formulaire|rgpd_email|guide_client|humain|rien", "confidence": 0.0-1.0, "reason": "une phrase courte en français"}]
+[{"i": 0, "category": "annuaire|reseau_social|presse_blog|donnees_legales|homonyme_probable|autre", "action": "formulaire|rgpd_email|guide_client|humain|demander_client|rien", "confidence": 0.0-1.0, "reason": "une phrase courte en français"}]
 
 Règles :
 - "annuaire" = annuaire téléphonique / people search / data broker → action formulaire ou rgpd_email
 - "reseau_social" = profil du client (Facebook, LinkedIn, Copains d'avant…) → guide_client (lui seul peut agir)
 - "presse_blog" = article de presse ou blog → humain (droit à l'oubli, cas par cas)
 - "donnees_legales" = registre du commerce, Societe.com, BODACC → humain (suppression partielle seulement)
-- "homonyme_probable" = la personne ne semble PAS être le client (autre ville, autre contexte) → rien
+- IMPORTANT — cas ambigu : si un IDENTIFIANT du client (son téléphone OU son email) apparaît bien, MAIS le nom affiché est DIFFÉRENT du sien (ex : possible nom de jeune fille, ancien titulaire du numéro) → action "demander_client". La personne est la seule à savoir si c'est elle. Ne jamais jeter ces cas.
+- "homonyme_probable" = une AUTRE personne (le nom seul ressemble mais AUCUN identifiant du client — téléphone/email — ne correspond, contexte ou ville différents) → action "rien"
 - confidence < 0.5 = à faire valider par un humain, ne jamais agir automatiquement`;
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -113,7 +114,8 @@ function buildReportHTML(c, findings, queries) {
   const email = c.user_email.toLowerCase().trim();
   const ICONS = { annuaire: '📒', reseau_social: '📱', presse_blog: '📰', donnees_legales: '⚖️', homonyme_probable: '👤', autre: '❓' };
   const ACTIONS = { formulaire: 'Formulaire de suppression', rgpd_email: 'Demande RGPD par email', guide_client: 'Guider le client (son compte)', humain: 'À évaluer par un humain', rien: 'Rien à faire' };
-  const actionable = findings.filter(f => f.action !== 'rien');
+  const actionable = findings.filter(f => f.action !== 'rien' && f.action !== 'demander_client');
+  const consulted = findings.filter(f => f.action === 'demander_client');
   const ignored = findings.filter(f => f.action === 'rien');
 
   const validationButtons = (f) => {
@@ -142,10 +144,69 @@ function buildReportHTML(c, findings, queries) {
     </div>
     ${actionable.length ? `<div style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:16px 0">
       <div style="background:#0a1f3a;color:#5BE3F5;padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">À valider</div>
-      ${actionable.map(f => row(f, true)).join('')}</div>` : '<p>✅ Rien à traiter — empreinte déjà propre sur ces recherches.</p>'}
+      ${actionable.map(f => row(f, true)).join('')}</div>` : (consulted.length ? '' : '<p>✅ Rien à traiter — empreinte déjà propre sur ces recherches.</p>')}
+    ${consulted.length ? `<div style="border:1px solid #fde68a;border-radius:12px;overflow:hidden;margin:16px 0">
+      <div style="background:#92400e;color:#fde68a;padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em">🙋 ${consulted.length} cas ambigu(s) — le client a été consulté par email</div>
+      ${consulted.map(f => row(f, false)).join('')}
+      <div style="padding:10px 14px;font-size:12px;color:#92400e;background:#fffbeb">Le client répond « Oui c'est moi / Non ce n'est pas moi » en un clic. Sa réponse met à jour le dossier automatiquement.</div>
+      </div>` : ''}
     ${ignored.length ? `<details><summary style="cursor:pointer;color:#888;font-size:13px">${ignored.length} résultat(s) écarté(s) automatiquement (homonymes / non pertinents)</summary>
       <div style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin:10px 0">${ignored.map(f => row(f, false)).join('')}</div></details>` : ''}
     <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
+  </div>`;
+}
+
+// ── Email de consultation du CLIENT (cas ambigus « est-ce vous ? ») ──
+// Ton chaleureux et rassurant : c'est un senior qui le lit. Deux boutons
+// clairs par trouvaille (les vraies cases à cocher ne marchent pas dans
+// les mails, un bouton-lien est fiable partout).
+function buildClientConsultHTML(c, ambiguous) {
+  const base = process.env.URL || 'https://despy.fr';
+  const email = c.user_email.toLowerCase().trim();
+  const cards = ambiguous.map(f => {
+    const yesUrl = `${base}/.netlify/functions/privacy-confirm?e=${encodeURIComponent(email)}&f=${f.id}&r=yes&k=${signFinding(email, f.id, 'cyes')}`;
+    const noUrl = `${base}/.netlify/functions/privacy-confirm?e=${encodeURIComponent(email)}&f=${f.id}&r=no&k=${signFinding(email, f.id, 'cno')}`;
+    let host = '';
+    try { host = new URL(f.url).hostname.replace(/^www\./, ''); } catch (e) {}
+    return `
+      <div style="border:1px solid #e8ecf3;border-radius:14px;padding:20px;margin:0 0 16px;background:#fcfdff">
+        <div style="font-size:15px;color:#0a1f3a;line-height:1.6;margin-bottom:4px">Nous avons trouvé <strong>votre numéro de téléphone</strong> sur le site <strong>${host || 'un annuaire'}</strong>…</div>
+        <div style="font-size:14px;color:#666;line-height:1.6;margin-bottom:16px">…mais il y est affiché sous le nom <strong>« ${(f.title || '').replace(/\|.*/, '').trim().slice(0, 40) || 'un autre nom'} »</strong>. Est-ce bien vous&nbsp;?</div>
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="padding-right:10px"><a href="${yesUrl}" style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;padding:14px 26px;border-radius:10px;font-size:15px;font-weight:800">✓ Oui, c'est moi</a></td>
+          <td><a href="${noUrl}" style="display:inline-block;background:#f1f3f7;color:#444;text-decoration:none;padding:14px 26px;border-radius:10px;font-size:15px;font-weight:800">✗ Non, ce n'est pas moi</a></td>
+        </tr></table>
+      </div>`;
+  }).join('');
+
+  return `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    <div style="background:#010410;padding:24px 32px;text-align:center">
+      <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="130" style="width:130px;max-width:50%;height:auto;display:inline-block;border:0">
+      <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:10px">Privacy Cleanup — une petite vérification</div>
+    </div>
+    <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
+    <div style="background:#fff;padding:34px 32px">
+      <h1 style="margin:0 0 12px;font-size:22px;color:#0a1f3a">Une question rapide, ${c.prenom} 🙂</h1>
+      <p style="font-size:15px;color:#444;line-height:1.7;margin:0 0 22px">
+        En nettoyant votre présence sur internet, nous avons trouvé quelque chose
+        d'un peu ambigu. Pour ne rien supprimer par erreur, on préfère vous demander.
+        <strong>Un seul clic suffit</strong> — pas besoin de répondre à cet email.
+      </p>
+      ${cards}
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 18px;margin:6px 0 0">
+        <div style="font-size:13.5px;color:#444;line-height:1.7">
+          💡 <strong>Pourquoi cette question&nbsp;?</strong> Parfois un numéro a appartenu à
+          quelqu'un d'autre avant vous, ou il est publié sous un ancien nom (nom de
+          naissance…). Vous seul(e) le savez&nbsp;: votre réponse nous permet d'agir sans risque.
+        </div>
+      </div>
+    </div>
+    <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
+    <div style="padding:24px 32px;text-align:center;background:#010410">
+      <p style="font-size:14px;color:rgba(255,255,255,.75);margin:0 0 6px">Un doute ? Écrivez-nous — un humain vous répond.</p>
+      <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr</p>
+    </div>
   </div>`;
 }
 
@@ -217,6 +278,25 @@ exports.handler = async (event) => {
         })
       });
     } catch (e) { console.error('rapport scan:', e.message); }
+
+    // 5. Cas ambigus → on demande directement au CLIENT (« est-ce vous ? »).
+    // Un seul email groupé, uniquement s'il y a au moins un cas à confirmer.
+    const ambiguous = findings.filter(f => f.action === 'demander_client' && f.id);
+    if (ambiguous.length > 0) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'Despy <contact@despy.fr>',
+            to: [c.user_email],
+            subject: `${c.prenom}, une petite vérification pour votre Privacy Cleanup`,
+            html: buildClientConsultHTML(c, ambiguous)
+          })
+        });
+        console.log(`Consultation client envoyée: ${c.user_email} (${ambiguous.length} cas)`);
+      } catch (e) { console.error('consult client:', e.message); }
+    }
 
     console.log(`Scan ${c.user_email}: ${queries.length} requêtes, ${findings.length} résultats`);
   } catch (err) {
