@@ -59,4 +59,5 @@ const FORM_BROKERS = [
   }
 ];
 
-module.exports = { EMAIL_BROKERS, FORM_BROKERS };
+const handler = async () => ({ statusCode: 404, body: 'Not found' }); // module partagé, pas un endpoint
+module.exports = { EMAIL_BROKERS, FORM_BROKERS, handler };

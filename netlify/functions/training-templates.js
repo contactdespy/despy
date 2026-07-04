@@ -192,4 +192,5 @@ function renderEmail(tpl, link) {
 const byId = (id) => TEMPLATES.find(t => t.id === id) || null;
 const pickRandom = () => TEMPLATES[Math.floor(Math.random() * TEMPLATES.length)];
 
-module.exports = { TEMPLATES, byId, pickRandom, renderEmail };
+const handler = async () => ({ statusCode: 404, body: 'Not found' }); // module partagé, pas un endpoint
+module.exports = { TEMPLATES, byId, pickRandom, renderEmail, handler };

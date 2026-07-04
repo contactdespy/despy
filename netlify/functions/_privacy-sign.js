@@ -16,4 +16,5 @@ function signFinding(email, id, action) {
     .slice(0, 24);
 }
 
-module.exports = { signFinding };
+const handler = async () => ({ statusCode: 404, body: 'Not found' }); // module partagé, pas un endpoint
+module.exports = { signFinding, handler };

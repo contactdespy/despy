@@ -94,4 +94,6 @@ function rateLimit(event, key, max, windowMs) {
   return b.count <= max;
 }
 
-module.exports = { issueToken, verifyToken, requireAuth, softAuth, rateLimit, tokenFromEvent };
+// Module partage, pas un endpoint : acces direct -> 404 propre (au lieu du 502 Netlify).
+const handler = async () => ({ statusCode: 404, body: 'Not found' });
+module.exports = { issueToken, verifyToken, requireAuth, softAuth, rateLimit, tokenFromEvent, handler };
