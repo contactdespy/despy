@@ -50,7 +50,11 @@ exports.handler = async (event) => {
     }
 
     if (!res.ok) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erreur de vérification' }) };
+      // Service HIBP indisponible (clé expirée, quota, panne…). On log le vrai
+      // statut côté serveur et on répond « unavailable » : l'UI masque l'outil
+      // proprement au lieu d'afficher une erreur au prospect.
+      console.error('HIBP upstream status:', res.status, (await res.text()).slice(0, 200));
+      return { statusCode: 200, headers, body: JSON.stringify({ unavailable: true, upstream: res.status }) };
     }
 
     const breaches = await res.json();
