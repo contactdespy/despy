@@ -10519,7 +10519,12 @@ async function checkHIBP() {
     });
     var data = await res.json();
 
-    if (data.safe) {
+    if (data.unavailable) {
+      // Service de fuites momentanément indisponible : message sobre, jamais
+      // d'erreur anxiogène. La vérification « appareil infecté » ci-dessous marche.
+      result.innerHTML = '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;text-align:center;font-size:13px;color:#64748b">' +
+        'La vérification des fuites de données est momentanément indisponible. Nous vérifions tout de même vos appareils juste en dessous.</div>';
+    } else if (data.safe) {
       result.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">' +
         '<div style="font-size:28px;margin-bottom:6px">✅</div>' +
         '<div style="font-weight:700;color:#16a34a;font-size:15px">Bonne nouvelle !</div>' +
