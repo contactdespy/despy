@@ -193,7 +193,7 @@ exports.handler = async (event) => {
     <div style="background:#f9fafb;border-radius:10px;padding:18px;margin-bottom:18px">
       <div style="font-weight:700;color:#111827;margin-bottom:10px;font-size:14px">Ce qui se passe maintenant :</div>
       <ol style="margin:0;padding-left:20px;color:#4b5563;line-height:1.8;font-size:14px">
-        <li><strong>Sous 7 jours</strong> : scan complet des 30 plus grands data brokers</li>
+        <li><strong>Sous 7 jours</strong> : scan complet des principaux annuaires et courtiers de données</li>
         <li><strong>Sous 14 jours</strong> : premières demandes RGPD article 17 envoyées</li>
         <li><strong>Sous 30 jours</strong> : la majorité des sites doivent supprimer vos données (délai légal UE)</li>
         <li><strong>Chaque mois</strong> : re-scan pour s'assurer qu'elles ne réapparaissent pas</li>
