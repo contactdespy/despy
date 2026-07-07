@@ -719,10 +719,14 @@ footer{background:linear-gradient(180deg,#0b1226 0%,#0f172a 100%);border-top:1px
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0));
   }
 
-  /* Masquer la bottom nav quand une modale fullscreen est ouverte */
+  /* Masquer la bottom nav ET le bouton flottant « Aide » quand une modale
+     est ouverte (sinon ils chevauchent le contenu de la modale). */
   body:has(.bs-overlay) #mobile-bottom-nav,
   body:has(.sub-modal-overlay) #mobile-bottom-nav,
-  body:has(.cs-modal-overlay) #mobile-bottom-nav {
+  body:has(.cs-modal-overlay) #mobile-bottom-nav,
+  body:has(.bs-overlay) #despy-fab,
+  body:has(.sub-modal-overlay) #despy-fab,
+  body:has(.cs-modal-overlay) #despy-fab {
     display: none;
   }
 }
@@ -4406,7 +4410,7 @@ function triggerPWAInstall() {
         <div id="defi-titre" style="font-size:18px;font-weight:900;margin-bottom:10px">Chargement...</div>
         <button onclick="showQuizModal()" style="width:100%;padding:11px;background:#fff;color:var(--blue);border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px">▶ Commencer le quiz</button>
         <button onclick="showSimulator()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:8px;font-family:inherit">🎭 Simulateur d'arnaque</button>
-        <button onclick="startDefiChrono()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">⏱ Défi Chrono · API</button>
+        <button onclick="startDefiChrono()" style="width:100%;padding:11px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">⏱ Défi Chrono</button>
       </div>
 
       <div style="background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">
