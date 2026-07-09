@@ -493,6 +493,120 @@ const templates = {
     };
   },
 
+  // ════════════════════════════════════════════
+  // MINI-FORMATION — séquence de nurture des leads du guide PDF.
+  // Envoyée par nurture-leads.js sur ~8 jours. Chaque email apporte de la
+  // valeur d'abord, l'offre vient en douceur à la fin.
+  // ════════════════════════════════════════════
+
+  // J+2 — Le piège n°1 en détail (valeur pure)
+  nurture_j2: ({ prenom }) => ({
+    subject: `${prenom || 'Bonjour'}, le piège n°1 des arnaques (à connaître absolument)`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Mini-formation · 1/4")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Le faux SMS de colis 📦</h1>
+        <p style="font-size:16px;color:#444;line-height:1.7;margin:0 0 18px">Bonjour ${prenom || ''}, vous avez récemment téléchargé notre guide — merci&nbsp;! Aujourd'hui on zoome sur <strong>l'arnaque la plus fréquente en France</strong>, celle qui piège le plus de gens.</p>
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:20px 22px;margin:0 0 20px">
+          <div style="font-size:14px;font-weight:800;color:#d97706;margin-bottom:10px">🚩 Les 3 signes qui trahissent le faux SMS</div>
+          <div style="font-size:14.5px;color:#444;line-height:1.9">
+            1. Un <strong>lien</strong> à cliquer pour « payer des frais » ou « suivre le colis »<br>
+            2. Un sentiment d'<strong>urgence</strong> (« sous 24h », « dernier avis »)<br>
+            3. Une adresse web <strong>bizarre</strong> (laposte-suivi.info, colis-fr.com…)
+          </div>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:18px 20px;margin:0 0 22px">
+          <div style="font-size:14px;font-weight:800;color:#166534;margin-bottom:6px">✅ Le bon réflexe</div>
+          <div style="font-size:14.5px;color:#444;line-height:1.7">Ne cliquez <strong>jamais</strong> le lien. Ouvrez directement l'application officielle (La Poste, Chronopost…) ou tapez l'adresse à la main. Un vrai transporteur ne demande jamais de payer par SMS.</div>
+        </div>
+        <p style="font-size:15px;color:#444;line-height:1.7;margin:0 0 22px">💬 <strong>Un doute sur un message&nbsp;?</strong> Despy le vérifie pour vous en 10 secondes, gratuitement.</p>
+        <div style="text-align:center;margin:0 0 6px">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:15px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Vérifier un message gratuitement</a>
+        </div>
+        <p style="font-size:13px;color:#999;text-align:center;margin:20px 0 0">À dans 2 jours pour le piège suivant 👋</p>
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
+  // J+4 — Que faire si c'est déjà arrivé (rassure + montre le SOS)
+  nurture_j4: ({ prenom }) => ({
+    subject: `${prenom || 'Bonjour'}, et si vous aviez déjà cliqué ? (pas de panique)`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Mini-formation · 2/4")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Vous avez cliqué ? Voici quoi faire</h1>
+        <p style="font-size:16px;color:#444;line-height:1.7;margin:0 0 18px">Bonjour ${prenom || ''}, ça arrive aux plus prudents. Le plus important, c'est de <strong>réagir vite et dans le bon ordre</strong>. Pas de panique — voici les 3 réflexes.</p>
+        <div style="border:1px solid #e8ecf3;border-radius:14px;overflow:hidden;margin:0 0 22px">
+          <div style="padding:16px 20px;border-bottom:1px solid #f1f3f7;font-size:15px;color:#0a1f3a"><strong style="color:#dc2626">1.</strong>&nbsp; Ne saisissez <strong>plus rien</strong> et fermez la page immédiatement.</div>
+          <div style="padding:16px 20px;border-bottom:1px solid #f1f3f7;font-size:15px;color:#0a1f3a"><strong style="color:#dc2626">2.</strong>&nbsp; <strong>Appelez votre banque</strong> (numéro au dos de la carte) pour faire opposition si vous avez donné une info bancaire.</div>
+          <div style="padding:16px 20px;font-size:15px;color:#0a1f3a"><strong style="color:#dc2626">3.</strong>&nbsp; <strong>Changez le mot de passe</strong> du compte concerné depuis un autre appareil.</div>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:18px 20px;margin:0 0 22px">
+          <div style="font-size:14px;font-weight:800;color:#1a3fd9;margin-bottom:6px">🆘 Avec Despy, vous n'êtes pas seul</div>
+          <div style="font-size:14.5px;color:#444;line-height:1.7">Notre bouton <strong>SOS</strong> vous met en relation avec un humain qui vous guide pas à pas, rédige les démarches et vous rassure. Personne ne reste seul face au doute.</div>
+        </div>
+        <div style="text-align:center;margin:0 0 6px">
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:15px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px">Découvrir Despy</a>
+        </div>
+        <p style="font-size:13px;color:#999;text-align:center;margin:20px 0 0">Dans 2 jours : une histoire vraie qui fait réfléchir 👀</p>
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
+  // J+6 — Histoire illustrative + preuve sociale (les 17 avis)
+  nurture_j6: ({ prenom }) => ({
+    subject: `${prenom || 'Bonjour'}, elle a failli virer 4 800 € à un faux conseiller`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Mini-formation · 3/4")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 12px;font-size:22px;color:#0a1f3a">« Votre compte est piraté, virez vite… »</h1>
+        <p style="font-size:16px;color:#444;line-height:1.7;margin:0 0 16px">Bonjour ${prenom || ''}, voici un scénario que nous voyons <strong>très souvent</strong> (exemple représentatif) :</p>
+        <div style="background:#f8fafc;border-left:4px solid #2D5BFF;border-radius:0 12px 12px 0;padding:16px 20px;margin:0 0 20px;font-size:15px;color:#444;line-height:1.7;font-style:italic">
+          Un « conseiller de votre banque » appelle, très rassurant. Il connaît votre nom, votre agence. Il dit qu'un pirate tente un virement et qu'il faut « sécuriser » votre argent en le virant sur un compte tampon. La victime, sous pression, s'exécute… C'est <strong>l'arnaque au faux conseiller bancaire</strong>.
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:18px 20px;margin:0 0 24px">
+          <div style="font-size:14px;font-weight:800;color:#166534;margin-bottom:6px">🛡️ La règle d'or</div>
+          <div style="font-size:14.5px;color:#444;line-height:1.7">Votre banque ne vous demandera <strong>jamais</strong> de virer de l'argent « pour le protéger », ni un code reçu par SMS. Raccrochez, et rappelez le numéro officiel au dos de votre carte.</div>
+        </div>
+        <div style="border:1px solid #fbbf24;border-radius:16px;padding:22px;text-align:center;margin:0 0 8px;background:linear-gradient(180deg,#fffdf5,#fff)">
+          <div style="font-size:30px;font-weight:900;color:#0a1f3a">5,0 <span style="color:#FBBF24;font-size:22px">★★★★★</span></div>
+          <div style="font-size:12px;color:#888;margin-bottom:12px">17 avis Google vérifiés</div>
+          <div style="font-size:14.5px;color:#444;line-height:1.7;font-style:italic">« Avec Despy, je me sens enfin pleinement rassuré face à toutes les arnaques. Je recommande fortement. »</div>
+          <div style="font-size:12px;color:#888;margin-top:8px">— Kevin K., client Despy</div>
+        </div>
+        <p style="font-size:13px;color:#999;text-align:center;margin:22px 0 0">Dernier email dans 2 jours 🎁</p>
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
+  // J+8 — L'offre, en douceur (avec l'angle famille)
+  nurture_j8: ({ prenom }) => ({
+    subject: `${prenom || 'Bonjour'}, protégez vos proches (dès 9,99€/mois)`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${brandHeader("Mini-formation · 4/4")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Vous ne pouvez pas être derrière eux 24h/24.</h1>
+        <p style="font-size:16px;color:#444;line-height:1.7;margin:0 0 18px">Despy, si. En 4 emails, vous avez vu à quel point les arnaques sont crédibles aujourd'hui. La bonne nouvelle : <strong>vous (ou vos parents) n'avez plus à affronter ça seul.</strong></p>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:22px;margin:0 0 22px">
+          <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:10px">Tout ce que Despy fait pour vous</div>
+          <div style="font-size:15px;color:#333;line-height:2">✅ Un message suspect&nbsp;? Verdict en 10 secondes<br>✅ Un conseiller humain qui vous guide<br>✅ Surveillance de vos données chaque semaine<br>✅ SOS humain en cas de problème</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:24px;text-align:center;color:#fff;margin:0 0 22px">
+          <div style="font-size:22px;font-weight:900;margin-bottom:2px">Dès 9,99€/mois</div>
+          <div style="font-size:14px;opacity:.85;margin-bottom:4px">ou <strong>14,99€/mois en Famille</strong> — jusqu'à 4 proches</div>
+          <div style="font-size:12px;opacity:.75;margin-bottom:16px">Sans engagement · résiliable en 1 clic · satisfait ou remboursé 30 jours</div>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#fff;color:#1a3fd9;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:800;font-size:15px">Je protège ma famille →</a>
+        </div>
+        ${founderNote()}
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
   // Template passthrough : html et subject fournis directement par l'appelant
   custom: ({ subject, html }) => ({ subject, html })
 };

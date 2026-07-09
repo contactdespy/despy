@@ -169,6 +169,10 @@
 [functions.relance-leads]
   schedule = "0 10 * * 2,5"        # Mardi + vendredi 10h (au lieu de chaque jour)
 
+[functions.nurture-leads]
+  schedule = "0 10 * * *"          # Chaque jour 10h — mini-formation des leads du guide
+                                   # (séquence 4 emails sur ~8 jours, espacés de 2 jours)
+
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
 
