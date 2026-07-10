@@ -127,6 +127,11 @@
   to = "/index.html"
   status = 200
 
+[[redirects]]
+  from = "/carte-arnaques"
+  to = "/index.html"
+  status = 200
+
 # ── Headers de sécurité ──
 [[headers]]
   for = "/*"
@@ -135,7 +140,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://js.stripe.com https://assets.calendly.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://assets.calendly.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://*.googleusercontent.com; connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.stripe.com https://accounts.google.com https://calendly.com https://www.facebook.com https://connect.facebook.net https://api.pwnedpasswords.com; frame-src https://js.stripe.com https://accounts.google.com https://calendly.com"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://js.stripe.com https://assets.calendly.com https://connect.facebook.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://assets.calendly.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://*.googleusercontent.com; connect-src 'self' https://api.anthropic.com https://*.supabase.co https://api.stripe.com https://accounts.google.com https://calendly.com https://www.facebook.com https://connect.facebook.net https://api.pwnedpasswords.com; frame-src https://js.stripe.com https://accounts.google.com https://calendly.com"
 
 # ── Crons automatiques (optimisés pour limiter la consommation Netlify) ──
 
@@ -172,6 +177,10 @@
 [functions.nurture-leads]
   schedule = "0 10 * * *"          # Chaque jour 10h — mini-formation des leads du guide
                                    # (séquence 4 emails sur ~8 jours, espacés de 2 jours)
+
+[functions.fraud-digest]
+  schedule = "0 17 * * 5"          # Vendredi 17h — récap hebdo Alerte Secteur (inscrits gratuits ;
+                                   # les premium reçoivent chaque alerte en temps réel)
 
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)

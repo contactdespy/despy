@@ -3961,6 +3961,231 @@ function triggerPWAInstall() {
 </div><!-- /page-sos-humain -->
 
 <!-- ══════════════════════════════════════ -->
+<!-- PAGE CARTE DES ARNAQUES (Alerte Secteur) -->
+<!-- ══════════════════════════════════════ -->
+<div id="page-carte-arnaques" class="page">
+  <section style="padding:calc(var(--nav-h) + 38px + 2.5rem) clamp(1rem,5vw,4rem) 2rem;background:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);color:#fff">
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">🗺️ Alerte Secteur</div>
+      <h1 style="font-size:clamp(24px,4vw,34px);font-weight:900;margin:0 0 10px;color:#fff">La carte des arnaques près de chez vous</h1>
+      <p style="font-size:15px;color:rgba(255,255,255,.8);line-height:1.7;max-width:640px;margin:0 0 18px">Faux artisans, faux agents EDF, démarchage abusif… Les membres Despy signalent les arnaques de leur secteur, <strong>vous êtes prévenu avant qu'elles n'arrivent chez vous</strong>. Chaque signalement est vérifié avant publication.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="openFraudReport()" style="background:#fff;color:var(--blue);border:none;border-radius:99px;padding:13px 24px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">📢 Signaler une arnaque</button>
+        <button onclick="document.getElementById('fraude-subscribe-box').scrollIntoView({behavior:'smooth',block:'center'})" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:13px 24px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer">🔔 Être alerté dans mon secteur</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--bg2);padding:2rem clamp(1rem,5vw,4rem) 4rem">
+    <div style="max-width:1100px;margin:0 auto">
+
+      <!-- Carte -->
+      <div style="background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:1.5rem">
+        <div id="fraude-map" style="height:480px;width:100%;background:#e8eef5;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px">Chargement de la carte…</div>
+        <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:1px solid var(--border)">
+          <div id="fraude-map-stats" style="font-size:13px;color:var(--text2);font-weight:600">—</div>
+          <div style="font-size:11.5px;color:var(--text3)">Signalements des 60 derniers jours · vérifiés avant publication · commune uniquement (jamais d'adresse)</div>
+        </div>
+      </div>
+
+      <!-- Abonnement alertes -->
+      <div id="fraude-subscribe-box" style="background:#fff;border-radius:18px;padding:26px;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:1.5rem">
+        <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:6px">🔔 Être alerté des arnaques de mon secteur</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.6;margin:0 0 16px">
+          <strong>Gratuit</strong> : le récapitulatif hebdomadaire de votre commune · <strong>Premium</strong> : notification immédiate sur votre téléphone, pour tout votre département.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input id="fraude-sub-cp" placeholder="Code postal" inputmode="numeric" maxlength="5" style="flex:0 0 130px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none">
+          <input id="fraude-sub-ville" placeholder="Votre ville" style="flex:1;min-width:160px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;outline:none">
+          <button onclick="subscribeFraudAlerts()" id="fraude-sub-btn" style="padding:12px 22px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;white-space:nowrap">Activer les alertes</button>
+        </div>
+        <div id="fraude-sub-status" style="margin-top:12px"></div>
+      </div>
+
+      <!-- Comment ça marche -->
+      <div style="background:#fff;border-radius:18px;padding:26px;box-shadow:0 4px 20px rgba(0,0,0,.06)">
+        <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:14px">Comment ça marche ?</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;font-size:13.5px;color:var(--text2);line-height:1.6">
+          <div><strong style="color:var(--text)">1. Un membre signale</strong><br>Un faux agent sonne chez lui ? Il le signale en 30 secondes depuis son compte Despy (gratuit).</div>
+          <div><strong style="color:var(--text)">2. Despy vérifie</strong><br>Chaque signalement est contrôlé (jamais de nom ni d'adresse publiés) avant d'apparaître sur la carte.</div>
+          <div><strong style="color:var(--text)">3. Le secteur est prévenu</strong><br>Les voisins inscrits reçoivent l'alerte — l'arnaqueur perd son effet de surprise.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal signalement -->
+  <div id="fraude-report-modal" style="display:none;position:fixed;inset:0;background:rgba(10,18,38,.75);z-index:9999;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)">
+    <div style="background:#fff;border-radius:20px;max-width:460px;width:100%;max-height:92vh;overflow-y:auto;padding:26px 24px;position:relative">
+      <button onclick="closeFraudReport()" style="position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:#f2f2f7;border:none;font-size:19px;cursor:pointer;color:#555;line-height:1">×</button>
+      <div style="font-size:19px;font-weight:900;color:var(--text);margin-bottom:4px">📢 Signaler une arnaque</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 16px">Votre signalement protège tout votre secteur. Il est vérifié avant publication — <strong>ne mentionnez aucun nom</strong>, décrivez juste le procédé.</p>
+      <div class="field"><label>Type d'arnaque</label>
+        <select id="fraude-rep-cat" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;background:#fff">
+          <option value="faux_artisan">🔧 Faux artisan / dépanneur</option>
+          <option value="faux_agent">🎭 Faux agent (EDF, eau, police…)</option>
+          <option value="demarchage_abusif">🚪 Démarchage abusif à domicile</option>
+          <option value="arnaque_telephone">📞 Arnaque par téléphone locale</option>
+          <option value="faux_livreur">📦 Faux livreur / faux colis</option>
+          <option value="vol_ruse">🧤 Vol par ruse</option>
+          <option value="autre">⚠️ Autre arnaque locale</option>
+        </select>
+      </div>
+      <div class="field" style="margin-top:12px"><label>Que s'est-il passé ?</label>
+        <textarea id="fraude-rep-desc" rows="4" maxlength="600" placeholder="Ex : Un homme se présentant comme agent des eaux a sonné et insisté pour entrer vérifier les canalisations…" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <div class="field" style="flex:0 0 130px"><label>Code postal</label><input id="fraude-rep-cp" inputmode="numeric" maxlength="5" placeholder="67100"></div>
+        <div class="field" style="flex:1"><label>Ville</label><input id="fraude-rep-ville" placeholder="Strasbourg"></div>
+      </div>
+      <button onclick="submitFraudReport()" id="fraude-rep-btn" style="width:100%;margin-top:16px;padding:14px;border-radius:12px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;border:none;cursor:pointer;font-family:inherit">Envoyer mon signalement</button>
+      <div id="fraude-rep-status" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div><!-- /page-carte-arnaques -->
+
+<script>
+// ════════════════════════════════════════
+// ALERTE SECTEUR — carte, signalement, abonnement
+// ════════════════════════════════════════
+var _fraudMapInit = false;
+var FRAUDE_CAT_EMOJI = { faux_artisan:'🔧', faux_agent:'🎭', demarchage_abusif:'🚪', arnaque_telephone:'📞', faux_livreur:'📦', vol_ruse:'🧤', autre:'⚠️' };
+
+// Chargement paresseux de Leaflet (uniquement quand on ouvre la page)
+function loadLeaflet(cb) {
+  if (window.L) { cb(); return; }
+  var css = document.createElement('link');
+  css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  js.onload = cb;
+  js.onerror = function(){ var m=document.getElementById('fraude-map'); if(m) m.textContent = 'Carte momentanément indisponible.'; };
+  document.head.appendChild(js);
+}
+
+function initFraudPage() {
+  if (_fraudMapInit) return;
+  _fraudMapInit = true;
+  loadLeaflet(function() {
+    var mapEl = document.getElementById('fraude-map');
+    if (!mapEl) return;
+    mapEl.textContent = '';
+    var map = L.map('fraude-map', { scrollWheelZoom: false }).setView([46.6, 2.4], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 18
+    }).addTo(map);
+
+    var hdrs = { 'Content-Type': 'application/json' };
+    try { var s = siteSession.get(); if (s && s.token) hdrs['Authorization'] = 'Bearer ' + s.token; } catch(e) {}
+
+    fetch('/.netlify/functions/fraud-map', { headers: hdrs })
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        var stats = document.getElementById('fraude-map-stats');
+        if (!data.communes || data.communes.length === 0) {
+          if (stats) stats.textContent = 'Aucun signalement publié ces 60 derniers jours — soyez le premier à protéger votre secteur.';
+          return;
+        }
+        if (stats) stats.textContent = data.total + ' signalement' + (data.total>1?'s':'') + ' vérifié' + (data.total>1?'s':'') + ' · ' + data.communes.length + ' commune' + (data.communes.length>1?'s':'');
+        data.communes.forEach(function(c) {
+          var radius = Math.min(9 + c.count * 3, 26);
+          var marker = L.circleMarker([c.lat, c.lng], { radius: radius, color: '#dc2626', weight: 2, fillColor: '#ef4444', fillOpacity: .35 }).addTo(map);
+          var cats = Object.keys(c.categories).map(function(k){ return (FRAUDE_CAT_EMOJI[k]||'⚠️') + ' ' + (data.categories[k]||k) + ' × ' + c.categories[k]; }).join('<br>');
+          var details = '';
+          if (data.connected && c.items && c.items.length) {
+            details = c.items.map(function(it){ return '<div style="margin-top:8px;padding:8px 10px;background:#f8fafc;border-radius:8px;font-size:12px;line-height:1.5"><strong>' + (FRAUDE_CAT_EMOJI[it.category]||'⚠️') + ' ' + it.label + '</strong> · ' + it.date + '<br>' + (it.description||'') + '</div>'; }).join('');
+          } else if (!data.connected) {
+            details = '<div style="margin-top:8px;font-size:12px;color:#666">🔒 <a href="#" onclick="showFreeSignup();return false" style="color:#2D5BFF;font-weight:700">Créez un compte gratuit</a> pour lire le détail des signalements.</div>';
+          }
+          marker.bindPopup('<div style="font-family:inherit;min-width:200px"><div style="font-weight:800;font-size:14px">' + c.ville + ' (' + c.code_postal + ')</div><div style="font-size:12.5px;color:#666;margin-top:4px">' + cats + '</div>' + details + '</div>');
+        });
+      })
+      .catch(function(){ var st=document.getElementById('fraude-map-stats'); if(st) st.textContent='Données momentanément indisponibles.'; });
+  });
+}
+
+function openFraudReport() {
+  var s = null;
+  try { s = siteSession.get(); } catch(e) {}
+  if (!s || !s.email) {
+    despyNotify('Créez votre compte gratuit (30 secondes) pour signaler une arnaque — cela garantit des signalements fiables.', 'info');
+    showFreeSignup();
+    return;
+  }
+  document.getElementById('fraude-report-modal').style.display = 'flex';
+}
+function closeFraudReport() { document.getElementById('fraude-report-modal').style.display = 'none'; }
+
+async function submitFraudReport() {
+  var s = siteSession.get();
+  if (!s || !s.email) { showFreeSignup(); return; }
+  var btn = document.getElementById('fraude-rep-btn');
+  var status = document.getElementById('fraude-rep-status');
+  var payload = {
+    user_email: s.email,
+    category: document.getElementById('fraude-rep-cat').value,
+    description: document.getElementById('fraude-rep-desc').value.trim(),
+    code_postal: document.getElementById('fraude-rep-cp').value.trim(),
+    ville: document.getElementById('fraude-rep-ville').value.trim()
+  };
+  btn.disabled = true; btn.textContent = 'Envoi en cours…';
+  try {
+    var r = await fetch('/.netlify/functions/report-fraud', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (s.token || '') },
+      body: JSON.stringify(payload)
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (data.error || 'Erreur, réessayez.') + '</div>';
+      return;
+    }
+    status.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;font-size:13px;color:#166534;line-height:1.6"><strong>✓ Merci !</strong> ' + data.message + '</div>';
+    document.getElementById('fraude-rep-desc').value = '';
+    setTimeout(closeFraudReport, 3500);
+  } catch(e) {
+    status.innerHTML = '<div style="background:#fef2f2;border-radius:10px;padding:12px;font-size:13px;color:#b91c1c">Erreur réseau, réessayez.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Envoyer mon signalement';
+  }
+}
+
+async function subscribeFraudAlerts() {
+  var s = null;
+  try { s = siteSession.get(); } catch(e) {}
+  if (!s || !s.email) {
+    despyNotify('Créez votre compte gratuit pour activer les alertes de votre secteur.', 'info');
+    showFreeSignup();
+    return;
+  }
+  var btn = document.getElementById('fraude-sub-btn');
+  var status = document.getElementById('fraude-sub-status');
+  var cp = document.getElementById('fraude-sub-cp').value.trim();
+  var ville = document.getElementById('fraude-sub-ville').value.trim();
+  btn.disabled = true; btn.textContent = 'Activation…';
+  try {
+    var r = await fetch('/.netlify/functions/fraud-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (s.token || '') },
+      body: JSON.stringify({ user_email: s.email, code_postal: cp, ville: ville })
+    });
+    var data = await r.json();
+    if (!r.ok || data.error) {
+      status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (data.error || 'Erreur, réessayez.') + '</div>';
+      return;
+    }
+    status.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;font-size:13px;color:#166534;line-height:1.6"><strong>✓ ' + (data.premium ? 'Temps réel activé !' : 'Alertes activées !') + '</strong> ' + data.message + '</div>';
+  } catch(e) {
+    status.innerHTML = '<div style="background:#fef2f2;border-radius:10px;padding:12px;font-size:13px;color:#b91c1c">Erreur réseau, réessayez.</div>';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Activer les alertes';
+  }
+}
+</script>
+
+<!-- ══════════════════════════════════════ -->
 <!-- PAGE LOGIN / ESPACE CLIENT            -->
 <!-- ══════════════════════════════════════ -->
 <div id="page-login" class="page">
@@ -4726,6 +4951,7 @@ function triggerPWAInstall() {
       <div class="footer-title">Navigation</div>
       <button class="footer-link" onclick="scrollToSection('situations')">Protection</button>
       <button class="footer-link" onclick="scrollToSection('centre-outils')">Fonctionnalités</button>
+      <button class="footer-link" onclick="showPage('carte-arnaques')">Carte des arnaques</button>
       <button class="footer-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
       <button class="footer-link" onclick="showPage('tarifs')">Tarifs</button>
       <button class="footer-link" onclick="showPage('qui-sommes-nous')">Qui sommes-nous</button>
@@ -4772,6 +4998,8 @@ function showPage(id) {
   closeMob();
   var footer = document.getElementById('site-footer');
   if (footer) footer.style.display = (id === 'login' || id === 'client') ? 'none' : 'block';
+  // Carte des arnaques : Leaflet est chargé à la première ouverture seulement
+  if (id === 'carte-arnaques' && typeof initFraudPage === 'function') setTimeout(initFraudPage, 60);
 }
 
 function scrollToSection(id) {
@@ -5584,6 +5812,7 @@ function buyLivret() {
       '/comment-ca-marche':  'comment-ca-marche',
       '/conseiller':         'conseiller',
       '/qui-sommes-nous':    'qui-sommes-nous',
+      '/carte-arnaques':     'carte-arnaques',
     };
     var targetPage = routes[path];
     if (targetPage) {
@@ -11729,7 +11958,8 @@ function updateMobileNavActive(pageId) {
       'tarifs':            '/tarifs',
       'comment-ca-marche': '/comment-ca-marche',
       'conseiller':        '/conseiller',
-      'qui-sommes-nous':   '/qui-sommes-nous'
+      'qui-sommes-nous':   '/qui-sommes-nous',
+      'carte-arnaques':    '/carte-arnaques'
     };
     function pathForPage(id) { return pageToPath[id] || ('/#' + id); }
     function pageForPath(path) {
