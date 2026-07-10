@@ -1232,6 +1232,10 @@ body.despy-abonne #outils-upsell{display:none!important}
       SOS Humain
       <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
     </button>
+    <button class="nav-link" onclick="showPage('carte-arnaques')" style="display:inline-flex;align-items:center;gap:6px">
+      🗺️ Carte des arnaques
+      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
+    </button>
     <button class="nav-link" onclick="showPage('livret')">Livret</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
     <button class="nav-link" onclick="triggerPWAInstall()" style="color:var(--blue);font-weight:700">📲 App mobile</button>
@@ -1288,6 +1292,10 @@ body.despy-abonne #outils-upsell{display:none!important}
     </button>
     <button class="mob-link" onclick="showPage('privacy');closeMob()">
       <span>Effacer mes traces sur internet</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <button class="mob-link" onclick="showPage('carte-arnaques');closeMob()">
+      <span style="display:inline-flex;align-items:center;gap:8px">🗺️ Carte des arnaques de mon secteur</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
 
@@ -4139,7 +4147,10 @@ async function submitFraudReport() {
     });
     var data = await r.json();
     if (!r.ok || data.error) {
-      status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (data.error || 'Erreur, réessayez.') + '</div>';
+      var extra = (data.code === 'AUTH_REQUIRED')
+        ? '<button onclick="closeFraudReport();showLoginModal()" style="margin-top:8px;padding:8px 16px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Se reconnecter →</button>'
+        : '';
+      status.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 14px;font-size:13px;color:#b91c1c">' + (data.error || 'Erreur, réessayez.') + '<br>' + extra + '</div>';
       return;
     }
     status.innerHTML = '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 14px;font-size:13px;color:#166534;line-height:1.6"><strong>✓ Merci !</strong> ' + data.message + '</div>';
