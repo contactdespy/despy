@@ -2328,7 +2328,7 @@ function triggerPWAInstall() {
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>Alertes nationales en temps réel (push)</span></div>
 
         <!-- Formation -->
-        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Formation complète</strong> · 9 modules + 45 quiz + badges XP</span></div>
+        <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Formation complète</strong> · 10 modules + 50 quiz + badges XP</span></div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>Défi Chrono hebdomadaire</span></div>
         <div class="plan-feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span>Simulateur d'arnaque (entraînement)</span></div>
 
@@ -4335,7 +4335,7 @@ async function subscribeFraudAlerts() {
           </div>
           <div style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--text);line-height:1.45">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-            <span><strong style="font-weight:600">Formation complète</strong> <span style="color:var(--text3)">— 9 modules + 45 quiz</span></span>
+            <span><strong style="font-weight:600">Formation complète</strong> <span style="color:var(--text3)">— 10 modules + 50 quiz</span></span>
           </div>
         </div>
       </div>
@@ -4460,7 +4460,7 @@ async function subscribeFraudAlerts() {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6"/><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg>
               <div style="font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Formation</div>
             </div>
-            <div style="font-size:24px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.5px"><span id="impact-modules">0</span><span style="font-size:14px;color:var(--text3);font-weight:500">/8</span></div>
+            <div style="font-size:24px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-.5px"><span id="impact-modules">0</span><span id="impact-modules-total" style="font-size:14px;color:var(--text3);font-weight:500">/10</span></div>
             <div style="font-size:11px;color:var(--text3);margin-top:5px;line-height:1.3">modules terminés</div>
           </div>
         </div>
@@ -8528,7 +8528,7 @@ function showQuizPaywall() {
   box.innerHTML = '<button onclick="document.getElementById(&quot;quiz-paywall&quot;).remove()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--bg2);border:none;font-size:18px;cursor:pointer;color:var(--text3)">×</button>' +
     '<div style="font-size:64px;margin-bottom:14px">🔒</div>' +
     '<div style="font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px">Vous avez terminé vos 5 questions découverte</div>' +
-    '<div style="font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:24px">Pour continuer à apprendre, débloquez l\'accès complet à <strong>45 questions</strong>, <strong>9 modules</strong>, <strong>Défi Chrono</strong>, <strong>Simulateur d\'arnaque</strong> et bien plus.</div>' +
+    '<div style="font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:24px">Pour continuer à apprendre, débloquez l\'accès complet à <strong>50 questions</strong>, <strong>10 modules</strong>, <strong>Défi Chrono</strong>, <strong>Simulateur d\'arnaque</strong> et bien plus.</div>' +
     '<div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:20px;margin-bottom:14px;color:#fff">' +
       '<div style="font-size:13px;opacity:.8;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Recommandé</div>' +
       '<div style="font-size:24px;font-weight:900;margin-bottom:4px">9,99€<span style="font-size:14px;opacity:.7">/mois</span></div>' +
@@ -8930,7 +8930,7 @@ async function checkSubscription(email) {
 // -- Page CSS active --
 // === QUIZ HEBDO + BADGES + XP + CLASSEMENT ===
 
-// -- 9 Modules × 5 questions = 45 questions --
+// -- 10 Modules × 5 questions = 50 questions --
 var MODULES = [
   {
     id: 1,
@@ -9273,6 +9273,44 @@ var MODULES = [
         expl: "L'IA permet de rediger de faux courriers administratifs parfaits, avec urgence (24h) et numero de dossier bidon. Verifiez toujours le domaine apres le @ : un vrai email Meta vient de @meta.com, jamais d'un domaine inconnu. Ne cliquez jamais : rendez-vous directement sur le site officiel en tapant l'adresse vous-meme."
       }
     ]
+  },
+  {
+    id: 10,
+    title: "Crypto & placements miracles",
+    icon: "🪙",
+    color: "#f59e0b",
+    questions: [
+      {
+        q: "Une publicite ou un contact vous propose un placement crypto avec 10% de gains par mois, garantis et sans risque. Qu'en pensez-vous ?",
+        opts: ["C'est interessant, la crypto rapporte beaucoup", "Un gain eleve GARANTI n'existe pas : c'est la signature d'une arnaque", "Je teste avec une petite somme pour verifier"],
+        answer: 1,
+        expl: "Regle d'or absolue : rendement eleve + garanti + sans risque = arnaque, a tous les coups. Aucun placement legal ne peut garantir de tels gains. Et 'tester avec une petite somme' est exactement ce que veut l'escroc : les premiers 'gains' affiches ne sont que du theatre pour vous faire verser plus."
+      },
+      {
+        q: "Un 'conseiller en investissement' tres sympathique vous contacte spontanement sur WhatsApp ou apres un clic sur une pub. Il vous accompagne pas a pas pour investir. Bon signe ?",
+        opts: ["Oui, il est patient et repond a toutes mes questions", "Non : un vrai conseiller ne demarche jamais par WhatsApp et ne vous presse jamais de verser", "Oui, s'il travaille pour une grande plateforme connue"],
+        answer: 1,
+        expl: "Le 'gentil conseiller' patient et disponible est LE personnage central des arnaques crypto : il cree une relation de confiance sur des semaines. Les vrais professionnels sont enregistres (ORIAS/AMF) et ne demarchent pas sur WhatsApp. Sa gentillesse est une technique, pas une qualite."
+      },
+      {
+        q: "Avant de verser de l'argent sur une plateforme d'investissement que vous ne connaissez pas, quel est LE reflexe indispensable ?",
+        opts: ["Verifier que le site est joli et professionnel", "Verifier la liste noire de l'AMF (amf-france.org) et que la plateforme est autorisee en France", "Lire les avis affiches sur le site lui-meme"],
+        answer: 1,
+        expl: "L'AMF (le gendarme de la bourse) publie une liste noire des sites d'investissement frauduleux et un registre des acteurs autorises. Un site peut etre magnifique et 100% frauduleux ; les avis affiches sur le site sont fabriques. Seule la verification officielle compte. En cas de doute, demandez a votre Conseiller Despy."
+      },
+      {
+        q: "Votre compte crypto affiche +8 500 euros de gains, mais pour retirer votre argent, la plateforme exige d'abord des 'frais de deblocage' de 900 euros. Que se passe-t-il ?",
+        opts: ["C'est normal, il y a toujours des frais", "C'est l'arnaque du retrait : les gains sont faux, chaque paiement de frais sera suivi d'un autre", "Je negocie les frais a la baisse"],
+        answer: 1,
+        expl: "Les gains affiches n'ont jamais existe : c'est un tableau de bord truque. Les 'frais de deblocage' (puis 'taxes', puis 'assurance'...) se succederont tant que vous paierez. Regle : on ne paie JAMAIS pour recuperer son propre argent. Arretez tout versement immediatement."
+      },
+      {
+        q: "Apres avoir perdu de l'argent dans une arnaque crypto, une societe vous contacte : elle peut recuperer vos fonds contre 500 euros de frais de dossier. Que faire ?",
+        opts: ["Accepter, c'est ma seule chance de revoir mon argent", "Refuser : c'est l'arnaque au recouvrement, souvent les MEMES escrocs qui reviennent", "Payer seulement la moitie d'avance"],
+        answer: 1,
+        expl: "L'arnaque au recouvrement est la double peine : les victimes sont fichees et recontactees par de faux 'recuperateurs de fonds' ou faux avocats. Personne de serieux ne demande d'argent d'avance pour recuperer des fonds. Les seuls interlocuteurs legitimes : la police (plainte), votre banque, et l'AMF. En cas de doute, bouton SOS Despy."
+      }
+    ]
   }
 ];
 
@@ -9309,7 +9347,7 @@ var SPECIAL_BADGES = [
   { id: "sans_faute",     label: "Sans Faute",        icon: "⚡", desc: "Module parfait (5/5 du 1er coup)", color: "#f59e0b" },
   { id: "serie_feu",      label: "Serie de Feu",      icon: "🔥", desc: "3 modules consecutifs parfaits",   color: "#ef4444" },
   { id: "champion",       label: "Champion",          icon: "🏆", desc: "Top 10 du classement",             color: "#ffd700" },
-  { id: "diplome",        label: "Diplome Despy",     icon: "🎓", desc: "9 modules termines",               color: "#8b5cf6" },
+  { id: "diplome",        label: "Diplome Despy",     icon: "🎓", desc: "10 modules termines",              color: "#8b5cf6" },
   { id: "vigilant_tel",   label: "Vigilant Mobile",   icon: "📱", desc: "Module SMS parfait",               color: "#06b6d4" },
   { id: "maitre_mdp",     label: "Maitre des MDP",    icon: "🔐", desc: "Module mots de passe parfait",     color: "#10b981" }
 ];
@@ -9748,7 +9786,7 @@ function showQuizModal() {
   try {
     // En-tête module
     var mod = getCurrentModule();
-    header.innerHTML = '<span style="font-size:20px">' + (mod.icon || '🎓') + '</span> <span>Module ' + (mod.id || 1) + '/8 — <strong>' + (mod.title || 'Quiz') + '</strong></span>';
+    header.innerHTML = '<span style="font-size:20px">' + (mod.icon || '🎓') + '</span> <span>Module ' + (mod.id || 1) + '/' + MODULES.length + ' — <strong>' + (mod.title || 'Quiz') + '</strong></span>';
     if (mod.color) {
       header.style.background = mod.color + '15';
       header.style.borderColor = mod.color + '40';
@@ -9842,7 +9880,7 @@ function renderQuiz() {
   var mod = getCurrentModule();
   var modHeader = document.getElementById('quiz-module-header');
   if (modHeader) {
-    modHeader.innerHTML = '<span style="font-size:20px">' + mod.icon + '</span> <span>Module ' + mod.id + '/8 — <strong>' + mod.title + '</strong></span>';
+    modHeader.innerHTML = '<span style="font-size:20px">' + mod.icon + '</span> <span>Module ' + mod.id + '/' + MODULES.length + ' — <strong>' + mod.title + '</strong></span>';
     modHeader.style.background = mod.color + '15';
     modHeader.style.borderColor = mod.color + '40';
   }

@@ -475,7 +475,7 @@ const templates = {
         `)}
 
         ${section("🎓 Pour devenir imbattable", `
-          ${feat("🏆", "#fff8ec", "La formation anti-arnaque", "9 modules simples, 45 quiz, des badges&nbsp;: apprenez à repérer tous les pièges, à votre rythme.", "espace Despy → « Formation »")}
+          ${feat("🏆", "#fff8ec", "La formation anti-arnaque", "10 modules simples, 50 quiz, des badges&nbsp;: apprenez à repérer tous les pièges — y compris les arnaques crypto —, à votre rythme.", "espace Despy → « Formation »")}
           ${feat("🎭", "#fff8ec", "L'entraînement grandeur nature", "Despy vous envoie de fausses arnaques (sans danger) pour tester vos réflexes. Le meilleur exercice qui existe.", "espace Despy → « Entraînement »")}
           ${feat("👨‍👩‍👧", "#fff8ec", "Le cercle de confiance", "Désignez un proche&nbsp;: en cas d'alerte sérieuse, il est prévenu aussi. Personne ne reste seul face au doute.", "espace Despy → « Mon compte »")}
         `)}
