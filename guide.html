@@ -217,6 +217,21 @@
       btn.disabled = false; btn.textContent = 'Recevoir mon guide gratuit';
     });
   });
+
+  // ── Correction de faute de frappe sur l'email (façon Mailcheck, sans API) ──
+  (function(){
+    var DOM=['gmail.com','googlemail.com','hotmail.com','hotmail.fr','outlook.com','outlook.fr','live.fr','live.com','msn.com','yahoo.com','yahoo.fr','orange.fr','wanadoo.fr','free.fr','sfr.fr','neuf.fr','laposte.net','bbox.fr','icloud.com','me.com','aol.com','gmx.fr','protonmail.com','proton.me'];
+    var TLD=['com','fr','net','org','be','ch','eu','info','me'];
+    function lev(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++)d[i]=[i];for(j=0;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++)for(j=1;j<=n;j++){var c=a.charAt(i-1)===b.charAt(j-1)?0:1;d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);}return d[m][n];}
+    function near(p,l,mx){var b=null,bd=mx+1;for(var i=0;i<l.length;i++){var dd=lev(p,l[i]);if(dd<bd&&dd>0){bd=dd;b=l[i];}}return bd<=mx?b:null;}
+    function check(e){e=(e||'').trim();if(!e)return{s:'empty'};if(/\s/.test(e))return{s:'bad'};var at=e.lastIndexOf('@');if(at<1||at===e.length-1)return{s:'bad'};var lo=e.slice(0,at),dm=e.slice(at+1).toLowerCase();if(dm.indexOf('.')===-1||dm.charAt(dm.length-1)==='.')return{s:'bad'};if(DOM.indexOf(dm)!==-1)return{s:'ok'};var sd=near(dm,DOM,2);if(sd&&sd!==dm)return{s:'sug',v:lo+'@'+sd};var pa=dm.split('.'),t=pa[pa.length-1],st=near(t,TLD,1);if(st&&st!==t){pa[pa.length-1]=st;return{s:'sug',v:lo+'@'+pa.join('.')};}return{s:'ok'};}
+    var input=document.getElementById('email'); if(!input) return;
+    var hint=document.createElement('div'); hint.style.cssText='font-size:12.5px;margin:-8px 0 12px;display:none;line-height:1.45';
+    input.parentNode.insertBefore(hint, input.nextSibling);
+    function render(){var r=check(input.value);if(r.s==='sug'){hint.style.display='block';hint.style.color='#d97706';hint.innerHTML='⚠️ Vouliez-vous dire ';var b=document.createElement('button');b.type='button';b.textContent=r.v;b.style.cssText='background:none;border:none;color:#2D5BFF;font-weight:800;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12.5px;padding:0';b.onclick=function(){input.value=r.v;hint.style.display='none';input.focus();};hint.appendChild(b);hint.appendChild(document.createTextNode(' ?'));}else if(r.s==='bad'){hint.style.display='block';hint.style.color='#DC2626';hint.textContent='⚠️ Cet email semble incomplet — vérifiez le « @ » et le domaine.';}else{hint.style.display='none';}}
+    input.addEventListener('blur',render);
+    input.addEventListener('input',function(){if(hint.style.display==='block')render();});
+  })();
 </script>
 </body>
 </html>

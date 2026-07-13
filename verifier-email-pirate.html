@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon email a-t-il été piraté ? Test gratuit en 10 secondes | Despy</title>
+<meta name="description" content="Vérifiez gratuitement si votre adresse email a fuité dans une fuite de données, ou si un de vos appareils est infecté par un virus voleur de mots de passe. Test instantané, sans inscription, données jamais conservées.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://despy.fr/verifier-email-pirate">
+<link rel="icon" href="assets/icon-192.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Mon email a-t-il été piraté ? Test gratuit | Despy">
+<meta property="og:description" content="Vérifiez en 10 secondes si votre email a fuité dans une fuite de données. Gratuit, sans inscription, 100 % confidentiel.">
+<meta property="og:url" content="https://despy.fr/verifier-email-pirate">
+<meta property="og:image" content="https://despy.fr/assets/og.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Données structurées : page + FAQ (rich snippets Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Vérificateur d'email piraté Despy",
+      "applicationCategory": "SecurityApplication",
+      "operatingSystem": "Web",
+      "url": "https://despy.fr/verifier-email-pirate",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "inLanguage": "fr-FR"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Comment savoir si mon email a été piraté ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Entrez votre adresse email dans l'outil gratuit ci-dessus : il vérifie instantanément si elle apparaît dans une fuite de données connue (piratage d'un site où vous étiez inscrit) et si un appareil lié à votre email a été infecté par un virus voleur de mots de passe. Aucune donnée n'est conservée." }
+        },
+        {
+          "@type": "Question",
+          "name": "Le test est-il vraiment gratuit ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Oui, le test est 100 % gratuit et ne demande aucune inscription ni carte bancaire. Vous pouvez ensuite créer un compte gratuit pour être surveillé automatiquement chaque semaine." }
+        },
+        {
+          "@type": "Question",
+          "name": "Que faire si mon email a été piraté ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Changez immédiatement le mot de passe de votre email et de tout compte utilisant le même mot de passe, activez la double authentification, et surveillez vos comptes. Ne réutilisez jamais un mot de passe déjà exposé." }
+        },
+        {
+          "@type": "Question",
+          "name": "Mes données sont-elles conservées ?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Non. Votre adresse email sert uniquement à effectuer la vérification en temps réel et n'est jamais stockée ni revendue. Despy est un service français, conforme au RGPD." }
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --dark:#010410; --navy:#0A1F3A; --navy2:#122A4D; --blue:#2D5BFF; --blue-d:#1f49e0;
+    --cyan:#5EE4FF; --light:#EAF0FF; --grey:#6B7280; --ink:#111827; --soft:#E3E8F0;
+    --pale:#F5F8FF; --green:#16A34A; --red:#DC2626; --amber:#d97706;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:#fff;line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  /* Header */
+  header{background:var(--dark);padding:14px 0}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  header img{height:34px;width:auto}
+  header a.site{color:#fff;text-decoration:none;font-size:13px;font-weight:700;opacity:.85;white-space:nowrap}
+  /* Hero */
+  .hero{background:linear-gradient(165deg,#010410 0%,#0A1F3A 50%,#122A4D 100%);color:#fff;padding:40px 0 44px;text-align:center}
+  .kicker{display:inline-block;background:var(--cyan);color:var(--dark);font-weight:800;font-size:12px;
+    letter-spacing:.06em;text-transform:uppercase;padding:6px 14px;border-radius:99px;margin-bottom:16px}
+  h1{font-size:30px;line-height:1.2;font-weight:800;margin-bottom:12px}
+  h1 em{color:var(--cyan);font-style:normal}
+  .hero p.sub{font-size:17px;color:var(--light);max-width:540px;margin:0 auto}
+  /* Tool card */
+  .tool{background:#fff;border-radius:18px;box-shadow:0 14px 44px rgba(10,31,58,.20);
+    padding:24px 22px;margin:-30px auto 0;position:relative;z-index:2;max-width:560px}
+  .tool label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:7px}
+  .tool .row{display:flex;gap:10px;flex-wrap:wrap}
+  .tool input{flex:1;min-width:200px;font-size:16px;padding:14px 15px;border:1.5px solid var(--soft);
+    border-radius:12px;font-family:inherit}
+  .tool input:focus{outline:none;border-color:var(--blue)}
+  .tool button.go{background:var(--blue);color:#fff;font-size:16px;font-weight:800;border:none;
+    padding:14px 24px;border-radius:12px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+  .tool button.go:hover{background:var(--blue-d)}
+  .tool button.go:disabled{opacity:.6;cursor:not-allowed}
+  .reassure{font-size:12.5px;color:var(--grey);margin-top:12px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+  .reassure span{display:inline-flex;align-items:center;gap:5px}
+  #result{margin-top:16px;display:none}
+  #email-hint{font-size:12.5px;margin-top:8px;display:none;line-height:1.45}
+  /* Content */
+  main{padding:44px 0 10px}
+  main h2{font-size:23px;color:var(--navy);margin:34px 0 12px;line-height:1.25}
+  main h2:first-child{margin-top:0}
+  main p{font-size:16px;color:#374151;margin-bottom:14px}
+  main ul{margin:0 0 16px 2px;padding:0;list-style:none}
+  main ul li{position:relative;padding-left:26px;margin-bottom:11px;font-size:16px;color:#374151}
+  main ul li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;border-radius:50%;background:var(--blue)}
+  .steps{counter-reset:s;margin:0 0 18px}
+  .steps .step{position:relative;padding:14px 16px 14px 56px;background:var(--pale);border:1px solid #e6ecfb;
+    border-radius:12px;margin-bottom:10px}
+  .steps .step::before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:14px;width:28px;height:28px;
+    background:var(--blue);color:#fff;border-radius:50%;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .steps .step b{display:block;color:var(--navy);font-size:15.5px;margin-bottom:2px}
+  .steps .step span{font-size:14.5px;color:var(--grey)}
+  /* CTA account */
+  .cta{background:linear-gradient(160deg,#0A1F3A,#1a3fd9);border-radius:18px;padding:30px 26px;color:#fff;
+    text-align:center;margin:36px 0}
+  .cta h2{color:#fff;margin:0 0 10px;font-size:22px}
+  .cta p{color:#dbe6ff;font-size:15px;margin-bottom:20px}
+  .cta a{display:inline-block;background:#fff;color:var(--blue);text-decoration:none;font-weight:800;
+    font-size:16px;padding:15px 30px;border-radius:12px}
+  .cta small{display:block;margin-top:12px;color:#aac4ff;font-size:12.5px}
+  /* FAQ */
+  .faq details{border:1px solid var(--soft);border-radius:12px;padding:2px 16px;margin-bottom:10px}
+  .faq summary{font-weight:700;color:var(--navy);font-size:16px;padding:14px 0;cursor:pointer;list-style:none}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";float:right;color:var(--blue);font-weight:800}
+  .faq details[open] summary::after{content:"−"}
+  .faq details p{padding:0 0 14px;margin:0;font-size:15px;color:#374151}
+  /* Footer */
+  footer{background:var(--dark);color:#9fb0c9;padding:28px 0;margin-top:40px;text-align:center;font-size:13px}
+  footer a{color:var(--cyan);text-decoration:none;font-weight:600}
+  footer .links{margin-bottom:10px}
+  @media(max-width:600px){ h1{font-size:25px} .tool button.go{width:100%} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="https://despy.fr"><img src="assets/logo-despy-officiel-nav.png" alt="Despy — cybersécurité pour particuliers"></a>
+    <a class="site" href="https://despy.fr">despy.fr →</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="kicker">🔒 Outil gratuit</span>
+    <h1>Votre email a-t-il été <em>piraté</em> ?</h1>
+    <p class="sub">Vérifiez en 10 secondes si votre adresse a fuité dans une fuite de données — et si un de vos appareils est infecté.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="tool">
+    <label for="email">Votre adresse email</label>
+    <div class="row">
+      <input type="email" id="email" placeholder="votre@email.fr" autocomplete="email" onkeydown="if(event.key==='Enter')runCheck()">
+      <button class="go" id="go-btn" onclick="runCheck()">Vérifier</button>
+    </div>
+    <div id="email-hint"></div>
+    <div id="result"></div>
+    <div class="reassure">
+      <span>✅ Gratuit</span><span>✅ Sans inscription</span><span>🔒 Données jamais conservées</span><span>🇫🇷 Service français</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <h2>Qu'est-ce qu'une fuite de données ?</h2>
+  <p>Une <strong>fuite de données</strong> (ou « data breach ») se produit quand un site où vous êtes inscrit se fait pirater : vos identifiants — email, mot de passe, parfois téléphone ou adresse — se retrouvent alors dans des bases revendues entre pirates. Le problème : ces informations circulent <strong>à votre insu</strong>, parfois des années après.</p>
+  <p>Avec votre email et un mot de passe volé, un escroc peut tenter de se connecter à vos autres comptes (banque, messagerie, réseaux sociaux), surtout si vous <strong>réutilisez le même mot de passe</strong> — l'erreur la plus courante.</p>
+
+  <h2>Comment savoir si votre email a été piraté ?</h2>
+  <p>L'outil ci-dessus interroge en temps réel deux sources de référence :</p>
+  <ul>
+    <li><strong>Les fuites de données connues</strong> (base HaveIBeenPwned) : votre email apparaît-il dans un piratage recensé ?</li>
+    <li><strong>Les appareils infectés</strong> (base Hudson Rock) : un virus « voleur de mots de passe » (infostealer) a-t-il été repéré sur un appareil lié à votre email ? C'est <strong>plus grave</strong> qu'une simple fuite, car il vole tous les mots de passe enregistrés.</li>
+  </ul>
+  <p>La vérification est instantanée et votre adresse n'est jamais conservée.</p>
+
+  <h2>Que faire si votre email a fuité ?</h2>
+  <div class="steps">
+    <div class="step"><b>Changez le mot de passe concerné</b><span>En priorité celui de votre email principal — c'est la clé de tous vos autres comptes.</span></div>
+    <div class="step"><b>N'utilisez jamais deux fois le même mot de passe</b><span>Un mot de passe unique par site. Une phrase de passe longue est plus sûre et plus facile à retenir.</span></div>
+    <div class="step"><b>Activez la double authentification (2FA)</b><span>Même si un pirate a votre mot de passe, il ne pourra pas se connecter sans le second code.</span></div>
+    <div class="step"><b>Surveillez vos comptes</b><span>Méfiez-vous des emails et SMS « urgents » qui suivent souvent une fuite (faux conseiller, faux support).</span></div>
+    <div class="step"><b>Faites-vous surveiller en continu</b><span>De nouvelles fuites apparaissent en permanence : une surveillance automatique vous alerte dès qu'un nouveau problème vous concerne.</span></div>
+  </div>
+
+  <div class="cta">
+    <h2>Restez protégé sans y penser</h2>
+    <p>Créez votre <strong>compte Despy gratuit</strong> : nous surveillons votre email <strong>chaque semaine</strong> et vous alertons dès qu'une nouvelle fuite ou infection apparaît.</p>
+    <a href="https://despy.fr/?signup=1">Créer mon compte gratuit →</a>
+    <small>Sans carte bancaire · Service français conforme au RGPD</small>
+  </div>
+
+  <h2>Questions fréquentes</h2>
+  <div class="faq">
+    <details><summary>Comment savoir si mon email a été piraté ?</summary><p>Entrez votre adresse dans l'outil gratuit en haut de page : il vérifie instantanément si elle apparaît dans une fuite de données connue et si un appareil lié à votre email a été infecté. Aucune donnée n'est conservée.</p></details>
+    <details><summary>Le test est-il vraiment gratuit ?</summary><p>Oui, 100 % gratuit, sans inscription ni carte bancaire. Vous pouvez ensuite créer un compte gratuit pour être surveillé automatiquement chaque semaine.</p></details>
+    <details><summary>Que faire si mon email a été piraté ?</summary><p>Changez immédiatement le mot de passe de votre email et de tout compte partageant le même mot de passe, activez la double authentification, et restez vigilant face aux messages « urgents » qui suivent souvent une fuite.</p></details>
+    <details><summary>Mes données sont-elles conservées ?</summary><p>Non. Votre adresse email sert uniquement à la vérification en temps réel : elle n'est jamais stockée ni revendue. Despy est un service français conforme au RGPD.</p></details>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://despy.fr">Accueil</a> ·
+      <a href="https://despy.fr/tarifs">Tarifs</a> ·
+      <a href="https://despy.fr/qui-sommes-nous">Qui sommes-nous</a> ·
+      <a href="https://despy.fr/?signup=1">Compte gratuit</a>
+    </div>
+    Despy — protection numérique pour les particuliers · Édité en France 🇫🇷<br>
+    Sources : HaveIBeenPwned + Hudson Rock · Aucune donnée conservée
+  </div>
+</footer>
+
+<script>
+// ── Correction de faute de frappe sur l'email (façon Mailcheck, sans API) ──
+var DOMN=['gmail.com','googlemail.com','hotmail.com','hotmail.fr','outlook.com','outlook.fr','live.fr','live.com','msn.com','yahoo.com','yahoo.fr','orange.fr','wanadoo.fr','free.fr','sfr.fr','neuf.fr','laposte.net','bbox.fr','icloud.com','me.com','aol.com','gmx.fr','protonmail.com','proton.me'];
+var TLDN=['com','fr','net','org','be','ch','eu','info','me'];
+function levN(a,b){var m=a.length,n=b.length,d=[],i,j;for(i=0;i<=m;i++)d[i]=[i];for(j=0;j<=n;j++)d[0][j]=j;for(i=1;i<=m;i++)for(j=1;j<=n;j++){var c=a.charAt(i-1)===b.charAt(j-1)?0:1;d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);}return d[m][n];}
+function nearN(p,l,mx){var b=null,bd=mx+1;for(var i=0;i<l.length;i++){var dd=levN(p,l[i]);if(dd<bd&&dd>0){bd=dd;b=l[i];}}return bd<=mx?b:null;}
+function emailCheckN(e){e=(e||'').trim();if(!e)return{s:'empty'};if(/\s/.test(e))return{s:'bad'};var at=e.lastIndexOf('@');if(at<1||at===e.length-1)return{s:'bad'};var lo=e.slice(0,at),dm=e.slice(at+1).toLowerCase();if(dm.indexOf('.')===-1||dm.charAt(dm.length-1)==='.')return{s:'bad'};if(DOMN.indexOf(dm)!==-1)return{s:'ok'};var sd=nearN(dm,DOMN,2);if(sd&&sd!==dm)return{s:'sug',v:lo+'@'+sd};var pa=dm.split('.'),t=pa[pa.length-1],st=nearN(t,TLDN,1);if(st&&st!==t){pa[pa.length-1]=st;return{s:'sug',v:lo+'@'+pa.join('.')};}return{s:'ok'};}
+(function(){
+  var input=document.getElementById('email'), hint=document.getElementById('email-hint');
+  function render(){var r=emailCheckN(input.value);if(r.s==='sug'){hint.style.display='block';hint.style.color='#d97706';hint.innerHTML='⚠️ Vouliez-vous dire ';var b=document.createElement('button');b.type='button';b.textContent=r.v;b.style.cssText='background:none;border:none;color:#2D5BFF;font-weight:800;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12.5px;padding:0';b.onclick=function(){input.value=r.v;hint.style.display='none';input.focus();};hint.appendChild(b);hint.appendChild(document.createTextNode(' ?'));}else if(r.s==='bad'){hint.style.display='block';hint.style.color='#DC2626';hint.textContent='⚠️ Cet email semble incomplet — vérifiez le « @ » et le domaine.';}else{hint.style.display='none';}}
+  input.addEventListener('blur',render);
+  input.addEventListener('input',function(){if(hint.style.display==='block')render();});
+})();
+
+// ── Vérification (fuites + appareil infecté) ──
+var CTA='<div style="font-size:13px;color:#374151;margin-top:12px;line-height:1.6">🔔 Créez votre <strong>compte gratuit</strong> : Despy surveille votre email <strong>chaque semaine</strong> et vous alerte dès qu\'une nouvelle fuite apparaît.</div>'
+  +'<a href="https://despy.fr/?signup=1" style="display:block;text-align:center;margin-top:12px;background:#2D5BFF;color:#fff;text-decoration:none;padding:13px;border-radius:11px;font-weight:800;font-size:14.5px">Créer mon compte gratuit — surveillance offerte →</a>';
+
+async function runCheck(){
+  var input=document.getElementById('email'), btn=document.getElementById('go-btn'), result=document.getElementById('result');
+  var email=(input.value||'').trim();
+  if(!email||email.indexOf('@')<1){ input.style.borderColor='#DC2626'; setTimeout(function(){input.style.borderColor='';},1500); return; }
+  btn.textContent='...'; btn.disabled=true; result.style.display='none';
+  try{
+    var res=await fetch('/.netlify/functions/hibp-public',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+    var data=await res.json();
+    if(data.unavailable){
+      result.innerHTML='<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;text-align:center;font-size:13px;color:#64748b">La vérification des fuites est momentanément indisponible. Nous vérifions tout de même vos appareils ci-dessous.</div>';
+    } else if(data.safe){
+      result.innerHTML='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center"><div style="font-size:28px">✅</div><div style="font-weight:800;color:#16a34a;font-size:15px">Bonne nouvelle&nbsp;!</div><div style="font-size:13.5px;color:#555;margin-top:4px">Votre email n\'a été trouvé dans aucune fuite de données connue.</div>'+CTA+'</div>';
+    } else {
+      var pv=(data.preview&&data.preview.length)?'<div style="font-size:12.5px;color:#dc2626;margin-top:6px">Fuites détectées&nbsp;: <strong>'+data.preview.join(', ')+(data.count>3?'…':'')+'</strong></div>':'';
+      result.innerHTML='<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px"><div style="font-size:22px">🚨</div><div style="font-weight:800;color:#dc2626;font-size:15px">'+(data.message||'Votre email apparaît dans une fuite de données.')+'</div>'+pv+CTA+'</div>';
+    }
+  }catch(e){
+    result.innerHTML='<div style="background:#fef2f2;border-radius:12px;padding:12px;font-size:13px;color:#dc2626">Erreur de vérification. Réessayez dans un instant.</div>';
+  }
+  result.style.display='block'; btn.textContent='Vérifier'; btn.disabled=false;
+  // 2ᵉ couche : appareil infecté (Hudson Rock)
+  try{
+    var slot=document.createElement('div'); slot.style.marginTop='12px';
+    slot.innerHTML='<div style="font-size:12px;color:#6B7280">🦠 Vérification des appareils infectés…</div>';
+    result.appendChild(slot);
+    var r2=await fetch('/.netlify/functions/hudsonrock-public',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+    var d2=await r2.json();
+    if(d2.infected===true){
+      slot.innerHTML='<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:14px"><div style="font-weight:800;color:#dc2626;font-size:15px">🦠 Appareil infecté détecté</div><div style="font-size:13px;color:#555;margin-top:6px">Un virus voleur de mots de passe a été repéré sur <strong>'+d2.count+' appareil'+(d2.count>1?'s':'')+'</strong> lié'+(d2.count>1?'s':'')+' à cet email. Changez vos mots de passe importants depuis un autre appareil sain, et lancez un antivirus.</div>'+CTA+'</div>';
+    } else if(d2.infected===false){
+      slot.innerHTML='<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px"><div style="font-weight:700;color:#16a34a;font-size:14px">✅ Aucun appareil infecté</div><div style="font-size:12px;color:#555;margin-top:4px">Aucun de vos appareils n\'apparaît dans les bases de virus voleurs de mots de passe.</div></div>';
+    } else { slot.remove(); }
+  }catch(e){}
+}
+</script>
+
+</body>
+</html>

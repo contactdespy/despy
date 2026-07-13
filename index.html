@@ -5085,6 +5085,14 @@ document.addEventListener('DOMContentLoaded', function(){
   initLiveActivity();
   try { handleStripeReturn(); } catch(e){}
   try { updateNavForSession(); } catch(e){}
+  // Ouverture directe de l'inscription depuis une page SEO externe (?signup=1)
+  try {
+    var _sp = new URLSearchParams(window.location.search);
+    if (_sp.get('signup') === '1') {
+      window.history.replaceState({}, '', window.location.pathname);
+      setTimeout(function(){ try { showFreeSignup(); } catch(e){} }, 400);
+    }
+  } catch(e){}
 });
 
 // ======================================
@@ -8691,6 +8699,70 @@ function buildGoogleSection(mode, plan) {
   return wrap;
 }
 
+// ════════════════════════════════════════════
+// Vérification d'email à la saisie (format + faute de frappe façon Mailcheck).
+// 100% navigateur, sans API. Corrige gmial.com→gmail.com, orange.f→orange.fr, etc.
+// But : éviter les comptes créés avec un email erroné (qui ne reçoivent jamais
+// le mail de bienvenue / la surveillance / le mot de passe oublié).
+// ════════════════════════════════════════════
+var DESPY_EMAIL_DOMAINS = ['gmail.com','googlemail.com','hotmail.com','hotmail.fr','outlook.com','outlook.fr','live.fr','live.com','msn.com','yahoo.com','yahoo.fr','ymail.com','orange.fr','wanadoo.fr','free.fr','sfr.fr','neuf.fr','laposte.net','bbox.fr','numericable.fr','icloud.com','me.com','aol.com','aol.fr','gmx.fr','gmx.com','protonmail.com','proton.me'];
+var DESPY_EMAIL_TLDS = ['com','fr','net','org','be','ch','eu','info','me','io'];
+function despyLev(a,b){
+  var m=a.length,n=b.length,d=[],i,j;
+  for(i=0;i<=m;i++)d[i]=[i];
+  for(j=0;j<=n;j++)d[0][j]=j;
+  for(i=1;i<=m;i++)for(j=1;j<=n;j++){
+    var c=a.charAt(i-1)===b.charAt(j-1)?0:1;
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);
+  }
+  return d[m][n];
+}
+function despyClosest(part,list,maxD){
+  var best=null,bd=maxD+1;
+  for(var i=0;i<list.length;i++){var dd=despyLev(part,list[i]); if(dd<bd&&dd>0){bd=dd;best=list[i];}}
+  return bd<=maxD?best:null;
+}
+function despyEmailCheck(email){
+  email=(email||'').trim();
+  if(!email) return {state:'empty'};
+  if(/\s/.test(email)) return {state:'invalid'};
+  var at=email.lastIndexOf('@');
+  if(at<1 || at===email.length-1) return {state:'invalid'};
+  var local=email.slice(0,at), domain=email.slice(at+1).toLowerCase();
+  if(domain.indexOf('.')===-1 || domain.charAt(domain.length-1)==='.') return {state:'invalid'};
+  if(DESPY_EMAIL_DOMAINS.indexOf(domain)!==-1) return {state:'ok'}; // domaine déjà valide → jamais de suggestion
+  var sd=despyClosest(domain,DESPY_EMAIL_DOMAINS,2);
+  if(sd && sd!==domain) return {state:'suggest', suggestion:local+'@'+sd};
+  var parts=domain.split('.'), tld=parts[parts.length-1];
+  var st=despyClosest(tld,DESPY_EMAIL_TLDS,1);
+  if(st && st!==tld){ parts[parts.length-1]=st; return {state:'suggest', suggestion:local+'@'+parts.join('.')}; }
+  return {state:'ok'};
+}
+function despyWireEmail(input){
+  if(!input || input._despyWired) return; input._despyWired=true;
+  var hint=document.createElement('div');
+  hint.style.cssText='width:100%;flex-basis:100%;box-sizing:border-box;font-size:12.5px;margin-top:6px;margin-bottom:6px;display:none;line-height:1.45';
+  input.parentNode.insertBefore(hint, input.nextSibling);
+  function render(){
+    var r=despyEmailCheck(input.value);
+    if(r.state==='suggest'){
+      hint.style.display='block'; hint.style.color='#d97706';
+      hint.innerHTML='⚠️ Vouliez-vous dire ';
+      var b=document.createElement('button'); b.type='button'; b.textContent=r.suggestion;
+      b.style.cssText='background:none;border:none;color:#2D5BFF;font-weight:800;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12.5px;padding:0';
+      b.onclick=function(){ input.value=r.suggestion; hint.style.display='none'; try{input.focus();}catch(e){} };
+      hint.appendChild(b); hint.appendChild(document.createTextNode(' ?'));
+    } else if(r.state==='invalid'){
+      hint.style.display='block'; hint.style.color='#dc2626';
+      hint.textContent='⚠️ Cet email semble incomplet — vérifiez le « @ » et le domaine.';
+    } else { hint.style.display='none'; hint.textContent=''; }
+  }
+  input.addEventListener('blur', render);
+  input.addEventListener('input', function(){ if(hint.style.display==='block') render(); });
+}
+// Brancher les champs email statiques présents dès le chargement (outils gratuits)
+(function(){ try{ var h=document.getElementById('hibp-email-input'); if(h) despyWireEmail(h); }catch(e){} })();
+
 function showFreeSignup(prefillEmail) {
   var modal = document.createElement('div');
   modal.className = 'sub-modal-overlay';
@@ -8820,10 +8892,12 @@ function showFreeSignup(prefillEmail) {
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
   document.body.appendChild(modal);
   setTimeout(function(){
+    var em = document.getElementById('free-email');
     // Pré-remplir l'email si on vient d'un outil gratuit (ex. « email piraté »)
-    if (prefillEmail && typeof prefillEmail === 'string' && prefillEmail.indexOf('@') !== -1) {
-      var em = document.getElementById('free-email'); if (em) em.value = prefillEmail;
+    if (em && prefillEmail && typeof prefillEmail === 'string' && prefillEmail.indexOf('@') !== -1) {
+      em.value = prefillEmail;
     }
+    if (em) despyWireEmail(em); // correction de faute de frappe à la saisie
     var el=document.getElementById('free-prenom'); if(el) el.focus();
   }, 100);
 }
