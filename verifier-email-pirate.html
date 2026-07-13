@@ -70,10 +70,8 @@
   a{color:var(--blue)}
   .wrap{max-width:720px;margin:0 auto;padding:0 20px}
   /* Header */
-  header{background:var(--dark);padding:14px 0}
-  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  header img{height:34px;width:auto}
-  header a.site{color:#fff;text-decoration:none;font-size:13px;font-weight:700;opacity:.85;white-space:nowrap}
+  header{background:var(--dark);padding:22px 0;text-align:center}
+  header img{height:68px;width:auto}
   /* Hero */
   .hero{background:linear-gradient(165deg,#010410 0%,#0A1F3A 50%,#122A4D 100%);color:#fff;padding:40px 0 44px;text-align:center}
   .kicker{display:inline-block;background:var(--cyan);color:var(--dark);font-weight:800;font-size:12px;
@@ -127,6 +125,23 @@
   .faq summary::after{content:"+";float:right;color:var(--blue);font-weight:800}
   .faq details[open] summary::after{content:"−"}
   .faq details p{padding:0 0 14px;margin:0;font-size:15px;color:#374151}
+  /* Pastilles de confiance */
+  .pills{max-width:580px;margin:18px auto 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .pills span{background:#fff;border:1px solid var(--soft);border-radius:99px;padding:8px 15px;font-size:13px;color:var(--navy);font-weight:600;box-shadow:0 2px 8px rgba(10,31,58,.05)}
+  .subline{max-width:500px;margin:16px auto 0;text-align:center;font-size:14px;color:var(--grey);line-height:1.6}
+  /* Bande de statistiques */
+  .statsband{background:var(--pale);border:1px solid #e6ecfb;border-radius:16px;padding:28px 22px;margin:34px 0}
+  .statsband .grid{display:flex;flex-wrap:wrap;gap:26px;justify-content:center;text-align:center}
+  .statsband .stat{flex:1;min-width:210px}
+  .statsband .num{font-size:34px;font-weight:900;color:var(--red);line-height:1}
+  .statsband .lab{font-size:14.5px;color:var(--ink);max-width:290px;margin:9px auto 0;line-height:1.5}
+  .statsband .src{font-size:11px;color:var(--grey);font-style:italic;margin-top:5px}
+  /* Bloc « pourquoi Despy » */
+  .why{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:8px 0 4px}
+  .why .item{display:flex;gap:12px;align-items:flex-start}
+  .why .ic{flex-shrink:0;width:38px;height:38px;border-radius:10px;background:var(--pale);display:flex;align-items:center;justify-content:center;font-size:19px}
+  .why b{display:block;color:var(--navy);font-size:15px;margin-bottom:2px}
+  .why span{font-size:13.5px;color:var(--grey);line-height:1.5}
   /* Footer */
   footer{background:var(--dark);color:#9fb0c9;padding:28px 0;margin-top:40px;text-align:center;font-size:13px}
   footer a{color:var(--cyan);text-decoration:none;font-weight:600}
@@ -139,7 +154,6 @@
 <header>
   <div class="wrap">
     <a href="https://despy.fr"><img src="assets/logo-despy-officiel-nav.png" alt="Despy — cybersécurité pour particuliers"></a>
-    <a class="site" href="https://despy.fr">despy.fr →</a>
   </div>
 </header>
 
@@ -160,10 +174,15 @@
     </div>
     <div id="email-hint"></div>
     <div id="result"></div>
-    <div class="reassure">
-      <span>✅ Gratuit</span><span>✅ Sans inscription</span><span>🔒 Données jamais conservées</span><span>🇫🇷 Service français</span>
-    </div>
   </div>
+
+  <div class="pills">
+    <span>🇫🇷 Service français</span>
+    <span>🔒 Données en France</span>
+    <span>✓ 100&nbsp;% gratuit</span>
+    <span>⚡ Résultat en 10 secondes</span>
+  </div>
+  <p class="subline">Conçu en France par Despy pour protéger les particuliers des arnaques et du piratage d'aujourd'hui.</p>
 </div>
 
 <main class="wrap">
@@ -180,6 +199,13 @@
   </ul>
   <p>La vérification est instantanée et votre adresse n'est jamais conservée.</p>
 
+  <div class="statsband">
+    <div class="grid">
+      <div class="stat"><div class="num">14 milliards</div><div class="lab">de comptes déjà exposés dans des fuites de données recensées</div><div class="src">Source : HaveIBeenPwned, 2025</div></div>
+      <div class="stat"><div class="num">411 700</div><div class="lab">victimes d'escroqueries en France en 2023</div><div class="src">Source : Ministère de l'Intérieur, 2024</div></div>
+    </div>
+  </div>
+
   <h2>Que faire si votre email a fuité ?</h2>
   <div class="steps">
     <div class="step"><b>Changez le mot de passe concerné</b><span>En priorité celui de votre email principal — c'est la clé de tous vos autres comptes.</span></div>
@@ -187,6 +213,13 @@
     <div class="step"><b>Activez la double authentification (2FA)</b><span>Même si un pirate a votre mot de passe, il ne pourra pas se connecter sans le second code.</span></div>
     <div class="step"><b>Surveillez vos comptes</b><span>Méfiez-vous des emails et SMS « urgents » qui suivent souvent une fuite (faux conseiller, faux support).</span></div>
     <div class="step"><b>Faites-vous surveiller en continu</b><span>De nouvelles fuites apparaissent en permanence : une surveillance automatique vous alerte dès qu'un nouveau problème vous concerne.</span></div>
+  </div>
+
+  <h2>Pourquoi vérifier avec Despy ?</h2>
+  <div class="why">
+    <div class="item"><div class="ic">🔒</div><div><b>100 % confidentiel</b><span>Votre email sert à la vérification et n'est jamais conservé ni revendu.</span></div></div>
+    <div class="item"><div class="ic">🇫🇷</div><div><b>Service français</b><span>Conçu en France, conforme au RGPD, avec un vrai support humain.</span></div></div>
+    <div class="item"><div class="ic">🔔</div><div><b>Surveillance continue</b><span>Avec un compte gratuit, on vous alerte dès qu'une nouvelle fuite vous concerne.</span></div></div>
   </div>
 
   <div class="cta">
