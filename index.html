@@ -8691,7 +8691,7 @@ function buildGoogleSection(mode, plan) {
   return wrap;
 }
 
-function showFreeSignup() {
+function showFreeSignup(prefillEmail) {
   var modal = document.createElement('div');
   modal.className = 'sub-modal-overlay';
   modal.id = 'free-signup-modal';
@@ -8819,7 +8819,13 @@ function showFreeSignup() {
   modal.appendChild(box);
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
   document.body.appendChild(modal);
-  setTimeout(function(){ var el=document.getElementById('free-prenom'); if(el) el.focus(); }, 100);
+  setTimeout(function(){
+    // Pré-remplir l'email si on vient d'un outil gratuit (ex. « email piraté »)
+    if (prefillEmail && typeof prefillEmail === 'string' && prefillEmail.indexOf('@') !== -1) {
+      var em = document.getElementById('free-email'); if (em) em.value = prefillEmail;
+    }
+    var el=document.getElementById('free-prenom'); if(el) el.focus();
+  }, 100);
 }
 
 async function createFreeAccount() {
@@ -10844,6 +10850,20 @@ async function checkHIBP() {
   btn.disabled = true;
   result.style.display = 'none';
 
+  // Contexte pour le CTA « compte gratuit » (stocké en global pour éviter tout
+  // souci d'échappement de l'email dans les onclick générés).
+  window._despyCheckedEmail = email;
+  var _s = siteSession.get();
+  var _loggedIn = !!(_s && _s.email);
+  function signupCta(danger){
+    if (_loggedIn) {
+      return '<div style="margin-top:12px;font-size:12.5px;color:#16a34a;font-weight:600;text-align:center;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px">✅ Vous êtes connecté — Despy surveille votre email chaque semaine et vous alerte automatiquement.</div>';
+    }
+    var bg = danger ? '#dc2626' : 'var(--blue)';
+    return '<div style="font-size:12.5px;color:#555;margin-top:10px;line-height:1.6">🔔 Créez votre <strong>compte gratuit</strong> : Despy <strong>surveille votre email chaque semaine</strong> et vous <strong>alerte dès qu\'une nouvelle fuite apparaît</strong> — sans carte bancaire.</div>' +
+      '<button onclick="showFreeSignup(window._despyCheckedEmail)" style="margin-top:10px;width:100%;padding:12px 20px;background:' + bg + ';color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit">Créer mon compte gratuit — surveillance offerte →</button>';
+  }
+
   try {
     var res = await fetch('/.netlify/functions/hibp-public', {
       method: 'POST',
@@ -10862,7 +10882,7 @@ async function checkHIBP() {
         '<div style="font-size:28px;margin-bottom:6px">✅</div>' +
         '<div style="font-weight:700;color:#16a34a;font-size:15px">Bonne nouvelle !</div>' +
         '<div style="font-size:13px;color:#555;margin-top:4px">Votre email n\'a été trouvé dans aucune fuite de données connue.</div>' +
-        '<button onclick="showFreeSignup()" style="margin-top:12px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Créer mon compte gratuit →</button>' +
+        signupCta(false) +
         '</div>';
     } else {
       var previewHtml = data.preview && data.preview.length
@@ -10872,8 +10892,7 @@ async function checkHIBP() {
         '<div style="font-size:22px;margin-bottom:6px">🚨</div>' +
         '<div style="font-weight:700;color:#dc2626;font-size:15px">' + data.message + '</div>' +
         previewHtml +
-        '<div style="font-size:12px;color:#555;margin-top:8px">Créez votre compte Despy pour voir toutes les fuites en détail et recevoir une alerte dès qu\'une nouvelle apparaît.</div>' +
-        '<button onclick="showFreeSignup()" style="margin-top:12px;width:100%;padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Voir mes fuites en détail →</button>' +
+        signupCta(true) +
         '</div>';
     }
   } catch(e) {
@@ -10885,8 +10904,7 @@ async function checkHIBP() {
   btn.disabled = false;
 
   // 2ᵉ couche : appareil infecté par un infostealer (Hudson Rock)
-  checkDeviceInfected(email, result,
-    '<button onclick="showFreeSignup()" style="margin-top:12px;width:100%;padding:10px 20px;background:#dc2626;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Être protégé par Despy →</button>');
+  checkDeviceInfected(email, result, signupCta(true));
 }
 
 // ════════════════════════════════════════════
