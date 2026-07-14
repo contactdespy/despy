@@ -80,7 +80,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#fff;color:#111;lin
 #scroll-prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--blue);z-index:300;transform-origin:left;transform:scaleX(0);transition:transform .1s}
 
 /* ── NAV (dark navy, style logo original) ── */
-nav{position:fixed;top:38px;left:0;right:0;z-index:200;height:var(--nav-h);overflow:visible;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:linear-gradient(180deg,rgba(7,21,42,.97),rgba(10,31,58,.9));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(91,227,245,.16);box-shadow:0 1px 0 rgba(255,255,255,.04) inset;transition:border-color .3s,box-shadow .3s}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nav-h);overflow:visible;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,4vw,3rem);background:linear-gradient(180deg,rgba(7,21,42,.97),rgba(10,31,58,.9));backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(91,227,245,.16);box-shadow:0 1px 0 rgba(255,255,255,.04) inset;transition:border-color .3s,box-shadow .3s}
 nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.25)}
 .logo{font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;cursor:pointer;display:flex;align-items:center;gap:12px}
 .logo-icon{width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center}
@@ -91,10 +91,25 @@ nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.
 .nav-link:hover::after{width:100%}
 .nav-cta{background:linear-gradient(135deg,#3580E8,#1A3FD9);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(53,128,232,.35)}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(53,128,232,.5)}
+.nav-cta-ghost{background:transparent;border:none;box-shadow:none;color:rgba(255,255,255,.82);font-weight:600;padding:9px 12px}
+.nav-cta-ghost:hover{background:rgba(255,255,255,.09);box-shadow:none;transform:none;color:#fff}
+.nav-cta-outline{background:rgba(255,255,255,.06);border:1.5px solid rgba(91,227,245,.55);box-shadow:none;color:#fff}
+.nav-cta-outline:hover{background:rgba(91,227,245,.16);box-shadow:0 6px 18px rgba(91,227,245,.20);transform:translateY(-1px)}
+.nav-dd{position:relative;display:inline-flex;align-items:center}
+.nav-dd-trigger{display:inline-flex;align-items:center;gap:6px}
+.nav-dd-trigger .caret{opacity:.7;transition:transform .2s}
+.nav-dd:hover .nav-dd-trigger{color:#fff}
+.nav-dd:hover .nav-dd-trigger .caret{transform:rotate(180deg)}
+.nav-new{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px;line-height:1}
+.nav-dd-menu{position:absolute;top:100%;left:50%;margin-top:14px;transform:translateX(-50%) translateY(-6px);background:rgba(10,26,50,.98);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(91,227,245,.18);border-radius:14px;box-shadow:0 16px 44px rgba(0,0,0,.42);padding:8px;min-width:242px;display:flex;flex-direction:column;gap:2px;opacity:0;visibility:hidden;transition:opacity .18s ease,transform .18s ease;z-index:250}
+.nav-dd:hover .nav-dd-menu{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.nav-dd-menu::before{content:"";position:absolute;top:-16px;left:0;right:0;height:16px}
+.nav-dd-menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:rgba(255,255,255,.85);font-family:inherit;font-size:14px;font-weight:500;padding:11px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.nav-dd-menu button:hover{background:rgba(91,227,245,.13);color:#fff}
 .mob-menu-btn{display:none;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:12px;cursor:pointer;padding:0;width:44px;height:44px;align-items:center;justify-content:center;flex-direction:column;gap:5px;transition:background .2s,border-color .2s}
 .mob-menu-btn:active,.mob-menu-btn:hover{background:rgba(255,255,255,.13);border-color:rgba(91,227,245,.4)}
 .mob-menu-btn span{display:block;width:20px;height:2px;background:rgba(255,255,255,.92);margin:0;transition:all .25s;border-radius:2px}
-#mob-menu{display:none;position:fixed;top:calc(38px + var(--nav-h));left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1rem 1.25rem 1.5rem;flex-direction:column;gap:.35rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08);max-height:calc(100vh - 38px - var(--nav-h));overflow-y:auto;-webkit-overflow-scrolling:touch}
+#mob-menu{display:none;position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;border-bottom:1px solid var(--border);padding:1rem 1.25rem 1.5rem;flex-direction:column;gap:.35rem;z-index:199;box-shadow:0 8px 24px rgba(0,0,0,.08);max-height:calc(100vh - var(--nav-h));overflow-y:auto;-webkit-overflow-scrolling:touch}
 #mob-menu.open{display:flex}
 .mob-link{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;text-align:left;padding:14px 16px;border-radius:10px;font-family:inherit;transition:background .15s ease;-webkit-tap-highlight-color:transparent}
 .mob-link:hover,.mob-link:active{background:var(--bg2)}
@@ -123,7 +138,7 @@ nav.scrolled{border-color:rgba(91,227,245,.2);box-shadow:0 4px 20px rgba(0,0,0,.
 .reveal.visible{opacity:1;transform:none}
 
 /* ── HERO ── */
-.hero{min-height:100vh;padding:calc(var(--nav-h) + 38px + 2rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(160deg,#030810 0%,#071428 50%,#0a1f3a 100%);position:relative;overflow:hidden;display:flex;align-items:flex-start}
+.hero{min-height:100vh;padding:calc(var(--nav-h) + 2rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(160deg,#030810 0%,#071428 50%,#0a1f3a 100%);position:relative;overflow:hidden;display:flex;align-items:flex-start}
 .hero::before{content:'';position:absolute;top:-100px;right:-100px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(45,91,255,0.15) 0%,transparent 70%);pointer-events:none}
 .hero::after{content:'';position:absolute;bottom:-80px;left:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,255,0.08) 0%,transparent 70%);pointer-events:none}
 .hero-dot-grid{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;opacity:.5}
@@ -785,7 +800,7 @@ footer{background:linear-gradient(180deg,#0b1226 0%,#0f172a 100%);border-top:1px
   #page-privacy > section:first-child,
   #page-sos-humain > section:first-child,
   #page-livret > section:first-child {
-    padding-top: calc(var(--nav-h) + 38px + 2rem) !important;
+    padding-top: calc(var(--nav-h) + 2rem) !important;
     padding-bottom: 2.5rem !important;
   }
 
@@ -1199,50 +1214,32 @@ body.despy-abonne #outils-upsell{display:none!important}
   </div>
 </div>
 
-<!-- ══ BANNIÈRE LANCEMENT ══ -->
-<div id="launch-banner" style="position:fixed;top:0;left:0;right:0;z-index:201;background:var(--blue);padding:9px 20px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px">
-  <div style="display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.85)">
-    <div style="width:7px;height:7px;border-radius:50%;background:#fbbf24;animation:blink 1.5s infinite;flex-shrink:0"></div>
-    <span style="font-weight:600">Offre de lancement</span>
-    <span style="color:rgba(255,255,255,.7)">— <strong id="lb-spots" style="color:#fff">47</strong> places sur 50</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:6px;color:#fff;font-weight:700">
-    <div id="lb-d" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">j</span>
-    <div id="lb-h" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">h</span>
-    <div id="lb-m" style="background:rgba(255,255,255,.2);border-radius:5px;padding:2px 7px;font-size:14px;font-weight:800;min-width:26px;text-align:center">--</div><span style="color:rgba(255,255,255,.7);font-size:12px">m</span>
-  </div>
-  <button onclick="siteSubscribe('annual')" style="background:#fff;color:var(--blue);border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0">Souscrire maintenant</button>
-  <button onclick="closeLaunchBanner()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:18px;cursor:pointer;padding:0 0 0 8px;line-height:1;flex-shrink:0">×</button>
-</div>
-
 <!-- ══ NAV ══ -->
 <nav id="nav">
   <div class="logo" onclick="showPage('home')" style="display:flex;align-items:center;cursor:pointer">
     <img src="/assets/logo-despy-officiel-nav.png" alt="Despy" style="height:68px;width:auto;object-fit:contain;display:block;image-rendering:-webkit-optimize-contrast" decoding="async" fetchpriority="high">
   </div>
   <div class="nav-links">
-    <button class="nav-link" onclick="showPage('tarifs')">Tarifs &amp; Services</button>
-    <button class="nav-link" onclick="showPage('privacy')" style="display:inline-flex;align-items:center;gap:6px">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Privacy Cleanup
-      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
-    </button>
-    <button class="nav-link" onclick="showPage('sos-humain')" style="display:inline-flex;align-items:center;gap:6px">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      SOS Humain
-      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
-    </button>
-    <button class="nav-link" onclick="showPage('carte-arnaques')" style="display:inline-flex;align-items:center;gap:6px">
-      🗺️ Carte des arnaques
-      <span style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;font-size:8px;font-weight:900;padding:2px 5px;border-radius:5px;letter-spacing:.5px">NEW</span>
-    </button>
-    <button class="nav-link" onclick="showPage('livret')">Livret</button>
+    <button class="nav-link" onclick="showPage('tarifs')">Tarifs</button>
     <button class="nav-link" onclick="showPage('comment-ca-marche')">Comment ça marche</button>
-    <button class="nav-link" onclick="triggerPWAInstall()" style="color:var(--blue);font-weight:700">📲 App mobile</button>
-    <button class="nav-link" onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">Conseiller IA</button>
+    <div class="nav-dd">
+      <button class="nav-link nav-dd-trigger" type="button">
+        Outils
+        <span class="nav-new">NEW</span>
+        <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="nav-dd-menu">
+        <button onclick="showPage('privacy')">🛡️ Privacy Cleanup</button>
+        <button onclick="showPage('sos-humain')">🆘 SOS Humain</button>
+        <button onclick="showPage('carte-arnaques')">🗺️ Carte des arnaques</button>
+        <button onclick="showPage('home');setTimeout(function(){scrollToSection('conseiller-ia')},150)">💬 Conseiller IA</button>
+        <button onclick="triggerPWAInstall()">📲 Application mobile</button>
+      </div>
+    </div>
+    <button class="nav-link" onclick="showPage('livret')">Livret</button>
     <button class="nav-link" onclick="scrollToSection('faq')">FAQ</button>
-    <button class="nav-cta" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);margin-right:6px;font-size:13px" onclick="showLoginModal()">Connexion</button>
-    <button class="nav-cta" style="background:var(--bg2);color:var(--blue);border:1.5px solid var(--blue-mid);margin-right:8px" onclick="showFreeSignup()">Compte gratuit</button>
+    <button class="nav-cta nav-cta-ghost" onclick="showLoginModal()">Connexion</button>
+    <button class="nav-cta nav-cta-outline" onclick="showFreeSignup()">Compte gratuit</button>
     <button class="nav-cta" onclick="siteSubscribe('monthly')">Commencer — 9,99€/mois</button>
   </div>
   <button class="mob-menu-btn" id="mob-btn" onclick="toggleMob()" aria-label="Menu">
@@ -1426,8 +1423,8 @@ body.despy-abonne #outils-upsell{display:none!important}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div>
-          <div style="font-weight:900;font-size:15px;color:var(--text)">+47</div>
-          <div style="font-size:11px;color:var(--text3)">Membres protégés</div>
+          <div style="font-weight:900;font-size:15px;color:var(--text)">5,0 ★</div>
+          <div style="font-size:11px;color:var(--text3)">17 avis Google</div>
         </div>
       </div>
       <div class="hero-stat-float tr">
@@ -2217,7 +2214,7 @@ function triggerPWAInstall() {
   <div class="wrap text-center reveal">
     <div class="section-tag" style="margin:0 auto 1rem">Commencez maintenant</div>
     <h2 class="sh2" style="margin-bottom:.75rem">Prêt à protéger <span>votre vie numérique ?</span></h2>
-    <p class="sdesc" style="margin:0 auto 1.75rem">Rejoignez les <strong id="cta-count">47</strong> membres qui protègent déjà leur vie numérique. Résiliation en 1 clic, sans engagement mensuel.</p>
+    <p class="sdesc" style="margin:0 auto 1.75rem">Rejoignez les membres qui protègent déjà leur vie numérique avec Despy. Résiliation en 1 clic, sans engagement mensuel.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <button class="btn-primary" style="font-size:16px;padding:16px 30px" onclick="siteSubscribe('monthly')">Commencer — 9,99€/mois</button>
       <button class="btn-secondary" style="font-size:16px;padding:16px 24px" onclick="showPage('tarifs')">Voir tous les tarifs</button>
@@ -2266,22 +2263,6 @@ function triggerPWAInstall() {
         <div style="font-size:15px;font-weight:900;margin-bottom:2px">Vous avez <span id="tarifs-bonus-count">0</span> mois offerts !</div>
         <div style="font-size:13px;opacity:.95" id="tarifs-bonus-detail">Ces mois seront déduits automatiquement de votre premier paiement.</div>
       </div>
-    </div>
-  </div>
-
-  <!-- Urgence lancement -->
-  <div class="launch-bar">
-    <div class="launch-bar-left">
-      <div class="launch-dot"></div>
-      <span>Prix de lancement — <span id="tarifs-spots" style="font-weight:900;color:var(--text)">47</span> places restantes sur 50</span>
-    </div>
-    <div class="launch-countdown">
-      <span>Offre valable encore</span>
-      <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap">
-      <div class="cd-unit" id="cd-d">--</div>j
-      <div class="cd-unit" id="cd-h">--</div>h
-      <div class="cd-unit" id="cd-m">--</div>m
-      </span>
     </div>
   </div>
 
@@ -3311,7 +3292,7 @@ function triggerPWAInstall() {
 <div id="page-privacy" class="page">
 
   <!-- HERO -->
-  <section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(180deg,#0a1f3a 0%,#1a3fd9 100%);color:#fff">
+  <section style="padding:calc(var(--nav-h) + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(180deg,#0a1f3a 0%,#1a3fd9 100%);color:#fff">
     <div style="max-width:1100px;margin:0 auto;text-align:center">
       <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -3677,7 +3658,7 @@ function triggerPWAInstall() {
 <div id="page-sos-humain" class="page">
 
   <!-- HERO -->
-  <section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 60%,#ef4444 100%);color:#fff;position:relative;overflow:hidden">
+  <section style="padding:calc(var(--nav-h) + 3rem) clamp(1rem,6vw,6rem) 4rem;background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 60%,#ef4444 100%);color:#fff;position:relative;overflow:hidden">
     <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);pointer-events:none"></div>
     <div style="max-width:1100px;margin:0 auto;text-align:center;position:relative">
       <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.3);border-radius:99px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.5rem">
@@ -3973,7 +3954,7 @@ function triggerPWAInstall() {
 <!-- PAGE CARTE DES ARNAQUES (Alerte Secteur) -->
 <!-- ══════════════════════════════════════ -->
 <div id="page-carte-arnaques" class="page">
-  <section style="padding:calc(var(--nav-h) + 38px + 2.5rem) clamp(1rem,5vw,4rem) 2rem;background:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);color:#fff">
+  <section style="padding:calc(var(--nav-h) + 2.5rem) clamp(1rem,5vw,4rem) 2rem;background:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);color:#fff">
     <div style="max-width:1100px;margin:0 auto">
       <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5ee4ff;font-weight:800;margin-bottom:8px">🗺️ Alerte Secteur</div>
       <h1 style="font-size:clamp(24px,4vw,34px);font-weight:900;margin:0 0 10px;color:#fff">La carte des arnaques près de chez vous</h1>
@@ -4201,7 +4182,7 @@ async function subscribeFraudAlerts() {
 <!-- PAGE LOGIN / ESPACE CLIENT            -->
 <!-- ══════════════════════════════════════ -->
 <div id="page-login" class="page">
-<section style="padding:calc(var(--nav-h) + 38px + 3rem) clamp(1rem,6vw,6rem);max-width:420px;margin:0 auto;text-align:center">
+<section style="padding:calc(var(--nav-h) + 3rem) clamp(1rem,6vw,6rem);max-width:420px;margin:0 auto;text-align:center">
   <div style="width:56px;height:56px;border-radius:16px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   </div>
@@ -5080,8 +5061,6 @@ document.addEventListener('DOMContentLoaded', function(){
       if (rect.top < window.innerHeight * 0.88) el.classList.add('visible');
     });
   }, 100);
-  initLaunch();
-  animateMemberCount();
   initLiveActivity();
   try { handleStripeReturn(); } catch(e){}
   try { updateNavForSession(); } catch(e){}
