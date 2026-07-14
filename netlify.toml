@@ -89,6 +89,12 @@
   to = "/verifier-email-pirate.html"
   status = 200
 
+# Page dédiée pub locale : visite à domicile Bas-Rhin (67)
+[[redirects]]
+  from = "/visite-domicile"
+  to = "/visite-domicile.html"
+  status = 200
+
 # ── URLs propres pour les pages internes (SPA routing) ──
 # Ces rewrites servent index.html, et le JS au chargement détecte le path
 # et appelle showPage() avec la bonne page. URL conservée dans la barre.
