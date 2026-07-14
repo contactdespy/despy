@@ -38,10 +38,10 @@
     color:var(--ink);background:#fff;line-height:1.65;-webkit-font-smoothing:antialiased;padding-bottom:76px}
   a{color:var(--blue)}
   .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-  header{background:var(--dark);padding:18px 0 14px;text-align:center}
-  header img{height:112px;width:auto}
-  /* Hero */
-  .hero{background:linear-gradient(165deg,#010410 0%,#0A1F3A 50%,#122A4D 100%);color:#fff;padding:34px 0 40px;text-align:center}
+  /* Hero — logo + accroche fondus dans un seul dégradé noir -> bleu (sans couture) */
+  .hero{background:linear-gradient(180deg,#010410 0%,#061224 34%,#0A1F3A 64%,#122A4D 100%);color:#fff;padding:26px 0 42px;text-align:center}
+  .hero-logo{display:inline-block;margin-bottom:6px}
+  .hero-logo img{height:132px;width:auto;display:block;margin:0 auto}
   .kicker{display:inline-block;background:var(--gold);color:#3a2600;font-weight:800;font-size:12.5px;
     letter-spacing:.04em;padding:7px 15px;border-radius:99px;margin-bottom:16px}
   h1{font-size:32px;line-height:1.18;font-weight:800;margin-bottom:14px}
@@ -111,12 +111,9 @@
 </head>
 <body>
 
-<header>
-  <div class="wrap"><a href="https://despy.fr"><img src="assets/logo-despy-seo.png" width="112" height="112" alt="Despy"></a></div>
-</header>
-
 <section class="hero">
   <div class="wrap">
+    <a href="https://despy.fr" class="hero-logo"><img src="assets/logo-despy-stack.png" width="139" height="132" alt="Despy"></a>
     <span class="kicker">🏠 À domicile · Bas-Rhin (67)</span>
     <h1>Un expert Despy se <em>déplace chez vous</em></h1>
     <p class="sub">Peur des arnaques&nbsp;? On sécurise vos appareils et on vous forme aux bons réflexes — tranquillement, chez vous, en toute confiance.</p>
