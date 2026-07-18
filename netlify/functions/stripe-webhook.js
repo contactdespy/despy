@@ -82,7 +82,7 @@ exports.handler = async (event) => {
     const email   = session.metadata?.despy_email;
     const name    = session.metadata?.despy_name || email?.split('@')[0] || '';
     const prenom  = name.split(' ')[0];
-    const plan    = session.subscription_data?.metadata?.despy_plan || 'monthly';
+    const plan    = session.metadata?.despy_plan || session.subscription_data?.metadata?.despy_plan || 'monthly';
 
     if (email) {
       const bonusUsed = parseInt(session.metadata?.despy_bonus_months_used || '0', 10) || 0;

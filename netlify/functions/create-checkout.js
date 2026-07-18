@@ -130,6 +130,7 @@ exports.handler = async (event, context) => {
       ),
       metadata: {
         despy_email: email,
+        despy_plan: plan,
         despy_source: source || 'site',
         despy_bonus_months_used: String(bonusMonths),
         despy_consent: marketing_consent ? '1' : '0'
