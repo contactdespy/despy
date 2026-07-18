@@ -88,6 +88,15 @@ const templates = {
       family_annual:  { label: 'Famille — Annuel',  price: '139 €/an',     cycle: 'chaque année' }
     };
     const info = PLAN_INFO[plan] || PLAN_INFO.monthly;
+    // Cadeau : le livret de formation, offert avec les abonnements ANNUELS
+    const isAnnual = plan === 'annual' || plan === 'family_annual';
+    const livretGift = isAnnual ? `
+        <div style="background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:14px;padding:22px;margin:22px 0;text-align:center">
+          <div style="font-size:30px;line-height:1;margin-bottom:6px">🎁</div>
+          <div style="font-size:18px;font-weight:800;color:#b45309;margin-bottom:6px">Votre cadeau : le Livret de formation</div>
+          <div style="font-size:14px;color:#7c5a1e;line-height:1.65;margin-bottom:18px">Offert avec votre abonnement annuel — <strong>valeur 29,90 €</strong>. 113 pages, 10 modules illustrés pour tout comprendre et garder sous la main.</div>
+          <a href="https://despy.fr/despy-livret-cybersecurite-2026-edition-1.pdf" style="display:inline-block;background:#d97706;color:#fff;padding:14px 28px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15px">📘 Télécharger mon livret offert</a>
+        </div>` : '';
     return {
     subject: `${prenom || name}, votre abonnement Despy est confirmé ✅`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
@@ -110,6 +119,7 @@ const templates = {
           <div style="font-size:14px;color:#1a3fd9;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Tout est inclus</div>
           <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ <strong>Surveillance dark web chaque semaine</strong> : fuites + appareils infectés, alerte immédiate<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
         </div>
+        ${livretGift}
 
         <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 22px">Vous restez <strong>libre</strong> : résiliez à tout moment, en 1 clic, depuis votre espace (onglet « Mon compte »). Une question ? Répondez simplement à cet email, un humain vous répond.</p>
 
