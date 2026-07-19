@@ -148,6 +148,10 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    # Force HTTPS pendant 1 an, sous-domaines inclus — protège même si
+    # l'utilisateur tape http:// sur un réseau piégé (pas de "preload" :
+    # irréversible, inutile ici).
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"

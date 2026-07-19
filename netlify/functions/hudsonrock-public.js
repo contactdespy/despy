@@ -12,6 +12,7 @@
 // On ne garde que des métadonnées sûres : date d'infection + système.
 // ════════════════════════════════════════════
 
+const { rateLimit } = require('./_auth');
 const HR_BASE = 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email';
 
 exports.handler = async (event) => {
@@ -23,6 +24,13 @@ exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
+
+  // Anti-abus : outil public → limite par IP (20 appels / 10 min).
+  // Largement assez pour un humain, bloque le martelage par robot
+  // (quota HIBP / consommation Netlify / appels IA).
+  if (!rateLimit(event, 'hudsonrock-public', 20, 10 * 60 * 1000)) {
+    return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de vérifications. Réessayez dans quelques minutes.' }) };
+  }
 
   try {
     const { email } = JSON.parse(event.body || '{}');

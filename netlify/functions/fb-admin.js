@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { requireAuth } = require('./_auth');
 
 // Accepte plusieurs emails admin séparés par virgules : ADMIN_EMAIL="x@a.fr,y@b.com"
 const ADMIN_EMAILS = (process.env.ADMIN_EMAIL || '')
@@ -189,6 +190,12 @@ exports.handler = async (event) => {
 
   let body = {};
   try { body = JSON.parse(event.body || '{}'); } catch(e) {}
+
+  // Le jeton signé de session doit correspondre à l'email réclamé — sans
+  // ça, connaître l'email admin (public) suffisait à utiliser le dashboard
+  // (génération de posts = facture Anthropic, écriture en base).
+  const auth = requireAuth(event, body, body.adminEmail, headers);
+  if (!auth.ok) return auth.response;
 
   if (!isAdmin(body.adminEmail)) {
     return {

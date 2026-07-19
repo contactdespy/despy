@@ -11467,7 +11467,7 @@ async function fbAdminLoad() {
   try {
     var r = await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ action: 'list', adminEmail: FBADMIN_STATE.adminEmail })
     });
     var data = await r.json();
@@ -11663,7 +11663,7 @@ async function fbAdminSaveGroup(groupId) {
   try {
     var r = await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify(payload)
     });
     var data = await r.json();
@@ -11680,7 +11680,7 @@ async function fbAdminDeleteGroup(groupId) {
   try {
     var r = await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ action: 'delete_group', adminEmail: FBADMIN_STATE.adminEmail, groupId: groupId })
     });
     var data = await r.json();
@@ -11696,7 +11696,7 @@ async function fbAdminUpdateStatus(groupId, newStatus) {
   try {
     await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({
         action: 'update_group',
         adminEmail: FBADMIN_STATE.adminEmail,
@@ -11723,7 +11723,7 @@ async function fbAdminGeneratePost(groupId) {
   try {
     var r = await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({
         action: 'generate_post',
         adminEmail: FBADMIN_STATE.adminEmail,
@@ -11785,7 +11785,7 @@ async function fbAdminMarkPosted(groupId) {
   try {
     var r = await fetch('/.netlify/functions/fb-admin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({
         action: 'log_post',
         adminEmail: FBADMIN_STATE.adminEmail,

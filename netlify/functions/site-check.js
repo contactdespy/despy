@@ -3,6 +3,7 @@
 // POST { url } → âge domaine (RDAP) + SSL + analyse IA
 // ════════════════════════════════════════════
 
+const { rateLimit } = require('./_auth');
 function extractDomain(url) {
   try {
     var u = new URL(url);
@@ -129,6 +130,13 @@ exports.handler = async (event) => {
   };
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: '{}' };
+
+  // Anti-abus : outil public → limite par IP (15 appels / 10 min).
+  // Largement assez pour un humain, bloque le martelage par robot
+  // (quota HIBP / consommation Netlify / appels IA).
+  if (!rateLimit(event, 'site-check', 15, 10 * 60 * 1000)) {
+    return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de vérifications. Réessayez dans quelques minutes.' }) };
+  }
 
   try {
     const { url } = JSON.parse(event.body || '{}');
