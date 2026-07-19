@@ -5425,6 +5425,52 @@ function authHeaders() {
   return (s && s.token) ? { 'Authorization': 'Bearer ' + s.token } : {};
 }
 
+// Ouvre le Portail Client Stripe : changement de formule (mensuel →
+// annuel, solo → famille), moyen de paiement, factures, résiliation.
+// Stripe gère le prorata → aucun risque de double facturation.
+async function openBillingPortal() {
+  var s = siteSession.get();
+  if (!s || !s.email) { showPage('login'); return; }
+
+  // Loader plein écran (le temps de l'aller-retour Stripe)
+  var loader = document.createElement('div');
+  loader.id = 'portal-loader';
+  loader.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.65);backdrop-filter:blur(6px);z-index:99998;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s';
+  loader.innerHTML = '<div style="background:#fff;border-radius:18px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)">'
+    + '<div style="width:42px;height:42px;border:3px solid #e5e7eb;border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite"></div>'
+    + '<div style="font-size:14px;font-weight:700;color:var(--text)">Ouverture de votre espace abonnement…</div>'
+    + '<div style="font-size:12px;color:var(--text3)">Portail sécurisé Stripe</div>'
+    + '</div>';
+  if (!document.getElementById('despy-spin-kf')) {
+    var sty = document.createElement('style'); sty.id = 'despy-spin-kf';
+    sty.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(sty);
+  }
+  document.body.appendChild(loader);
+
+  try {
+    var r = await fetch('/.netlify/functions/create-portal', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+      body: JSON.stringify({ email: s.email })
+    });
+    var data = await r.json();
+    if (!r.ok || !data || !data.url) {
+      throw new Error((data && (data.details || data.error)) || 'Réponse invalide');
+    }
+    window.location.href = data.url;
+  } catch (err) {
+    var ld = document.getElementById('portal-loader');
+    if (ld) ld.remove();
+    if (typeof despyNotify === 'function') {
+      despyNotify("La gestion de l'abonnement est momentanément indisponible. Écrivez-nous à contact.despy@gmail.com et on s'en occupe.", 'error');
+    } else {
+      alert("Gestion de l'abonnement momentanément indisponible. Contactez contact.despy@gmail.com");
+    }
+    console.log('openBillingPortal error:', err && err.message);
+  }
+}
+
 function updateNavForSession() {
   var s = siteSession.get();
   var navRight = document.querySelector('.nav-links');
@@ -6500,6 +6546,14 @@ function handleStripeReturn() {
     document.body.appendChild(modal);
   } else if (params.get('payment') === 'cancel') {
     window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('portal') === 'return') {
+    // Retour du Portail Client Stripe → rouvrir l'espace client et
+    // revalider le plan (il a pu changer : mensuel → annuel/famille).
+    window.history.replaceState({}, '', window.location.pathname);
+    if (siteSession.get()) {
+      showClientArea();
+      if (typeof despyNotify === 'function') despyNotify('Votre abonnement a été mis à jour.', 'success');
+    }
   }
 }
 
@@ -6574,7 +6628,7 @@ var LEGAL = {
   },
   resiliation: {
     title: "Résilier votre abonnement",
-    html: '<p><strong>Gratuit, immédiat, sans justification.</strong> Effet en fin de mois en cours.</p><div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin:14px 0"><p><strong>3 façons de résilier :</strong><br>1. Espace client → Paramètres → Résilier<br>2. Email : <a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="color:var(--blue)">contact.despy@gmail.com</a><br>3. Via votre espace Stripe (lien dans vos emails)</p></div><p><strong>Garantie satisfait ou remboursé</strong><br>30 jours, sans condition. Contactez-nous par email.</p><div style="margin-top:16px"><a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="display:inline-block;padding:12px 22px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:10px;color:var(--blue);font-weight:700;text-decoration:none">Envoyer ma demande de résiliation →</a></div>'
+    html: '<p><strong>Gratuit, immédiat, sans justification.</strong> Effet en fin de période déjà payée — vous gardez l’accès jusque-là.</p><div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin:14px 0"><p><strong>2 façons de résilier :</strong><br>1. Bouton ci-dessous → portail sécurisé Stripe, résiliation en 1 clic<br>2. Email : <a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="color:var(--blue)">contact.despy@gmail.com</a> — on s’en occupe pour vous</p></div><p><strong>Garantie satisfait ou remboursé</strong><br>30 jours, sans condition. Contactez-nous par email.</p><div style="margin-top:16px;display:flex;flex-direction:column;gap:10px"><button onclick="openBillingPortal()" style="display:inline-block;padding:12px 22px;background:var(--blue);border:none;border-radius:10px;color:#fff;font-weight:700;font-family:inherit;font-size:15px;cursor:pointer">Gérer / résilier mon abonnement →</button><a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="display:inline-block;padding:12px 22px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:10px;color:var(--blue);font-weight:700;text-decoration:none;text-align:center">Demander par email →</a></div>'
   }
 };
 
@@ -7399,16 +7453,25 @@ function fillCompteInfo() {
       html +=   '</div>';
       html += '</div>';
 
-      // Upsell vers annuel — uniquement si plan mensuel
-      if (s.plan !== 'annual') {
-        html += '<button onclick="siteSubscribe(\'annual\')" style="width:100%;padding:13px 16px;background:#fff;border:1.5px solid rgba(184,160,106,.4);border-radius:12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s,transform .15s;margin-bottom:12px" onmouseover="this.style.borderColor=\'#b8a06a\';this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.borderColor=\'rgba(184,160,106,.4)\';this.style.transform=\'translateY(0)\'">';
-        html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
-        html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="#b8a06a" aria-hidden="true"><path d="M12 2l2.39 4.84L20 8l-4 3.9.94 5.45L12 14.77 7.06 17.36 8 11.9 4 8l5.61-1.16L12 2z"/></svg>';
-        html +=     '<span><span style="font-weight:700">Passer à l\'annuel</span><span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">Économisez 30 € · 2 mois offerts</span></span>';
-        html +=   '</span>';
-        html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
-        html += '</button>';
-      }
+      // Changer de formule — via le Portail Client Stripe (prorata
+      // automatique, aucun risque de double facturation). Le sous-titre
+      // s'adapte au plan actuel pour rester vendeur.
+      // family_annual = formule maximale → pas d'upsell, on montre quand
+      // même l'accès « gérer » plus bas via la résiliation/portail.
+      var _switchSub = {
+        monthly:        'Passez à l’annuel (2 mois offerts) ou en famille',
+        family_monthly: 'Passez à l’annuel · 2 mois offerts',
+        annual:         'Passez en famille · jusqu’à 4 personnes',
+        family_annual:  'Modifier votre formule ou votre paiement'
+      };
+      var _switchTitle = (s.plan === 'family_annual') ? 'Gérer ma formule' : 'Changer de formule';
+      html += '<button onclick="openBillingPortal()" style="width:100%;padding:13px 16px;background:#fff;border:1.5px solid rgba(184,160,106,.4);border-radius:12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s,transform .15s;margin-bottom:12px" onmouseover="this.style.borderColor=\'#b8a06a\';this.style.transform=\'translateY(-1px)\'" onmouseout="this.style.borderColor=\'rgba(184,160,106,.4)\';this.style.transform=\'translateY(0)\'">';
+      html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+      html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="#b8a06a" aria-hidden="true"><path d="M12 2l2.39 4.84L20 8l-4 3.9.94 5.45L12 14.77 7.06 17.36 8 11.9 4 8l5.61-1.16L12 2z"/></svg>';
+      html +=     '<span><span style="font-weight:700">' + _switchTitle + '</span><span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">' + (_switchSub[s.plan] || 'Annuel, famille, moyen de paiement, factures') + '</span></span>';
+      html +=   '</span>';
+      html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+      html += '</button>';
 
       // Résiliation — accès clair et toujours visible (bouton bordé, sobre)
       html += '<button onclick="showLegal(\'resiliation\')" style="width:100%;padding:12px 16px;background:#fff;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor=\'#fca5a5\';this.style.color=\'#dc2626\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text2)\'">';

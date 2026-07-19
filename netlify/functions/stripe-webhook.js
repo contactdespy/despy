@@ -46,6 +46,18 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
+// Retrouve notre plan interne à partir de l'ID de prix Stripe.
+// Sert au changement de formule via le Portail Client (subscription.updated).
+function planFromPriceId(priceId) {
+  if (!priceId) return null;
+  const map = {};
+  if (process.env.STRIPE_PRICE_MONTHLY)        map[process.env.STRIPE_PRICE_MONTHLY]        = 'monthly';
+  if (process.env.STRIPE_PRICE_ANNUAL)         map[process.env.STRIPE_PRICE_ANNUAL]         = 'annual';
+  if (process.env.STRIPE_PRICE_FAMILY_MONTHLY) map[process.env.STRIPE_PRICE_FAMILY_MONTHLY] = 'family_monthly';
+  if (process.env.STRIPE_PRICE_FAMILY_ANNUAL)  map[process.env.STRIPE_PRICE_FAMILY_ANNUAL]  = 'family_annual';
+  return map[priceId] || null;
+}
+
 async function sendEmail(type, data) {
   try {
     await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
@@ -155,6 +167,54 @@ exports.handler = async (event) => {
         attemptCount: invoice.attempt_count,
         invoiceUrl:   invoice.hosted_invoice_url
       });
+    }
+  }
+
+  // ── Changement de formule (via le Portail Client Stripe) ──
+  // Le client passe de mensuel → annuel, solo → famille, etc. Stripe
+  // émet subscription.updated. On resynchronise le plan en base (sinon
+  // l'appli afficherait l'ancienne formule) et on livre le livret si le
+  // passage se fait vers un plan annuel (cohérent avec la promo).
+  if (stripeEvent.type === 'customer.subscription.updated') {
+    const subscription = stripeEvent.data.object;
+    const priceId = subscription.items?.data?.[0]?.price?.id;
+    const newPlan = planFromPriceId(priceId);
+
+    if (newPlan) {
+      const customer = await stripe.customers.retrieve(subscription.customer);
+      if (customer.email) {
+        const email  = customer.email;
+        const active = subscription.status === 'active' || subscription.status === 'trialing';
+
+        // Plan actuel en base → détecter un vrai changement de formule
+        const { data: existing } = await supabase
+          .from('clients').select('plan').eq('email', email).maybeSingle();
+        const oldPlan = existing?.plan;
+
+        if (oldPlan !== newPlan) {
+          await supabase.from('clients').update({
+            plan: newPlan,
+            subscribed: active,
+            updated_at: new Date().toISOString()
+          }).eq('email', email);
+
+          await supabase.from('subscriptions').update({
+            plan: newPlan,
+            status: active ? 'active' : subscription.status
+          }).eq('email', email);
+
+          console.log(`♻️ Formule mise à jour : ${email} — ${oldPlan || '?'} → ${newPlan}`);
+
+          // Livret offert si passage vers un plan annuel (cadeau promo)
+          const isAnnual = newPlan === 'annual' || newPlan === 'family_annual';
+          const wasAnnual = oldPlan === 'annual' || oldPlan === 'family_annual';
+          if (isAnnual && !wasAnnual) {
+            const name   = customer.name || email.split('@')[0];
+            const prenom = name.split(' ')[0];
+            await sendEmail('welcome', { email, name, prenom, plan: newPlan });
+          }
+        }
+      }
     }
   }
 
