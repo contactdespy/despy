@@ -63,15 +63,40 @@ exports.handler = async (event) => {
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
+    const cleanEmail = email.toLowerCase().trim();
     const { data: client, error } = await supabase
       .from('clients')
-      .select('subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan')
-      .eq('email', email.toLowerCase().trim())
+      .select('subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan, trusted_contact_email')
+      .eq('email', cleanEmail)
       .maybeSingle();
 
     if (error || !client) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Compte introuvable' }) };
     }
+
+    // ── Checklist « Votre protection » (dashboard) ──
+    // privacy_requests et training_tests : simple présence d'une ligne.
+    // Best-effort : si une table manque, l'étape reste à faire (pas d'erreur).
+    let hasPrivacy = false, hasTraining = false;
+    try {
+      const { count: pc } = await supabase.from('privacy_requests')
+        .select('id', { count: 'exact', head: true }).eq('email', cleanEmail);
+      hasPrivacy = (pc || 0) > 0;
+    } catch (e) { /* table absente → étape non faite */ }
+    try {
+      const { count: tc } = await supabase.from('training_tests')
+        .select('id', { count: 'exact', head: true }).eq('email', cleanEmail);
+      hasTraining = (tc || 0) > 0;
+    } catch (e) { /* table absente → étape non faite */ }
+
+    const checklist = {
+      darkweb:    !!client.last_hibp_check,
+      trusted:    !!client.trusted_contact_email,
+      conseiller: (client.questions_used || 0) > 0,
+      formation:  (client.quizzes_completed || 0) > 0,
+      privacy:    hasPrivacy,
+      training:   hasTraining,
+    };
 
     const score = computeScore(client);
     const { label, color, emoji } = getScoreLabel(score);
@@ -92,6 +117,7 @@ exports.handler = async (event) => {
         color,
         emoji,
         tips: tips.slice(0, 3),
+        checklist,
         stats: {
           questions_used:    client.questions_used || 0,
           breach_count:      client.breach_count || 0,

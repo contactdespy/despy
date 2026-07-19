@@ -4627,6 +4627,52 @@ async function subscribeFraudAlerts() {
         </div>
       </div>
 
+      <!-- ═══ CHECKLIST — Votre protection, étape par étape (abonnés) ═══ -->
+      <div id="protection-checklist" class="premium-fade-in" style="display:none;background:#fff;border-radius:16px;padding:22px 24px;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);border:1px solid rgba(0,0,0,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:6px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">Votre protection</div>
+            <div id="checklist-title" style="font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.2px">Activez toute votre protection</div>
+          </div>
+          <div id="checklist-count" style="font-size:13px;font-weight:800;color:var(--blue);background:var(--blue-light);border-radius:99px;padding:5px 12px">—/6</div>
+        </div>
+        <div style="background:#eef1f6;border-radius:99px;height:8px;overflow:hidden;margin:10px 0 16px">
+          <div id="checklist-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--blue),#22c55e);border-radius:99px;transition:width .6s ease"></div>
+        </div>
+        <div id="checklist-items" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+
+      <!-- ═══ QUESTION RAPIDE — accès direct au Conseiller (abonnés) ═══ -->
+      <div id="dash-ask-card" class="premium-fade-in" style="display:none;background:#fff;border-radius:16px;padding:22px 24px;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);border:1px solid rgba(0,0,0,.04)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:38px;height:38px;background:var(--blue-light);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.2px">Un doute ? Posez votre question</div>
+            <div style="font-size:12.5px;color:var(--text3);font-weight:500">Un message suspect, un appel bizarre… le Conseiller vous répond immédiatement.</div>
+          </div>
+        </div>
+        <form onsubmit="event.preventDefault();askFromDashboard()" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="dash-ask-input" type="text" placeholder="Ex : j'ai reçu un SMS de livraison suspect…" style="flex:1;min-width:200px;padding:12px 14px;border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-family:inherit;outline:none" onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--border)'">
+          <button type="submit" style="padding:12px 20px;background:var(--blue);color:#fff;border:none;border-radius:11px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;min-height:46px">Demander →</button>
+        </form>
+      </div>
+
+      <!-- ═══ LIVRET OFFERT — visible uniquement abonnés annuels ═══ -->
+      <div id="livret-gift-card" class="premium-fade-in" style="display:none;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:16px;padding:20px 24px;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06)">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:30px;line-height:1">📘</div>
+            <div>
+              <div style="font-size:15px;font-weight:800;color:#b45309">Votre Livret de formation offert</div>
+              <div style="font-size:12.5px;color:#7c5a1e;font-weight:500;line-height:1.5">Inclus avec votre abonnement annuel — 113 pages, 10 modules illustrés. Valeur 29,90&nbsp;€.</div>
+            </div>
+          </div>
+          <a href="/despy-livret-cybersecurite-2026-edition-1.pdf" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:#d97706;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13.5px;white-space:nowrap">Télécharger mon livret</a>
+        </div>
+      </div>
+
       <!-- ═══ BLOC PREMIUM — Votre impact ce mois-ci (visible uniquement abonnés) ═══ -->
       <div id="premium-impact" class="premium-fade-in" style="display:none;background:#fff;border-radius:16px;padding:22px 24px;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);border:1px solid rgba(0,0,0,.04)">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
@@ -5634,6 +5680,16 @@ function updateNavForSession() {
       // Section "Votre impact" — visible uniquement abonnés
       var impactEl = document.getElementById('premium-impact');
       if (impactEl) impactEl.style.display = s.subscribed ? '' : 'none';
+
+      // Checklist protection + question rapide — visibles uniquement abonnés
+      var checklistEl = document.getElementById('protection-checklist');
+      if (checklistEl) checklistEl.style.display = s.subscribed ? '' : 'none';
+      var askEl = document.getElementById('dash-ask-card');
+      if (askEl) askEl.style.display = s.subscribed ? '' : 'none';
+
+      // Livret offert — uniquement plans annuels (cadeau de la promo)
+      var livretEl = document.getElementById('livret-gift-card');
+      if (livretEl) livretEl.style.display = (s.plan === 'annual' || s.plan === 'family_annual') ? '' : 'none';
 
       // Mois en cours dans le tag impact
       var impactMonthTag = document.getElementById('impact-month-tag');
@@ -7393,6 +7449,10 @@ function saveTrustedContact() {
   });
 }
 
+// ⚠️ CODE MORT — l'onglet compte est en réalité rendu par renderAccountPanel()
+// (le 2e switchTab, défini plus bas, écrase le 1er et reconstruit #panel-compte,
+// détruisant #compte-sub-content). Toute évolution de l'onglet compte doit se
+// faire dans renderAccountPanel(). Conservé le temps d'une future dédoublonnage.
 function fillCompteInfo() {
   try {
     var s = siteSession.get();
@@ -7452,6 +7512,17 @@ function fillCompteInfo() {
       html +=     'Prochain prélèvement : <span style="color:var(--text2);font-weight:600">' + nextDateFr + '</span>';
       html +=   '</div>';
       html += '</div>';
+
+      // Livret offert — rappel du cadeau pour les plans annuels
+      if (s.plan === 'annual' || s.plan === 'family_annual') {
+        html += '<a href="/despy-livret-cybersecurite-2026-edition-1.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 16px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:12px;text-decoration:none;margin-bottom:12px">';
+        html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+        html +=     '<span style="font-size:16px;line-height:1">📘</span>';
+        html +=     '<span><span style="font-weight:700;font-size:13px;color:#b45309">Mon livret offert</span><span style="display:block;font-size:11.5px;color:#7c5a1e;font-weight:500;margin-top:1px">113 pages · inclus avec votre abonnement annuel</span></span>';
+        html +=   '</span>';
+        html +=   '<span style="font-size:12px;font-weight:700;color:#d97706;white-space:nowrap">Télécharger ↓</span>';
+        html += '</a>';
+      }
 
       // Changer de formule — via le Portail Client Stripe (prorata
       // automatique, aucun risque de double facturation). Le sous-titre
@@ -8644,9 +8715,17 @@ function renderAccountPanel() {
   var email = session.email || '—';
   var tel = session.telephone || session.tel || '—';
   var plan = session.subscribed ? '⭐ Abonné Premium' : 'Compte gratuit';
+  // Libellé exact de la formule (le champ session est `plan`)
+  var PLAN_LABELS = {
+    monthly:        'Solo · 9,99€/mois',
+    annual:         'Solo Annuel · 89€/an',
+    family_monthly: 'Famille · 14,99€/mois',
+    family_annual:  'Famille Annuel · 139€/an'
+  };
   var planSub = session.subscribed
-    ? (session.planType === 'annual' ? '89€/an' : '9,99€/mois')
+    ? (PLAN_LABELS[session.plan] || 'Abonnement actif')
     : 'Aucun abonnement actif';
+  var isAnnualPlan = session.plan === 'annual' || session.plan === 'family_annual';
 
   var html = '';
   html += '<div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
@@ -8668,6 +8747,32 @@ function renderAccountPanel() {
     html += '<button onclick="siteSubscribe(\'monthly\')" style="padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">S\'abonner</button>';
   }
   html += '</div>';
+  if (session.subscribed) {
+    // Livret offert — rappel du cadeau pour les plans annuels
+    if (isAnnualPlan) {
+      html += '<a href="/despy-livret-cybersecurite-2026-edition-1.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;padding:12px 14px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:10px;text-decoration:none;margin-bottom:10px">';
+      html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+      html +=     '<span style="font-size:16px;line-height:1">📘</span>';
+      html +=     '<span><span style="font-weight:700;font-size:13px;color:#b45309">Mon livret offert</span><span style="display:block;font-size:11.5px;color:#7c5a1e;font-weight:500;margin-top:1px">113 pages · inclus avec votre abonnement annuel</span></span>';
+      html +=   '</span>';
+      html +=   '<span style="font-size:12px;font-weight:700;color:#d97706;white-space:nowrap">Télécharger ↓</span>';
+      html += '</a>';
+    }
+    // Changer de formule — Portail Client Stripe (prorata automatique)
+    var switchSub = {
+      monthly:        'Passez à l’annuel (2 mois offerts) ou en famille',
+      family_monthly: 'Passez à l’annuel · 2 mois offerts',
+      annual:         'Passez en famille · jusqu’à 4 personnes',
+      family_annual:  'Modifier votre formule ou votre paiement'
+    };
+    html += '<button onclick="openBillingPortal()" style="width:100%;padding:12px 14px;background:#fff;border:1.5px solid rgba(184,160,106,.4);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s;margin-bottom:10px" onmouseover="this.style.borderColor=\'#b8a06a\'" onmouseout="this.style.borderColor=\'rgba(184,160,106,.4)\'">';
+    html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
+    html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="#b8a06a" aria-hidden="true"><path d="M12 2l2.39 4.84L20 8l-4 3.9.94 5.45L12 14.77 7.06 17.36 8 11.9 4 8l5.61-1.16L12 2z"/></svg>';
+    html +=     '<span><span style="font-weight:700">' + (session.plan === 'family_annual' ? 'Gérer ma formule' : 'Changer de formule') + '</span><span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">' + (switchSub[session.plan] || 'Annuel, famille, moyen de paiement, factures') + '</span></span>';
+    html +=   '</span>';
+    html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
+    html += '</button>';
+  }
   // Accès résiliation — clair et toujours visible pour les abonnés
   if (session.subscribed) {
     html += '<button onclick="showLegal(\'resiliation\')" style="width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor=\'#fca5a5\';this.style.color=\'#dc2626\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text2)\'">';
@@ -11329,6 +11434,9 @@ async function loadSecurityScore(email) {
     scoreEl.textContent = d.score;
     if (msgEl) msgEl.textContent = d.emoji + ' ' + d.label;
 
+    // Checklist « Votre protection » — état serveur + notifications locales
+    try { renderProtectionChecklist(d.checklist || {}); } catch(e) {}
+
     if (tipsEl && d.tips && d.tips.length) {
       tipsEl.innerHTML = d.tips.map(function(t){
         var bg = t.priority === 'high' ? '#fef2f2' : t.priority === 'medium' ? '#fff7ed' : '#f0fdf4';
@@ -11339,6 +11447,92 @@ async function loadSecurityScore(email) {
   } catch(e) {
     if (scoreEl) scoreEl.textContent = '—';
   }
+}
+
+// ── Checklist « Votre protection » (dashboard abonné) ──
+// 6 étapes : 5 viennent du serveur (security-score), les notifications
+// sont lues sur CE navigateur (Notification.permission).
+function renderProtectionChecklist(ck) {
+  var itemsEl = document.getElementById('checklist-items');
+  var countEl = document.getElementById('checklist-count');
+  var barEl   = document.getElementById('checklist-bar');
+  var titleEl = document.getElementById('checklist-title');
+  if (!itemsEl) return;
+
+  var notifOk = (typeof Notification !== 'undefined' && Notification.permission === 'granted');
+  var steps = [
+    { done: !!ck.darkweb,  icon: '🔍', label: 'Vérifier si votre email a fuité',       sub: 'Surveillance dark web en 10 secondes', btn: 'Vérifier',  act: "switchTab('protection')" },
+    { done: notifOk,       icon: '🔔', label: 'Activer les alertes sur cet appareil',  sub: 'Prévenu immédiatement en cas de danger', btn: 'Activer',  act: "despyChecklistPush()" },
+    { done: !!ck.trusted,  icon: '👥', label: 'Enregistrer votre proche de confiance', sub: 'Une personne alertée si besoin',          btn: 'Ajouter',  act: "switchTab('compte')" },
+    { done: !!ck.formation,icon: '🎓', label: 'Faire votre premier quiz',              sub: 'Formation — 5 minutes, en douceur',       btn: 'Commencer',act: "switchTab('formation')" },
+    { done: !!ck.privacy,  icon: '🧹', label: 'Lancer votre audit de vie privée',      sub: 'Vos données effacées des annuaires',      btn: 'Lancer',   act: "switchTab('privacy')" },
+    { done: !!ck.training, icon: '🎯', label: 'Tester l’entraînement anti-arnaque', sub: 'Un faux message-test, sans danger',     btn: 'Tester',   act: "window.location.href='/mon-entrainement'" }
+  ];
+
+  var doneCount = steps.filter(function(x){ return x.done; }).length;
+  if (countEl) countEl.textContent = doneCount + '/6';
+  if (barEl) barEl.style.width = Math.round(doneCount / 6 * 100) + '%';
+  if (titleEl) {
+    titleEl.textContent = doneCount === 6 ? 'Protection complète — bravo ! 🎉'
+      : doneCount === 0 ? 'Activez toute votre protection'
+      : 'Encore ' + (6 - doneCount) + ' étape' + (6 - doneCount > 1 ? 's' : '') + ' pour être protégé à 100%';
+  }
+
+  var nextFound = false;
+  itemsEl.innerHTML = steps.map(function(st){
+    if (st.done) {
+      return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f0fdf4;border:1px solid #dcfce7;border-radius:11px">'
+        + '<span style="width:22px;height:22px;background:#22c55e;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
+        + '<span style="font-size:13.5px;font-weight:600;color:#15803d">' + st.label + '</span>'
+        + '</div>';
+    }
+    var isNext = !nextFound; nextFound = true;
+    var border = isNext ? '1.5px solid var(--blue)' : '1px solid var(--border)';
+    var btnStyle = isNext
+      ? 'background:var(--blue);color:#fff;border:none'
+      : 'background:#fff;color:var(--blue);border:1.5px solid var(--blue-mid)';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;background:#fff;border:' + border + ';border-radius:11px;flex-wrap:wrap">'
+      + '<span style="display:flex;align-items:center;gap:10px;min-width:0">'
+      +   '<span style="font-size:17px;line-height:1;flex-shrink:0">' + st.icon + '</span>'
+      +   '<span style="min-width:0"><span style="display:block;font-size:13.5px;font-weight:700;color:var(--text)">' + st.label + '</span>'
+      +   '<span style="display:block;font-size:11.5px;color:var(--text3);font-weight:500;margin-top:1px">' + st.sub + '</span></span>'
+      + '</span>'
+      + '<button onclick="' + st.act.replace(/"/g, '&quot;') + '" style="' + btnStyle + ';padding:8px 16px;border-radius:9px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;white-space:nowrap;min-height:38px">' + st.btn + ' →</button>'
+      + '</div>';
+  }).join('');
+}
+
+// Étape notifications : active la permission puis re-rend la checklist
+function despyChecklistPush() {
+  try {
+    if (typeof subscribePushFromClient === 'function') {
+      subscribePushFromClient();
+      // Re-vérifier après la réponse de l'utilisateur à la popup navigateur
+      setTimeout(function(){
+        var s = siteSession.get();
+        if (s && s.email && typeof loadSecurityScore === 'function') loadSecurityScore(s.email);
+      }, 4000);
+    } else {
+      switchTab('protection');
+    }
+  } catch(e) { switchTab('protection'); }
+}
+
+// Question rapide du dashboard → Conseiller pré-rempli (et envoyée)
+function askFromDashboard() {
+  var inp = document.getElementById('dash-ask-input');
+  var q = (inp && inp.value || '').trim();
+  showPage('home');
+  setTimeout(function(){
+    scrollToSection('conseiller-ia');
+    var ci = document.getElementById('chat-input');
+    if (ci) {
+      ci.value = q;
+      if (q && typeof sendChat === 'function') { sendChat(); }
+      else { ci.focus(); }
+    }
+    if (inp) inp.value = '';
+  }, 350);
 }
 
 // ── Défi Chrono — connecté à l'API ──
