@@ -567,6 +567,23 @@ body{ background:var(--p-paper); }
 .cons-bar textarea:focus{ border-color:#b9c6e4; }
 .cons-send{ width:50px; height:48px; flex:none; border:0; border-radius:14px; background:var(--p-blue); color:#fff; font-size:19px; cursor:pointer; }
 
+
+/* ── écran compte gratuit ── */
+.ph-free{ display:none; align-items:center; gap:5px; margin-top:10px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); color:#cfd8e6; font-size:11.5px; font-weight:700; border-radius:99px; padding:4px 12px; }
+.upsell{ background:linear-gradient(120deg,#1b3e73,#2d5bff); color:#fff; border-radius:18px; padding:18px; box-shadow:0 12px 28px rgba(45,91,255,.3); }
+.upsell .a{ font-size:16.5px; font-weight:800; letter-spacing:-.01em; }
+.upsell .b{ font-size:12.5px; color:#d5e0ff; margin-top:4px; line-height:1.5; }
+.upsell .u-btn{ margin-top:13px; width:100%; background:#fff; color:#1E3FD0; border:0; font-family:inherit; font-weight:800; font-size:14.5px; border-radius:12px; padding:13px; cursor:pointer; }
+.locklist{ overflow:hidden; }
+.lockrow{ display:flex; align-items:center; gap:13px; padding:13px 16px; border-top:1px solid var(--p-line); width:100%; text-align:left; background:none; border-left:0; border-right:0; border-bottom:0; font-family:inherit; cursor:pointer; }
+.lockrow:first-child{ border-top:0; }
+.lockrow .ic{ width:38px; height:38px; border-radius:11px; background:#EFF1F6; display:flex; align-items:center; justify-content:center; flex:none; font-size:18px; filter:grayscale(.3); }
+.lockrow .m{ flex:1; min-width:0; }
+.lockrow .m .a{ display:block; font-size:14px; font-weight:800; color:#8892a5; }
+.lockrow .m .b{ display:block; }
+.lockrow .m .b{ font-size:11.5px; color:#aab2c2; margin-top:2px; }
+.lockrow .unlock{ font-size:11px; font-weight:800; color:#fff; background:var(--p-gold); border-radius:99px; padding:6px 11px; white-space:nowrap; flex:none; }
+
 </style>
 </head>
 <body>
@@ -634,6 +651,7 @@ body{ background:var(--p-paper); }
       </div>
       <div class="ph-hello"><span id="home-greeting">Bonjour</span><b id="home-firstname">!</b></div>
       <span class="ph-plan" id="home-plan">★ <span id="home-plan-label">Abonné Premium</span></span>
+      <span class="ph-free" id="home-free" style="display:none">Compte gratuit</span>
     </header>
 
     <div class="pbody">
@@ -652,6 +670,11 @@ body{ background:var(--p-paper); }
         <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
         <span class="sos-btn">Appeler</span>
       </button>
+      <div class="upsell" id="home-upsell" style="display:none">
+        <div class="a">Passez à la protection complète</div>
+        <div class="b">Ligne SOS humaine, conseiller illimité, surveillance en continu, votre livret offert… dès 9,99 €/mois, sans engagement.</div>
+        <button class="u-btn" onclick="openPaywall()">Découvrir l'abonnement →</button>
+      </div>
 
       <button class="card next" id="home-push" style="display:none;width:100%" onclick="requestPush()">
         <span class="k">🔔</span>
@@ -686,6 +709,16 @@ body{ background:var(--p-paper); }
           <div><div class="n" id="stat-fuites" style="color:var(--p-safe)">0</div><div class="k">fuite détectée</div></div>
           <div><div class="n" id="stat-sites" style="color:var(--p-blue)">—</div><div class="k">sites surveillés</div></div>
           <div><div class="n" id="stat-questions" style="color:var(--p-blue)">0</div><div class="k">questions posées</div></div>
+        </div>
+      </div>
+
+      <div id="home-locked" style="display:none">
+        <div class="sec">Avec l'abonnement</div>
+        <div class="plist locklist">
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">📞</span><span class="m"><span class="a">Ligne SOS humaine</span><span class="b">Un vrai conseiller au téléphone</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">🛡️</span><span class="m"><span class="a">Surveillance en continu</span><span class="b">Fuites &amp; appareils infectés, 24 h/24</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">🧹</span><span class="m"><span class="a">Nettoyage de mes données</span><span class="b">Effacer mes traces sur internet</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">📘</span><span class="m"><span class="a">Le livret de formation</span><span class="b">135 pages · offert avec l'annuel</span></span><span class="unlock">🔒 Débloquer</span></button>
         </div>
       </div>
 
@@ -1950,6 +1983,21 @@ function refreshPushCard() {
   el.style.display = ok ? 'none' : 'flex';
 }
 
+
+// Bascule l'accueil entre variante abonné et variante « compte gratuit ».
+function renderAccountState() {
+  var sub = !!(session.get() || {}).subscribed;
+  var show = function (id, on, disp) { var e = document.getElementById(id); if (e) e.style.display = on ? (disp || 'block') : 'none'; };
+  show('home-free', !sub, 'inline-flex');
+  show('home-upsell', !sub);
+  show('home-locked', !sub);
+  // Le badge Premium ne s'affiche que pour un abonné (déjà géré par refreshPlanBadge).
+  // Cadre orange « protection incomplète » pour un compte gratuit.
+  var ey = document.getElementById('home-score-ey');
+  if (ey && !sub) { ey.textContent = '⚠ Protection incomplète'; ey.style.color = '#D97706'; }
+  else if (ey) { ey.style.color = ''; }
+}
+
 function refreshHomeScore() {
   var ringEl = document.getElementById('home-score-ring');
   if (!ringEl) return;
@@ -1960,6 +2008,7 @@ function refreshHomeScore() {
 
   ringEl.innerHTML = heroPlaceholderRing();
   refreshPlanBadge();
+  renderAccountState();
   refreshFormationCard();
   refreshPushCard();
   if (!s.email) return;
@@ -1976,6 +2025,7 @@ function refreshHomeScore() {
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
       renderProtection(d.checklist);
       renderHomeStats(d.stats);
+      renderAccountState();  // réapplique le cadre « gratuit » après la donnée
     } else {
       ringEl.innerHTML = heroPlaceholderRing();
       if (titleEl) titleEl.textContent = 'Construire mon score';
