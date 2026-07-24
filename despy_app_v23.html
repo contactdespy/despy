@@ -1249,14 +1249,23 @@ async function runAnnuaire() {
       body: JSON.stringify({ phone: phone })
     });
     var data = await r.json();
-    var reports = data.reports || data.count || 0;
-    var cls = reports >= 3 ? 'scam' : reports >= 1 ? 'doubt' : 'safe';
-    var label = reports >= 3 ? '⚠️ NUMÉRO SIGNALÉ' : reports >= 1 ? '🤔 PEU DE SIGNALEMENTS' : '✅ AUCUN SIGNALEMENT';
+    // Le serveur renvoie « total » et « verdict ». L'appli lisait reports/count,
+    // deux champs qui n'existent pas : le compteur valait donc TOUJOURS 0 et
+    // un numéro signalé 50 fois s'affichait « aucun signalement ».
+    var reports = (typeof data.total === 'number') ? data.total : (data.reports || data.count || 0);
+    var vp = (data.verdict || '').toLowerCase();
+    var cls = (vp === 'scam' || reports >= 5) ? 'scam' : (vp === 'suspicious' || reports >= 1) ? 'doubt' : 'safe';
+    var label = cls === 'scam' ? '⚠️ NUMÉRO SIGNALÉ' : cls === 'doubt' ? '🤔 PRUDENCE' : '✅ AUCUN SIGNALEMENT';
     var desc = reports >= 1 ? reports + ' signalement' + (reports > 1 ? 's' : '') + ' de la communauté' : 'Ce numéro n\'a pas été signalé comme suspect';
     document.getElementById('ann-result').innerHTML =
       '<div class="result-card">' +
         '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + desc + '</div></div>' +
-        (data.categories ? '<div style="font-size:14px;margin-top:4px"><strong>Catégories :</strong> ' + (Array.isArray(data.categories) ? data.categories.join(', ') : data.categories) + '</div>' : '') +
+        // categories est une liste d'objets {key,label,count} : un join() brut
+        // affichait « [object Object] ».
+        (data.categories && data.categories.length ? '<div style="font-size:14px;margin-top:4px"><strong>Motifs signalés :</strong> ' +
+          (Array.isArray(data.categories)
+            ? data.categories.map(function (c) { return typeof c === 'string' ? c : (c.label || c.key) + (c.count > 1 ? ' (' + c.count + ')' : ''); }).join(', ')
+            : data.categories) + '</div>' : '') +
         '<button class="btn-secondary" style="margin-top:12px" onclick="openPhoneReport()">Signaler ce numéro</button>' +
       '</div>';
   } catch(e) {
@@ -1289,13 +1298,36 @@ async function runSiteCheck() {
       document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (data.error || 'Erreur') + '</div>';
       return;
     }
+    // Le serveur renvoie verdict ∈ {safe, caution, dangerous}. L'appli ne
+    // testait que scam/high/doubt/medium : « dangerous » et « caution »
+    // retombaient donc dans le cas par défaut et un site DANGEREUX
+    // s'affichait « ✅ SITE FIABLE ». Le pire résultat possible pour cet outil.
     var vv = (data.verdict || data.risk || '').toLowerCase();
-    var cls = (vv.indexOf('scam') !== -1 || vv === 'high') ? 'scam' : (vv === 'doubt' || vv === 'medium') ? 'doubt' : 'safe';
-    var label = cls === 'scam' ? '⚠️ SITE SUSPECT' : cls === 'doubt' ? '🤔 PRUDENCE' : '✅ SITE FIABLE';
+    var cls = (vv === 'dangerous' || vv === 'scam' || vv === 'high') ? 'scam'
+            : (vv === 'caution' || vv === 'doubt' || vv === 'medium' || vv === 'suspicious') ? 'doubt'
+            : (vv === 'safe' || vv === 'low') ? 'safe'
+            : 'doubt';   // verdict inconnu : on ne rassure jamais par défaut
+    var label = cls === 'scam' ? '⚠️ SITE DANGEREUX' : cls === 'doubt' ? '🤔 PRUDENCE' : '✅ SITE FIABLE';
     document.getElementById('site-result').innerHTML =
       '<div class="result-card">' +
-        '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + (data.summary || '') + '</div></div>' +
-        (data.age ? '<div style="font-size:14px;margin-top:4px"><strong>Ancienneté :</strong> ' + data.age + '</div>' : '') +
+        // summary / age n'ont jamais existé : la description était donc TOUJOURS
+        // vide. Les vrais champs sont recommendation, signals, domain_age_days.
+        '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + escapeHtmlA(data.recommendation || data.summary || '') + '</div></div>' +
+        (Array.isArray(data.signals) && data.signals.length
+          ? '<div style="margin-top:10px">' + data.signals.slice(0, 5).map(function (sg) {
+              var c = sg.level === 'danger' ? '#C62828' : sg.level === 'warning' ? '#A16207' : '#15803D';
+              return '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:7px">' +
+                '<span style="color:' + c + ';font-weight:800;flex:none">•</span>' +
+                '<span style="font-size:14px;line-height:1.45;color:var(--text2)">' + escapeHtmlA(sg.text || '') + '</span></div>';
+            }).join('') + '</div>'
+          : '') +
+        (typeof data.domain_age_days === 'number'
+          ? '<div style="font-size:14px;margin-top:6px;color:var(--text2)"><strong>Ancienneté du site :</strong> ' +
+            (data.domain_age_days < 90
+              ? '<span style="color:#C62828;font-weight:700">' + data.domain_age_days + ' jours seulement</span> — les sites frauduleux sont presque toujours récents.'
+              : data.domain_age_days < 400 ? Math.round(data.domain_age_days / 30) + ' mois'
+              : Math.floor(data.domain_age_days / 365) + ' ans') + '</div>'
+          : '') +
       '</div>';
   } catch(e) {
     document.getElementById('site-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
