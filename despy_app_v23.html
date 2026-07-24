@@ -372,6 +372,158 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
 .img-thumb { position: relative; display: inline-block; margin-top: 12px; }
 .img-thumb img { max-width: 140px; max-height: 140px; border-radius: 12px; border: 1px solid var(--border); display: block; }
 .img-thumb button { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%; background: #1C1C1E; color: #fff; font-size: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+
+/* ════════════════════════════════════════════════════
+   DESIGN ULTRA PREMIUM — repris du prototype de référence
+   (en-tête bleu nuit, carte de score, SOS, tuiles, barre à
+   bouton central). Cohabite avec les styles existants.
+   ════════════════════════════════════════════════════ */
+:root{
+  --p-navy-1:#164a86; --p-navy-2:#0e2c54; --p-navy-3:#091c38;
+  --p-paper:#EEF1F7; --p-card:#fff; --p-line:#E7EBF3; --p-soft:#F4F6FB;
+  --p-ink:#152238; --p-muted:#5C6B84;
+  --p-blue:#2D5BFF; --p-cyan:#5BD6F5; --p-safe:#159B6B; --p-safe-soft:#E6F6EF;
+  --p-amber:#D97706; --p-amber-soft:#FEF3E2; --p-sos:#E5484D; --p-gold:#C9A24B;
+}
+body{ background:var(--p-paper); }
+*{ -webkit-tap-highlight-color:transparent; }
+
+/* ── fluidité : chaque surface tactile répond ── */
+.pheader,.hero-card,.sos-card,.qa-card,.tile,.listrow,.nav-btn,.nav-sos{
+  transition:transform .16s cubic-bezier(.2,.7,.3,1), box-shadow .16s ease, background .16s ease;
+}
+.hero-card:active,.sos-card:active,.qa-card:active,.tile:active,.listrow:active{ transform:scale(.978); }
+.nav-sos:active{ transform:scale(.92); }
+.tab-pane{ animation:pfade .32s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes pfade{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none;} }
+@media (prefers-reduced-motion:reduce){
+  .tab-pane{ animation:none; }
+  .hero-card:active,.sos-card:active,.qa-card:active,.tile:active,.listrow:active{ transform:none; }
+  .ring-arc{ transition:none !important; }
+}
+
+/* ── en-tête ── */
+.pheader{
+  background:radial-gradient(130% 130% at 18% -20%,var(--p-navy-1) 0%,var(--p-navy-2) 46%,var(--p-navy-3) 100%);
+  color:#fff; padding:calc(var(--safe-top) + 20px) 20px 46px; position:relative;
+}
+.ph-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.ph-logo{ height:24px; width:auto; display:block; }
+.ph-avatar{
+  width:38px; height:38px; border-radius:50%; border:0; flex:none; cursor:pointer;
+  background:linear-gradient(135deg,var(--p-blue),var(--p-cyan)); color:#fff;
+  font-family:inherit; font-weight:800; font-size:15px;
+  box-shadow:0 0 0 2px rgba(255,255,255,.25);
+}
+.ph-hello{ margin-top:15px; font-size:15px; color:#9FB6D8; font-weight:500; }
+.ph-hello b{ color:#fff; font-weight:800; font-size:23px; display:block; margin-top:2px; letter-spacing:-.01em; }
+.ph-plan{
+  display:none; align-items:center; gap:5px; margin-top:10px;
+  background:rgba(201,162,75,.16); border:1px solid rgba(201,162,75,.5); color:#F2D89B;
+  font-size:11.5px; font-weight:800; border-radius:99px; padding:4px 12px;
+}
+.ph-plan.on{ display:inline-flex; }
+
+/* ── corps ── */
+.pbody{ padding:0 16px 22px; display:flex; flex-direction:column; gap:14px; }
+.sec{ font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--p-muted); margin:6px 2px -4px; }
+.card{ background:var(--p-card); border-radius:18px; box-shadow:0 6px 20px rgba(12,25,55,.07); border:0; }
+.pad{ padding:17px 18px; }
+
+/* ── score : la carte chevauche l'en-tête ── */
+.hero-card{
+  margin-top:-34px; display:flex; gap:16px; align-items:center; padding:19px;
+  width:100%; text-align:left; font-family:inherit; cursor:pointer; position:relative; z-index:2;
+}
+.ring{ width:96px; height:96px; flex:none; position:relative; display:flex; align-items:center; justify-content:center; }
+.ring-arc{ transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.3,1); }
+.hero-txt{ min-width:0; }
+.hero-ey{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--p-safe); }
+.hero-txt h2{ font-size:17.5px; margin:4px 0; letter-spacing:-.01em; color:var(--p-ink); font-weight:800; }
+.hero-txt p{ margin:0; font-size:12.5px; color:var(--p-muted); line-height:1.45; }
+
+/* ── SOS ── */
+.sos-card{
+  background:linear-gradient(120deg,#7a1114,#c0322f); color:#fff; border:0; border-radius:18px;
+  padding:17px 18px; display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  font-family:inherit; cursor:pointer; box-shadow:0 10px 26px rgba(197,50,47,.30);
+}
+.sos-ic{ width:44px; height:44px; border-radius:13px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; flex:none; }
+.sos-card .a{ font-size:15.5px; font-weight:800; }
+.sos-card .b{ font-size:12px; color:#FFDCD9; margin-top:2px; line-height:1.35; }
+.sos-btn{ background:#fff; color:#c0322f; font-weight:800; font-size:14px; border-radius:12px; padding:11px 15px; white-space:nowrap; margin-left:auto; flex:none; }
+
+/* ── action rapide ── */
+.qa-card{ display:flex; align-items:center; gap:13px; padding:15px 16px; width:100%; text-align:left; font-family:inherit; cursor:pointer; }
+.qa-ic{ width:42px; height:42px; border-radius:12px; background:#EEF2FF; color:var(--p-blue); display:flex; align-items:center; justify-content:center; flex:none; }
+.qa-card .a{ font-size:15px; font-weight:800; color:var(--p-ink); }
+.qa-card .b{ font-size:12.5px; color:var(--p-muted); margin-top:2px; line-height:1.4; }
+
+/* ── progression protection ── */
+.prot-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:11px; }
+.prot-top .t{ font-size:15px; font-weight:800; letter-spacing:-.01em; color:var(--p-ink); }
+.pill{ font-size:12px; font-weight:800; border-radius:99px; padding:4px 11px; }
+.pill-blue{ color:var(--p-blue); background:#EEF2FF; }
+.pill-green{ color:var(--p-safe); background:var(--p-safe-soft); }
+.pbar{ height:9px; background:#EBEEF5; border-radius:99px; overflow:hidden; }
+.pbar>i{ display:block; height:100%; width:0; border-radius:99px; background:linear-gradient(90deg,var(--p-blue),var(--p-safe)); transition:width .9s cubic-bezier(.2,.7,.3,1); }
+.next{ margin-top:13px; display:flex; align-items:center; gap:11px; background:var(--p-soft); border:1px solid var(--p-line); border-radius:12px; padding:11px 12px; width:100%; text-align:left; font-family:inherit; cursor:pointer; }
+.next .k{ width:34px; height:34px; border-radius:10px; background:#fff; border:1px solid var(--p-line); display:flex; align-items:center; justify-content:center; flex:none; font-size:16px; }
+.next .m{ flex:1; min-width:0; } .next .m .a{ font-size:13px; font-weight:800; color:var(--p-ink); } .next .m .b{ font-size:11px; color:var(--p-muted); margin-top:1px; }
+.next .go{ background:var(--p-blue); color:#fff; font-weight:800; font-size:12.5px; border-radius:10px; padding:9px 13px; white-space:nowrap; flex:none; }
+
+/* ── tuiles ── */
+.tiles{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.tile{ background:var(--p-card); border:0; border-radius:16px; padding:14px; box-shadow:0 6px 18px rgba(12,25,55,.06); text-align:left; font-family:inherit; cursor:pointer; }
+.tile .ic{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; margin-bottom:9px; }
+.tile .t{ font-size:13.5px; font-weight:800; letter-spacing:-.01em; color:var(--p-ink); }
+.tile .s{ font-size:11px; color:var(--p-muted); margin-top:3px; line-height:1.35; }
+.ic-blue{ background:#EEF2FF; color:var(--p-blue); } .ic-green{ background:var(--p-safe-soft); color:var(--p-safe); }
+.ic-cyan{ background:#E4F7FC; color:#0E7E9C; } .ic-gold{ background:#FBF3E0; color:#B4892E; }
+.ic-red{ background:#FDECEC; color:var(--p-sos); } .ic-violet{ background:#F1EDFE; color:#6D45D9; }
+
+/* ── lignes de liste ── */
+.plist{ background:var(--p-card); border-radius:18px; box-shadow:0 6px 20px rgba(12,25,55,.07); overflow:hidden; }
+.listrow{ display:flex; align-items:center; gap:13px; padding:13px 16px; border-top:1px solid var(--p-line); width:100%; text-align:left; background:none; border-left:0; border-right:0; border-bottom:0; font-family:inherit; cursor:pointer; }
+.listrow:first-child{ border-top:0; }
+.listrow .ic{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none; }
+.listrow .m{ flex:1; min-width:0; }
+.listrow .m .a{ font-size:14px; font-weight:800; color:var(--p-ink); }
+.listrow .m .b{ font-size:11.5px; color:var(--p-muted); margin-top:2px; line-height:1.35; }
+.listrow .chev{ color:#C4CDDD; flex:none; }
+
+/* ── barre de navigation à bouton central ── */
+.nav-sos{
+  width:52px; height:52px; margin-top:-22px; border-radius:50%; border:3px solid #fff; flex:none;
+  background:var(--p-sos); color:#fff; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 18px rgba(229,72,77,.45); cursor:pointer;
+}
+.nav-sos-wrap{ display:flex; flex-direction:column; align-items:center; gap:3px; flex:1; }
+.nav-sos-wrap span{ font-size:10px; font-weight:800; color:var(--p-sos); }
+
+
+/* ── correctifs de mise en page premium ── */
+/* Les libellés sont des <span> : sans display:block ils s'enchaînent sur la
+   même ligne au lieu de s'empiler (titre puis sous-titre). */
+.sos-card .a,.sos-card .b,.qa-card .a,.qa-card .b,
+.tile .t,.tile .s,
+.listrow .m .a,.listrow .m .b,
+.next .m .a,.next .m .b{ display:block; }
+.sos-card > span:nth-child(2){ flex:1; min-width:0; }
+.tile .ic{ display:flex; }
+
+/* La barre du bas était en 3 colonnes : le bouton SOS la faisait passer à la ligne. */
+.bottom-nav{ grid-template-columns:repeat(4,1fr); align-items:end; }
+.nav-sos-wrap{ padding:0 0 9px; cursor:pointer; }
+
+
+/* ── finitions ── */
+/* Le bouton « Appeler » comprimait le titre : « ? » tombait seul à la ligne. */
+.sos-card .a{ font-size:15px; line-height:1.3; }
+.sos-btn{ padding:10px 14px; font-size:13.5px; }
+/* La barre du bas masquait la dernière ligne de la page. */
+.pbody{ padding-bottom:calc(var(--nav-h,84px) + 16px); }
+
 </style>
 </head>
 <body>
@@ -432,134 +584,139 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
 
   <!-- TAB : ACCUEIL -->
   <div id="tab-home" class="tab-pane active">
-    <div class="app-header">
-      <div>
-        <div class="app-greeting" id="home-greeting">Bonjour</div>
-        <div class="app-title" id="home-firstname">!</div>
-      </div>
-      <button class="header-avatar" id="home-avatar" onclick="switchAppTab('profile')">?</button>
-    </div>
 
-    <button class="hero" onclick="openTool('score')">
-      <div class="hero-left">
-        <div class="hero-label">Votre protection</div>
-        <div class="hero-title" id="home-score-title">Voir mon score sécurité</div>
-        <span class="hero-btn">Consulter
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    <header class="pheader">
+      <div class="ph-row">
+        <img class="ph-logo" src="/assets/logo-despy-nav-h.png?v=3" alt="Despy">
+        <button class="ph-avatar" id="home-avatar" onclick="switchAppTab('profile')" aria-label="Mon compte">?</button>
+      </div>
+      <div class="ph-hello"><span id="home-greeting">Bonjour</span><b id="home-firstname">!</b></div>
+      <span class="ph-plan" id="home-plan">★ <span id="home-plan-label">Abonné Premium</span></span>
+    </header>
+
+    <div class="pbody">
+
+      <button class="card hero-card" onclick="openTool('score')">
+        <div class="ring" id="home-score-ring"></div>
+        <div class="hero-txt">
+          <div class="hero-ey" id="home-score-ey">Votre protection</div>
+          <h2 id="home-score-title">Voir mon score sécurité</h2>
+          <p id="home-score-sub">Touchez pour le détail et vos conseils personnalisés.</p>
+        </div>
+      </button>
+
+      <button class="sos-card" onclick="openTool('sos')">
+        <span class="sos-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span>
+          <span class="a">Un doute, un problème ?</span>
+          <span class="b">Un vrai conseiller vous répond</span>
         </span>
-      </div>
-      <div class="hero-ring" id="home-score-ring"></div>
-    </button>
+        <span class="sos-btn">Appeler</span>
+      </button>
 
-    <button class="quick-action" onclick="openTool('analyseur')">
-      <div class="qa-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-      <div class="qa-text">
-        <div class="qa-title">Un message vous inquiète&nbsp;?</div>
-        <div class="qa-sub">SMS, email, photo ou lien → analyse en 10 sec</div>
-      </div>
-      <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
+      <button class="card qa-card" onclick="openTool('analyseur')">
+        <span class="qa-ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+        <span style="flex:1;min-width:0">
+          <span class="a">Un message vous inquiète&nbsp;?</span>
+          <span class="b">SMS, email, photo ou lien → analyse en 10 secondes</span>
+        </span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
 
-    <div class="section" id="home-onboarding-section" style="display:none">
-      <div class="section-label">Premiers pas</div>
-      <div style="margin:0 16px 10px;font-size:14px;color:var(--text3);line-height:1.4">Bienvenue chez Despy ! Voici par où commencer pour vous protéger :</div>
-      <div class="list-group">
-        <button class="list-row" onclick="openTool('analyseur')">
-          <div class="row-icon-lg" style="background:rgba(45,91,255,.12);font-size:19px">🔍</div>
-          <div class="row-text"><div class="row-title">Analyser un message suspect</div><div class="row-desc">SMS, email ou lien douteux → réponse en 10 sec</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="list-row" onclick="openTool('darkweb')">
-          <div class="row-icon-lg" style="background:rgba(14,165,164,.14);font-size:19px">🛡️</div>
-          <div class="row-text"><div class="row-title">Vérifier si mon email a fuité</div><div class="row-desc">Contrôle dark web gratuit</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="list-row" onclick="openTool('diag')">
-          <div class="row-icon-lg" style="background:rgba(88,86,214,.14);font-size:19px">📱</div>
-          <div class="row-text"><div class="row-title">Diagnostiquer mon téléphone</div><div class="row-desc">11 questions · score de risque · nettoyage</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="list-row" onclick="openTool('quiz')">
-          <div class="row-icon-lg" style="background:rgba(175,82,222,.14);font-size:19px">🎓</div>
-          <div class="row-text"><div class="row-title">Tester mes réflexes</div><div class="row-desc">Quiz anti-arnaque, en 2 minutes</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <div class="card pad" id="home-prot" style="display:none">
+        <div class="prot-top">
+          <span class="t">Votre protection</span>
+          <span class="pill pill-blue" id="home-prot-count">0 / 6 activées</span>
+        </div>
+        <div class="pbar"><i id="home-prot-bar"></i></div>
+        <button class="next" id="home-prot-next" style="display:none">
+          <span class="k" id="home-prot-icon">🛡️</span>
+          <span class="m"><span class="a" id="home-prot-title"></span><span class="b" id="home-prot-desc"></span></span>
+          <span class="go">Activer</span>
         </button>
       </div>
-    </div>
 
-    <div class="section" id="home-activity-section" style="display:none">
-      <div class="section-label">Activité récente</div>
-      <div class="list-group" id="home-activity-list"></div>
-    </div>
+      <div id="home-onboarding-section" style="display:none">
+        <div class="sec">Premiers pas</div>
+        <div class="plist">
+          <button class="listrow" onclick="openTool('darkweb')">
+            <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
+            <span class="m"><span class="a">Vérifier si mon email a fuité</span><span class="b">Le contrôle le plus utile pour commencer</span></span>
+            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="listrow" onclick="openTool('diag')">
+            <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+            <span class="m"><span class="a">Diagnostiquer mon téléphone</span><span class="b">3 minutes, sans rien installer</span></span>
+            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          <button class="listrow" onclick="openTool('quiz')">
+            <span class="ic ic-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
+            <span class="m"><span class="a">Tester mes réflexes</span><span class="b">Quiz découverte</span></span>
+            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
 
-    <div class="section">
-      <div class="section-label">Outils du quotidien</div>
-      <div class="tile-grid">
+      <div id="home-activity-section" style="display:none">
+        <div class="sec">Activité récente</div>
+        <div class="plist" id="home-activity-list"></div>
+      </div>
+
+      <div class="sec">Outils du quotidien</div>
+      <div class="tiles">
         <button class="tile" onclick="openTool('entrainement')">
-          <div class="tile-icon" style="background:rgba(45,91,255,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg></div>
-          <div class="tile-title">Entraînement</div>
-          <div class="tile-sub">Testez-vous face à une fausse arnaque</div>
+          <span class="ic ic-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
+          <span class="t">Entraînement</span><span class="s">Testez-vous face à une fausse arnaque</span>
         </button>
         <button class="tile" onclick="openTool('annuaire')">
-          <div class="tile-icon" style="background:rgba(52,199,89,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
-          <div class="tile-title">Qui m'appelle ?</div>
-          <div class="tile-sub">Vérifier un numéro inconnu</div>
+          <span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
+          <span class="t">Qui m'appelle&nbsp;?</span><span class="s">Vérifier un numéro inconnu</span>
         </button>
         <button class="tile" onclick="openTool('site')">
-          <div class="tile-icon" style="background:rgba(255,149,0,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9500" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
-          <div class="tile-title">Vérifier un site</div>
-          <div class="tile-sub">Avant d'acheter en ligne</div>
+          <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span>
+          <span class="t">Vérifier un site</span><span class="s">Avant d'acheter, on contrôle</span>
         </button>
         <button class="tile" onclick="openTool('conseiller')">
-          <div class="tile-icon" style="background:rgba(175,82,222,.14)"><svg viewBox="0 0 24 24" fill="none" stroke="#AF52DE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-          <div class="tile-title">Conseiller IA</div>
-          <div class="tile-sub">Posez votre question</div>
+          <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.4-9 8.5 8.5 0 0 1 8.6 8.3z"/></svg></span>
+          <span class="t">Conseiller</span><span class="s">Posez votre question, on répond</span>
         </button>
         <button class="tile" onclick="openTool('darkweb')">
-          <div class="tile-icon" style="background:rgba(28,28,30,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="tile-title">Email piraté ?</div>
-          <div class="tile-sub">Vérification dark web</div>
+          <span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
+          <span class="t">Email piraté&nbsp;?</span><span class="s">Surveillance des fuites</span>
+        </button>
+        <button class="tile" onclick="openModule()">
+          <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+          <span class="t">Module du moment</span><span class="s">Le faux SMS de colis · 6 min</span>
         </button>
       </div>
-    </div>
 
-    <div class="section">
-      <div class="section-label">Protection</div>
-      <div class="list-group">
-        <button class="list-row" onclick="openTool('signaler')">
-          <div class="row-icon-lg" style="background:#FF2D55"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
-          <div class="row-text"><div class="row-title">Signaler un numéro</div><div class="row-desc">Aidez la communauté Despy</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <div class="sec">Protection</div>
+      <div class="plist">
+        <button class="listrow" onclick="openTool('signaler')">
+          <span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg></span>
+          <span class="m"><span class="a">Signaler un numéro</span><span class="b">Protégez les autres membres</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="list-row" onclick="openTool('alertes')">
-          <div class="row-icon-lg" style="background:#FF3B30"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-          <div class="row-text"><div class="row-title">Alertes nationales</div><div class="row-desc">Notifications arnaques en cours</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="listrow" onclick="openTool('alertes')">
+          <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+          <span class="m"><span class="a">Alertes nationales</span><span class="b">Les arnaques qui circulent en ce moment</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="list-row" onclick="openTool('diag')">
-          <div class="row-icon-lg" style="background:#0EA5A4"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M9 6h6"/></svg></div>
-          <div class="row-text"><div class="row-title">Diagnostic du téléphone</div><div class="row-desc">11 questions · score de risque · nettoyage</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="listrow" onclick="openTool('diag')">
+          <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+          <span class="m"><span class="a">Diagnostic du téléphone</span><span class="b">Vérifier les réglages de sécurité</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="list-row" onclick="openTool('privacy')">
-          <div class="row-icon-lg" style="background:#5856D6"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-          <div class="row-text"><div class="row-title">Effacer mes données</div><div class="row-desc">Privacy Cleanup · Premium</div></div>
-          <svg class="row-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <button class="listrow" onclick="openTool('privacy')">
+          <span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>
+          <span class="m"><span class="a">Effacer mes données</span><span class="b">Demandes RGPD envoyées pour vous</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
-    </div>
 
-    <div class="section">
-      <div class="section-label">En cas d'urgence</div>
-      <button class="sos-card" onclick="openTool('sos')">
-        <div class="sos-ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div>
-        <div class="row-text"><div class="row-title">J'ai été arnaqué(e)</div><div class="row-desc">Plan d'action immédiat, étape par étape</div></div>
-        <svg class="row-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
     </div>
   </div>
 
-  <!-- TAB : APPRENDRE -->
   <div id="tab-learn" class="tab-pane">
     <div class="app-header">
       <div>
@@ -703,6 +860,12 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       <span>Apprendre</span>
     </button>
+    <div class="nav-sos-wrap" onclick="openTool('sos')">
+      <div class="nav-sos" aria-label="SOS — parler à un humain">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg>
+      </div>
+      <span>SOS</span>
+    </div>
     <button class="nav-btn" data-tab="profile" onclick="switchAppTab('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Moi</span>
@@ -1739,51 +1902,109 @@ function shareRef(code) {
 // ─── SCORE SÉCURITÉ ───
 // ─── Anneau de score sur l'accueil (réel, branché sur security-score) ───
 function heroScoreRing(score, color) {
+  // L'anneau vit désormais sur une carte blanche : chiffre sombre, piste claire,
+  // arc dégradé bleu → vert. L'ancien dessin (texte blanc) y était invisible.
   score = Math.max(0, Math.min(100, Math.round(score || 0)));
-  color = color || '#5BE3F5';
-  var c = 2 * Math.PI * 50;
-  var off = c * (1 - score / 100);
-  return '<svg width="86" height="86" viewBox="0 0 120 120">' +
-    '<circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>' +
-    '<circle cx="60" cy="60" r="50" fill="none" stroke="' + color + '" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .6s ease"/>' +
-    '<text x="60" y="60" text-anchor="middle" dominant-baseline="central" font-size="34" font-weight="800" fill="#fff">' + score + '</text>' +
+  var c = 2 * Math.PI * 52, off = c * (1 - score / 100);
+  return '<svg width="96" height="96" viewBox="0 0 120 120">' +
+    '<defs><linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="#2D5BFF"/><stop offset="1" stop-color="#159B6B"/></linearGradient></defs>' +
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="#EBEEF5" stroke-width="11"/>' +
+    '<circle class="ring-arc" cx="60" cy="60" r="52" fill="none" stroke="url(#ringgrad)" stroke-width="11" ' +
+      'stroke-linecap="round" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" ' +
+      'transform="rotate(-90 60 60)"/>' +
+    '<text x="60" y="55" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="800" ' +
+      'fill="#152238" font-family="inherit">' + score + '</text>' +
+    '<text x="60" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="#5C6B84" font-family="inherit">/ 100</text>' +
     '</svg>';
 }
 
-// État « pas encore de score » : anneau neutre avec bouclier (pas de chiffre factice).
 function heroPlaceholderRing() {
-  return '<svg width="86" height="86" viewBox="0 0 120 120">' +
-    '<circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="12"/>' +
-    '<svg x="42" y="42" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
+  return '<svg width="96" height="96" viewBox="0 0 120 120">' +
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="#EBEEF5" stroke-width="11"/>' +
+    '<svg x="44" y="44" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9AA6BD" stroke-width="2" ' +
+      'stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>' +
     '</svg>';
+}
+
+// Badge doré « Abonné Premium » dans l'en-tête.
+function refreshPlanBadge() {
+  var el = document.getElementById('home-plan'), lab = document.getElementById('home-plan-label');
+  if (!el) return;
+  var s = session.get() || {};
+  if (!s.subscribed) { el.classList.remove('on'); return; }
+  var noms = { monthly: 'Abonné Premium', annual: 'Premium annuel',
+               family_monthly: 'Premium Famille', family_annual: 'Premium Famille' };
+  if (lab) lab.textContent = noms[s.plan] || 'Abonné Premium';
+  el.classList.add('on');
+}
+
+// Progression « Votre protection » — 6 gestes réels renvoyés par security-score.
+var PROT_ETAPES = [
+  { k: 'darkweb',    i: '🔎', t: 'Vérifier vos fuites de données', d: 'Le contrôle le plus utile', go: 'darkweb' },
+  { k: 'trusted',    i: '👥', t: 'Ajouter un proche de confiance', d: 'Prévenu si quelque chose cloche', go: 'score' },
+  { k: 'conseiller', i: '💬', t: 'Poser une question au Conseiller', d: 'Il répond en moins d\'une minute', go: 'conseiller' },
+  { k: 'formation',  i: '🎓', t: 'Faire votre premier quiz', d: 'Pour repérer les pièges', go: 'quiz' },
+  { k: 'privacy',    i: '🧹', t: 'Lancer l\'effacement de vos données', d: 'Demandes RGPD envoyées pour vous', go: 'privacy' },
+  { k: 'training',   i: '🎯', t: 'Passer un entraînement', d: 'Un faux SMS, sans danger', go: 'entrainement' }
+];
+
+function renderProtection(checklist) {
+  var carte = document.getElementById('home-prot');
+  if (!carte || !checklist) return;
+  var faits = PROT_ETAPES.filter(function (e) { return !!checklist[e.k]; }).length;
+  carte.style.display = 'block';
+  var cpt = document.getElementById('home-prot-count');
+  if (cpt) {
+    cpt.textContent = faits + ' / ' + PROT_ETAPES.length + ' activées';
+    cpt.className = 'pill ' + (faits === PROT_ETAPES.length ? 'pill-green' : 'pill-blue');
+  }
+  var barre = document.getElementById('home-prot-bar');
+  if (barre) setTimeout(function () { barre.style.width = (faits / PROT_ETAPES.length * 100) + '%'; }, 60);
+
+  var suite = PROT_ETAPES.filter(function (e) { return !checklist[e.k]; })[0];
+  var bloc = document.getElementById('home-prot-next');
+  if (!bloc) return;
+  if (!suite) { bloc.style.display = 'none'; return; }
+  bloc.style.display = 'flex';
+  document.getElementById('home-prot-icon').textContent = suite.i;
+  document.getElementById('home-prot-title').textContent = suite.t;
+  document.getElementById('home-prot-desc').textContent = suite.d;
+  bloc.onclick = function (e) { e.stopPropagation(); openTool(suite.go); };
 }
 
 function refreshHomeScore() {
   var ringEl = document.getElementById('home-score-ring');
   if (!ringEl) return;
   var titleEl = document.getElementById('home-score-title');
+  var subEl   = document.getElementById('home-score-sub');
+  var eyEl    = document.getElementById('home-score-ey');
   var s = session.get() || {};
-  // État par défaut tant qu'on n'a pas la donnée réelle.
+
   ringEl.innerHTML = heroPlaceholderRing();
+  refreshPlanBadge();
   if (!s.email) return;
+
   fetch('/.netlify/functions/security-score', {
     method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
     body: JSON.stringify({ email: s.email })
-  }).then(function(r){ return r.json(); }).then(function(d){
+  }).then(function (r) { return r.json(); }).then(function (d) {
     if (d && typeof d.score === 'number' && !d.error) {
       ringEl.innerHTML = heroScoreRing(d.score, d.color);
-      if (titleEl) titleEl.textContent = d.label ? ((d.emoji ? d.emoji + ' ' : '') + d.label) : 'Voir mon score sécurité';
+      if (titleEl) titleEl.textContent = d.label || 'Votre score de sécurité';
+      if (eyEl && d.emoji) eyEl.textContent = d.emoji + ' Votre protection';
+      if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
+      renderProtection(d.checklist);
     } else {
       ringEl.innerHTML = heroPlaceholderRing();
       if (titleEl) titleEl.textContent = 'Construire mon score';
     }
-  }).catch(function(){
+  }).catch(function () {
     ringEl.innerHTML = heroPlaceholderRing();
   });
 }
 
-// ── Fil d'activité récente (accueil) ──
 function timeAgoFr(iso) {
   var d = new Date(iso);
   if (isNaN(d.getTime())) return '';
