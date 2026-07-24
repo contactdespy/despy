@@ -630,7 +630,7 @@ body{ background:var(--p-paper); }
 <body>
 
 <!-- ═══ AUTH VIEW ═══ -->
-<div id="auth-view" class="view active">
+<div id="auth-view" class="view">
   <img src="/assets/logo-despy.png" alt="Despy" class="auth-logo" style="width:min(420px,82vw);height:auto;display:block;margin:0 auto 20px;filter:drop-shadow(0 12px 30px rgba(0,0,0,.3));image-rendering:-webkit-optimize-contrast" decoding="async" fetchpriority="high">
   <div class="despy-tagline" style="margin-top:0">Cybersécurité simple pour tous</div>
 
@@ -887,6 +887,22 @@ body{ background:var(--p-paper); }
 
 
 <!-- ═══ PAGE ABONNEMENT (plein écran) ═══ -->
+<script>
+  /* Choisit la bonne vue AVANT le premier affichage : sans ça, l'écran de
+     connexion (bleu) apparaissait une fraction de seconde avant que le JS
+     ne bascule sur l'appli pour un membre déjà connecté. Ce script est
+     synchrone (il s'exécute pendant l'analyse du HTML, avant le rendu). */
+  (function () {
+    try {
+      var s = JSON.parse(localStorage.getItem('despy_session') || 'null');
+      var id = (s && s.email) ? 'app-view' : 'auth-view';
+      document.getElementById(id).classList.add('active');
+    } catch (e) {
+      document.getElementById('auth-view').classList.add('active');
+    }
+  })();
+</script>
+
 <div id="paywall" class="paywall">
   <div class="pw-scroll">
     <div class="pw-top">
