@@ -15,8 +15,8 @@ self.addEventListener('push', function(event) {
   var title = data.title || 'Despy — Alerte cybermalveillance';
   var options = {
     body: data.body || 'Une nouvelle arnaque a été détectée en France.',
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     tag: data.tag || 'despy-alert',
     requireInteraction: false,
     data: { url: data.url || 'https://despy.fr' }
