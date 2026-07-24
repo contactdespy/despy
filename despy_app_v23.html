@@ -255,6 +255,7 @@ a { color: var(--blue); text-decoration: none; }
   position: relative; overflow: hidden;
 }
 .learn-card.alt { background: linear-gradient(135deg, #0891B2, #06B6D4); }
+.learn-card.mod { background: linear-gradient(135deg, #0B2350, #2F5BEA); }
 .learn-card-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
 .learn-card-title { font-size: 19px; font-weight: 800; margin-top: 4px; letter-spacing: -.015em; }
 .learn-card-desc { font-size: 14px; opacity: .9; margin-top: 6px; line-height: 1.45; }
@@ -579,6 +580,14 @@ select.auth-input { appearance: auto; -webkit-appearance: menulist; }
       <div class="learn-card-title">Le défi de la semaine</div>
       <div class="learn-card-desc">3 questions chronométrées. Plus vous êtes rapide et juste, plus vous gagnez de points.</div>
       <button class="learn-card-btn" onclick="openTool('defi')" style="color:#0891B2">Relever le défi
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div class="learn-card mod">
+      <div class="learn-card-label">Module 3 sur 10 · 6 min</div>
+      <div class="learn-card-title">Le faux SMS de colis</div>
+      <div class="learn-card-desc">La leçon, un vrai SMS piégé à décortiquer, puis 2 questions avec le corrigé expliqué.</div>
+      <button class="learn-card-btn" onclick="openModule()" style="color:#153A7D">Suivre le module
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
     </div>
@@ -1293,37 +1302,127 @@ async function runSiteCheck() {
   }
 }
 
+var _advHist = [];
+var _advBusy = false;
+
+// Le Conseiller met en gras les gestes à faire (**…**) : sans cette
+// conversion, les astérisques s'affichaient telles quelles.
+function advTexte(t) {
+  return escapeHtmlA(t)
+    .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function advBulle(role, texte) {
+  var z = document.getElementById('adv-msgs');
+  if (!z) return;
+  var moi = role === 'me';
+  var d = document.createElement('div');
+  d.style.cssText = 'max-width:86%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.55;' +
+    (moi ? 'align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:5px'
+         : 'align-self:flex-start;background:#fff;color:var(--text);border:1px solid var(--line,#E5E5EA);border-bottom-left-radius:5px');
+  d.innerHTML = advTexte(texte);
+  z.appendChild(d);
+  z.scrollTop = z.scrollHeight;
+}
+
+function advChips(liste) {
+  var z = document.getElementById('adv-chips');
+  if (!z) return;
+  z.innerHTML = '';
+  if (!liste || !liste.length) return;
+  liste.forEach(function (c) {
+    var texte = typeof c === 'string' ? c : c.t;
+    var action = typeof c === 'string' ? null : c.action;
+    if (!texte) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texte;
+    b.style.cssText = 'background:#EEF3FF;border:1px solid #C9D8FF;color:var(--blue);border-radius:20px;padding:9px 14px;font-size:14px;font-weight:700;font-family:inherit;text-align:left;cursor:pointer';
+    b.onclick = function () {
+      z.innerHTML = '';
+      // « Ouvrir le SOS » : seul chemin qui déclenche un vrai rappel humain.
+      if (action === 'sos') { closeSheet(); setTimeout(openSOS, 300); return; }
+      document.getElementById('adv-input').value = texte;
+      runConseiller();
+    };
+    z.appendChild(b);
+  });
+}
+
 function openConseiller() {
-  openSheet('Conseiller IA',
-    '<p class="sheet-help">Posez n\'importe quelle question sur la cybersécurité, les arnaques, les mots de passe…</p>' +
-    '<textarea id="adv-input" class="sheet-textarea" placeholder="Ex : Comment savoir si mon compte Gmail est sécurisé ?"></textarea>' +
-    '<button class="btn-primary" onclick="runConseiller()" style="margin-top:14px">Envoyer ma question</button>' +
-    '<div id="adv-result"></div>'
+  var s = session.get() || {};
+  var prenom = (s.name || '').split(' ')[0];
+  openSheet('Conseiller Despy',
+    '<div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#16A34A;margin:-6px 0 12px">' +
+      '<span style="width:8px;height:8px;border-radius:50%;background:#16A34A"></span>En ligne · répond en moins d\'une minute</div>' +
+    '<div id="adv-msgs" style="display:flex;flex-direction:column;gap:9px;max-height:46vh;overflow-y:auto;padding:4px 2px"></div>' +
+    '<div id="adv-typing" style="display:none;align-self:flex-start;font-size:14px;color:var(--text3);padding:6px 2px">Le conseiller écrit…</div>' +
+    '<div id="adv-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"></div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">' +
+      '<textarea id="adv-input" class="sheet-textarea" rows="1" placeholder="Écrivez votre question…" style="flex:1;min-height:48px"></textarea>' +
+      '<button class="btn-primary" onclick="runConseiller()" style="width:52px;height:48px;padding:0;font-size:19px;flex:none">&#10148;</button>' +
+    '</div>' +
+    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Un conseiller humain prend le relais si besoin.</div>'
   );
-  setTimeout(function(){ var el = document.getElementById('adv-input'); if (el) el.focus(); }, 350);
+  _advHist = [];
+  setTimeout(function () {
+    advBulle('them', 'Bonjour' + (prenom ? ' ' + prenom : '') + ' \uD83D\uDC4B Posez-moi votre question : un message douteux, un appel bizarre, un prélèvement que vous ne reconnaissez pas.');
+    advChips([
+      "J'ai reçu un SMS bizarre",
+      "On m'a appelé en disant être ma banque",
+      "Un prélèvement inconnu sur mon compte"
+    ]);
+  }, 250);
 }
 
 async function runConseiller() {
-  var q = document.getElementById('adv-input').value.trim();
-  if (q.length < 5) return toast('Question trop courte');
-  document.getElementById('adv-result').innerHTML = '<div class="spinner"></div>';
+  var el = document.getElementById('adv-input');
+  var q = (el ? el.value : '').trim();
+  if (q.length < 3) return toast('Question trop courte');
+  if (_advBusy) return;
+
+  _advBusy = true;
+  advBulle('me', q);
+  el.value = '';
+  advChips([]);
+  _advHist.push({ role: 'user', content: q });
+  var typing = document.getElementById('adv-typing');
+  if (typing) typing.style.display = 'block';
+
   try {
     var r = await fetch('/.netlify/functions/despy-chat', {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
-      body: JSON.stringify({ messages: [{ role: 'user', content: q }], email: (session.get() || {}).email })
+      body: JSON.stringify({ messages: _advHist, email: (session.get() || {}).email })
     });
     var data = await r.json();
-    if (!r.ok || data.error) {
-      document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#991b1b">' + (data.error || 'Erreur') + '</div>';
+    if (typing) typing.style.display = 'none';
+
+    if (!r.ok || (data.error && !data.reply)) {
+      advBulle('them', data.error || "Je n'ai pas pu répondre. Réessayez dans un instant.");
+      _advBusy = false;
       return;
     }
-    var answer = data.response || data.answer || data.message || '';
-    document.getElementById('adv-result').innerHTML =
-      '<div class="result-card" style="white-space:pre-wrap;line-height:1.65">' + (answer || 'Pas de réponse') + '</div>';
-  } catch(e) {
-    document.getElementById('adv-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
+
+    // Le serveur renvoie « reply ». L'appli lisait response/answer/message :
+    // aucun de ces champs n'existe, donc le Conseiller répondait
+    // « Pas de réponse » à absolument toutes les questions.
+    var reponse = data.reply || "Je n'ai pas pu répondre. Réessayez.";
+    advBulle('them', reponse);
+    _advHist.push({ role: 'assistant', content: reponse });
+
+    if (data.limit_reached) {
+      advChips([]);
+      setTimeout(function () { closeSheet(); openPaywall(); }, 1800);
+    } else {
+      advChips(data.chips);
+    }
+  } catch (e) {
+    if (typing) typing.style.display = 'none';
+    advBulle('them', 'Erreur réseau. Vérifiez votre connexion et réessayez.');
   }
+  _advBusy = false;
 }
 
 function openDarkWeb() {
@@ -1334,6 +1433,29 @@ function openDarkWeb() {
     '<button class="btn-primary" onclick="runDarkWeb()" style="margin-top:6px">Vérifier mon email</button>' +
     '<div id="hibp-result"></div>'
   );
+}
+
+function dwGeste(el) {
+  el.classList.toggle('fait');
+  var fait = el.classList.contains('fait');
+  el.style.background = fait ? '#E9F7EE' : '#fff';
+  el.style.borderColor = fait ? '#B7E0C4' : 'var(--line,#E5E5EA)';
+  var c = el.querySelector('.dw-case');
+  c.style.background = fait ? '#15803D' : '#fff';
+  c.style.borderColor = fait ? '#15803D' : '#C3CEE6';
+  c.textContent = fait ? '\u2713' : '';
+  var n = document.querySelectorAll('.dw-geste.fait').length;
+  var cpt = document.getElementById('dw-compteur');
+  if (cpt) cpt.textContent = n + ' sur 3';
+  var barre = document.getElementById('dw-barre');
+  if (barre) barre.style.width = (n / 3 * 100) + '%';
+}
+
+function dwGesteHtml(titre, detail) {
+  return '<button class="dw-geste" onclick="dwGeste(this)" style="width:100%;text-align:left;display:flex;gap:12px;align-items:flex-start;background:#fff;border:1.5px solid var(--line,#E5E5EA);border-radius:14px;padding:13px;margin-bottom:9px;font-family:inherit;cursor:pointer">' +
+    '<span class="dw-case" style="width:24px;height:24px;border-radius:7px;border:2px solid #C3CEE6;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;margin-top:1px"></span>' +
+    '<span><span style="display:block;font-size:15px;font-weight:700;color:var(--text);line-height:1.35">' + titre + '</span>' +
+    '<span style="display:block;font-size:13.5px;color:var(--text3);line-height:1.45;margin-top:3px">' + detail + '</span></span></button>';
 }
 
 async function runDarkWeb() {
@@ -1347,19 +1469,72 @@ async function runDarkWeb() {
       body: JSON.stringify({ email: email })
     });
     var data = await r.json();
+
+    if (!r.ok || data.unavailable) {
+      document.getElementById('hibp-result').innerHTML =
+        '<div class="result-card" style="color:var(--text2)">Le service de vérification est momentanément indisponible. Votre surveillance hebdomadaire, elle, continue de tourner — vous serez prévenu si quelque chose apparaît.</div>';
+      return;
+    }
+
     var breaches = data.breaches || data.count || 0;
+    var liste = Array.isArray(breaches) ? breaches : [];
     var n = Array.isArray(breaches) ? breaches.length : breaches;
-    var cls = n >= 3 ? 'scam' : n >= 1 ? 'doubt' : 'safe';
-    var label = n >= 3 ? '⚠️ EMAIL TRÈS EXPOSÉ' : n >= 1 ? '🤔 EMAIL CONCERNÉ' : '✅ EMAIL SÛR';
-    var desc = n >= 1 ? 'Trouvé dans ' + n + ' fuite' + (n > 1 ? 's' : '') + ' de données' : 'Aucune fuite détectée';
-    var list = Array.isArray(breaches) ? breaches.slice(0, 5).map(function(b){ return '<li>' + (b.name || b) + (b.date ? ' (' + b.date + ')' : '') + '</li>'; }).join('') : '';
+
+    // Aucune fuite : on rassure, et on rappelle que la surveillance continue.
+    if (!n) {
+      document.getElementById('hibp-result').innerHTML =
+        '<div style="background:#E9F7EE;border:1px solid #B7E0C4;border-radius:16px;padding:16px;margin-top:14px">' +
+          '<div style="font-size:17px;font-weight:800;color:#15803D;margin-bottom:5px">Aucune fuite connue</div>' +
+          '<div style="font-size:14.5px;color:#2F6B45;line-height:1.5">Votre adresse n\'apparaît dans aucune fuite répertoriée. Nous la surveillons chaque semaine : si elle sort un jour, vous serez prévenu le jour même.</div>' +
+        '</div>';
+      return;
+    }
+
+    var grave = n >= 3;
+    var puces = liste.slice(0, 8).map(function (b) {
+      var nom = (b && (b.name || b.Name)) || b;
+      var an = b && (b.date || b.BreachDate);
+      return '<span style="font-size:13px;font-weight:700;padding:5px 10px;border-radius:20px;background:rgba(0,0,0,.22);color:#fff">' +
+             escapeHtmlA(String(nom)) + (an ? ' <span style="font-weight:400;opacity:.85">' + escapeHtmlA(String(an).slice(0, 4)) + '</span>' : '') + '</span>';
+    }).join('');
+
     document.getElementById('hibp-result').innerHTML =
-      '<div class="result-card">' +
-        '<div class="verdict-banner ' + cls + '"><div class="verdict-title">' + label + '</div><div class="verdict-desc">' + desc + '</div></div>' +
-        (list ? '<div style="font-size:14px;line-height:1.6"><strong>Fuites :</strong><ul style="margin:8px 0 0 18px">' + list + '</ul></div>' : '') +
-        (n >= 1 ? '<div style="margin-top:12px;font-size:14px;line-height:1.5;color:var(--text2)">👉 Changez le mot de passe des comptes concernés et activez la double authentification.</div>' : '') +
-      '</div>';
-  } catch(e) {
+      // Bandeau : ce qui a fuité
+      '<div style="background:' + (grave ? 'linear-gradient(140deg,#7C2D12,#C2410C)' : 'linear-gradient(140deg,#854F0B,#BA7517)') + ';color:#fff;border-radius:18px;padding:16px;margin-top:14px">' +
+        '<div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:6px">' + (grave ? 'exposition élevée' : 'exposition modérée') + '</div>' +
+        '<div style="font-size:19px;font-weight:850;line-height:1.3;margin-bottom:6px">Vos données sont dans ' + n + ' fuite' + (n > 1 ? 's' : '') + '</div>' +
+        '<div style="font-size:14.5px;line-height:1.5;opacity:.92">Ces sites ont été piratés et vos informations s\'y trouvaient.</div>' +
+        (puces ? '<div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:11px">' + puces + '</div>' : '') +
+      '</div>' +
+
+      // Ce que ça change, en langage courant
+      '<div class="section-label" style="margin:18px 0 8px">Ce que ça change pour vous</div>' +
+      '<div class="result-card" style="text-align:left">' +
+        '<div style="font-size:15px;line-height:1.6;color:var(--text2)">Le danger n\'est pas la fuite elle-même : c\'est qu\'un escroc puisse vous écrire ou vous appeler en <strong>ayant l\'air de vous connaître</strong>. Et si vous utilisiez le même mot de passe ailleurs, il faut le changer — c\'est la réutilisation qui transforme une petite fuite en gros problème.</div>' +
+      '</div>' +
+
+      // Ce qui est déjà fait de notre côté
+      '<div class="section-label" style="margin:18px 0 8px">Ce que Despy fait déjà</div>' +
+      '<div class="result-card" style="text-align:left">' +
+        '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px"><span style="color:#15803D;font-weight:800">\u2713</span><span style="font-size:14.5px;line-height:1.5;color:var(--text2)">Surveillance de votre adresse <strong>chaque semaine</strong></span></div>' +
+        '<div style="display:flex;gap:10px;align-items:flex-start"><span style="color:#15803D;font-weight:800">\u2713</span><span style="font-size:14.5px;line-height:1.5;color:var(--text2)">Alerte immédiate, par notification et par email, si une <strong>nouvelle</strong> fuite apparaît</span></div>' +
+      '</div>' +
+
+      // Les 3 gestes, cochables
+      '<div class="section-label" style="margin:18px 0 8px">À faire de votre côté</div>' +
+      '<div class="result-card" style="text-align:left;padding:12px 14px;margin-bottom:10px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline">' +
+          '<span style="font-size:14px;font-weight:700;color:var(--text)">Votre avancement</span>' +
+          '<span id="dw-compteur" style="font-size:14px;font-weight:800;color:var(--blue)">0 sur 3</span></div>' +
+        '<div style="height:8px;border-radius:20px;background:#E9EDF6;overflow:hidden;margin-top:9px"><div id="dw-barre" style="height:100%;width:0;border-radius:20px;background:var(--blue);transition:width .35s"></div></div>' +
+      '</div>' +
+      dwGesteHtml('Changer le mot de passe des sites concernés', 'Et surtout : n\'utilisez jamais deux fois le même.') +
+      dwGesteHtml('Activer la double authentification sur votre boîte mail', 'C\'est elle qui commande tous vos autres comptes.') +
+      dwGesteHtml('Se méfier des messages « bien informés »', 'Personne de sérieux ne demandera jamais un code ou un virement.') +
+
+      '<button class="btn-secondary" style="margin-top:8px" onclick="closeSheet();setTimeout(openConseiller,300)">Poser une question au Conseiller</button>';
+
+  } catch (e) {
     document.getElementById('hibp-result').innerHTML = '<div class="result-card" style="color:#991b1b">Erreur réseau</div>';
   }
 }
@@ -2150,6 +2325,13 @@ function openPaywall() {
       '<div style="font-size:20px;font-weight:800;color:#16A34A">139€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
       '<div style="margin-top:9px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;color:#9A3412">🎁 Livret de formation offert</div>' +
       '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'family_annual\')">Choisir Famille annuel</button></div>' +
+    // Réassurance : pour un senior, « remboursé » et « sans engagement »
+    // lèvent le dernier frein bien mieux qu'un argument de plus.
+    '<div style="background:#fff;border:1px solid var(--line,#E5E5EA);border-radius:14px;padding:13px 14px;margin-top:16px">' +
+      '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)">Satisfait ou <strong>remboursé sous 30 jours</strong></span></div>' +
+      '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)"><strong>Résiliable en 1 clic</strong>, sans justification</span></div>' +
+      '<div style="display:flex;gap:9px;align-items:flex-start"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)">Service français · vos données restent en France</span></div>' +
+    '</div>' +
     '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Paiement sécurisé par Stripe · CB, Apple Pay, prélèvement SEPA · résiliable à tout moment</div>'
   );
 }
@@ -2310,6 +2492,208 @@ function incrQuizQuota() {
 // ─── PWA install ───
 var _pwaPromptApp = null;
 window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); _pwaPromptApp = e; });
+
+// ─── MODULE DE FORMATION (parcours guidé) ───
+var _modEtape = 0, _modTrouves = {}, _modRep = {};
+
+var MOD_Q = {
+  1: { bonne: 'b',
+    a: ["Raté, mais c'est le piège classique", "La page qui s'ouvre est une copie parfaite du site de La Poste. Ce que vous tapez ne paie rien du tout : votre numéro de carte part directement chez l'escroc."],
+    b: ["Exactement !", "En passant par vos propres moyens — l'appli, ou le site que vous tapez vous-même — vous ne pouvez pas atterrir sur une fausse page. C'est la seule méthode sûre à 100 %."],
+    c: ["Non, et c'est contre-productif", "Répondre confirme que votre numéro est actif : vous en recevrez encore plus. Transférez le message au 33700 (gratuit), puis supprimez-le."] },
+  2: { bonne: 'b',
+    a: ["Non, chaque minute compte", "Attendre laisse le temps à l'escroc de débiter, souvent en pleine nuit et en plusieurs fois. L'opposition immédiate est ce qui vous protège."],
+    b: ["Parfait, c'est le bon réflexe", "Appelez le numéro d'opposition au dos de votre carte ou passez par votre appli bancaire. Ensuite seulement : signalement sur perceval.gouv.fr. La banque doit vous rembourser."],
+    c: ["Utile, mais pas en premier", "Changer vos mots de passe est une bonne idée ensuite. Là, c'est votre argent qui est en jeu : l'opposition passe avant tout le reste."] }
+};
+
+var MOD_PIEGES = {
+  1: ["La petite somme.", "1,49 € pour ne pas éveiller les soupçons — l'escroc veut votre carte, pas vos 1,49 €."],
+  2: ["Le compte à rebours.", "« sous 48 h » vous pousse à agir avant de réfléchir. Un vrai transporteur ne menace pas."],
+  3: ["La fausse adresse.", "Le vrai nom se lit juste avant le .net : ici c'est <strong>colis-suivi-fr</strong>, pas laposte. Le mot « laposte » est glissé après pour vous rassurer."]
+};
+
+function openModule() {
+  _modEtape = 0; _modTrouves = {}; _modRep = {};
+  openSheet('Le faux SMS de colis', '<div id="mod-body"></div>');
+  setTimeout(modRender, 120);
+}
+
+function modAller(n) { _modEtape = Math.max(0, Math.min(5, n)); modRender(); }
+
+function modDeverrouille() {
+  if (_modEtape === 2) return Object.keys(_modTrouves).length === 3;
+  if (_modEtape === 3) return !!_modRep[1];
+  if (_modEtape === 4) return !!_modRep[2];
+  return true;
+}
+
+function modPuces() {
+  var h = '<div style="display:flex;gap:5px;margin-bottom:18px">';
+  for (var i = 1; i <= 5; i++) {
+    var c = _modEtape > i ? '#5CE0A0' : (_modEtape === i ? 'var(--blue)' : '#E1E6F0');
+    h += '<i style="flex:1;height:5px;border-radius:20px;background:' + c + '"></i>';
+  }
+  return h + '</div>';
+}
+
+function modCarte(contenu, style) {
+  return '<div style="background:#fff;border:1px solid var(--line,#E5E5EA);border-radius:16px;padding:14px;margin-bottom:11px;' + (style || '') + '">' + contenu + '</div>';
+}
+
+function modSigne(icone, titre, texte) {
+  return modCarte(
+    '<div style="display:flex;gap:12px;align-items:flex-start">' +
+      '<div style="width:38px;height:38px;border-radius:11px;background:#EEF3FF;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none">' + icone + '</div>' +
+      '<div><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">' + titre + '</div>' +
+      '<div style="font-size:14.5px;line-height:1.5;color:var(--text2)">' + texte + '</div></div></div>');
+}
+
+function modOption(q, lettre, texte) {
+  var rep = _modRep[q], bonne = MOD_Q[q].bonne;
+  var fond = '#fff', bord = 'var(--line,#E5E5EA)', pastille = '#fff', bordP = '#C3CEE6', couleurP = '#7A87A6', texteC = 'var(--text)';
+  if (rep) {
+    if (lettre === bonne) { fond = '#E9F7EE'; bord = '#15803D'; pastille = '#15803D'; bordP = '#15803D'; couleurP = '#fff'; texteC = '#15803D'; }
+    else if (lettre === rep) { fond = '#FDECEC'; bord = '#C62828'; pastille = '#C62828'; bordP = '#C62828'; couleurP = '#fff'; }
+  }
+  return '<button ' + (rep ? '' : 'onclick="modRepondre(' + q + ',\'' + lettre + '\')"') +
+    ' style="width:100%;text-align:left;display:flex;gap:11px;align-items:flex-start;background:' + fond + ';border:1.5px solid ' + bord +
+    ';border-radius:15px;padding:14px;margin-bottom:10px;font-family:inherit;font-size:15.5px;line-height:1.45;color:' + texteC + ';cursor:' + (rep ? 'default' : 'pointer') + '">' +
+    '<span style="width:27px;height:27px;border-radius:50%;background:' + pastille + ';border:1.5px solid ' + bordP + ';color:' + couleurP +
+    ';display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;flex:none">' + lettre.toUpperCase() + '</span>' +
+    '<span>' + texte + '</span></button>';
+}
+
+function modCorrige(q) {
+  var rep = _modRep[q];
+  if (!rep) return '';
+  var bon = rep === MOD_Q[q].bonne, t = MOD_Q[q][rep];
+  return '<div style="border-radius:15px;padding:14px;margin-top:2px;background:' + (bon ? '#E9F7EE' : '#FDECEC') +
+    ';border:1px solid ' + (bon ? '#B7E0C4' : '#F0C4C4') + '">' +
+    '<div style="font-size:14px;font-weight:850;margin-bottom:5px;color:' + (bon ? '#15803D' : '#C62828') + '">' +
+    (bon ? '✓ ' : '✕ ') + t[0] + '</div>' +
+    '<div style="font-size:15px;line-height:1.55;color:var(--text2)">' + t[1] + '</div></div>';
+}
+
+function modRender() {
+  var z = document.getElementById('mod-body');
+  if (!z) return;
+  var h = modPuces(), cta = '', astuce = '';
+
+  if (_modEtape === 0) {
+    h += '<div style="font-size:22px;font-weight:850;color:var(--text);line-height:1.25;margin-bottom:10px">Le faux SMS de colis</div>' +
+      '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px">' +
+        '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF">6 minutes</span>' +
+        '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF">Leçon + 2 questions</span>' +
+        '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#FDF6E3;color:#A16207">Livret p. 42</span></div>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--text2);margin:0 0 14px">C\'est l\'arnaque n°1 en France. Elle marche parce qu\'elle tombe pile au moment où vous attendez vraiment un colis.</p>' +
+      modCarte('<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px">À la fin de ce module, vous saurez :</div>' +
+        '<ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.6;color:var(--text2)">' +
+        '<li>Reconnaître un lien piégé en 3 secondes</li>' +
+        '<li>Vérifier un colis sans jamais prendre de risque</li>' +
+        '<li>Réagir vite si vous avez déjà cliqué</li></ul>');
+    cta = 'Commencer le module';
+
+  } else if (_modEtape === 1) {
+    h += '<div style="font-size:21px;font-weight:850;color:var(--text);line-height:1.25;margin-bottom:10px">Pourquoi ça marche si bien</div>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--text2);margin:0 0 12px">L\'escroc n\'a pas besoin de vous connaître : il envoie le même SMS à des millions de personnes. Il suffit qu\'il tombe sur quelqu\'un qui attend un colis — et ce jour-là, c\'est vous.</p>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--text2);margin:0 0 16px">La somme demandée est <strong>toute petite</strong> (1 ou 2 €) : c\'est volontaire. On ne se méfie pas pour 1,49 €. Ce qui l\'intéresse, ce n\'est pas cette somme, c\'est <strong>votre numéro de carte</strong>.</p>' +
+      '<div class="section-label" style="margin:0 0 10px">Les 3 signes qui trahissent</div>' +
+      modSigne('🔗', 'L\'adresse du lien', 'La Poste, c\'est <strong>laposte.fr</strong>. Pas « colis-suivi-fr.net ». Le vrai nom est toujours juste avant le <strong>.fr</strong>.') +
+      modSigne('💶', 'Une petite somme à régler', 'Aucun transporteur ne réclame de frais par SMS avec un lien de paiement. Jamais.') +
+      modSigne('⏱️', 'L\'urgence', '« sous 48 h », « dernier avis ». C\'est fait pour vous empêcher de réfléchir.') +
+      '<div style="background:linear-gradient(140deg,#173A80,#2F5BEA);color:#fff;border-radius:16px;padding:15px 16px;margin-top:4px">' +
+        '<div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#B9CDFB;margin-bottom:5px">La règle Despy</div>' +
+        '<div style="font-size:16px;font-weight:750;line-height:1.45">On ne clique jamais dans un SMS. On ouvre soi-même l\'application ou le site du transporteur.</div></div>';
+    cta = 'J\'ai compris, continuer';
+
+  } else if (_modEtape === 2) {
+    var n = Object.keys(_modTrouves).length;
+    h += '<div style="font-size:21px;font-weight:850;color:var(--text);margin-bottom:8px">À vous de jouer</div>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--text2);margin:0 0 12px">Voici un vrai SMS reçu par une cliente. <strong>Touchez les 3 éléments suspects.</strong></p>' +
+      '<div style="background:#fff;border:1px dashed #C3CEE6;border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px">' +
+        '<span style="font-size:15px;font-weight:700;color:var(--text)">Trouvez les pièges</span>' +
+        '<span style="font-size:14px;font-weight:800;color:var(--blue);background:#E8EEFC;padding:4px 10px;border-radius:20px;white-space:nowrap">' + n + ' / 3 trouvés</span></div>' +
+      '<div style="background:#E9EBF0;border-radius:18px;padding:14px;margin-bottom:12px">' +
+        '<div style="font-size:12px;font-weight:800;color:#7A8299;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">SMS · +33 7 55 28 …</div>' +
+        '<div style="background:#fff;border-radius:16px 16px 16px 5px;padding:13px 14px;font-size:16px;line-height:1.7;color:#1B2438">' +
+          'La Poste : votre colis est en attente de livraison. Des frais de douane de ' +
+          modPiege(1, '1,49 €') + ' restent à régler ' + modPiege(2, 'sous 48 h') +
+          ', sans quoi il sera retourné à l\'expéditeur. Suivi : ' + modPiege(3, 'colis-suivi-fr.net/laposte') +
+        '</div></div>';
+    for (var k = 1; k <= 3; k++) {
+      if (_modTrouves[k]) {
+        h += '<div style="display:flex;gap:10px;align-items:flex-start;background:#FDF6E3;border:1px solid #F0DDA6;border-radius:13px;padding:11px 13px;margin-bottom:9px">' +
+          '<span style="width:23px;height:23px;border-radius:50%;background:#A16207;color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none">' + k + '</span>' +
+          '<span style="font-size:14.5px;line-height:1.5;color:#6B4708"><strong>' + MOD_PIEGES[k][0] + '</strong> ' + MOD_PIEGES[k][1] + '</span></div>';
+      }
+    }
+    cta = 'Continuer';
+    if (n < 3) astuce = 'Touchez les 3 éléments suspects pour continuer';
+
+  } else if (_modEtape === 3 || _modEtape === 4) {
+    var q = _modEtape - 2;
+    var enonce = q === 1
+      ? 'Vous recevez ce SMS et vous attendez réellement un colis. Que faites-vous ?'
+      : 'Trop tard : vous avez saisi votre numéro de carte. Quel est le tout premier geste ?';
+    var opts = q === 1
+      ? ['Je clique sur le lien et je paie les 1,49 €', 'J\'ouvre moi-même l\'application du transporteur pour vérifier', 'Je réponds STOP pour ne plus être contacté']
+      : ['Attendre de voir si un prélèvement apparaît', 'Faire opposition auprès de ma banque immédiatement', 'Changer le mot de passe de ma boîte mail'];
+    h += '<span style="display:inline-block;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF;margin-bottom:12px">Question ' + q + ' sur 2</span>' +
+      '<div style="font-size:18px;font-weight:800;line-height:1.4;color:var(--text);margin:0 0 14px">' + enonce + '</div>' +
+      modOption(q, 'a', opts[0]) + modOption(q, 'b', opts[1]) + modOption(q, 'c', opts[2]) + modCorrige(q);
+    cta = q === 1 ? 'Question suivante' : 'Terminer le module';
+    if (!_modRep[q]) astuce = 'Choisissez une réponse';
+
+  } else {
+    try { localStorage.setItem('despy_module_3', '1'); } catch (e) {}
+    h += '<div style="text-align:center;padding:6px 0 0">' +
+      '<div style="width:86px;height:86px;border-radius:50%;background:#15803D;color:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;margin:6px auto 14px">✓</div>' +
+      '<div style="font-size:22px;font-weight:850;color:var(--text);margin-bottom:8px">Module 3 terminé !</div>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--text2);margin:0 0 16px">Vous savez maintenant repérer un faux SMS de colis les yeux fermés.</p></div>' +
+      modCarte('<div style="display:flex;justify-content:space-between;align-items:baseline">' +
+        '<span style="font-size:15px;font-weight:800;color:var(--text)">Votre progression</span>' +
+        '<span style="font-size:15px;font-weight:800;color:var(--blue)">3 / 10 modules</span></div>' +
+        '<div style="height:9px;border-radius:20px;background:#E9EDF6;overflow:hidden;margin-top:9px"><div style="height:100%;width:30%;border-radius:20px;background:var(--blue)"></div></div>') +
+      modCarte('<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:9px">À retenir</div>' +
+        '<ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.6;color:var(--text2)">' +
+        '<li>On ne clique <strong>jamais</strong> dans un SMS.</li>' +
+        '<li>Le vrai nom du site se lit <strong>juste avant le .fr</strong>.</li>' +
+        '<li>Carte saisie par erreur ? <strong>Opposition immédiate</strong>, puis perceval.gouv.fr.</li></ul>') +
+      '<button class="btn-secondary" onclick="modAller(1)" style="margin-top:4px">Revoir la leçon</button>' +
+      '<div style="font-size:13px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.5">Ce module correspond à la page 42 de votre livret.</div>';
+    cta = 'Terminer';
+  }
+
+  var bloque = !modDeverrouille();
+  h += '<button class="btn-primary" style="margin-top:14px' + (bloque ? ';background:#C6CEE0;box-shadow:none' : '') + '" ' +
+    (bloque ? 'disabled' : 'onclick="' + (_modEtape === 5 ? 'closeSheet()' : 'modAller(' + (_modEtape + 1) + ')') + '"') +
+    '>' + cta + '</button>';
+  if (astuce) h += '<div style="text-align:center;font-size:13px;color:var(--text3);margin-top:9px">' + astuce + '</div>';
+
+  z.innerHTML = h;
+  var sh = document.querySelector('.sheet-content') || z.parentElement;
+  if (sh && sh.scrollTop) sh.scrollTop = 0;
+}
+
+function modPiege(n, texte) {
+  var trouve = _modTrouves[n];
+  return '<span onclick="modTrouver(' + n + ')" style="cursor:pointer;padding:1px 3px;border-radius:4px;' +
+    (trouve ? 'background:#FDE9B8;border-bottom:2.5px solid #A16207;font-weight:750;color:#6B4708'
+            : 'border-bottom:2.5px dotted #93A2C4') + '">' + texte + '</span>';
+}
+
+function modTrouver(n) {
+  if (_modTrouves[n]) return;
+  _modTrouves[n] = 1;
+  modRender();
+}
+
+function modRepondre(q, choix) {
+  if (_modRep[q]) return;
+  _modRep[q] = choix;
+  modRender();
+}
 
 function isStandaloneApp() {
   return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
