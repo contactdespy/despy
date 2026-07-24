@@ -513,7 +513,7 @@ body{ background:var(--p-paper); }
 .tile .ic{ display:flex; }
 
 /* La barre du bas était en 3 colonnes : le bouton SOS la faisait passer à la ligne. */
-.bottom-nav{ grid-template-columns:repeat(4,1fr); align-items:end; }
+.bottom-nav{ grid-template-columns:repeat(5,1fr); align-items:end; }
 .nav-sos-wrap{ padding:0 0 9px; cursor:pointer; }
 
 
@@ -547,6 +547,25 @@ body{ background:var(--p-paper); }
 .logout{ width:100%; background:#fff; border:1px solid var(--p-line); border-radius:14px; padding:14px;
   font-family:inherit; font-size:15px; font-weight:800; color:#E5484D; cursor:pointer; margin-top:4px; }
 .legal{ font-size:11.5px; color:var(--p-muted); text-align:center; line-height:1.6; margin-top:6px; }
+
+
+/* ── bloc statistiques ── */
+.stats-h{ font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--p-muted); }
+.stats-g{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:13px; }
+.stats-g .n{ font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
+.stats-g .k{ font-size:10.5px; color:var(--p-muted); line-height:1.3; margin-top:3px; }
+
+/* ── onglet Conseiller (chat plein écran) ── */
+.cons-av{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,#5ce0a0,#2d5bff); }
+.cons-wrap{ display:flex; flex-direction:column; gap:9px; padding:16px 16px 12px; min-height:40vh; }
+.cons-msgs{ display:flex; flex-direction:column; gap:9px; }
+.cons-msgs .msg{ max-width:86%; padding:11px 14px; border-radius:16px; font-size:15px; line-height:1.55; }
+.cons-typing{ align-self:flex-start; font-size:14px; color:var(--p-muted); padding:2px 2px; }
+.cons-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.cons-bar{ position:sticky; bottom:calc(var(--nav-h,84px) - 18px); background:var(--p-paper); display:flex; gap:9px; align-items:flex-end; padding:10px 0 4px; }
+.cons-bar textarea{ flex:1; min-height:48px; max-height:120px; border:1.5px solid var(--p-line); border-radius:14px; padding:13px 15px; font:inherit; font-size:16px; color:var(--p-ink); background:#fff; resize:none; outline:none; }
+.cons-bar textarea:focus{ border-color:#b9c6e4; }
+.cons-send{ width:50px; height:48px; flex:none; border:0; border-radius:14px; background:var(--p-blue); color:#fff; font-size:19px; cursor:pointer; }
 
 </style>
 </head>
@@ -608,7 +627,6 @@ body{ background:var(--p-paper); }
 
   <!-- TAB : ACCUEIL -->
   <div id="tab-home" class="tab-pane active">
-
     <header class="pheader">
       <div class="ph-row">
         <img class="ph-logo" src="/assets/logo-despy-nav-h.png?v=3" alt="Despy">
@@ -625,175 +643,100 @@ body{ background:var(--p-paper); }
         <div class="hero-txt">
           <div class="hero-ey" id="home-score-ey">Votre protection</div>
           <h2 id="home-score-title">Voir mon score sécurité</h2>
-          <p id="home-score-sub">Touchez pour le détail et vos conseils personnalisés.</p>
+          <p id="home-score-sub">Touchez pour le détail et vos conseils.</p>
         </div>
       </button>
 
       <button class="sos-card" onclick="openTool('sos')">
-        <span class="sos-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
-        <span>
-          <span class="a">Un doute, un problème ?</span>
-          <span class="b">Un vrai conseiller vous répond</span>
-        </span>
+        <span class="sos-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
+        <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
         <span class="sos-btn">Appeler</span>
       </button>
 
-      <button class="card qa-card" onclick="openTool('analyseur')">
-        <span class="qa-ic"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span>
+      <button class="card next" id="home-push" style="display:none;width:100%" onclick="requestPush()">
+        <span class="k">🔔</span>
+        <span class="m"><span class="a">Activer les alertes sur ce téléphone</span><span class="b">Être prévenu immédiatement en cas de danger</span></span>
+        <span class="go">Activer</span>
+      </button>
+
+      <div class="sec">Accès rapide</div>
+      <div class="tiles">
+        <button class="tile" onclick="openTool('analyseur')">
+          <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.4-9 8.5 8.5 0 0 1 8.6 8.3z"/></svg></span>
+          <span class="t">Est-ce une arnaque&nbsp;?</span><span class="s">Montrez-moi le message, je réponds</span>
+        </button>
+        <button class="tile" onclick="switchAppTab('protection')">
+          <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span class="t">Mes données</span><span class="s">Surveillance &amp; nettoyage</span>
+        </button>
+      </div>
+
+      <button class="card qa-card" id="home-formation" onclick="openFormation()">
+        <span class="qa-ic ic-gold" style="background:#FBF3E0;color:#B4892E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
         <span style="flex:1;min-width:0">
-          <span class="a">Un message vous inquiète&nbsp;?</span>
-          <span class="b">SMS, email, photo ou lien → analyse en 10 secondes</span>
+          <span class="a" id="home-formation-title">Ma formation — 3 / 10 modules</span>
+          <span class="b" id="home-formation-sub">Reprenez le module « Le faux SMS de colis »</span>
         </span>
         <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      <div class="card pad" id="home-prot" style="display:none">
-        <div class="prot-top">
-          <span class="t">Votre protection</span>
-          <span class="pill pill-blue" id="home-prot-count">0 / 6 activées</span>
+      <div class="card pad stats" id="home-stats">
+        <div class="stats-h">Ce mois-ci, Despy a veillé sur vous</div>
+        <div class="stats-g">
+          <div><div class="n" id="stat-fuites" style="color:var(--p-safe)">0</div><div class="k">fuite détectée</div></div>
+          <div><div class="n" id="stat-sites" style="color:var(--p-blue)">—</div><div class="k">sites surveillés</div></div>
+          <div><div class="n" id="stat-questions" style="color:var(--p-blue)">0</div><div class="k">questions posées</div></div>
         </div>
-        <div class="pbar"><i id="home-prot-bar"></i></div>
-        <button class="next" id="home-prot-next" style="display:none">
-          <span class="k" id="home-prot-icon">🛡️</span>
-          <span class="m"><span class="a" id="home-prot-title"></span><span class="b" id="home-prot-desc"></span></span>
-          <span class="go">Activer</span>
-        </button>
-      </div>
-
-      <div id="home-onboarding-section" style="display:none">
-        <div class="sec">Premiers pas</div>
-        <div class="plist">
-          <button class="listrow" onclick="openTool('darkweb')">
-            <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
-            <span class="m"><span class="a">Vérifier si mon email a fuité</span><span class="b">Le contrôle le plus utile pour commencer</span></span>
-            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <button class="listrow" onclick="openTool('diag')">
-            <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
-            <span class="m"><span class="a">Diagnostiquer mon téléphone</span><span class="b">3 minutes, sans rien installer</span></span>
-            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <button class="listrow" onclick="openTool('quiz')">
-            <span class="ic ic-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
-            <span class="m"><span class="a">Tester mes réflexes</span><span class="b">Quiz découverte</span></span>
-            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div id="home-activity-section" style="display:none">
-        <div class="sec">Activité récente</div>
-        <div class="plist" id="home-activity-list"></div>
-      </div>
-
-      <div class="sec">Outils du quotidien</div>
-      <div class="tiles">
-        <button class="tile" onclick="openTool('entrainement')">
-          <span class="ic ic-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></span>
-          <span class="t">Entraînement</span><span class="s">Testez-vous face à une fausse arnaque</span>
-        </button>
-        <button class="tile" onclick="openTool('annuaire')">
-          <span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
-          <span class="t">Qui m'appelle&nbsp;?</span><span class="s">Vérifier un numéro inconnu</span>
-        </button>
-        <button class="tile" onclick="openTool('site')">
-          <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg></span>
-          <span class="t">Vérifier un site</span><span class="s">Avant d'acheter, on contrôle</span>
-        </button>
-        <button class="tile" onclick="openTool('conseiller')">
-          <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.4-9 8.5 8.5 0 0 1 8.6 8.3z"/></svg></span>
-          <span class="t">Conseiller</span><span class="s">Posez votre question, on répond</span>
-        </button>
-        <button class="tile" onclick="openTool('darkweb')">
-          <span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span>
-          <span class="t">Email piraté&nbsp;?</span><span class="s">Surveillance des fuites</span>
-        </button>
-        <button class="tile" onclick="openModule()">
-          <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
-          <span class="t">Module du moment</span><span class="s">Le faux SMS de colis · 6 min</span>
-        </button>
-      </div>
-
-      <div class="sec">Protection</div>
-      <div class="plist">
-        <button class="listrow" onclick="openTool('signaler')">
-          <span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg></span>
-          <span class="m"><span class="a">Signaler un numéro</span><span class="b">Protégez les autres membres</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="listrow" onclick="openTool('alertes')">
-          <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
-          <span class="m"><span class="a">Alertes nationales</span><span class="b">Les arnaques qui circulent en ce moment</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="listrow" onclick="openTool('diag')">
-          <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
-          <span class="m"><span class="a">Diagnostic du téléphone</span><span class="b">Vérifier les réglages de sécurité</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="listrow" onclick="openTool('privacy')">
-          <span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>
-          <span class="m"><span class="a">Effacer mes données</span><span class="b">Demandes RGPD envoyées pour vous</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
       </div>
 
     </div>
   </div>
 
-  <div id="tab-learn" class="tab-pane">
-
-    <header class="pheader">
-      <div class="psub">Formation</div>
-      <h1 class="ptitle">Apprendre</h1>
-    </header>
-
+  <div id="tab-protection" class="tab-pane">
+    <header class="pheader"><div class="psub">Votre bouclier</div><h1 class="ptitle">Protection</h1></header>
     <div class="pbody">
-
-      <button class="learn-card mod" onclick="openModule()">
-        <span class="learn-card-label">Module 3 sur 10 · 6 min</span>
-        <span class="learn-card-title">Le faux SMS de colis</span>
-        <span class="learn-card-desc">La leçon, un vrai SMS piégé à décortiquer, puis 2 questions avec le corrigé expliqué.</span>
-        <span class="learn-card-btn" style="color:#153A7D">Suivre le module <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-      </button>
-
-      <button class="learn-card" onclick="openTool('quiz')">
-        <span class="learn-card-label">Quiz découverte</span>
-        <span class="learn-card-title">Testez vos réflexes anti-arnaque</span>
-        <span class="learn-card-desc">Des questions concrètes : faux SMS, appels suspects, mots de passe, IA…</span>
-        <span class="learn-card-btn" style="color:#5B21B6">Commencer <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-      </button>
-
-      <button class="learn-card alt" onclick="openTool('defi')">
-        <span class="learn-card-label">⏱️ Défi chrono</span>
-        <span class="learn-card-title">Le défi de la semaine</span>
-        <span class="learn-card-desc">3 questions chronométrées. Plus vous êtes rapide et juste, plus vous gagnez de points.</span>
-        <span class="learn-card-btn" style="color:#0891B2">Relever le défi <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-      </button>
-
-      <div class="sec">Vos progrès</div>
-      <div class="plist">
-        <button class="listrow" onclick="openTool('score')">
-          <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span>
-          <span class="m"><span class="a">Mon score sécurité</span><span class="b">Note + conseils personnalisés</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <button class="listrow" onclick="openTool('bilan')">
-          <span class="ic ic-violet"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
-          <span class="m"><span class="a">Bilan mensuel</span><span class="b">Vos statistiques de protection</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <div class="card pad" id="prot-panel">
+        <div class="prot-top"><span class="t">Votre protection</span><span class="pill pill-blue" id="prot-count">— / 6</span></div>
+        <div class="pbar"><i id="prot-bar"></i></div>
+        <button class="next" id="prot-next" style="display:none">
+          <span class="k" id="prot-next-ic">🛡️</span>
+          <span class="m"><span class="a" id="prot-next-t"></span><span class="b" id="prot-next-d"></span></span>
+          <span class="go">Activer</span>
         </button>
       </div>
 
-      <div class="sec">Guide d'utilisation</div>
+      <div class="sec">Surveillance</div>
       <div class="plist">
-        <button class="listrow" onclick="window.location='/#comment-ca-marche'">
-          <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4"/><path d="M12 17h.01"/></svg></span>
-          <span class="m"><span class="a">Comment ça marche ?</span><span class="b">Le mode d'emploi complet</span></span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
+        <button class="listrow" onclick="openTool('darkweb')"><span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span class="m"><span class="a">Email piraté ?</span><span class="b">Fuites de données · dark web</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('privacy')"><span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span><span class="m"><span class="a">Effacer mes données</span><span class="b">Demandes RGPD envoyées pour vous</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('diag')"><span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span class="m"><span class="a">Diagnostic du téléphone</span><span class="b">Vérifier les réglages de sécurité</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
 
+      <div class="sec">Communauté</div>
+      <div class="plist">
+        <button class="listrow" onclick="openTool('alertes')"><span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><span class="m"><span class="a">Alertes nationales</span><span class="b">Les arnaques qui circulent en ce moment</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('signaler')"><span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg></span><span class="m"><span class="a">Signaler un numéro</span><span class="b">Protégez les autres membres</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('site')"><span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><span class="m"><span class="a">Vérifier un site</span><span class="b">Avant d'acheter, on contrôle</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-conseiller" class="tab-pane">
+    <header class="pheader" style="padding-bottom:16px">
+      <div class="ph-row" style="align-items:center;gap:11px">
+        <div class="cons-av">🛡️</div>
+        <div><div class="ptitle" style="font-size:19px">Conseiller Despy</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#9FE6C2;margin-top:2px"><span style="width:7px;height:7px;border-radius:50%;background:#4ade80"></span>En ligne · répond vite</div></div>
+      </div>
+    </header>
+    <div class="cons-wrap">
+      <div id="adv-msgs" class="cons-msgs"></div>
+      <div id="adv-typing" class="cons-typing" style="display:none">Le conseiller écrit…</div>
+      <div id="adv-chips" class="cons-chips"></div>
+      <div class="cons-bar">
+        <textarea id="adv-input" rows="1" placeholder="Écrivez votre question…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();runConseiller();}"></textarea>
+        <button class="cons-send" onclick="runConseiller()" aria-label="Envoyer">&#10148;</button>
+      </div>
     </div>
   </div>
 
@@ -869,24 +812,13 @@ body{ background:var(--p-paper); }
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="home" onclick="switchAppTab('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Accueil</span>
-    </button>
-    <button class="nav-btn" data-tab="learn" onclick="switchAppTab('learn')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      <span>Apprendre</span>
-    </button>
+    <button class="nav-btn" data-tab="home" onclick="switchAppTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Accueil</span></button>
+    <button class="nav-btn" data-tab="protection" onclick="switchAppTab('protection')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Protection</span></button>
     <div class="nav-sos-wrap" onclick="openTool('sos')">
-      <div class="nav-sos" aria-label="SOS — parler à un humain">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg>
-      </div>
-      <span>SOS</span>
+      <div class="nav-sos" aria-label="SOS"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><span>SOS</span>
     </div>
-    <button class="nav-btn" data-tab="profile" onclick="switchAppTab('profile')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Moi</span>
-    </button>
+    <button class="nav-btn" data-tab="conseiller" onclick="switchAppTab('conseiller')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.4-9 8.5 8.5 0 0 1 8.6 8.3z"/></svg><span>Conseiller</span></button>
+    <button class="nav-btn" data-tab="profile" onclick="switchAppTab('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg><span>Compte</span></button>
   </nav>
 
 </div>
@@ -1188,13 +1120,14 @@ function refreshProfile() {
 }
 
 function switchAppTab(tab) {
-  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.tab === tab);
-  });
+  document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+  var pane = document.getElementById('tab-' + tab);
+  if (pane) pane.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === tab); });
   window.scrollTo(0, 0);
   if (navigator.vibrate) navigator.vibrate(5);
+  if (tab === 'conseiller') mountConseiller();
+  if (tab === 'protection') refreshHomeScore();
 }
 
 function openSheet(title, html) {
@@ -1562,30 +1495,16 @@ function advChips(liste) {
   });
 }
 
-function openConseiller() {
+var _advSeeded = false;
+function openConseiller() { switchAppTab('conseiller'); }
+function mountConseiller() {
+  if (_advSeeded) return;
+  _advSeeded = true;
+  _advHist = [];
   var s = session.get() || {};
   var prenom = (s.name || '').split(' ')[0];
-  openSheet('Conseiller Despy',
-    '<div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#16A34A;margin:-6px 0 12px">' +
-      '<span style="width:8px;height:8px;border-radius:50%;background:#16A34A"></span>En ligne · répond en moins d\'une minute</div>' +
-    '<div id="adv-msgs" style="display:flex;flex-direction:column;gap:9px;max-height:46vh;overflow-y:auto;padding:4px 2px"></div>' +
-    '<div id="adv-typing" style="display:none;align-self:flex-start;font-size:14px;color:var(--text3);padding:6px 2px">Le conseiller écrit…</div>' +
-    '<div id="adv-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"></div>' +
-    '<div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end">' +
-      '<textarea id="adv-input" class="sheet-textarea" rows="1" placeholder="Écrivez votre question…" style="flex:1;min-height:48px"></textarea>' +
-      '<button class="btn-primary" onclick="runConseiller()" style="width:52px;height:48px;padding:0;font-size:19px;flex:none">&#10148;</button>' +
-    '</div>' +
-    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Un conseiller humain prend le relais si besoin.</div>'
-  );
-  _advHist = [];
-  setTimeout(function () {
-    advBulle('them', 'Bonjour' + (prenom ? ' ' + prenom : '') + ' \uD83D\uDC4B Posez-moi votre question : un message douteux, un appel bizarre, un prélèvement que vous ne reconnaissez pas.');
-    advChips([
-      "J'ai reçu un SMS bizarre",
-      "On m'a appelé en disant être ma banque",
-      "Un prélèvement inconnu sur mon compte"
-    ]);
-  }, 250);
+  advBulle('them', 'Bonjour' + (prenom ? ' ' + prenom : '') + ' \uD83D\uDC4B Posez-moi votre question : un message douteux, un appel bizarre, un pr\u00e9l\u00e8vement que vous ne reconnaissez pas.');
+  advChips(["J'ai re\u00e7u un SMS bizarre", "On m'a appel\u00e9 en disant \u00eatre ma banque", "Un pr\u00e9l\u00e8vement inconnu sur mon compte"]);
 }
 
 async function runConseiller() {
@@ -1967,27 +1886,68 @@ var PROT_ETAPES = [
 ];
 
 function renderProtection(checklist) {
-  var carte = document.getElementById('home-prot');
-  if (!carte || !checklist) return;
+  if (!checklist) return;
   var faits = PROT_ETAPES.filter(function (e) { return !!checklist[e.k]; }).length;
-  carte.style.display = 'block';
-  var cpt = document.getElementById('home-prot-count');
+  var cpt = document.getElementById('prot-count');
   if (cpt) {
     cpt.textContent = faits + ' / ' + PROT_ETAPES.length + ' activées';
     cpt.className = 'pill ' + (faits === PROT_ETAPES.length ? 'pill-green' : 'pill-blue');
   }
-  var barre = document.getElementById('home-prot-bar');
+  var barre = document.getElementById('prot-bar');
   if (barre) setTimeout(function () { barre.style.width = (faits / PROT_ETAPES.length * 100) + '%'; }, 60);
-
   var suite = PROT_ETAPES.filter(function (e) { return !checklist[e.k]; })[0];
-  var bloc = document.getElementById('home-prot-next');
+  var bloc = document.getElementById('prot-next');
   if (!bloc) return;
   if (!suite) { bloc.style.display = 'none'; return; }
   bloc.style.display = 'flex';
-  document.getElementById('home-prot-icon').textContent = suite.i;
-  document.getElementById('home-prot-title').textContent = suite.t;
-  document.getElementById('home-prot-desc').textContent = suite.d;
-  bloc.onclick = function (e) { e.stopPropagation(); openTool(suite.go); };
+  document.getElementById('prot-next-ic').textContent = suite.i;
+  document.getElementById('prot-next-t').textContent = suite.t;
+  document.getElementById('prot-next-d').textContent = suite.d;
+  bloc.onclick = function () { openTool(suite.go); };
+}
+
+
+// Bloc « Ce mois-ci, Despy a veillé sur vous ».
+function renderHomeStats(stats) {
+  if (!stats) return;
+  var f = document.getElementById('stat-fuites'), q = document.getElementById('stat-questions'), si = document.getElementById('stat-sites');
+  if (f) f.textContent = stats.breach_count || 0;
+  if (q) q.textContent = stats.questions_used || 0;
+  // « sites surveillés » : nombre indicatif de courtiers/annuaires suivis pour un abonné.
+  if (si) si.textContent = (session.get() || {}).subscribed ? '30+' : '—';
+}
+
+// Carte « Ma formation » : progression lue dans localStorage.
+function refreshFormationCard() {
+  var done = 0;
+  try { for (var i = 1; i <= 10; i++) if (localStorage.getItem('despy_module_' + i) === '1') done++; } catch (e) {}
+  if (!done) done = 3; // le module 3 est le module vitrine
+  var t = document.getElementById('home-formation-title');
+  if (t) t.textContent = 'Ma formation \u2014 ' + done + ' / 10 modules';
+}
+
+// Écran Formation (ouvert depuis la carte) : module, quiz, défi, bilan.
+function openFormation() {
+  openSheet('Ma formation',
+    '<button class="learn-card mod" style="margin-bottom:12px" onclick="closeSheet();setTimeout(openModule,250)">' +
+      '<span class="learn-card-label">Module 3 sur 10 \u00b7 6 min</span>' +
+      '<span class="learn-card-title">Le faux SMS de colis</span>' +
+      '<span class="learn-card-desc">La le\u00e7on, un vrai SMS pi\u00e9g\u00e9 \u00e0 d\u00e9cortiquer, puis 2 questions.</span>' +
+      '<span class="learn-card-btn" style="color:#153A7D">Suivre le module \u203a</span></button>' +
+    '<div class="plist">' +
+      '<button class="listrow" onclick="closeSheet();setTimeout(function(){openTool(\'quiz\')},250)"><span class="ic ic-violet">\ud83c\udfaf</span><span class="m"><span class="a">Quiz d\u00e9couverte</span><span class="b">Testez vos r\u00e9flexes</span></span></button>' +
+      '<button class="listrow" onclick="closeSheet();setTimeout(function(){openTool(\'defi\')},250)"><span class="ic ic-cyan">\u23f1\ufe0f</span><span class="m"><span class="a">D\u00e9fi chrono</span><span class="b">3 questions chronom\u00e9tr\u00e9es</span></span></button>' +
+      '<button class="listrow" onclick="closeSheet();setTimeout(function(){openTool(\'bilan\')},250)"><span class="ic ic-blue">\ud83d\udcc5</span><span class="m"><span class="a">Bilan mensuel</span><span class="b">Vos statistiques de protection</span></span></button>' +
+    '</div>'
+  );
+}
+
+// Carte « Activer les alertes » : visible seulement si la permission n'est pas accordée.
+function refreshPushCard() {
+  var el = document.getElementById('home-push');
+  if (!el) return;
+  var ok = ('Notification' in window) && Notification.permission === 'granted';
+  el.style.display = ok ? 'none' : 'flex';
 }
 
 function refreshHomeScore() {
@@ -2000,6 +1960,8 @@ function refreshHomeScore() {
 
   ringEl.innerHTML = heroPlaceholderRing();
   refreshPlanBadge();
+  refreshFormationCard();
+  refreshPushCard();
   if (!s.email) return;
 
   fetch('/.netlify/functions/security-score', {
@@ -2013,6 +1975,7 @@ function refreshHomeScore() {
       if (eyEl && d.emoji) eyEl.textContent = d.emoji + ' Votre protection';
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
       renderProtection(d.checklist);
+      renderHomeStats(d.stats);
     } else {
       ringEl.innerHTML = heroPlaceholderRing();
       if (titleEl) titleEl.textContent = 'Construire mon score';
