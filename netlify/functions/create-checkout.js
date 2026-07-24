@@ -50,11 +50,16 @@ exports.handler = async (event, context) => {
 
     // Déterminer les URLs de retour selon la source (site ou appli)
     const baseUrl = process.env.URL || 'https://despy.fr';
+    // ⚠️ On vise /app (redirection 301 vers la version courante de l'appli), et
+    // JAMAIS le nom de fichier versionné : il pointait encore vers
+    // despy_app_v21.html, supprimé depuis — un client qui payait depuis l'appli
+    // tombait sur une 404 juste après avoir réglé. La redirection conserve bien
+    // les paramètres (vérifié en prod).
     const successUrl = source === 'app'
-      ? `${baseUrl}/despy_app_v21.html?payment=success&session_id={CHECKOUT_SESSION_ID}`
+      ? `${baseUrl}/app?payment=success&session_id={CHECKOUT_SESSION_ID}`
       : `${baseUrl}?payment=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = source === 'app'
-      ? `${baseUrl}/despy_app_v21.html?payment=cancel`
+      ? `${baseUrl}/app?payment=cancel`
       : `${baseUrl}?payment=cancel`;
 
     // Lire les bonus_months du compte (parrainage)

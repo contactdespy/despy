@@ -871,6 +871,56 @@ function enterApp() {
   revalidateSession();
 }
 
+// Retour depuis le paiement Stripe (?payment=success | cancel).
+// Sans ça, le client revenait dans l'appli sans un mot de confirmation et
+// avec un statut « gratuit » tant qu'il ne relançait pas l'appli.
+function handlePaymentReturn() {
+  var params;
+  try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+  var etat = params.get('payment');
+  if (!etat) return;
+
+  // On nettoie l'URL tout de suite : un rafraîchissement ne doit pas rejouer l'écran.
+  try {
+    params.delete('payment'); params.delete('session_id');
+    var reste = params.toString();
+    history.replaceState({}, '', window.location.pathname + (reste ? '?' + reste : ''));
+  } catch (e) {}
+
+  if (etat === 'cancel') {
+    toast('Paiement annulé — rien n\'a été débité.');
+    return;
+  }
+
+  openSheet('Merci !',
+    '<div style="text-align:center;padding:6px 0 2px">' +
+      '<div style="width:74px;height:74px;border-radius:50%;background:#16A34A;color:#fff;font-size:36px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">✓</div>' +
+      '<div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">Votre abonnement est actif</div>' +
+      '<p class="sheet-help" style="text-align:center">Tout est débloqué : conseiller illimité, surveillance dark web, SOS et Privacy Cleanup. Un email de confirmation vous a été envoyé.</p>' +
+      '<div id="pay-sync" style="font-size:13px;color:var(--text3);margin:10px 0 4px">Activation en cours…</div>' +
+      '<button class="btn-primary" style="margin-top:10px" onclick="closeSheet()">Commencer</button>' +
+    '</div>'
+  );
+
+  // L'activation vient du webhook Stripe : elle peut arriver une ou deux
+  // secondes après le retour. On revalide plusieurs fois plutôt qu'une.
+  var essais = 0;
+  (function resync() {
+    essais++;
+    revalidateSession().then(function () {
+      var s = session.get() || {};
+      var ligne = document.getElementById('pay-sync');
+      if (s.subscribed) {
+        if (ligne) { ligne.textContent = '✓ Compte Premium activé'; ligne.style.color = '#16A34A'; }
+      } else if (essais < 4) {
+        setTimeout(resync, 2000);
+      } else if (ligne) {
+        ligne.textContent = 'Activation en cours — relancez l\'appli dans un instant.';
+      }
+    }).catch(function () {});
+  })();
+}
+
 // Revalide l'abonnement auprès du serveur (source de vérité).
 // Évite de se fier à un plan/subscribed périmé dans le localStorage.
 async function revalidateSession() {
@@ -2305,6 +2355,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
+  setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
   setTimeout(showInstallBanner, 1500);
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(e){ console.warn('SW register failed:', e.message); });
