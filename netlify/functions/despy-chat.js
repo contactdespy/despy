@@ -6,6 +6,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth, rateLimit } = require('./_auth');
+const { matchPlaybook, buildPlaybookReply } = require('./_chat-playbooks');
 
 exports.handler = async (event) => {
   const headers = {
@@ -35,6 +36,20 @@ exports.handler = async (event) => {
     // Garde-fou coût IA : 30 messages / heure / IP
     if (!rateLimit(event, 'chat', 30, 60 * 60 * 1000)) {
       return { statusCode: 429, headers, body: JSON.stringify({ error: 'Trop de messages d\'un coup. Réessayez dans quelques minutes.' }) };
+    }
+
+    // ── Réponses verrouillées : de l'argent est en jeu, on ne génère rien ──
+    // Volontairement AVANT le quota : refuser de l'aide à quelqu'un qui se fait
+    // voler en direct parce qu'il a épuisé ses 3 questions gratuites serait
+    // indéfendable. Ces réponses ne coûtent rien (aucun appel à l'IA) et ne
+    // décomptent pas de question.
+    const dernier = [...messages].reverse().find((m) => m && m.role === 'user');
+    const fiche = dernier && matchPlaybook(
+      typeof dernier.content === 'string' ? dernier.content : ''
+    );
+    if (fiche) {
+      console.log('playbook:', fiche.id);
+      return { statusCode: 200, headers, body: JSON.stringify(buildPlaybookReply(fiche)) };
     }
 
     // ── Vérification quota pour les comptes gratuits ──

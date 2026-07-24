@@ -6738,15 +6738,13 @@ async function sendChat() {
     return;
   }
 
-  // Vérifier quota gratuit (3 questions pour compte gratuit, illimité pour abonnés)
-  if (!session.subscribed && _chatFreeCount >= _chatMaxFree) {
-    addMsg("conseiller", "Vous avez utilis\u00e9 vos 3 questions gratuites. Abonnez-vous pour un acc\u00e8s illimit\u00e9 !", true);
-    showSubscribePrompt();
-    return;
-  }
-
+  // Quota gratuit : c'est désormais le serveur qui arbitre (il renvoie
+  // limit_reached), et non plus le front. Une urgence — carte volée, virement
+  // parti — reçoit ainsi sa réponse même si les 3 questions sont épuisées.
 
   // Afficher message utilisateur
+  var vieillesChips = document.getElementById('chat-chips');
+  if (vieillesChips) vieillesChips.remove();
   addMsg('user', msg);
   if (input) { input.value = ''; input.style.height = 'auto'; }
 
@@ -6780,6 +6778,12 @@ async function sendChat() {
     var reply = data.reply || "Je n’ai pas pu répondre. Réessayez.";
     _chatHistory.push({ role: 'assistant', content: reply });
     addMsg('conseiller', reply);
+
+    // Une fiche verrouillée propose ses suites logiques (et le SOS).
+    renderChatChips(data.chips);
+
+    // Une réponse verrouillée ne consomme pas de question gratuite.
+    if (data.playbook) _chatFreeCount = Math.max(0, _chatFreeCount - 1);
 
     // Mettre à jour le compteur affiché
     if (session && !session.subscribed) updateChatQuotaDisplay(Math.max(0, 3 - _chatFreeCount));
@@ -6815,7 +6819,50 @@ function addMsg(role, text, isWarning) {
 }
 
 function escHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  // On échappe d'abord, puis on rétablit le gras **…** : les réponses du
+  // Conseiller (et le message de quota) l'utilisent pour mettre en avant
+  // le geste à faire. Sans ça, les astérisques s'affichaient telles quelles.
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')
+          .replace(/\n/g,'<br>');
+}
+
+// Suggestions de réponse renvoyées par une fiche verrouillée.
+function renderChatChips(list) {
+  var container = document.getElementById('chat-messages');
+  if (!container) return;
+  var old = document.getElementById('chat-chips');
+  if (old) old.remove();
+  if (!list || !list.length) return;
+
+  var wrap = document.createElement('div');
+  wrap.id = 'chat-chips';
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 0 40px';
+
+  list.forEach(function(c) {
+    var texte  = typeof c === 'string' ? c : c.t;
+    var action = typeof c === 'string' ? null : c.action;
+    if (!texte) return;
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = texte;
+    b.style.cssText = 'background:var(--blue-light);border:1px solid var(--blue-mid);color:var(--blue);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left';
+    b.onclick = function() {
+      wrap.remove();
+      // « Ouvrir le SOS » : on envoie vers le formulaire qui collecte le
+      // numéro, seul chemin qui déclenche réellement un rappel.
+      if (action === 'sos') {
+        if (typeof openSOSModal === 'function') openSOSModal();
+        return;
+      }
+      var input = document.getElementById('chat-input');
+      if (input) { input.value = texte; sendChat(); }
+    };
+    wrap.appendChild(b);
+  });
+
+  container.appendChild(wrap);
+  container.scrollTop = container.scrollHeight;
 }
 
 function addTyping() {
