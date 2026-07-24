@@ -1008,8 +1008,49 @@ function openTool(name) {
 
 function openSubscription() {
   var s = session.get() || {};
-  if (s.subscribed) { window.location = '/#tarifs'; }
+  // Un abonné va au portail Stripe (changement de formule, factures,
+  // résiliation). Surtout PAS vers /#tarifs : les boutons de la page de vente
+  // ouvrent un nouveau paiement, ce qui créait un second abonnement en
+  // parallèle du premier.
+  if (s.subscribed) { openBillingPortal(); }
   else { openPaywall(); }
+}
+
+// Portail Client Stripe — même parcours que sur le site.
+async function openBillingPortal() {
+  var s = session.get() || {};
+  if (!s.email) { toast('Connectez-vous d\'abord'); return; }
+
+  var loader = document.createElement('div');
+  loader.id = 'portal-loader';
+  loader.style.cssText = 'position:fixed;inset:0;background:rgba(10,15,30,.65);backdrop-filter:blur(6px);z-index:99998;display:flex;align-items:center;justify-content:center';
+  loader.innerHTML = '<div style="background:#fff;border-radius:18px;padding:26px 32px;display:flex;flex-direction:column;align-items:center;gap:13px;max-width:80%;text-align:center">'
+    + '<div style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:var(--blue);border-radius:50%;animation:portalspin 1s linear infinite"></div>'
+    + '<div style="font-size:15px;font-weight:800;color:var(--text)">Ouverture de votre espace abonnement…</div>'
+    + '<div style="font-size:12px;color:var(--text3)">Portail sécurisé Stripe</div></div>';
+  if (!document.getElementById('portal-spin-kf')) {
+    var sty = document.createElement('style');
+    sty.id = 'portal-spin-kf';
+    sty.textContent = '@keyframes portalspin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(sty);
+  }
+  document.body.appendChild(loader);
+
+  try {
+    var r = await fetch('/.netlify/functions/create-portal', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+      body: JSON.stringify({ email: s.email })
+    });
+    var d = await r.json();
+    if (!r.ok || !d || !d.url) throw new Error((d && (d.details || d.error)) || 'Réponse invalide');
+    window.location.href = d.url;
+  } catch (e) {
+    var ld = document.getElementById('portal-loader');
+    if (ld) ld.remove();
+    toast('Indisponible — écrivez à contact.despy@gmail.com');
+    console.log('openBillingPortal error:', e && e.message);
+  }
 }
 
 // ─── ANALYSEUR (texte + photo, vision IA) ───
@@ -2041,11 +2082,25 @@ function openPaywall() {
       '<div style="font-size:22px;font-weight:800;color:var(--blue)">9,99€<span style="font-size:13px;color:var(--text3)">/mois</span></div></div>' +
       '<button class="btn-primary" style="margin-top:12px" onclick="startCheckout(\'monthly\')">Choisir le mensuel</button></div>' +
     '<div class="result-card" style="margin-top:12px;border:2px solid #16A34A;position:relative">' +
-      '<div style="position:absolute;top:-11px;right:14px;background:#16A34A;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px">ÉCONOMIE</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Annuel</div><div style="font-size:13px;color:var(--text3)">Le plus avantageux</div></div>' +
+      '<div style="position:absolute;top:-11px;right:14px;background:#16A34A;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px">2 MOIS OFFERTS</div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Annuel</div><div style="font-size:13px;color:var(--text3)">soit 7,42€/mois</div></div>' +
       '<div style="font-size:22px;font-weight:800;color:#16A34A">89€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
+      '<div style="margin-top:9px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;color:#9A3412">🎁 Livret de formation offert <span style="font-weight:400">(135 pages, 29,90€)</span></div>' +
       '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'annual\')">Choisir l\'annuel</button></div>' +
-    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Paiement sécurisé par Stripe · résiliable à tout moment</div>'
+
+    // Offre Famille : elle existait côté serveur (create-checkout accepte
+    // family_monthly / family_annual) mais n'était affichée que sur le site.
+    '<div style="margin-top:18px;font-size:13px;font-weight:800;color:var(--text3);letter-spacing:.04em">POUR TOUTE LA FAMILLE · jusqu\'à 4 personnes</div>' +
+    '<div class="result-card" style="margin-top:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Famille</div><div style="font-size:13px;color:var(--text3)">Moins cher que 2 abonnements</div></div>' +
+      '<div style="font-size:20px;font-weight:800;color:var(--text)">14,99€<span style="font-size:13px;color:var(--text3)">/mois</span></div></div>' +
+      '<button class="btn-secondary" style="margin-top:12px" onclick="startCheckout(\'family_monthly\')">Choisir Famille mensuel</button></div>' +
+    '<div class="result-card" style="margin-top:10px;border:2px solid #16A34A">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Famille annuel</div><div style="font-size:13px;color:var(--text3)">soit 11,58€/mois</div></div>' +
+      '<div style="font-size:20px;font-weight:800;color:#16A34A">139€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
+      '<div style="margin-top:9px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;color:#9A3412">🎁 Livret de formation offert</div>' +
+      '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'family_annual\')">Choisir Famille annuel</button></div>' +
+    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Paiement sécurisé par Stripe · CB, Apple Pay, prélèvement SEPA · résiliable à tout moment</div>'
   );
 }
 
