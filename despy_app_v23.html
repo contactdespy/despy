@@ -3145,10 +3145,37 @@ function showInstallInstructions() {
   document.getElementById('install-modal').style.display = 'flex';
 }
 
+// Identifiant de build. À incrémenter à chaque déploiement de l'appli :
+// c'est lui qui déclenche la mise à jour automatique côté téléphone.
+var APP_BUILD = '2026-07-24-9';
+
+// Mise à jour auto : au lancement, on demande au serveur la toute dernière
+// version (sans passer par le cache). Si le build a changé, on recharge une
+// fois. Indispensable pour une appli installée sur l'écran d'accueil : sans
+// ça, iOS garde longtemps l'ancienne page et les nouveautés n'apparaissent
+// jamais (cartes qui ne réagissent pas, écrans « d'avant »…).
+function checkForUpdate() {
+  if (!navigator.onLine) return;
+  fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.text(); })
+    .then(function (html) {
+      var m = html.match(/APP_BUILD\s*=\s*'([^']+)'/);
+      if (!m) return;
+      var latest = m[1];
+      if (latest === APP_BUILD) return;              // déjà à jour
+      var flag = 'despy_updated_to';
+      if (sessionStorage.getItem(flag) === latest) return;  // évite toute boucle
+      sessionStorage.setItem(flag, latest);
+      location.replace(location.pathname + '?maj=' + latest); // recharge propre, cache contourné
+    })
+    .catch(function () {});
+}
+
 document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
+  setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
   setTimeout(showInstallBanner, 1500);
   if ('serviceWorker' in navigator) {
