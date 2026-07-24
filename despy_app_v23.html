@@ -584,6 +584,47 @@ body{ background:var(--p-paper); }
 .lockrow .m .b{ font-size:11.5px; color:#aab2c2; margin-top:2px; }
 .lockrow .unlock{ font-size:11px; font-weight:800; color:#fff; background:var(--p-gold); border-radius:99px; padding:6px 11px; white-space:nowrap; flex:none; }
 
+
+/* ── page abonnement plein écran ── */
+.paywall{ position:fixed; inset:0; z-index:2000; background:var(--p-paper); display:none; flex-direction:column; }
+.paywall.on{ display:flex; animation:pwIn .28s cubic-bezier(.2,.7,.3,1) both; }
+@keyframes pwIn{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:none;} }
+@media (prefers-reduced-motion:reduce){ .paywall.on{ animation:none; } }
+.pw-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.pw-top{ background:radial-gradient(130% 130% at 18% -20%,#164a86 0%,#0e2c54 46%,#091c38 100%); color:#fff; padding:calc(var(--safe-top) + 20px) 20px 22px; }
+.pw-back{ width:34px; height:34px; border:0; border-radius:10px; background:rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; margin-bottom:14px; cursor:pointer; }
+.pw-top h1{ font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0; }
+.pw-top p{ font-size:13px; color:#9fb6d8; margin:5px 0 0; }
+.pw-body{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+.pw-toggle{ background:#E7EBF3; border-radius:99px; padding:5px; display:flex; position:relative; }
+.pw-toggle button{ flex:1; border:0; background:none; font-family:inherit; font-size:13.5px; font-weight:800; color:var(--p-muted); padding:11px; border-radius:99px; cursor:pointer; z-index:2; display:flex; align-items:center; justify-content:center; gap:7px; }
+.pw-toggle button.on{ color:var(--p-ink); }
+.pw-knob{ position:absolute; top:5px; bottom:5px; left:5px; width:calc(50% - 5px); background:#fff; border-radius:99px; box-shadow:0 3px 10px rgba(12,25,55,.14); transition:transform .28s cubic-bezier(.3,.8,.3,1); z-index:1; }
+.pw-toggle.annuel .pw-knob{ transform:translateX(100%); }
+.pw-save{ font-size:10px; font-weight:800; color:var(--p-safe); background:var(--p-safe-soft); border-radius:99px; padding:2px 7px; }
+.pw-plan{ background:#fff; border:2px solid var(--p-line); border-radius:18px; padding:16px 17px; cursor:pointer; position:relative; transition:border-color .15s,box-shadow .15s; }
+.pw-plan.sel{ border-color:var(--p-blue); box-shadow:0 10px 26px rgba(45,91,255,.16); }
+.pw-plan-h{ display:flex; align-items:center; gap:11px; }
+.pw-radio{ width:22px; height:22px; border-radius:50%; border:2px solid #CBD4E4; flex:none; display:flex; align-items:center; justify-content:center; }
+.pw-plan.sel .pw-radio{ border-color:var(--p-blue); background:var(--p-blue); }
+.pw-plan.sel .pw-radio::after{ content:""; width:8px; height:8px; border-radius:50%; background:#fff; }
+.pw-name{ font-size:16px; font-weight:800; letter-spacing:-.01em; } .pw-who{ font-size:12px; color:var(--p-muted); margin-top:1px; }
+.pw-price{ margin-left:auto; text-align:right; } .pw-price .p{ font-size:22px; font-weight:800; letter-spacing:-.02em; } .pw-price .per{ font-size:12px; color:var(--p-muted); font-weight:600; }
+.pw-foot{ display:flex; align-items:center; gap:8px; margin-top:11px; padding-top:11px; border-top:1px solid var(--p-line); flex-wrap:wrap; }
+.pw-equiv{ font-size:11.5px; color:var(--p-muted); } .pw-equiv b{ color:var(--p-ink); }
+.pw-gift{ font-size:11px; font-weight:800; color:#B4892E; background:#FBF3E0; border-radius:99px; padding:4px 9px; display:inline-flex; align-items:center; gap:4px; }
+.pw-best{ position:absolute; top:-9px; right:16px; background:var(--p-blue); color:#fff; font-size:10px; font-weight:800; letter-spacing:.03em; border-radius:99px; padding:3px 10px; box-shadow:0 4px 10px rgba(45,91,255,.35); }
+.pw-incl{ background:#fff; border-radius:16px; padding:16px 18px; box-shadow:0 6px 18px rgba(12,25,55,.06); }
+.pw-h{ font-size:12px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--p-muted); margin-bottom:11px; }
+.pw-it{ display:flex; align-items:flex-start; gap:11px; padding:6px 0; font-size:13.3px; line-height:1.4; color:var(--p-ink); }
+.pw-ck{ width:20px; height:20px; border-radius:50%; background:var(--p-safe); flex:none; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+.pw-it.gift-line{ color:#B4892E; font-weight:700; } .pw-it.gift-line .pw-ck{ background:#B4892E; }
+.pw-reass{ display:flex; justify-content:space-around; gap:8px; padding:2px; }
+.pw-reass .r{ text-align:center; flex:1; } .pw-reass .r svg{ margin-bottom:5px; } .pw-reass .r span{ display:block; font-size:10.5px; color:var(--p-muted); font-weight:700; line-height:1.3; }
+.pw-cta-bar{ background:rgba(255,255,255,.97); backdrop-filter:blur(10px); border-top:1px solid var(--p-line); padding:12px 16px calc(16px + var(--safe-bottom)); }
+.pw-cta{ width:100%; border:0; font-family:inherit; font-weight:800; font-size:16px; color:#fff; background:linear-gradient(120deg,#2D5BFF,#1E3FD0); border-radius:14px; padding:16px; box-shadow:0 8px 20px rgba(45,91,255,.38); cursor:pointer; }
+.pw-note{ text-align:center; font-size:11px; color:var(--p-muted); margin-top:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
+
 </style>
 </head>
 <body>
@@ -843,6 +884,65 @@ body{ background:var(--p-paper); }
 
     </div>
   </div>
+
+
+<!-- ═══ PAGE ABONNEMENT (plein écran) ═══ -->
+<div id="paywall" class="paywall">
+  <div class="pw-scroll">
+    <div class="pw-top">
+      <button class="pw-back" onclick="closePaywall()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h1>Passez à Premium</h1>
+      <p>Débloquez toute votre protection. Sans engagement.</p>
+    </div>
+    <div class="pw-body">
+      <div class="pw-toggle annuel" id="pw-toggle">
+        <div class="pw-knob"></div>
+        <button data-c="mensuel" onclick="pwSetCycle('mensuel')">Mensuel</button>
+        <button class="on" data-c="annuel" onclick="pwSetCycle('annuel')">Annuel <span class="pw-save">−2 mois</span></button>
+      </div>
+
+      <div class="pw-plan sel" id="pw-solo" onclick="pwSetPlan('solo')">
+        <span class="pw-best">LE PLUS CHOISI</span>
+        <div class="pw-plan-h">
+          <span class="pw-radio"></span>
+          <div><div class="pw-name">Solo</div><div class="pw-who">1 personne</div></div>
+          <div class="pw-price"><span class="p" data-pw-price="solo">89 €</span><span class="per" data-pw-per="solo">/an</span></div>
+        </div>
+        <div class="pw-foot" data-pw-foot="solo"><span class="pw-equiv">soit <b>7,42 €/mois</b></span><span class="pw-gift">🎁 Livret offert (135 p.)</span></div>
+      </div>
+
+      <div class="pw-plan" id="pw-famille" onclick="pwSetPlan('famille')">
+        <div class="pw-plan-h">
+          <span class="pw-radio"></span>
+          <div><div class="pw-name">Famille</div><div class="pw-who">jusqu'à 4 personnes</div></div>
+          <div class="pw-price"><span class="p" data-pw-price="famille">139 €</span><span class="per" data-pw-per="famille">/an</span></div>
+        </div>
+        <div class="pw-foot" data-pw-foot="famille"><span class="pw-equiv">soit <b>11,58 €/mois</b></span><span class="pw-gift">🎁 Livret offert (135 p.)</span></div>
+      </div>
+
+      <div class="pw-incl">
+        <div class="pw-h">Tout est inclus</div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Conseiller « Est-ce une arnaque&nbsp;? » <b>illimité</b></div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Ligne <b>SOS humaine</b>, réponse garantie</div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Surveillance dark web <b>en continu</b></div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Nettoyage de vos données personnelles</div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Alertes arnaques en temps réel</div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Formation complète (10 modules)</div>
+        <div class="pw-it gift-line"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span id="pw-giftline">Le livret de formation offert (valeur 29,90 €)</span></div>
+      </div>
+
+      <div class="pw-reass">
+        <div class="r"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#159B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg><span>Satisfait ou remboursé 30 j</span></div>
+        <div class="r"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#2D5BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Paiement 100% sécurisé</span></div>
+        <div class="r"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#5C6B84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span>Résiliable en 1 clic</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pw-cta-bar">
+    <button class="pw-cta" id="pw-cta" onclick="pwCheckout()">S'abonner — 89 €/an</button>
+    <div class="pw-note"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Carte bancaire · Apple Pay · prélèvement SEPA</div>
+  </div>
+</div>
 
   <nav class="bottom-nav">
     <button class="nav-btn" data-tab="home" onclick="switchAppTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Accueil</span></button>
@@ -2582,41 +2682,52 @@ function diagGuide(os) {
 }
 
 // ─── ABONNEMENT / PAIEMENT STRIPE ───
-function openPaywall() {
-  openSheet('Passer en Premium',
-    '<p class="sheet-help">Débloquez l\'accès illimité : analyses sans limite, conseiller IA, quiz, alertes nationales, assistance téléphonique et Privacy Cleanup.</p>' +
-    '<div class="result-card" style="border:2px solid var(--blue);margin-top:0">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Mensuel</div><div style="font-size:13px;color:var(--text3)">Sans engagement</div></div>' +
-      '<div style="font-size:22px;font-weight:800;color:var(--blue)">9,99€<span style="font-size:13px;color:var(--text3)">/mois</span></div></div>' +
-      '<button class="btn-primary" style="margin-top:12px" onclick="startCheckout(\'monthly\')">Choisir le mensuel</button></div>' +
-    '<div class="result-card" style="margin-top:12px;border:2px solid #16A34A;position:relative">' +
-      '<div style="position:absolute;top:-11px;right:14px;background:#16A34A;color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px">2 MOIS OFFERTS</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Annuel</div><div style="font-size:13px;color:var(--text3)">soit 7,42€/mois</div></div>' +
-      '<div style="font-size:22px;font-weight:800;color:#16A34A">89€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
-      '<div style="margin-top:9px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;color:#9A3412">🎁 Livret de formation offert <span style="font-weight:400">(135 pages, 29,90€)</span></div>' +
-      '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'annual\')">Choisir l\'annuel</button></div>' +
+var _pwCycle = 'annuel', _pwPlan = 'solo';
+var PW_DATA = {
+  solo:    { mensuel: { price: '9,99\u00a0\u20ac',  per: '/mois', plan: 'monthly' },       annuel: { price: '89\u00a0\u20ac',  per: '/an', equiv: '7,42\u00a0\u20ac/mois',  plan: 'annual' } },
+  famille: { mensuel: { price: '14,99\u00a0\u20ac', per: '/mois', plan: 'family_monthly' }, annuel: { price: '139\u00a0\u20ac', per: '/an', equiv: '11,58\u00a0\u20ac/mois', plan: 'family_annual' } }
+};
 
-    // Offre Famille : elle existait côté serveur (create-checkout accepte
-    // family_monthly / family_annual) mais n'était affichée que sur le site.
-    '<div style="margin-top:18px;font-size:13px;font-weight:800;color:var(--text3);letter-spacing:.04em">POUR TOUTE LA FAMILLE · jusqu\'à 4 personnes</div>' +
-    '<div class="result-card" style="margin-top:8px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Famille</div><div style="font-size:13px;color:var(--text3)">Moins cher que 2 abonnements</div></div>' +
-      '<div style="font-size:20px;font-weight:800;color:var(--text)">14,99€<span style="font-size:13px;color:var(--text3)">/mois</span></div></div>' +
-      '<button class="btn-secondary" style="margin-top:12px" onclick="startCheckout(\'family_monthly\')">Choisir Famille mensuel</button></div>' +
-    '<div class="result-card" style="margin-top:10px;border:2px solid #16A34A">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:17px">Famille annuel</div><div style="font-size:13px;color:var(--text3)">soit 11,58€/mois</div></div>' +
-      '<div style="font-size:20px;font-weight:800;color:#16A34A">139€<span style="font-size:13px;color:var(--text3)">/an</span></div></div>' +
-      '<div style="margin-top:9px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:9px;padding:8px 10px;font-size:13px;font-weight:700;color:#9A3412">🎁 Livret de formation offert</div>' +
-      '<button class="btn-primary" style="margin-top:12px;background:#16A34A" onclick="startCheckout(\'family_annual\')">Choisir Famille annuel</button></div>' +
-    // Réassurance : pour un senior, « remboursé » et « sans engagement »
-    // lèvent le dernier frein bien mieux qu'un argument de plus.
-    '<div style="background:#fff;border:1px solid var(--line,#E5E5EA);border-radius:14px;padding:13px 14px;margin-top:16px">' +
-      '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)">Satisfait ou <strong>remboursé sous 30 jours</strong></span></div>' +
-      '<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:8px"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)"><strong>Résiliable en 1 clic</strong>, sans justification</span></div>' +
-      '<div style="display:flex;gap:9px;align-items:flex-start"><span style="color:#15803D;font-weight:800">✓</span><span style="font-size:14px;line-height:1.45;color:var(--text2)">Service français · vos données restent en France</span></div>' +
-    '</div>' +
-    '<div style="font-size:12px;color:var(--text3);text-align:center;margin-top:14px">Paiement sécurisé par Stripe · CB, Apple Pay, prélèvement SEPA · résiliable à tout moment</div>'
-  );
+function openPaywall() {
+  _pwCycle = 'annuel'; _pwPlan = 'solo';
+  document.getElementById('paywall').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  renderPaywall();
+}
+function closePaywall() {
+  document.getElementById('paywall').classList.remove('on');
+  document.body.style.overflow = '';
+}
+function pwSetCycle(c) { _pwCycle = c; renderPaywall(); }
+function pwSetPlan(p) { _pwPlan = p; renderPaywall(); }
+
+function renderPaywall() {
+  var tog = document.getElementById('pw-toggle');
+  tog.classList.toggle('annuel', _pwCycle === 'annuel');
+  document.querySelectorAll('#pw-toggle button').forEach(function (b) { b.classList.toggle('on', b.dataset.c === _pwCycle); });
+  ['solo', 'famille'].forEach(function (k) {
+    var d = PW_DATA[k][_pwCycle];
+    document.querySelector('[data-pw-price="' + k + '"]').textContent = d.price;
+    document.querySelector('[data-pw-per="' + k + '"]').textContent = d.per;
+    var foot = document.querySelector('[data-pw-foot="' + k + '"]');
+    if (_pwCycle === 'annuel') { foot.style.display = 'flex'; foot.querySelector('.pw-equiv').innerHTML = 'soit <b>' + d.equiv + '</b>'; }
+    else { foot.style.display = 'none'; }
+  });
+  document.getElementById('pw-solo').classList.toggle('sel', _pwPlan === 'solo');
+  document.getElementById('pw-famille').classList.toggle('sel', _pwPlan === 'famille');
+  var d = PW_DATA[_pwPlan][_pwCycle];
+  document.getElementById('pw-cta').textContent = 'S\u2019abonner \u2014 ' + d.price + d.per;
+  document.getElementById('pw-giftline').textContent = _pwCycle === 'annuel'
+    ? 'Le livret de formation offert (valeur 29,90\u00a0\u20ac)'
+    : 'Le livret de formation (offert avec l\u2019annuel)';
+  document.querySelector('#paywall .pw-best').style.display = (_pwPlan === 'solo') ? 'block' : 'none';
+}
+
+// Le CTA lance le paiement Stripe pour le plan choisi.
+function pwCheckout() {
+  var plan = PW_DATA[_pwPlan][_pwCycle].plan;
+  closePaywall();
+  startCheckout(plan);
 }
 
 async function startCheckout(plan) {
