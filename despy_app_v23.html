@@ -625,6 +625,24 @@ body{ background:var(--p-paper); }
 .pw-cta{ width:100%; border:0; font-family:inherit; font-weight:800; font-size:16px; color:#fff; background:linear-gradient(120deg,#2D5BFF,#1E3FD0); border-radius:14px; padding:16px; box-shadow:0 8px 20px rgba(45,91,255,.38); cursor:pointer; }
 .pw-note{ text-align:center; font-size:11px; color:var(--p-muted); margin-top:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
 
+
+/* ── module de formation plein écran ── */
+.modscreen{ position:fixed; inset:0; z-index:2000; background:var(--p-paper); display:none; flex-direction:column; }
+.modscreen.on{ display:flex; animation:pwIn .28s cubic-bezier(.2,.7,.3,1) both; }
+@media (prefers-reduced-motion:reduce){ .modscreen.on{ animation:none; } }
+.mod-top{ background:radial-gradient(130% 130% at 18% -20%,#164a86 0%,#0e2c54 46%,#091c38 100%); color:#fff; padding:calc(var(--safe-top) + 18px) 18px 16px; }
+.mod-top-row{ display:flex; align-items:center; gap:12px; }
+.mod-back{ width:36px; height:36px; border:0; border-radius:11px; background:rgba(255,255,255,.14); color:#fff; display:flex; align-items:center; justify-content:center; flex:none; cursor:pointer; }
+.mod-label{ font-size:12.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#a9c2f5; }
+.mod-htitle{ font-size:17px; font-weight:800; margin-top:1px; }
+.mod-steps{ display:flex; gap:5px; margin-top:14px; }
+.mod-scroll{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:18px 16px; }
+.mod-cta-bar{ background:rgba(255,255,255,.97); backdrop-filter:blur(10px); border-top:1px solid var(--p-line); padding:12px 16px calc(16px + var(--safe-bottom)); }
+.mod-cta{ width:100%; border:0; border-radius:15px; padding:16px; font-family:inherit; font-size:17px; font-weight:800; color:#fff; background:var(--p-blue); cursor:pointer; box-shadow:0 8px 20px rgba(47,91,234,.34); }
+.mod-cta:disabled{ background:#C6CEE0; box-shadow:none; cursor:default; }
+.mod-astuce{ text-align:center; font-size:13px; color:var(--p-muted); margin-top:9px; }
+.mod-astuce:empty{ display:none; }
+
 </style>
 </head>
 <body>
@@ -885,6 +903,23 @@ body{ background:var(--p-paper); }
     </div>
   </div>
 
+
+
+<!-- ═══ MODULE DE FORMATION (plein écran) ═══ -->
+<div id="module" class="modscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeModule()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Module 3 sur 10</div><div class="mod-htitle">Le faux SMS de colis</div></div>
+    </div>
+    <div class="mod-steps" id="mod-steps"></div>
+  </div>
+  <div class="mod-scroll"><div id="mod-body"></div></div>
+  <div class="mod-cta-bar">
+    <button class="mod-cta" id="mod-cta"></button>
+    <div class="mod-astuce" id="mod-astuce"></div>
+  </div>
+</div>
 
 <!-- ═══ PAGE ABONNEMENT (plein écran) ═══ -->
 <script>
@@ -2948,8 +2983,24 @@ var MOD_PIEGES = {
 
 function openModule() {
   _modEtape = 0; _modTrouves = {}; _modRep = {};
-  openSheet('Le faux SMS de colis', '<div id="mod-body"></div>');
-  setTimeout(modRender, 120);
+  document.getElementById('module').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  modRender();
+}
+function closeModule() {
+  document.getElementById('module').classList.remove('on');
+  document.body.style.overflow = '';
+}
+// Barre de progression, dans l'en-tête bleu nuit (couleurs claires).
+function modSteps() {
+  var el = document.getElementById('mod-steps');
+  if (!el) return;
+  var h = '';
+  for (var i = 1; i <= 5; i++) {
+    var c = _modEtape > i ? '#5CE0A0' : (_modEtape === i ? '#fff' : 'rgba(255,255,255,.25)');
+    h += '<i style="flex:1;height:5px;border-radius:20px;background:' + c + '"></i>';
+  }
+  el.innerHTML = h;
 }
 
 function modAller(n) { _modEtape = Math.max(0, Math.min(5, n)); modRender(); }
@@ -3011,7 +3062,8 @@ function modCorrige(q) {
 function modRender() {
   var z = document.getElementById('mod-body');
   if (!z) return;
-  var h = modPuces(), cta = '', astuce = '';
+  modSteps();
+  var h = '', cta = '', astuce = '';
 
   if (_modEtape === 0) {
     h += '<div style="font-size:22px;font-weight:850;color:var(--text);line-height:1.25;margin-bottom:10px">Le faux SMS de colis</div>' +
@@ -3098,15 +3150,18 @@ function modRender() {
     cta = 'Terminer';
   }
 
-  var bloque = !modDeverrouille();
-  h += '<button class="btn-primary" style="margin-top:14px' + (bloque ? ';background:#C6CEE0;box-shadow:none' : '') + '" ' +
-    (bloque ? 'disabled' : 'onclick="' + (_modEtape === 5 ? 'closeSheet()' : 'modAller(' + (_modEtape + 1) + ')') + '"') +
-    '>' + cta + '</button>';
-  if (astuce) h += '<div style="text-align:center;font-size:13px;color:var(--text3);margin-top:9px">' + astuce + '</div>';
-
   z.innerHTML = h;
-  var sh = document.querySelector('.sheet-content') || z.parentElement;
-  if (sh && sh.scrollTop) sh.scrollTop = 0;
+
+  // Bouton d'action collant (dans la barre du bas, pas dans le corps).
+  var bloque = !modDeverrouille();
+  var btn = document.getElementById('mod-cta');
+  btn.textContent = cta;
+  btn.disabled = bloque;
+  btn.onclick = bloque ? null : (_modEtape === 5 ? closeModule : function () { modAller(_modEtape + 1); });
+  document.getElementById('mod-astuce').textContent = astuce || '';
+
+  var sc = document.querySelector('#module .mod-scroll');
+  if (sc) sc.scrollTop = 0;
 }
 
 function modPiege(n, texte) {
@@ -3170,7 +3225,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-24-11';
+var APP_BUILD = '2026-07-24-12';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
