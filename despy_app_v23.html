@@ -1279,7 +1279,14 @@ function switchAppTab(tab) {
   if (tab === 'protection') refreshHomeScore();
 }
 
+// Minuteur du nettoyage de la feuille. Sans lui, quand on enchaîne
+// closeSheet() puis la réouverture d'une autre feuille (ex. écran Formation
+// → « Bilan mensuel »), le nettoyage différé (300 ms) écrasait le contenu
+// fraîchement ouvert par un spinner qui tournait ensuite dans le vide.
+var _sheetResetTimer = null;
+
 function openSheet(title, html) {
+  if (_sheetResetTimer) { clearTimeout(_sheetResetTimer); _sheetResetTimer = null; }
   document.getElementById('sheet-title').textContent = title;
   document.getElementById('sheet-body').innerHTML = html;
   document.getElementById('sheet-backdrop').classList.add('open');
@@ -1289,9 +1296,10 @@ function openSheet(title, html) {
 
 function closeSheet() {
   document.getElementById('sheet').classList.remove('open');
-  setTimeout(function(){
+  _sheetResetTimer = setTimeout(function(){
     document.getElementById('sheet-backdrop').classList.remove('open');
     document.getElementById('sheet-body').innerHTML = '<div class="spinner"></div>';
+    _sheetResetTimer = null;
   }, 300);
 }
 
@@ -3147,7 +3155,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-24-9';
+var APP_BUILD = '2026-07-24-10';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
