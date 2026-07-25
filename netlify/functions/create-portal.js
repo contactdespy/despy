@@ -85,10 +85,17 @@ exports.handler = async (event) => {
     }
 
     // ── Créer la session du portail ──
+    // Le lien « Retour » de Stripe doit ramener LÀ D'OÙ l'on vient : dans
+    // l'appli si l'appel vient de l'appli, sur le site sinon. Sans ça, un
+    // membre de l'appli atterrissait sur la page d'accueil du site, sans
+    // aucun chemin de retour vers l'appli.
     const baseUrl = process.env.URL || 'https://despy.fr';
+    const returnUrl = body.source === 'app'
+      ? `${baseUrl}/app?portal=return`
+      : `${baseUrl}/?portal=return`;
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${baseUrl}/?portal=return`,
+      return_url: returnUrl,
       locale: 'fr',
     });
 

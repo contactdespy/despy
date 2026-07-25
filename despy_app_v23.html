@@ -1147,6 +1147,21 @@ function enterApp() {
 function handlePaymentReturn() {
   var params;
   try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+
+  // Retour depuis le portail Stripe (« Gérer mon abonnement »). On nettoie
+  // l'URL, on revalide l'abonnement (il a pu changer) et on rouvre le compte.
+  if (params.get('portal') === 'return') {
+    try {
+      params.delete('portal');
+      var q = params.toString();
+      history.replaceState({}, '', window.location.pathname + (q ? '?' + q : ''));
+    } catch (e) {}
+    if (typeof revalidateSession === 'function') revalidateSession();
+    switchAppTab('profile');
+    toast('Abonnement mis à jour');
+    return;
+  }
+
   var etat = params.get('payment');
   if (!etat) return;
 
@@ -1369,7 +1384,7 @@ async function openBillingPortal() {
     var r = await fetch('/.netlify/functions/create-portal', {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
-      body: JSON.stringify({ email: s.email })
+      body: JSON.stringify({ email: s.email, source: 'app' })
     });
     var d = await r.json();
     if (!r.ok || !d || !d.url) throw new Error((d && (d.details || d.error)) || 'Réponse invalide');
@@ -3155,7 +3170,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-24-10';
+var APP_BUILD = '2026-07-24-11';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
