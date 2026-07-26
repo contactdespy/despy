@@ -724,6 +724,16 @@ html.dys{ --sans:Verdana, Tahoma, "Segoe UI", Arial, sans-serif; }
 html.dys body{ letter-spacing:.02em; word-spacing:.06em; line-height:1.7; }
 html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h2{ letter-spacing:.01em; }
 
+
+/* ── bandeau hors-ligne ── */
+.offline-bar{ position:fixed; left:0; right:0; bottom:calc(var(--nav-h,84px) - 8px); z-index:1500;
+  margin:0 12px; padding:11px 14px; border-radius:14px; background:#3a4152; color:#fff;
+  font-size:13px; line-height:1.4; display:none; align-items:flex-start; gap:9px;
+  box-shadow:0 10px 26px rgba(0,0,0,.28); }
+.offline-bar.on{ display:flex; animation:pwIn .28s cubic-bezier(.2,.7,.3,1) both; }
+.offline-bar svg{ flex:none; margin-top:1px; opacity:.9; }
+@media (prefers-reduced-motion:reduce){ .offline-bar.on{ animation:none; } }
+
 </style>
 </head>
 <body>
@@ -1154,6 +1164,11 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
   </div>
 </div>
 
+  <div id="offline-bar" class="offline-bar" role="status" aria-live="polite">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.7 11.1a5 5 0 0 1 3 1.5M5 12.5a10 10 0 0 1 4-2.3M2 8.8a15 15 0 0 1 4.2-2.5M20.9 8.8a15 15 0 0 0-4.6-2.6"/><path d="M8.5 16a5 5 0 0 1 6 0"/><path d="M12 20h.01"/></svg>
+    Pas de connexion internet — l'appli reste accessible, les vérifications reprendront au retour du réseau.
+  </div>
+
   <nav class="bottom-nav">
     <button class="nav-btn" data-tab="home" onclick="switchAppTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Accueil</span></button>
     <button class="nav-btn" data-tab="protection" onclick="switchAppTab('protection')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Protection</span></button>
@@ -1544,6 +1559,18 @@ function initA11yToggles() {
     applyContrast(localStorage.getItem('despy_contrast') === '1');
     applyDyslexia(localStorage.getItem('despy_dyslexia') === '1');
   } catch (e) {}
+}
+
+// Bandeau hors-ligne : piloté par les événements online/offline du système
+// (fiables en conditions réelles), + état initial selon navigator.onLine.
+function setOffline(on) {
+  var bar = document.getElementById('offline-bar');
+  if (bar) bar.classList.toggle('on', !!on);
+}
+function initOfflineBar() {
+  window.addEventListener('offline', function () { setOffline(true); });
+  window.addEventListener('online', function () { setOffline(false); });
+  setOffline(navigator.onLine === false);
 }
 
 // Accessibilité : taille du texte (agrandit toute l'appli via zoom).
@@ -3866,7 +3893,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-25-6';
+var APP_BUILD = '2026-07-25-7';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -3897,6 +3924,7 @@ document.addEventListener('DOMContentLoaded', function(){
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   initTextSize();                          // taille du texte (accessibilité)
   initA11yToggles();                       // contraste + confort de lecture
+  initOfflineBar();                        // bandeau hors-ligne
   setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
   setTimeout(handleShareTarget, 450);     // « Partager avec Despy » (Android)
   setTimeout(showInstallBanner, 1500);
