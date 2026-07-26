@@ -554,6 +554,7 @@ body{ background:var(--p-paper); }
 .stats-g{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:13px; }
 .stats-g .n{ font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
 .stats-g .k{ font-size:10.5px; color:var(--p-muted); line-height:1.3; margin-top:3px; }
+.stats-cta{ display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:14px; padding-top:12px; border-top:1px solid var(--p-line,#E7EBF3); font-size:13px; font-weight:800; color:var(--p-blue,#2D5BFF); }
 
 /* ── onglet Conseiller (chat plein écran) ── */
 .cons-av{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,#5ce0a0,#2d5bff); }
@@ -875,14 +876,15 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      <div class="card pad stats" id="home-stats">
+      <button class="card pad stats" id="home-stats" onclick="openBilan()" style="width:100%;display:block;text-align:left;font-family:inherit;cursor:pointer">
         <div class="stats-h">Ce mois-ci, Despy a veillé sur vous</div>
         <div class="stats-g">
           <div><div class="n" id="stat-fuites" style="color:var(--p-safe)">0</div><div class="k">fuite détectée</div></div>
           <div><div class="n" id="stat-sites" style="color:var(--p-blue)">—</div><div class="k">sites surveillés</div></div>
           <div><div class="n" id="stat-questions" style="color:var(--p-blue)">0</div><div class="k">questions posées</div></div>
         </div>
-      </div>
+        <div class="stats-cta">Voir mon bilan complet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </button>
 
       <div id="home-locked" style="display:none">
         <div class="sec">Avec l'abonnement</div>
@@ -961,6 +963,15 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           <div class="b" id="profile-email">—</div>
         </div>
         <span class="prof-plan" id="profile-plan"></span>
+      </div>
+
+      <div class="sec">Mon suivi</div>
+      <div class="plist">
+        <button class="listrow" onclick="openBilan()">
+          <span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></span>
+          <span class="m"><span class="a">Mon bilan mensuel</span><span class="b">Le récap de votre protection ce mois-ci</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
 
       <div class="sec">Mon abonnement</div>
@@ -3893,7 +3904,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-25-7';
+var APP_BUILD = '2026-07-26-1';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
