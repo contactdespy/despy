@@ -688,6 +688,16 @@ body{ background:var(--p-paper); }
 .auth-back{ position:absolute; top:calc(var(--safe-top,0) + 14px); left:16px; width:38px; height:38px; border:0; border-radius:11px;
   background:rgba(255,255,255,.14); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5; }
 
+
+/* ── accessibilité : sélecteur de taille du texte ── */
+.ts-row{ display:flex; gap:9px; }
+.ts-btn{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  background:#fff; border:1.5px solid var(--p-line,#E7EBF3); border-radius:14px; padding:13px 6px;
+  font-family:inherit; font-size:12.5px; font-weight:700; color:var(--p-muted); cursor:pointer; line-height:1; }
+.ts-btn span{ font-weight:900; color:var(--p-ink); }
+.ts-btn.on{ border-color:var(--p-blue); background:#EEF2FF; color:var(--p-blue); }
+.ts-btn.on span{ color:var(--p-blue); }
+
 </style>
 </head>
 <body>
@@ -945,6 +955,17 @@ body{ background:var(--p-paper); }
         </button>
       </div>
 
+      <div class="sec">Accessibilité</div>
+      <div class="card pad">
+        <div style="font-size:14.5px;font-weight:800;color:var(--p-ink);margin-bottom:3px">Taille du texte</div>
+        <div style="font-size:13px;color:var(--p-muted);margin-bottom:12px">Choisissez ce qui se lit le mieux pour vous.</div>
+        <div class="ts-row">
+          <button id="ts-normal" class="ts-btn" onclick="applyTextSize('normal')"><span style="font-size:15px">A</span>Normal</button>
+          <button id="ts-grand" class="ts-btn" onclick="applyTextSize('grand')"><span style="font-size:19px">A</span>Grand</button>
+          <button id="ts-xl" class="ts-btn" onclick="applyTextSize('xl')"><span style="font-size:24px">A</span>Très grand</button>
+        </div>
+      </div>
+
       <div class="sec">Aide &amp; contact</div>
       <div class="plist">
         <button class="listrow" id="app-support-call" onclick="window.location='tel:+33689148395'">
@@ -1030,6 +1051,12 @@ body{ background:var(--p-paper); }
     } catch (e) {
       document.getElementById('welcome-view').classList.add('active');
     }
+    // Taille du texte choisie (accessibilité) : appliquée tout de suite pour
+    // éviter un saut de mise en page au chargement.
+    try {
+      var v = localStorage.getItem('despy_textsize') || 'normal';
+      document.documentElement.style.zoom = v === 'xl' ? 1.30 : v === 'grand' ? 1.15 : 1;
+    } catch (e) {}
   })();
 </script>
 
@@ -1453,6 +1480,24 @@ function refreshProfile() {
   }
   var callBtn = document.getElementById('app-support-call');
   if (callBtn) callBtn.style.display = s.subscribed ? '' : 'none';
+}
+
+
+// Accessibilité : taille du texte (agrandit toute l'appli via zoom).
+function applyTextSize(v, save) {
+  var z = v === 'xl' ? 1.30 : v === 'grand' ? 1.15 : 1;
+  try { document.documentElement.style.zoom = z; } catch (e) {}
+  if (save !== false) { try { localStorage.setItem('despy_textsize', v); } catch (e) {} }
+  ['normal', 'grand', 'xl'].forEach(function (k) {
+    var b = document.getElementById('ts-' + k);
+    if (b) b.classList.toggle('on', k === v);
+  });
+  if (save !== false && navigator.vibrate) navigator.vibrate(6);
+}
+function initTextSize() {
+  var v = 'normal';
+  try { v = localStorage.getItem('despy_textsize') || 'normal'; } catch (e) {}
+  applyTextSize(v, false);
 }
 
 function switchAppTab(tab) {
@@ -3758,7 +3803,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-25-4';
+var APP_BUILD = '2026-07-25-5';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -3787,6 +3832,7 @@ document.addEventListener('DOMContentLoaded', function(){
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
+  initTextSize();                          // taille du texte (accessibilité)
   setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
   setTimeout(handleShareTarget, 450);     // « Partager avec Despy » (Android)
   setTimeout(showInstallBanner, 1500);
