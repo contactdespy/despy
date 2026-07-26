@@ -698,6 +698,32 @@ body{ background:var(--p-paper); }
 .ts-btn.on{ border-color:var(--p-blue); background:#EEF2FF; color:var(--p-blue); }
 .ts-btn.on span{ color:var(--p-blue); }
 
+
+/* ── interrupteurs accessibilité ── */
+.a11y-row{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none;
+  border:0; border-top:1px solid var(--p-line,#E7EBF3); padding:14px 0 4px; margin-top:12px; font-family:inherit; cursor:pointer; }
+.a11y-m{ flex:1; min-width:0; }
+.a11y-t{ display:block; font-size:14.5px; font-weight:800; color:var(--p-ink); }
+.a11y-s{ display:block; font-size:12.5px; color:var(--p-muted); margin-top:2px; }
+.a11y-sw{ width:46px; height:28px; border-radius:99px; background:#CBD4E4; position:relative; flex:none; transition:background .2s; }
+.a11y-sw i{ position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,.2); transition:transform .2s; }
+.a11y-row.on .a11y-sw{ background:var(--p-blue,#2D5BFF); }
+.a11y-row.on .a11y-sw i{ transform:translateX(18px); }
+
+/* ── mode contraste élevé ── */
+html.hc{ --p-muted:#2b3547; --p-ink:#000; --p-line:#8b97ad;
+  --text:#000; --text2:#1c2536; --text3:#3a4459; --border:#8b97ad; --separator:rgba(11,18,32,.28); }
+html.hc .hero-ey, html.hc .sec, html.hc .stats-h, html.hc .mod-label{ color:#1c2536 !important; }
+html.hc .card, html.hc .plist, html.hc .tile, html.hc .bl-tile, html.hc .fm-row{ border:1px solid #b6c0d2; }
+html.hc .a11y-s, html.hc .fm-s, html.hc .bl-k{ color:#2b3547; }
+
+/* ── confort de lecture (dyslexie) ── */
+html.dys, html.dys body, html.dys input, html.dys textarea, html.dys button{
+  font-family:Verdana, Tahoma, "Segoe UI", Arial, sans-serif !important; }
+html.dys{ --sans:Verdana, Tahoma, "Segoe UI", Arial, sans-serif; }
+html.dys body{ letter-spacing:.02em; word-spacing:.06em; line-height:1.7; }
+html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h2{ letter-spacing:.01em; }
+
 </style>
 </head>
 <body>
@@ -960,10 +986,19 @@ body{ background:var(--p-paper); }
         <div style="font-size:14.5px;font-weight:800;color:var(--p-ink);margin-bottom:3px">Taille du texte</div>
         <div style="font-size:13px;color:var(--p-muted);margin-bottom:12px">Choisissez ce qui se lit le mieux pour vous.</div>
         <div class="ts-row">
-          <button id="ts-normal" class="ts-btn" onclick="applyTextSize('normal')"><span style="font-size:15px">A</span>Normal</button>
-          <button id="ts-grand" class="ts-btn" onclick="applyTextSize('grand')"><span style="font-size:19px">A</span>Grand</button>
-          <button id="ts-xl" class="ts-btn" onclick="applyTextSize('xl')"><span style="font-size:24px">A</span>Très grand</button>
+          <button id="ts-normal" class="ts-btn" onclick="applyTextSize('normal')"><span style="font-size:15px" aria-hidden="true">A</span>Normal</button>
+          <button id="ts-grand" class="ts-btn" onclick="applyTextSize('grand')"><span style="font-size:19px" aria-hidden="true">A</span>Grand</button>
+          <button id="ts-xl" class="ts-btn" onclick="applyTextSize('xl')"><span style="font-size:24px" aria-hidden="true">A</span>Très grand</button>
         </div>
+
+        <button id="hc-toggle" class="a11y-row" role="switch" aria-checked="false" onclick="applyContrast()">
+          <span class="a11y-m"><span class="a11y-t">Contraste élevé</span><span class="a11y-s">Texte plus foncé, bords plus nets</span></span>
+          <span class="a11y-sw" aria-hidden="true"><i></i></span>
+        </button>
+        <button id="dys-toggle" class="a11y-row" role="switch" aria-checked="false" onclick="applyDyslexia()">
+          <span class="a11y-m"><span class="a11y-t">Confort de lecture</span><span class="a11y-s">Police lisible &amp; lettres espacées</span></span>
+          <span class="a11y-sw" aria-hidden="true"><i></i></span>
+        </button>
       </div>
 
       <div class="sec">Aide &amp; contact</div>
@@ -1056,6 +1091,8 @@ body{ background:var(--p-paper); }
     try {
       var v = localStorage.getItem('despy_textsize') || 'normal';
       document.documentElement.style.zoom = v === 'xl' ? 1.30 : v === 'grand' ? 1.15 : 1;
+      if (localStorage.getItem('despy_contrast') === '1') document.documentElement.classList.add('hc');
+      if (localStorage.getItem('despy_dyslexia') === '1') document.documentElement.classList.add('dys');
     } catch (e) {}
   })();
 </script>
@@ -1483,6 +1520,32 @@ function refreshProfile() {
 }
 
 
+
+// Contraste élevé (texte plus foncé, bords plus nets).
+function applyContrast(force) {
+  var on = (typeof force === 'boolean') ? force : !document.documentElement.classList.contains('hc');
+  document.documentElement.classList.toggle('hc', on);
+  try { localStorage.setItem('despy_contrast', on ? '1' : '0'); } catch (e) {}
+  var t = document.getElementById('hc-toggle');
+  if (t) { t.classList.toggle('on', on); t.setAttribute('aria-checked', on ? 'true' : 'false'); }
+  if (typeof force !== 'boolean' && navigator.vibrate) navigator.vibrate(6);
+}
+// Confort de lecture (police lisible + espacement, aide dyslexie).
+function applyDyslexia(force) {
+  var on = (typeof force === 'boolean') ? force : !document.documentElement.classList.contains('dys');
+  document.documentElement.classList.toggle('dys', on);
+  try { localStorage.setItem('despy_dyslexia', on ? '1' : '0'); } catch (e) {}
+  var t = document.getElementById('dys-toggle');
+  if (t) { t.classList.toggle('on', on); t.setAttribute('aria-checked', on ? 'true' : 'false'); }
+  if (typeof force !== 'boolean' && navigator.vibrate) navigator.vibrate(6);
+}
+function initA11yToggles() {
+  try {
+    applyContrast(localStorage.getItem('despy_contrast') === '1');
+    applyDyslexia(localStorage.getItem('despy_dyslexia') === '1');
+  } catch (e) {}
+}
+
 // Accessibilité : taille du texte (agrandit toute l'appli via zoom).
 function applyTextSize(v, save) {
   var z = v === 'xl' ? 1.30 : v === 'grand' ? 1.15 : 1;
@@ -1490,7 +1553,7 @@ function applyTextSize(v, save) {
   if (save !== false) { try { localStorage.setItem('despy_textsize', v); } catch (e) {} }
   ['normal', 'grand', 'xl'].forEach(function (k) {
     var b = document.getElementById('ts-' + k);
-    if (b) b.classList.toggle('on', k === v);
+    if (b) { b.classList.toggle('on', k === v); b.setAttribute('aria-pressed', k === v ? 'true' : 'false'); }
   });
   if (save !== false && navigator.vibrate) navigator.vibrate(6);
 }
@@ -3803,7 +3866,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-25-5';
+var APP_BUILD = '2026-07-25-6';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -3833,6 +3896,7 @@ document.addEventListener('DOMContentLoaded', function(){
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   initTextSize();                          // taille du texte (accessibilité)
+  initA11yToggles();                       // contraste + confort de lecture
   setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
   setTimeout(handleShareTarget, 450);     // « Partager avec Despy » (Android)
   setTimeout(showInstallBanner, 1500);
