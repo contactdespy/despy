@@ -11,6 +11,16 @@
   "lang": "fr",
   "dir": "ltr",
   "categories": ["productivity", "utilities", "lifestyle"],
+  "share_target": {
+    "action": "/despy_app_v23.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "/icon-192.png",

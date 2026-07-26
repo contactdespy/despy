@@ -1287,6 +1287,34 @@ function enterApp() {
 // Retour depuis le paiement Stripe (?payment=success | cancel).
 // Sans ça, le client revenait dans l'appli sans un mot de confirmation et
 // avec un statut « gratuit » tant qu'il ne relançait pas l'appli.
+// « Partager avec Despy » : quand l'utilisateur partage un SMS/lien depuis un
+// autre app via le menu du téléphone, le système ouvre Despy avec le contenu
+// en paramètres (Web Share Target). On ouvre l'analyseur pré-rempli et on
+// lance l'analyse tout de suite. (Android uniquement — iOS ne le permet pas.)
+function handleShareTarget() {
+  var params;
+  try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
+  var texte = params.get('text') || '';
+  var lien = params.get('url') || '';
+  var titre = params.get('title') || '';
+  var partage = [titre, texte, lien].filter(Boolean).join(' ').trim();
+  if (!partage) return;
+
+  // on nettoie l'URL pour qu'un rafraîchissement ne relance pas l'analyse
+  try {
+    ['text', 'url', 'title'].forEach(function (k) { params.delete(k); });
+    var reste = params.toString();
+    history.replaceState({}, '', window.location.pathname + (reste ? '?' + reste : ''));
+  } catch (e) {}
+
+  openAnalyseur();
+  setTimeout(function () {
+    var el = document.getElementById('ana-input');
+    if (el) { el.value = partage; }
+    if (typeof runAnalyseur === 'function') runAnalyseur();
+  }, 400);
+}
+
 function handlePaymentReturn() {
   var params;
   try { params = new URLSearchParams(window.location.search); } catch (e) { return; }
@@ -3730,7 +3758,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-25-3';
+var APP_BUILD = '2026-07-25-4';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -3760,6 +3788,7 @@ document.addEventListener('DOMContentLoaded', function(){
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   setTimeout(handlePaymentReturn, 400);   // retour de paiement Stripe
+  setTimeout(handleShareTarget, 450);     // « Partager avec Despy » (Android)
   setTimeout(showInstallBanner, 1500);
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function(e){ console.warn('SW register failed:', e.message); });
