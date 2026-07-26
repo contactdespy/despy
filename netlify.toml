@@ -201,6 +201,13 @@
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
 
+[functions.nudge-push]
+  schedule = "0 9 * * 3"           # Mercredi 9h UTC (~11h Paris) — notifs « douces »
+                                   # de réengagement, RÉSERVÉES aux comptes gratuits
+                                   # et anciens abonnés (subscribed = false).
+                                   # JAMAIS un abonné Premium actif. 1/semaine max,
+                                   # ton « valeur », messages en rotation.
+
 # Agent IA réseaux sociaux — refonte mai 2026
 # Passage de 7 posts/semaine à 3 posts/semaine (qualité > quantité)
 # Mardi  → scène vécue (storytelling humain)
