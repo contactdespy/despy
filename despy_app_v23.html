@@ -580,6 +580,31 @@ body{ background:var(--p-paper); }
 .vic-help span{ display:block; font-weight:500; font-size:12.5px; color:#a9b7d1; margin-top:3px; }
 .vic-help-2{ background:var(--p-card,#fff); color:var(--p-ink,#0f1830); border:1px solid var(--p-line,#E7EBF3); }
 .vic-help-2 span{ color:var(--p-muted,#6b7280); }
+/* ── Protéger mon téléphone ── */
+.bcl-sel{ border-color:var(--p-blue,#2D5BFF) !important; box-shadow:0 0 0 2px rgba(45,91,255,.15); }
+.bcl-reco{ font-size:11px; font-weight:800; color:var(--p-blue,#2D5BFF); background:#EEF2FF; padding:2px 7px; border-radius:99px; margin-left:4px; white-space:nowrap; }
+.bcl-list{ display:flex; flex-direction:column; gap:10px; }
+.bcl-item{ background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:14px; overflow:hidden; }
+.bcl-head{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0; padding:14px; font-family:inherit; cursor:pointer; }
+.bcl-ic{ font-size:22px; flex:none; }
+.bcl-h-txt{ flex:1; min-width:0; }
+.bcl-t{ display:block; font-size:15px; font-weight:800; color:var(--p-ink,#0f1830); line-height:1.3; }
+.bcl-w{ display:block; font-size:12.5px; color:var(--p-muted,#6b7280); margin-top:3px; line-height:1.4; }
+.bcl-chev{ flex:none; color:#b4c0d6; font-size:15px; transition:transform .2s; }
+.bcl-item.open .bcl-chev{ transform:rotate(180deg); }
+.bcl-body{ display:none; padding:0 14px 14px; }
+.bcl-item.open .bcl-body{ display:block; }
+.bcl-steps{ margin:0 0 10px; padding-left:22px; }
+.bcl-steps li{ font-size:14px; line-height:1.5; color:var(--p-ink,#1c2536); margin-bottom:8px; }
+.bcl-steps strong{ font-weight:800; }
+.bcl-note{ display:block; font-size:12px; color:var(--p-muted,#6b7280); margin-top:3px; }
+.bcl-link{ display:inline-block; font-size:13px; font-weight:800; color:var(--p-blue,#2D5BFF); text-decoration:none; margin-bottom:11px; }
+.bcl-done{ display:block; width:100%; background:#EEF2FF; color:var(--p-blue,#2D5BFF); border:1.5px solid #cfe0ff; border-radius:11px; padding:12px; font-family:inherit; font-weight:800; font-size:14px; cursor:pointer; }
+.bcl-done .bcl-done-on{ display:none; }
+.bcl-item.done .bcl-head{ background:#f2fbf5; }
+.bcl-item.done .bcl-done{ background:#16a34a; border-color:#16a34a; color:#fff; }
+.bcl-item.done .bcl-done .bcl-done-off{ display:none; }
+.bcl-item.done .bcl-done .bcl-done-on{ display:inline; }
 
 /* ── onglet Conseiller (chat plein écran) ── */
 .cons-av{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,#5ce0a0,#2d5bff); }
@@ -941,7 +966,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <div class="plist">
         <button class="listrow" onclick="openTool('darkweb')"><span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></span><span class="m"><span class="a">Email piraté ?</span><span class="b">Fuites de données · dark web</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="listrow" onclick="openTool('privacy')"><span class="ic ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span><span class="m"><span class="a">Effacer mes données</span><span class="b">Demandes RGPD envoyées pour vous</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <button class="listrow" onclick="openTool('diag')"><span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span class="m"><span class="a">Diagnostic du téléphone</span><span class="b">Vérifier les réglages de sécurité</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('bouclier')"><span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M9.3 12l1.8 1.8 3.6-3.8"/></svg></span><span class="m"><span class="a">Protéger mon téléphone</span><span class="b">Activer les filtres appels, SMS &amp; sites</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="listrow" onclick="openTool('diag')"><span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span><span class="m"><span class="a">Nettoyer mon téléphone</span><span class="b">Retirer les pubs &amp; applis indésirables</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
 
       <div class="sec">Communauté</div>
@@ -1096,6 +1122,17 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     </div>
   </div>
   <div class="mod-scroll"><div id="victime-body"></div></div>
+</div>
+
+<!-- ═══ PROTÉGER MON TÉLÉPHONE (plein écran) ═══ -->
+<div id="bouclier" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeBouclier()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Réglages de sécurité</div><div class="mod-htitle" id="bouclier-htitle">Protéger mon téléphone</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="bouclier-body"></div></div>
 </div>
 
 <!-- ═══ FORMATION — liste des 10 modules ═══ -->
@@ -1722,6 +1759,7 @@ function openTool(name) {
     case 'defi':       return openDefi();
     case 'privacy':    return openPrivacy();
     case 'diag':       return openDiag();
+    case 'bouclier':   return openBouclier();
     case 'entrainement': window.location.href = '/mon-entrainement'; return;
     default: toast('Outil bientôt disponible');
   }
@@ -2434,6 +2472,154 @@ function renderVictimePlan(type) {
        '<a href="https://www.cybermalveillance.gouv.fr" target="_blank" rel="noopener" class="vic-help vic-help-2">🌐 Cybermalveillance.gouv.fr<span>Assistance officielle aux victimes</span></a></div>';
   document.getElementById('victime-body').innerHTML = h;
   var sc = document.querySelector('#victime .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+// ─── PROTÉGER MON TÉLÉPHONE (parcours guidé, adapté à l'appareil) ───
+function detectPhone() {
+  var low = (navigator.userAgent || '').toLowerCase();
+  var isIOS = /iphone|ipad|ipod/.test(low) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS) return { key: 'ios', label: 'iPhone' };
+  if (/android/.test(low)) {
+    if (/samsung|sm-|galaxy|one ?ui/.test(low)) return { key: 'samsung', label: 'Android Samsung' };
+    return { key: 'android', label: 'Android' };
+  }
+  return { key: '', label: 'votre téléphone' };
+}
+
+var PHONE_GUIDES = {
+  ios: { label: 'iPhone', items: [
+    { ic: '📵', t: 'Filtrer les appels inconnus',
+      w: 'Les numéros absents de vos contacts sont mis en silence — fini les sonneries d’arnaqueurs.',
+      steps: ['Ouvrez <strong>Réglages</strong>.',
+              'Touchez <strong>Apps</strong> puis <strong>Téléphone</strong><span class="bcl-note">Sur iPhone plus ancien : directement <strong>Réglages › Téléphone</strong>.</span>',
+              'Touchez <strong>Filtrer les correspondants inconnus</strong> (ou <strong>Rendre muets les appels inconnus</strong>).',
+              'Activez l’option.'],
+      link: { u: 'https://support.apple.com/fr-fr/guide/iphone/iphe4b3f7823/ios', l: 'Guide Apple' } },
+    { ic: '💬', t: 'Filtrer les SMS indésirables',
+      w: 'Les SMS d’expéditeurs inconnus sont rangés dans un onglet séparé, à part de vos vrais messages.',
+      steps: ['Ouvrez <strong>Réglages</strong> › <strong>Apps</strong> › <strong>Messages</strong><span class="bcl-note">Ou <strong>Réglages › Messages</strong>.</span>',
+              'Touchez <strong>Filtrer les correspondants inconnus</strong> (ou <strong>Filtrer les expéditeurs inconnus</strong>).',
+              'Activez l’option.'] },
+    { ic: '🌐', t: 'Alerte sur les sites dangereux',
+      w: 'Safari vous prévient avant d’ouvrir un site frauduleux connu.',
+      steps: ['Ouvrez <strong>Réglages</strong> › <strong>Apps</strong> › <strong>Safari</strong><span class="bcl-note">Ou <strong>Réglages › Safari</strong>.</span>',
+              'Vérifiez que <strong>Avertissement de site Web frauduleux</strong> est <strong>activé</strong> (interrupteur vert).'] },
+    { ic: '🚫', t: 'Bloquer un numéro qui vous harcèle',
+      w: 'Empêcher définitivement un numéro de vous rappeler.',
+      steps: ['Ouvrez <strong>Téléphone</strong> › <strong>Récents</strong>.',
+              'Touchez le <strong>ⓘ</strong> à côté du numéro.',
+              'Descendez et touchez <strong>Bloquer ce correspondant</strong>.'] }
+  ]},
+  android: { label: 'Android', items: [
+    { ic: '📵', t: 'Filtrer les appels spam',
+      w: 'L’application Téléphone de Google identifie et écarte les appels frauduleux.',
+      steps: ['Ouvrez l’application <strong>Téléphone</strong>.',
+              'Touchez les <strong>trois points ⋮</strong> (ou votre photo) › <strong>Paramètres</strong>.',
+              'Touchez <strong>Spam et filtrage des appels</strong>.',
+              'Activez <strong>Voir l’ID d’appelant et le spam</strong> et <strong>Filtrer les appels spam</strong>.'],
+      link: { u: 'https://support.google.com/phone', l: 'Guide Google' } },
+    { ic: '💬', t: 'Filtrer les SMS spam',
+      w: 'Google Messages range automatiquement les SMS suspects dans les indésirables.',
+      steps: ['Ouvrez l’application <strong>Messages</strong>.',
+              'Touchez votre <strong>photo de profil</strong> › <strong>Paramètres des messages</strong>.',
+              'Touchez <strong>Protection anti-spam</strong>.',
+              'Activez <strong>Activer la protection anti-spam</strong>.'],
+      link: { u: 'https://support.google.com/messages/answer/9327903', l: 'Guide Google' } },
+    { ic: '🌐', t: 'Protection contre les sites dangereux',
+      w: 'Chrome vous avertit avant les sites et téléchargements dangereux.',
+      steps: ['Ouvrez <strong>Chrome</strong>.',
+              'Touchez les <strong>trois points ⋮</strong> › <strong>Paramètres</strong>.',
+              'Touchez <strong>Confidentialité et sécurité</strong> › <strong>Navigation sécurisée</strong>.',
+              'Choisissez <strong>Protection renforcée</strong>.'],
+      link: { u: 'https://support.google.com/chrome/answer/9890866', l: 'Guide Google' } },
+    { ic: '🚫', t: 'Bloquer un numéro',
+      w: 'Bloquer et signaler un numéro indésirable.',
+      steps: ['Ouvrez <strong>Téléphone</strong> › <strong>Récents</strong>.',
+              'Faites un <strong>appui long</strong> sur le numéro.',
+              'Touchez <strong>Bloquer / Signaler comme spam</strong>.'] }
+  ]},
+  samsung: { label: 'Android Samsung', items: [
+    { ic: '📵', t: 'Bloquer les appels spam (Smart Call)',
+      w: 'Smart Call détecte et bloque les appels indésirables et frauduleux.',
+      steps: ['Ouvrez l’application <strong>Téléphone</strong>.',
+              'Touchez les <strong>trois points ⋮</strong> › <strong>Paramètres</strong>.',
+              'Touchez <strong>Bloquer des numéros</strong>.',
+              'Activez <strong>Bloquer les appels indésirables et d’arnaque</strong> (et <strong>ID d’appelant et protection anti-spam</strong>).'],
+      link: { u: 'https://www.samsung.com/fr/support/mobile-devices/comment-gerer-les-parametres-d-appel-sur-mon-smartphone-android/', l: 'Guide Samsung' } },
+    { ic: '💬', t: 'Filtrer les SMS indésirables',
+      w: 'Écartez les SMS de numéros inconnus.',
+      steps: ['Ouvrez l’application <strong>Messages</strong>.',
+              'Touchez les <strong>trois points ⋮</strong> › <strong>Paramètres</strong>.',
+              'Touchez <strong>Bloquer numéros et messages</strong> › <strong>Filtre anti-spam</strong>.<span class="bcl-note">Si vous utilisez Google Messages : photo de profil › Paramètres › Protection anti-spam.</span>',
+              'Activez le filtre.'] },
+    { ic: '🌐', t: 'Protection contre les sites dangereux',
+      w: 'Votre navigateur vous avertit avant les sites dangereux.',
+      steps: ['<strong>Samsung Internet</strong> : <strong>☰</strong> › <strong>Paramètres</strong> › <strong>Confidentialité et sécurité</strong> › activez <strong>Avertir en cas de sites malveillants</strong>.',
+              '<strong>Chrome</strong> : <strong>⋮</strong> › <strong>Paramètres</strong> › <strong>Confidentialité et sécurité</strong> › <strong>Navigation sécurisée</strong> › <strong>Protection renforcée</strong>.'],
+      link: { u: 'https://support.google.com/chrome/answer/9890866', l: 'Guide Chrome' } },
+    { ic: '🚫', t: 'Bloquer un numéro',
+      w: 'Bloquer un numéro qui vous harcèle.',
+      steps: ['Ouvrez <strong>Téléphone</strong> › <strong>Récents</strong>.',
+              'Faites un <strong>appui long</strong> sur le numéro › <strong>Bloquer</strong>.'] }
+  ]}
+};
+
+function openBouclier() {
+  renderBouclierDetect();
+  document.getElementById('bouclier').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeBouclier() {
+  document.getElementById('bouclier').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function renderBouclierDetect() {
+  document.getElementById('bouclier-htitle').textContent = 'Protéger mon téléphone';
+  var d = detectPhone();
+  var opts = [['ios', '📱', 'iPhone'], ['samsung', '🤖', 'Android Samsung'], ['android', '🤖', 'Android (Pixel, Xiaomi, autre)']];
+  var h = '<div class="vic-calm"><b>On active ensemble les protections déjà présentes dans votre téléphone.</b>' +
+          (d.key ? 'Nous avons reconnu : <strong>' + d.label + '</strong>. Confirmez, ou choisissez votre téléphone.'
+                 : 'Choisissez votre téléphone pour voir le parcours exact.') + '</div>';
+  h += '<div class="vic-cats">';
+  opts.forEach(function (o) {
+    var sel = (o[0] === d.key) ? ' bcl-sel' : '';
+    h += '<button class="vic-cat' + sel + '" onclick="renderBouclierPlan(\'' + o[0] + '\')">' +
+           '<span class="vic-cat-ic">' + o[1] + '</span>' +
+           '<span class="vic-cat-t">' + o[2] + (sel ? ' <span class="bcl-reco">reconnu</span>' : '') + '</span>' +
+           '<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>';
+  });
+  h += '</div>';
+  document.getElementById('bouclier-body').innerHTML = h;
+  var sc = document.querySelector('#bouclier .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+function renderBouclierPlan(key) {
+  var g = PHONE_GUIDES[key];
+  if (!g) return renderBouclierDetect();
+  document.getElementById('bouclier-htitle').textContent = g.label;
+  var h = '<button class="vic-retour" onclick="renderBouclierDetect()">‹ Changer de téléphone</button>';
+  h += '<div class="vic-calm"><b>4 protections à activer.</b>Touchez chacune pour voir les étapes, puis cochez « c’est activé ». Prenez votre temps.</div>';
+  h += '<div class="bcl-list">';
+  g.items.forEach(function (it) {
+    var steps = '<ol class="bcl-steps">';
+    it.steps.forEach(function (s) { steps += '<li>' + s + '</li>'; });
+    steps += '</ol>';
+    var link = it.link ? '<a class="bcl-link" href="' + it.link.u + '" target="_blank" rel="noopener">📖 ' + it.link.l + '</a>' : '';
+    h += '<div class="bcl-item">' +
+           '<button class="bcl-head" onclick="this.closest(\'.bcl-item\').classList.toggle(\'open\')">' +
+             '<span class="bcl-ic">' + it.ic + '</span>' +
+             '<span class="bcl-h-txt"><span class="bcl-t">' + it.t + '</span><span class="bcl-w">' + it.w + '</span></span>' +
+             '<span class="bcl-chev">▾</span>' +
+           '</button>' +
+           '<div class="bcl-body">' + steps + link +
+             '<button class="bcl-done" onclick="this.closest(\'.bcl-item\').classList.toggle(\'done\')"><span class="bcl-done-off">C’est activé ✓</span><span class="bcl-done-on">✓ Activé</span></button>' +
+           '</div></div>';
+  });
+  h += '</div>';
+  h += '<div class="vic-foot">' + _vicDespyHelp() + '</div>';
+  document.getElementById('bouclier-body').innerHTML = h;
+  var sc = document.querySelector('#bouclier .mod-scroll'); if (sc) sc.scrollTop = 0;
 }
 
 async function openParrainage() {
@@ -4061,7 +4247,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-2';
+var APP_BUILD = '2026-07-27-3';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
