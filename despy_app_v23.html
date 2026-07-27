@@ -598,6 +598,10 @@ body{ background:var(--p-paper); }
 .bcl-steps li{ font-size:14px; line-height:1.5; color:var(--p-ink,#1c2536); margin-bottom:8px; }
 .bcl-steps strong{ font-weight:800; }
 .bcl-note{ display:block; font-size:12px; color:var(--p-muted,#6b7280); margin-top:3px; }
+.bcl-sub{ display:block; font-size:13.5px; line-height:1.45; color:var(--p-ink,#1c2536); margin-top:7px; }
+.bcl-warn{ display:flex; gap:9px; align-items:flex-start; background:#FFF7E6; border:1px solid #F5C451; color:#6b4a00; border-radius:11px; padding:11px 12px; font-size:13px; line-height:1.5; margin-bottom:11px; }
+.bcl-warn-ic{ flex:none; font-size:15px; line-height:1.4; }
+.bcl-warn strong{ color:#5a3d00; font-weight:800; }
 .bcl-link{ display:inline-block; font-size:13px; font-weight:800; color:var(--p-blue,#2D5BFF); text-decoration:none; margin-bottom:11px; }
 .bcl-done{ display:block; width:100%; background:#EEF2FF; color:var(--p-blue,#2D5BFF); border:1.5px solid #cfe0ff; border-radius:11px; padding:12px; font-family:inherit; font-weight:800; font-size:14px; cursor:pointer; }
 .bcl-done .bcl-done-on{ display:none; }
@@ -2489,12 +2493,16 @@ function detectPhone() {
 var PHONE_GUIDES = {
   ios: { label: 'iPhone', items: [
     { ic: '📵', t: 'Filtrer les appels inconnus',
-      w: 'Les numéros absents de vos contacts sont mis en silence — fini les sonneries d’arnaqueurs.',
+      w: 'Les numéros absents de vos contacts ne font plus sonner directement. Mieux : vous pouvez exiger que l’appelant dise qui il est avant que ça sonne — le démarchage et les robots s’arrêtent net.',
       steps: ['Ouvrez <strong>Réglages</strong>.',
               'Touchez <strong>Apps</strong> puis <strong>Téléphone</strong><span class="bcl-note">Sur iPhone plus ancien : directement <strong>Réglages › Téléphone</strong>.</span>',
               'Touchez <strong>Filtrer les correspondants inconnus</strong> (ou <strong>Rendre muets les appels inconnus</strong>).',
-              'Activez l’option.'],
-      link: { u: 'https://support.apple.com/fr-fr/guide/iphone/iphe4b3f7823/ios', l: 'Guide Apple' } },
+              'Choisissez le niveau qui vous convient :' +
+                '<span class="bcl-sub"><strong>· Demander le motif de l’appel</strong> — l’inconnu doit dire son nom et la raison <em>avant</em> que votre téléphone sonne. Le plus efficace contre le démarchage et les robots.</span>' +
+                '<span class="bcl-sub"><strong>· Autoriser les appels répétés</strong> — si un inconnu rappelle dans les 3 minutes, l’appel passe (utile en cas d’urgence).</span>' +
+                '<span class="bcl-sub"><strong>· Filtrer selon la catégorie</strong> — laisse passer les appels utiles : <strong>services de santé</strong>, services publics, numéros déjà connus de votre opérateur.</span>'],
+      warn: 'Vous attendez un appel médical (médecin, laboratoire, hôpital, <strong>rappel de rendez-vous automatisé</strong>) ? Avec « Demander le motif », un appel de santé automatique pourrait être écarté. Activez aussi <strong>Autoriser les appels répétés</strong> et, si proposé, <strong>Filtrer selon la catégorie › Services de santé</strong>. Et vérifiez de temps en temps les appels filtrés dans l’app <strong>Téléphone</strong>.',
+      link: { u: 'https://support.apple.com/fr-fr/guide/iphone/iphe4b3f7823/26/ios/26', l: 'Guide Apple' } },
     { ic: '💬', t: 'Filtrer les SMS indésirables',
       w: 'Les SMS d’expéditeurs inconnus sont rangés dans un onglet séparé, à part de vos vrais messages.',
       steps: ['Ouvrez <strong>Réglages</strong> › <strong>Apps</strong> › <strong>Messages</strong><span class="bcl-note">Ou <strong>Réglages › Messages</strong>.</span>',
@@ -2606,13 +2614,14 @@ function renderBouclierPlan(key) {
     it.steps.forEach(function (s) { steps += '<li>' + s + '</li>'; });
     steps += '</ol>';
     var link = it.link ? '<a class="bcl-link" href="' + it.link.u + '" target="_blank" rel="noopener">📖 ' + it.link.l + '</a>' : '';
+    var warn = it.warn ? '<div class="bcl-warn"><span class="bcl-warn-ic">⚠️</span><span><strong>À savoir</strong> — ' + it.warn + '</span></div>' : '';
     h += '<div class="bcl-item">' +
            '<button class="bcl-head" onclick="this.closest(\'.bcl-item\').classList.toggle(\'open\')">' +
              '<span class="bcl-ic">' + it.ic + '</span>' +
              '<span class="bcl-h-txt"><span class="bcl-t">' + it.t + '</span><span class="bcl-w">' + it.w + '</span></span>' +
              '<span class="bcl-chev">▾</span>' +
            '</button>' +
-           '<div class="bcl-body">' + steps + link +
+           '<div class="bcl-body">' + steps + warn + link +
              '<button class="bcl-done" onclick="this.closest(\'.bcl-item\').classList.toggle(\'done\')"><span class="bcl-done-off">C’est activé ✓</span><span class="bcl-done-on">✓ Activé</span></button>' +
            '</div></div>';
   });
@@ -4247,7 +4256,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-3';
+var APP_BUILD = '2026-07-27-4';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
