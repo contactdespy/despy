@@ -445,7 +445,7 @@ body{ background:var(--p-paper); }
 /* ── SOS ── */
 .sos-card{
   background:linear-gradient(120deg,#7a1114,#c0322f); color:#fff; border:0; border-radius:18px;
-  padding:17px 18px; display:flex; align-items:center; gap:13px; width:100%; text-align:left;
+  margin:0; padding:17px 18px; display:flex; align-items:center; gap:13px; width:100%; text-align:left;
   font-family:inherit; cursor:pointer; box-shadow:0 10px 26px rgba(197,50,47,.30);
 }
 .sos-ic{ width:44px; height:44px; border-radius:13px; background:rgba(255,255,255,.16); display:flex; align-items:center; justify-content:center; flex:none; }
@@ -1519,15 +1519,38 @@ function appLogout() {
   try { window.google.accounts.id.disableAutoSelect(); } catch(e){}
 }
 
+// Prénom présentable : jamais un email ni un préfixe d'email
+// (ex. « yacine.bourefis67 » → « Yacine »).
+function friendlyFirstName(s) {
+  if (!s) return '';
+  var raw = (s.prenom || '').trim();
+  if (!raw) {
+    var n = (s.name || '').trim();
+    if (n && n.indexOf('@') === -1 && !/[._]/.test(n)) raw = n.split(' ')[0];  // vrai nom, pas un email
+  }
+  if (!raw) {
+    var local = ((s.email || '').split('@')[0] || '');
+    raw = local.split(/[._\-+0-9]/)[0];   // partie avant un séparateur ou un chiffre
+  }
+  if (!raw) return '';
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+// Nom affiché dans « Mon compte » : vrai nom si dispo, sinon le prénom présentable.
+function friendlyDisplayName(s) {
+  var n = ((s && s.name) || '').trim();
+  var emailish = !n || n.indexOf('@') !== -1 || /[._]/.test(n) || /\d/.test(n);
+  return emailish ? friendlyFirstName(s) : n;
+}
+
 function refreshProfile() {
   var s = session.get();
   if (!s) return;
-  var firstName = s.prenom || (s.name || s.email).split(' ')[0];
+  var firstName = friendlyFirstName(s) || 'à vous';
   document.getElementById('home-firstname').textContent = 'Bonjour ' + firstName + ' 👋';
   document.getElementById('home-greeting').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   var initial = (firstName[0] || '?').toUpperCase();
   document.getElementById('home-avatar').textContent = initial;
-  document.getElementById('profile-name').textContent = s.name || firstName;
+  document.getElementById('profile-name').textContent = friendlyDisplayName(s) || firstName;
   document.getElementById('profile-email').textContent = s.email;
   document.getElementById('profile-avatar').textContent = initial;
   var planEl = document.getElementById('profile-plan');
@@ -1992,7 +2015,7 @@ function mountConseiller() {
   _advSeeded = true;
   _advHist = [];
   var s = session.get() || {};
-  var prenom = (s.name || '').split(' ')[0];
+  var prenom = friendlyFirstName(s);
   advBulle('them', 'Bonjour' + (prenom ? ' ' + prenom : '') + ' \uD83D\uDC4B Posez-moi votre question : un message douteux, un appel bizarre, un pr\u00e9l\u00e8vement que vous ne reconnaissez pas.');
   advChips(["J'ai re\u00e7u un SMS bizarre", "On m'a appel\u00e9 en disant \u00eatre ma banque", "Un pr\u00e9l\u00e8vement inconnu sur mon compte"]);
 }
@@ -3904,7 +3927,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-26-1';
+var APP_BUILD = '2026-07-27-1';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
