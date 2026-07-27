@@ -555,6 +555,31 @@ body{ background:var(--p-paper); }
 .stats-g .n{ font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
 .stats-g .k{ font-size:10.5px; color:var(--p-muted); line-height:1.3; margin-top:3px; }
 .stats-cta{ display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:14px; padding-top:12px; border-top:1px solid var(--p-line,#E7EBF3); font-size:13px; font-weight:800; color:var(--p-blue,#2D5BFF); }
+/* ── Plan d'action « je suis victime » ── */
+.vic-calm{ background:#EEF4FF; border:1px solid #cfe0ff; color:#1e3a6b; border-radius:14px; padding:14px 16px; font-size:14px; line-height:1.5; margin:2px 0 16px; }
+.vic-calm b{ display:block; font-size:15.5px; color:#0f2c57; margin-bottom:3px; }
+.vic-cats{ display:flex; flex-direction:column; gap:10px; }
+.vic-cat{ display:flex; align-items:center; gap:13px; width:100%; text-align:left; background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:15px; padding:15px 16px; font-family:inherit; cursor:pointer; box-shadow:0 4px 14px rgba(12,25,55,.05); }
+.vic-cat:active{ transform:scale(.985); }
+.vic-cat-ic{ font-size:24px; flex:none; }
+.vic-cat-t{ flex:1; font-size:15px; font-weight:700; color:var(--p-ink,#0f1830); line-height:1.35; }
+.vic-cat .chev{ color:#b4c0d6; flex:none; }
+.vic-retour{ background:none; border:0; color:var(--p-blue,#2D5BFF); font-family:inherit; font-weight:800; font-size:14px; padding:0 0 12px; cursor:pointer; }
+.vic-steps{ display:flex; flex-direction:column; gap:10px; }
+.vic-step{ display:flex; align-items:flex-start; gap:12px; background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:14px; padding:13px 14px; transition:opacity .2s; }
+.vic-num{ width:26px; height:26px; border-radius:50%; background:var(--p-blue,#2D5BFF); color:#fff; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; flex:none; margin-top:1px; }
+.vic-txt{ flex:1; font-size:14.5px; line-height:1.5; color:var(--p-ink,#1c2536); }
+.vic-txt a{ color:var(--p-blue,#2D5BFF); font-weight:700; }
+.vic-tick{ width:34px; height:34px; border-radius:10px; border:1.5px solid var(--p-line,#E7EBF3); background:#fff; color:transparent; font-weight:900; font-size:16px; line-height:1; flex:none; cursor:pointer; }
+.vic-step.done{ opacity:.5; }
+.vic-step.done .vic-num{ background:#16a34a; }
+.vic-step.done .vic-txt{ text-decoration:line-through; }
+.vic-step.done .vic-tick{ background:#16a34a; border-color:#16a34a; color:#fff; }
+.vic-foot{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+.vic-help{ display:block; text-decoration:none; background:#111a2e; color:#fff; border-radius:14px; padding:14px 16px; font-weight:800; font-size:15px; }
+.vic-help span{ display:block; font-weight:500; font-size:12.5px; color:#a9b7d1; margin-top:3px; }
+.vic-help-2{ background:var(--p-card,#fff); color:var(--p-ink,#0f1830); border:1px solid var(--p-line,#E7EBF3); }
+.vic-help-2 span{ color:var(--p-muted,#6b7280); }
 
 /* ── onglet Conseiller (chat plein écran) ── */
 .cons-av{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,#5ce0a0,#2d5bff); }
@@ -1060,6 +1085,17 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     </div>
   </div>
   <div class="mod-scroll"><div id="bilan-body"></div></div>
+</div>
+
+<!-- ═══ PLAN D'ACTION « JE SUIS VICTIME » (plein écran) ═══ -->
+<div id="victime" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeVictime()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Plan d'action</div><div class="mod-htitle" id="victime-htitle">Je pense être victime</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="victime-body"></div></div>
 </div>
 
 <!-- ═══ FORMATION — liste des 10 modules ═══ -->
@@ -2282,24 +2318,122 @@ async function requestPush() {
   }
 }
 
-function openSOS() {
-  var _s = session.get();
-  var _despyHelp = (_s && _s.subscribed)
-    ? '<a href="tel:+33689148395" class="btn-primary" style="display:block;text-align:center;text-decoration:none">📞 Appeler Despy — 06 89 14 83 95</a>'
-    : '<a href="mailto:contact@despy.fr" class="btn-secondary" style="display:block;text-align:center;text-decoration:none">✉️ Écrire à Despy — contact@despy.fr</a><div style="font-size:12px;color:#8a8a8e;text-align:center;margin-top:8px">L\'assistance téléphonique directe est incluse dans l\'abonnement Premium.</div>';
-  openSheet('J\'ai été arnaqué(e)',
-    '<div class="result-card" style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;margin-top:0"><strong>Restez calme.</strong> Plus vous agissez vite, plus vous limitez les dégâts.</div>' +
-    '<div class="section-label" style="padding:16px 0 8px">Étape 1 — Sécuriser</div>' +
-    '<div class="result-card" style="margin-top:0">📵 <strong>Coupez tout contact</strong> avec l\'arnaqueur (bloquez le numéro, supprimez l\'email)</div>' +
-    '<div class="result-card" style="margin-top:8px">💳 <strong>Si paiement effectué :</strong> contactez immédiatement votre banque pour faire opposition</div>' +
-    '<div class="result-card" style="margin-top:8px">🔒 <strong>Si mot de passe partagé :</strong> changez-le sur TOUS les sites où vous l\'utilisez</div>' +
-    '<div class="section-label" style="padding:18px 0 8px">Étape 2 — Signaler</div>' +
-    '<a href="tel:17" class="btn-primary" style="display:block;text-align:center;margin-bottom:8px;text-decoration:none">📞 Police 17 (urgence)</a>' +
-    '<a href="https://www.cybermalveillance.gouv.fr/" target="_blank" class="btn-secondary" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px">🚨 Cybermalveillance.gouv.fr</a>' +
-    '<a href="https://www.internet-signalement.gouv.fr/" target="_blank" class="btn-secondary" style="display:block;text-align:center;text-decoration:none">⚖️ Signaler sur PHAROS</a>' +
-    '<div class="section-label" style="padding:18px 0 8px">Étape 3 — Besoin d\'aide ?</div>' +
-    _despyHelp
-  );
+// ─── PLAN D'ACTION « JE SUIS VICTIME » (parcours guidé plein écran) ───
+// openSOS reste le point d'entrée (bouton SOS, carte accueil) → parcours guidé.
+function openSOS() { openVictime(); }
+
+function openVictime() {
+  renderVictimeTriage();
+  document.getElementById('victime').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeVictime() {
+  document.getElementById('victime').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// Aide humaine en pied de parcours (téléphone conseiller si abonné, sinon email).
+function _vicDespyHelp() {
+  var s = session.get();
+  if (s && s.subscribed) {
+    return '<a href="tel:+33689148395" class="vic-help">📞 Parler à un conseiller Despy<span>06 89 14 83 95 · on vous guide pas à pas</span></a>';
+  }
+  return '<a href="mailto:contact@despy.fr" class="vic-help">✉️ Écrire à Despy<span>contact@despy.fr · l’appel direct est inclus dans Premium</span></a>';
+}
+
+var VIC_PLANS = {
+  paiement: {
+    title: 'Paiement ou carte',
+    steps: [
+      'Faites <strong>opposition tout de suite</strong> : appelez le <a href="tel:0892705705">0 892 705 705</a> (24 h/24, 7 j/7) <u>et</u> votre banque.',
+      'Ne payez plus rien et ne donnez aucun code. L’arnaqueur peut rappeler en se faisant passer pour votre banque.',
+      'Gardez les <strong>preuves</strong> : SMS, e-mails, captures d’écran, référence du virement.',
+      'Signalez la fraude à la carte sur <a href="https://www.service-public.fr/particuliers/vosdroits/R46526" target="_blank" rel="noopener">Perceval</a> (service officiel).',
+      'Portez plainte en ligne avec <a href="https://www.service-public.fr/particuliers/vosdroits/R57155" target="_blank" rel="noopener">THESEE</a>, ou au commissariat (urgence : <a href="tel:17">17</a>).',
+      'Demandez par écrit à votre banque le <strong>remboursement</strong> du paiement non autorisé.'
+    ]
+  },
+  compte: {
+    title: 'Compte piraté',
+    steps: [
+      'Changez <strong>immédiatement le mot de passe</strong> du compte concerné (depuis un autre appareil si possible).',
+      'Changez-le aussi sur <strong>tous les sites</strong> où vous utilisiez le même mot de passe.',
+      'Activez la <strong>double authentification</strong> (code par SMS ou appli) dès que c’est proposé.',
+      'Vérifiez qu’on n’a pas ajouté un renvoi d’e-mails ni changé vos coordonnées de récupération.',
+      'Prévenez vos proches : l’arnaqueur peut leur écrire en votre nom.',
+      'Si c’est un compte bancaire → faites aussi opposition (<a href="tel:0892705705">0 892 705 705</a>).'
+    ]
+  },
+  infos: {
+    title: 'Lien cliqué / infos données',
+    steps: [
+      'Fermez la page, ne saisissez plus rien.',
+      'Si vous avez tapé un <strong>mot de passe</strong> → changez-le partout où il servait.',
+      'Si vous avez donné une <strong>information bancaire</strong> → opposition (<a href="tel:0892705705">0 892 705 705</a>) et surveillez vos comptes.',
+      'Si on vous a fait installer une appli ou donner l’accès à distance (AnyDesk, TeamViewer…) → éteignez l’appareil, désinstallez, faites-le vérifier.',
+      'Vérifiez si vos données ont fuité avec l’outil <a href="#" onclick="closeVictime();setTimeout(function(){openTool(\'darkweb\')},260);return false;">« E-mail piraté ? »</a> de Despy.'
+    ]
+  },
+  appels: {
+    title: 'Appels / harcèlement',
+    steps: [
+      '<strong>Ne rappelez jamais</strong> le numéro qui vous a appelé.',
+      'Bloquez le numéro sur votre téléphone (un conseiller peut vous montrer comment).',
+      'Signalez le SMS ou l’appel au <strong>33700</strong> (transférez le SMS au 33700) ou sur <a href="https://www.33700.fr" target="_blank" rel="noopener">33700.fr</a>.',
+      'Inscrivez-vous gratuitement sur <a href="https://www.bloctel.gouv.fr" target="_blank" rel="noopener">Bloctel</a> pour bloquer le démarchage.',
+      'Signalez le numéro dans Despy pour protéger les autres : <a href="#" onclick="closeVictime();setTimeout(function(){openTool(\'signaler\')},260);return false;">signaler un numéro</a>.'
+    ]
+  },
+  doute: {
+    title: 'Je ne suis pas sûr(e)',
+    steps: [
+      'Ne payez rien et ne donnez aucun code ni mot de passe pour l’instant.',
+      'Gardez tout : messages, captures d’écran, numéros.',
+      'Ne rappelez pas les numéros reçus. Pour votre banque, rappelez le numéro au dos de votre carte.',
+      'Parlez-en tout de suite : un conseiller Despy ou Info Escroqueries peut vous dire si c’est une arnaque.'
+    ]
+  }
+};
+
+function renderVictimeTriage() {
+  document.getElementById('victime-htitle').textContent = 'Je pense être victime';
+  var cats = [
+    ['paiement', '💳', 'J’ai payé, donné ma carte ou fait un virement'],
+    ['compte',   '🔓', 'Un de mes comptes a été piraté'],
+    ['infos',    '⚠️', 'J’ai cliqué un lien ou donné des informations'],
+    ['appels',   '📞', 'On me harcèle ou on continue de m’appeler'],
+    ['doute',    '❓', 'Je ne suis pas sûr(e) de ce qui s’est passé']
+  ];
+  var chev = '<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  var h = '<div class="vic-calm"><b>Respirez, vous n’êtes pas seul(e).</b>Dites-moi ce qui s’est passé — je vous guide étape par étape, dans le bon ordre.</div>';
+  h += '<div class="vic-cats">';
+  cats.forEach(function (c) {
+    h += '<button class="vic-cat" onclick="renderVictimePlan(\'' + c[0] + '\')"><span class="vic-cat-ic">' + c[1] + '</span><span class="vic-cat-t">' + c[2] + '</span>' + chev + '</button>';
+  });
+  h += '</div>';
+  h += '<div class="vic-foot">' + _vicDespyHelp() +
+       '<a href="tel:0805805817" class="vic-help vic-help-2">📞 Info Escroqueries (gratuit)<span>0 805 805 817 · police &amp; gendarmerie, lun-ven 9h-18h30</span></a></div>';
+  document.getElementById('victime-body').innerHTML = h;
+  var sc = document.querySelector('#victime .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+function renderVictimePlan(type) {
+  var p = VIC_PLANS[type];
+  if (!p) return renderVictimeTriage();
+  document.getElementById('victime-htitle').textContent = p.title;
+  var h = '<button class="vic-retour" onclick="renderVictimeTriage()">‹ Changer de situation</button>';
+  h += '<div class="vic-calm"><b>Respirez. Voici quoi faire, dans l’ordre.</b>Cochez au fur et à mesure. Rien ne presse au point de mal faire.</div>';
+  h += '<div class="vic-steps">';
+  p.steps.forEach(function (s, i) {
+    h += '<div class="vic-step"><span class="vic-num">' + (i + 1) + '</span><span class="vic-txt">' + s + '</span>' +
+         '<button class="vic-tick" onclick="this.closest(\'.vic-step\').classList.toggle(\'done\')" aria-label="C’est fait">✓</button></div>';
+  });
+  h += '</div>';
+  h += '<div class="vic-foot">' + _vicDespyHelp() +
+       '<a href="tel:0805805817" class="vic-help vic-help-2">📞 Info Escroqueries (gratuit)<span>0 805 805 817 · police &amp; gendarmerie, lun-ven 9h-18h30</span></a>' +
+       '<a href="https://www.cybermalveillance.gouv.fr" target="_blank" rel="noopener" class="vic-help vic-help-2">🌐 Cybermalveillance.gouv.fr<span>Assistance officielle aux victimes</span></a></div>';
+  document.getElementById('victime-body').innerHTML = h;
+  var sc = document.querySelector('#victime .mod-scroll'); if (sc) sc.scrollTop = 0;
 }
 
 async function openParrainage() {
@@ -3927,7 +4061,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-1';
+var APP_BUILD = '2026-07-27-2';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
