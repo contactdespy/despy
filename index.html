@@ -3,6 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+/* PWA : si l'appli installée s'ouvre sur le site (start_url capturé sur « / »),
+   on bascule vers /app AVANT tout rendu → plus de flash du site à l'ouverture.
+   Ne concerne QUE le mode installé ; les visiteurs web normaux voient le site. */
+(function(){
+  try {
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+                  || window.navigator.standalone === true;
+    if (!standalone) return;
+    var p = window.location.pathname;
+    if (p === '/' || p === '/index.html') window.location.replace('/app');
+  } catch (e) {}
+})();
+</script>
 <title>Despy — Cybersécurité pour particuliers</title>
 <meta name="description" content="Despy protège votre vie numérique : audit, détection d'arnaques, conseiller expert. Simple, sans jargon. 9,99€/mois. France métropolitaine.">
 <meta name="facebook-domain-verification" content="xbpwjphkfszr1qifha1lno0uvsp1rv" />
@@ -44,6 +58,7 @@
 <link rel="canonical" href="https://despy.fr">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=3">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<link rel="manifest" href="/manifest.json">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Despy","description":"Cybersécurité pour particuliers","url":"https://despy.fr","offers":{"@type":"Offer","price":"9.99","priceCurrency":"EUR"},"provider":{"@type":"Organization","name":"Despy — Bourefis Yacine EI","email":"contact.despy@gmail.com"}}</script>
 <style>
 /* ── RESET & BASE ── */
@@ -2042,21 +2057,8 @@ body.despy-abonne #outils-upsell{display:none!important}
 </div>
 
 <script>
-// ─── REDIRECTION PWA : si l'utilisateur a installé l'icône depuis despy.fr/
-// (cas iOS Safari qui ignore le start_url du manifest), on le redirige vers /app
-(function redirectIfStandalone() {
-  try {
-    var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
-                    || window.navigator.standalone === true;
-    if (isStandalone) {
-      // On évite la boucle si on est déjà sur /app ou similaire
-      var path = window.location.pathname;
-      if (path === '/' || path === '/index.html') {
-        window.location.replace('/app');
-      }
-    }
-  } catch(e) {}
-})();
+// ─── REDIRECTION PWA en mode installé : désormais faite AVANT tout rendu
+// par le script bloquant en tête de <head> (évite le flash du site). ───
 
 // ─── PWA Install Logic ───
 var _pwaPrompt = null;
