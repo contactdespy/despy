@@ -7,6 +7,9 @@
 const { createClient } = require('@supabase/supabase-js');
 
 exports.handler = async (event) => {
+  const { isScheduled, notScheduled } = require('./_is-scheduled');
+  if (!isScheduled(event)) return notScheduled();   // cron uniquement (pas d'appel HTTP)
+
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {

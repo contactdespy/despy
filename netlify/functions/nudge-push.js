@@ -64,15 +64,9 @@ const MIN_AGE_DAYS = 10;   // on laisse l'onboarding faire son travail avant
 const CAP_DAYS = 6;        // au plus une notif douce tous les 6 jours
 
 exports.handler = async (event) => {
-  // SÉCURITÉ : ne s'exécute QUE sur un vrai déclenchement planifié Netlify.
-  // Netlify envoie alors un corps JSON { next_run } ; un appel HTTP direct
-  // (sans ce corps) ne doit RIEN faire — sinon n'importe qui pourrait, en
-  // appelant l'URL, déclencher l'envoi de notifications aux membres.
-  let scheduled = false;
-  try { scheduled = !!JSON.parse((event && event.body) || '{}').next_run; } catch (e) {}
-  if (!scheduled) {
-    return { statusCode: 200, body: JSON.stringify({ skipped: 'not_scheduled' }) };
-  }
+  // SÉCURITÉ : envoie des notifs → ne s'exécute QUE sur déclenchement planifié.
+  const { isScheduled, notScheduled } = require('./_is-scheduled');
+  if (!isScheduled(event)) return notScheduled();
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 

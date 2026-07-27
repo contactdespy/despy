@@ -260,6 +260,10 @@ exports.handler = async (event) => {
     }
   }
 
+  // Boucle cron (tous les abonnés) : uniquement sur déclenchement planifié Netlify.
+  const { isScheduled, notScheduled } = require('./_is-scheduled');
+  if (!isScheduled(event)) return notScheduled();
+
   // ── Cron mensuel : tous les abonnés ──
   try {
     const { data: clients, error } = await supabase

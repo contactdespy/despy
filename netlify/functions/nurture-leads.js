@@ -17,7 +17,10 @@ const { createClient } = require('@supabase/supabase-js');
 const STEP_EMAIL = { 1: 'nurture_j2', 2: 'nurture_j4', 3: 'nurture_j6', 4: 'nurture_j8' };
 const MAX_STEP = 4;
 
-exports.handler = async () => {
+exports.handler = async (event) => {
+  const { isScheduled, notScheduled } = require('./_is-scheduled');
+  if (!isScheduled(event)) return notScheduled();   // cron uniquement (pas d'appel HTTP)
+
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {

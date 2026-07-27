@@ -409,6 +409,10 @@ async function publishToFacebook(message, pageToken) {
 // ── Handler principal ────────────────────────
 
 exports.handler = async (event) => {
+  // Publication automatique Facebook : uniquement sur déclenchement planifié.
+  const { isScheduled, notScheduled } = require('./_is-scheduled');
+  if (!isScheduled(event)) return notScheduled();
+
   const isManual = event && event.httpMethod === 'POST';
   const isPreview = isManual && (event.queryStringParameters || {}).preview === '1';
 
