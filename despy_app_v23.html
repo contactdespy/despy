@@ -711,6 +711,24 @@ body{ background:var(--p-paper); }
 .fm-s{ display:block; font-size:12px; color:var(--p-muted); margin-top:2px; }
 .fm-check{ width:26px; height:26px; border-radius:50%; background:#15803D; color:#fff; font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none; }
 .fm-chev{ color:#C4CDDD; flex:none; }
+/* Modules réservés à l'abonnement (les 3 premiers restent offerts) */
+.fm-sep{ padding:13px 16px 7px; font-size:11.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--p-muted,#6b7280); border-top:1px solid var(--p-line,#E7EBF3); }
+.fm-row.fm-lock .fm-ic{ filter:grayscale(.85); opacity:.75; }
+.fm-row.fm-lock .fm-t{ color:#8892a5; }
+.fm-row.fm-lock .fm-s{ color:var(--p-gold,#B4892E); font-weight:700; }
+.fm-key{ flex:none; font-size:15px; opacity:.75; }
+/* Bande « surveillance active » — rend visible le travail de fond (abonnés) */
+.veille{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:inherit; cursor:pointer;
+  background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; border:0; border-radius:16px; padding:14px 16px;
+  box-shadow:0 8px 22px rgba(16,102,74,.25); }
+.veille:active{ transform:scale(.985); }
+.v-dot{ width:11px; height:11px; border-radius:50%; background:#4ade80; flex:none; box-shadow:0 0 0 4px rgba(74,222,128,.22); animation:vpulse 2.4s ease-in-out infinite; }
+@keyframes vpulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(74,222,128,.22); } 50%{ box-shadow:0 0 0 8px rgba(74,222,128,.10); } }
+@media (prefers-reduced-motion: reduce){ .v-dot{ animation:none; } }
+.v-m{ flex:1; min-width:0; }
+.v-a{ display:block; font-size:15px; font-weight:800; line-height:1.3; }
+.v-b{ display:block; font-size:12.5px; color:#9FE6C2; margin-top:2px; line-height:1.4; }
+.veille .chev{ color:rgba(255,255,255,.5); flex:none; }
 
 
 /* ── bilan mensuel ── */
@@ -897,6 +915,15 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
         <span class="sos-btn">Appeler</span>
       </button>
+      <button class="veille" id="home-veille" style="display:none" onclick="openBilan()">
+        <span class="v-dot" aria-hidden="true"></span>
+        <span class="v-m">
+          <span class="v-a" id="veille-title">Surveillance active</span>
+          <span class="v-b" id="veille-sub">Vérification de vos données en cours…</span>
+        </span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
       <div class="upsell" id="home-upsell" style="display:none">
         <div class="a">Passez à la protection complète</div>
         <div class="b">Ligne SOS humaine, conseiller illimité, surveillance en continu, votre livret offert… dès 9,99 €/mois, sans engagement.</div>
@@ -946,6 +973,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           <button class="lockrow" onclick="openPaywall()"><span class="ic">📞</span><span class="m"><span class="a">Ligne SOS humaine</span><span class="b">Un vrai conseiller au téléphone</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">🛡️</span><span class="m"><span class="a">Surveillance en continu</span><span class="b">Fuites &amp; appareils infectés, 24 h/24</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">🧹</span><span class="m"><span class="a">Nettoyage de mes données</span><span class="b">Effacer mes traces sur internet</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">🎓</span><span class="m"><span class="a">La formation complète</span><span class="b">Les 7 modules suivants · 3 offerts</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">💬</span><span class="m"><span class="a">Conseiller sans limite</span><span class="b">Gratuit : 5 questions par mois</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">📘</span><span class="m"><span class="a">Le livret de formation</span><span class="b">135 pages · offert avec l'annuel</span></span><span class="unlock">🔒 Débloquer</span></button>
         </div>
       </div>
@@ -2771,7 +2800,12 @@ function refreshFormationCard() {
   var t = document.getElementById('home-formation-title');
   if (t) t.textContent = 'Ma formation \u2014 ' + done + ' / 10 modules';
   var sub = document.getElementById('home-formation-sub');
-  if (sub) sub.textContent = done >= 10 ? 'Bravo, tout est terminé \ud83c\udf89' : (next ? 'À suivre : « ' + next + ' »' : 'Commencez votre premier module');
+  // Si la suite est réservée aux abonnés, on l'annonce clairement plutôt que
+  // de proposer un module qui s'ouvrirait sur la page d'abonnement.
+  var bloque = (typeof fmLocked === 'function') && done >= FM_GRATUITS && fmLocked(done + 1);
+  if (sub) sub.textContent = done >= 10 ? 'Bravo, tout est terminé \ud83c\udf89'
+                           : bloque ? 'La suite de la formation est dans l’abonnement'
+                           : (next ? 'À suivre : « ' + next + ' »' : 'Commencez votre premier module');
 }
 
 // Écran Formation (ouvert depuis la carte) : module, quiz, défi, bilan.
@@ -2788,6 +2822,14 @@ function closeFormation() {
 function fmDone(id) { try { return localStorage.getItem('despy_module_' + id) === '1'; } catch (e) { return false; } }
 function fmCountDone() { var n = 0; for (var i = 1; i <= MODULES_FORMATION.length; i++) if (fmDone(i)) n++; return n; }
 
+// Les 3 premiers modules sont offerts ; les suivants font partie de l'abonnement.
+// (L'urgence et les outils de secours restent gratuits — ici c'est de la formation.)
+var FM_GRATUITS = 3;
+function fmLocked(id) {
+  if (id <= FM_GRATUITS) return false;
+  return !((session.get() || {}).subscribed);
+}
+
 function renderFormationList() {
   var done = fmCountDone(), tot = MODULES_FORMATION.length;
   var head = document.getElementById('fm-head');
@@ -2797,13 +2839,20 @@ function renderFormationList() {
   var z = document.getElementById('fm-list');
   if (!z) return;
   var h = '';
+  var premierVerrou = true;
   MODULES_FORMATION.forEach(function (m) {
     var ok = fmDone(m.id);
-    h += '<button class="fm-row" onclick="openModule(' + m.id + ')">' +
+    var lock = fmLocked(m.id);
+    if (lock && premierVerrou) {
+      premierVerrou = false;
+      h += '<div class="fm-sep">La suite de la formation</div>';
+    }
+    h += '<button class="fm-row' + (lock ? ' fm-lock' : '') + '" onclick="openModule(' + m.id + ')">' +
       '<span class="fm-ic" style="background:' + m.color + '1f;color:' + m.color + '">' + (m.icon || '📘') + '</span>' +
       '<span class="fm-m"><span class="fm-t">' + m.title + '</span>' +
-      '<span class="fm-s">' + m.questions.length + ' questions · corrigés expliqués</span></span>' +
-      (ok ? '<span class="fm-check">✓</span>'
+      '<span class="fm-s">' + (lock ? 'Inclus dans l’abonnement' : m.questions.length + ' questions · corrigés expliqués') + '</span></span>' +
+      (lock ? '<span class="fm-key">🔒</span>'
+            : ok ? '<span class="fm-check">✓</span>'
           : '<span class="fm-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>') +
       '</button>';
   });
@@ -2826,6 +2875,7 @@ function renderAccountState() {
   show('home-free', !sub, 'inline-flex');
   show('home-upsell', !sub);
   show('home-locked', !sub);
+  if (!sub) show('home-veille', false);   // la bande de veille est réservée aux abonnés
   // Le badge Premium ne s'affiche que pour un abonné (déjà géré par refreshPlanBadge).
   // Cadre orange « protection incomplète » pour un compte gratuit.
   var ey = document.getElementById('home-score-ey');
@@ -2860,6 +2910,7 @@ function refreshHomeScore() {
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
       renderProtection(d.checklist);
       renderHomeStats(d.stats);
+      renderVeille(d.stats);          // surveillance rendue visible (abonnés)
       renderAccountState();  // réapplique le cadre « gratuit » après la donnée
     } else {
       ringEl.innerHTML = heroPlaceholderRing();
@@ -2868,6 +2919,37 @@ function refreshHomeScore() {
   }).catch(function () {
     ringEl.innerHTML = heroPlaceholderRing();
   });
+}
+
+// ─── Rendre VISIBLE la surveillance qui tourne en fond ───
+// C'est le bénéfice premium le plus fort et le plus invisible : sans preuve
+// à l'écran, l'abonné ne « sent » rien et finit par résilier.
+// Les contrôles tournent le lundi (fuites HIBP) et le jeudi (appareils infectés).
+function prochainControleFr() {
+  var j = new Date().getDay();          // 0 dim … 6 sam
+  for (var i = 1; i <= 7; i++) {
+    var d = (j + i) % 7;
+    if (d === 1 || d === 4) return i === 1 ? 'demain' : (d === 1 ? 'lundi' : 'jeudi');
+  }
+  return 'sous peu';
+}
+
+function renderVeille(stats) {
+  var el = document.getElementById('home-veille');
+  if (!el) return;
+  if (!((session.get() || {}).subscribed)) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  var st = stats || {};
+  var fuites = st.breach_count || 0;
+  var t = document.getElementById('veille-title');
+  var b = document.getElementById('veille-sub');
+  if (t) t.textContent = fuites > 0
+    ? (fuites + (fuites > 1 ? ' fuites sous surveillance' : ' fuite sous surveillance'))
+    : 'Aucune fuite détectée';
+  var bouts = [];
+  if (st.last_hibp_check) { var q = timeAgoFr(st.last_hibp_check); if (q) bouts.push('vérifié ' + q); }
+  bouts.push('prochain contrôle ' + prochainControleFr());
+  if (b) b.textContent = bouts.join(' · ');
 }
 
 function timeAgoFr(iso) {
@@ -3532,7 +3614,7 @@ function openQuiz() {
     openSheet('Quota atteint',
       '<div class="result-card" style="text-align:center"><div style="font-size:48px;margin-bottom:8px">🔒</div>' +
         '<div style="font-weight:800;font-size:18px;margin-bottom:8px;color:var(--text)">Quota mensuel atteint</div>' +
-        '<div style="font-size:15px;color:var(--text3);margin-bottom:18px;line-height:1.5">Vous avez utilisé vos 5 questions découverte ce mois. Abonnez-vous pour un accès illimité au quiz, conseiller IA et toutes les fonctionnalités.</div>' +
+        '<div style="font-size:15px;color:var(--text3);margin-bottom:18px;line-height:1.5">Vous avez utilisé vos 5 quiz découverte de ce mois-ci. Ils se renouvellent le 1er du mois prochain. Avec l’abonnement : quiz et Conseiller sans limite, et les 10 modules de formation.</div>' +
         '<button class="btn-primary" onclick="openPaywall()">Passer en Premium</button></div>');
     return;
   }
@@ -4104,7 +4186,10 @@ var MODULES_FORMATION = [
 var _fmId = null, _fmStep = 0, _fmRep = {};
 
 function openModule(id) {
-  _fmId = id || 1; _fmStep = 0; _fmRep = {};
+  id = id || 1;
+  // Modules 4 à 10 : réservés aux abonnés (les 3 premiers restent offerts).
+  if (typeof fmLocked === 'function' && fmLocked(id)) { openPaywall(); return; }
+  _fmId = id; _fmStep = 0; _fmRep = {};
   document.getElementById('module').classList.add('on');
   document.body.style.overflow = 'hidden';
   fmRender();
@@ -4256,7 +4341,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-4';
+var APP_BUILD = '2026-07-27-5';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

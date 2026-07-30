@@ -1,12 +1,17 @@
 // ════════════════════════════════════════════
 // DESPY — Proxy Chat IA
 // Netlify Function : /.netlify/functions/despy-chat
-// Bloque les comptes gratuits après 3 questions
+// Comptes gratuits : 5 questions découverte PAR MOIS (remises à zéro le 1er).
+// Les réponses verrouillées (playbooks « de l'argent est en jeu ») restent
+// toujours accessibles et ne décomptent aucune question.
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth, rateLimit } = require('./_auth');
 const { matchPlaybook, buildPlaybookReply } = require('./_chat-playbooks');
+
+// Quota découverte des comptes gratuits (aligné sur le quiz : 5/mois).
+const FREE_CHAT_PAR_MOIS = 5;
 
 exports.handler = async (event) => {
   const headers = {
@@ -53,34 +58,57 @@ exports.handler = async (event) => {
     }
 
     // ── Vérification quota pour les comptes gratuits ──
+    // 5 questions découverte PAR MOIS, réellement remises à zéro le 1er.
+    // `questions_used` reste le total cumulé (bilan, rapport mensuel,
+    // onboarding-sequence) ; le quota vit dans chat_period/chat_period_used.
     if (email) {
       const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+      const em = email.toLowerCase().trim();
+      const periode = new Date().toISOString().slice(0, 7);   // 'AAAA-MM'
 
-      const { data: client } = await supabase
+      // Si la migration n'est pas passée, on retombe en douceur sur le
+      // compteur cumulatif (pas de reset, mais aucun plantage).
+      let avecPeriode = true;
+      let res = await supabase
         .from('clients')
-        .select('plan, subscribed, questions_used')
-        .eq('email', email.toLowerCase().trim())
+        .select('plan, subscribed, questions_used, chat_period, chat_period_used')
+        .eq('email', em)
         .maybeSingle();
+      if (res.error) {
+        avecPeriode = false;
+        res = await supabase
+          .from('clients')
+          .select('plan, subscribed, questions_used')
+          .eq('email', em)
+          .maybeSingle();
+      }
+      const client = res.data;
 
       if (client && !client.subscribed) {
-        const used = client.questions_used || 0;
-        if (used >= 3) {
+        const used = avecPeriode
+          ? (client.chat_period === periode ? (client.chat_period_used || 0) : 0)
+          : (client.questions_used || 0);
+
+        if (used >= FREE_CHAT_PAR_MOIS) {
           return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-              reply: "Vous avez utilisé vos 3 questions gratuites 😊 Pour continuer à bénéficier d'un accompagnement illimité, passez à l'abonnement Despy — **9,99€/mois** ou **89€/an** (2 mois offerts). Cliquez sur « Je m'abonne » pour continuer.",
+              reply: "Vous avez utilisé vos " + FREE_CHAT_PAR_MOIS + " questions découverte de ce mois-ci 😊 Elles se renouvellent le 1er du mois prochain.\n\nPour un accompagnement **illimité** tout de suite (et la ligne SOS avec un vrai conseiller au téléphone) : abonnement Despy — **9,99€/mois** ou **89€/an** (2 mois offerts).",
               limit_reached: true,
-              questions_used: used
+              questions_used: used,
+              quota: FREE_CHAT_PAR_MOIS
             })
           };
         }
 
-        // Incrémenter le compteur avant l'appel IA
-        await supabase
-          .from('clients')
-          .update({ questions_used: used + 1, updated_at: new Date().toISOString() })
-          .eq('email', email.toLowerCase().trim());
+        // Incrémenter avant l'appel IA
+        const patch = {
+          questions_used: (client.questions_used || 0) + 1,
+          updated_at: new Date().toISOString()
+        };
+        if (avecPeriode) { patch.chat_period = periode; patch.chat_period_used = used + 1; }
+        await supabase.from('clients').update(patch).eq('email', em);
       }
     }
 
