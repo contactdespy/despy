@@ -9450,19 +9450,19 @@ var MODULES = [
     questions: [
       {
         q: "Vous recevez ce SMS : Votre colis La Poste est bloque, cliquez ici : lapost-livraison.com. Que faites-vous ?",
-        opts: ["Je clique pour voir mon colis", "Je signale au 33700 et je supprime", "Je rappelle le numero affiche"],
+        opts: ["Je clique : l'adresse ressemble a celle de La Poste", "Je signale au 33700 et je supprime", "Je rappelle le numero indique dans le message"],
         answer: 1,
         expl: "Ce SMS est une arnaque. La Poste utilise toujours laposte.fr. Signalez au 33700 (service officiel anti-spam SMS) et supprimez immediatement."
       },
       {
         q: "Un inconnu vous appelle : Je suis de votre banque, votre compte est compromis, donnez-moi votre code SMS recu a l'instant.",
-        opts: ["Je donne le code, c'est urgent", "Je raccroche et j'appelle ma banque sur le numero au dos de ma carte", "Je lui demande son identifiant employe"],
+        opts: ["Je donne le code : il dit que mon argent est en danger", "Je raccroche et j'appelle ma banque sur le numero au dos de ma carte", "Je lui demande son identifiant employe"],
         answer: 1,
         expl: "Aucune banque ne demande jamais votre code SMS par telephone. Ce code est votre signature electronique. Raccrochez et appelez le numero officiel au dos de votre carte."
       },
       {
         q: "Vous recevez un SMS : Votre espace Ameli est suspendu. Regularisez ici : ameli-sante-gouv.fr. Est-ce legitime ?",
-        opts: ["Oui, c'est l'Assurance Maladie", "Non, le vrai site est ameli.fr", "Je ne sais pas, je clique pour verifier"],
+        opts: ["Oui : le message reprend le logo et le ton d'Ameli", "Non, le vrai site est ameli.fr", "Je ne sais pas, je clique pour verifier"],
         answer: 1,
         expl: "Le seul site officiel de l'Assurance Maladie est ameli.fr. Les arnaqueurs creent des domaines similaires. En cas de doute, tapez vous-meme l'adresse dans votre navigateur."
       },
@@ -9477,6 +9477,12 @@ var MODULES = [
         opts: ["Repondre STOP pour se desabonner", "Supprimer et signaler au 33700", "Cliquer sur le lien pour voir ce que c'est"],
         answer: 1,
         expl: "Supprimer et signaler au 33700. Ne repondez jamais a ces SMS, meme par STOP — cela confirme que votre numero est actif et vous expose a encore plus d'arnaques."
+      },
+      {
+        q: "Vous attendez vraiment un colis. Un SMS « Colissimo » vous donne un suivi, sans rien demander d'autre. Que faites-vous ?",
+        opts: ["Je clique sur le lien du SMS puisque j'attends bien un colis", "Je vais moi-même sur laposte.fr et je saisis mon numéro de suivi", "Je supprime : un SMS de colis est toujours une arnaque"],
+        answer: 1,
+        expl: "Attention aux deux erreurs inverses. Tous les SMS de colis ne sont pas des arnaques — mais on ne passe jamais par le lien : allez sur le site officiel vous-même. Le vrai signal d'alarme, c'est la demande de PAIEMENT (« frais de douane ») ou de coordonnées bancaires."
       }
     ]
   },
@@ -9515,6 +9521,12 @@ var MODULES = [
         opts: ["Je clique et je change mon mot de passe", "Je vais directement sur le site de ma banque sans cliquer", "Je reponds a l'email pour confirmer"],
         answer: 1,
         expl: "Ne cliquez jamais sur un lien dans un email pour vous connecter. Tapez toujours l'adresse de votre banque directement dans votre navigateur. C'est la regle d'or anti-phishing."
+      },
+      {
+        q: "Vous payez un achat en ligne et votre banque vous envoie aussitôt un code à 6 chiffres. Que faites-vous ?",
+        opts: ["Je le saisis sur la page de paiement : c'est moi qui viens de lancer l'achat", "Je ne le saisis jamais : un code reçu par SMS est toujours une arnaque", "Je le dicte au conseiller qui m'appelle pour valider l'opération"],
+        answer: 0,
+        expl: "C'est un cas parfaitement légitime : ce code confirme un achat QUE VOUS venez de faire. La règle tient en une phrase : on saisit ce code soi-même sur la page de paiement, on ne le DICTE jamais à quelqu'un au téléphone. Et un code qui arrive alors que vous n'avez rien demandé = quelqu'un essaie d'utiliser votre carte."
       }
     ]
   },
@@ -9538,7 +9550,7 @@ var MODULES = [
       },
       {
         q: "Votre ami vous envoie par email un lien vers une video de chat tres drole. Que faites-vous ?",
-        opts: ["Je clique directement", "Je verifie l'adresse email de l'expediteur et je survole le lien avant de cliquer", "Je partage a mes contacts"],
+        opts: ["Je clique : le lien vient d'un expediteur connu", "Je verifie l'adresse email de l'expediteur et je survole le lien avant de cliquer", "Je partage : autant prevenir mes proches"],
         answer: 1,
         expl: "Les comptes email de vos proches peuvent etre pirates. Verifiez que c'est bien son adresse habituelle et survolez le lien pour voir la vraie destination avant de cliquer."
       },
@@ -9553,6 +9565,12 @@ var MODULES = [
         opts: ["Le site est totalement securise et fiable", "La connexion est chiffree mais cela ne garantit pas la fiabilite du site", "Que le site appartient au gouvernement"],
         answer: 1,
         expl: "Le cadenas signifie que votre connexion est chiffree. Mais des sites d'arnaque peuvent aussi avoir ce cadenas. Verifiez toujours l'adresse complete du site, pas seulement le cadenas."
+      },
+      {
+        q: "Un email des impôts annonce un remboursement. L'adresse se termine bien par @dgfip.finances.gouv.fr. Que faites-vous ?",
+        opts: ["Je clique sur le lien, l'adresse d'expéditeur est officielle", "Rien : l'administration n'envoie jamais d'email", "Je me connecte moi-même sur impots.gouv.fr pour vérifier"],
+        answer: 2,
+        expl: "L'administration envoie de vrais emails : tout rejeter n'est pas la solution. Mais une adresse d'expéditeur se falsifie en quelques secondes — elle ne prouve rien. Le réflexe qui marche toujours : ne pas passer par le lien, aller soi-même sur impots.gouv.fr. Le fisc ne demande JAMAIS vos coordonnées bancaires par email."
       }
     ]
   },
@@ -9591,6 +9609,12 @@ var MODULES = [
         opts: ["Cliquer sur le lien dans le message pour securiser le compte", "Aller directement sur facebook.com et verifier les appareils connectes dans les parametres", "Partager le message pour prevenir vos amis"],
         answer: 1,
         expl: "Ne cliquez jamais sur un lien dans un message d'alerte. Allez directement sur le site officiel. Facebook vous alertera dans les parametres de securite de votre compte."
+      },
+      {
+        q: "Une amie vous écrit depuis un NOUVEAU compte Facebook : « j'ai perdu l'accès à l'ancien », puis vous demande de l'argent. Que faites-vous ?",
+        opts: ["Je l'appelle sur son téléphone habituel avant de faire quoi que ce soit", "Je l'aide : je reconnais ses photos et sa façon d'écrire", "Je bloque le compte, c'est forcément un faux"],
+        answer: 0,
+        expl: "C'est l'arnaque la plus répandue sur Facebook — mais il arrive vraiment qu'on perde son compte, donc bloquer d'office n'est pas juste non plus. La règle : toute demande d'argent se vérifie de vive voix, sur le numéro que vous avez déjà. Photos et style d'écriture se copient."
       }
     ]
   },
@@ -9629,6 +9653,12 @@ var MODULES = [
         opts: ["Je clique directement sur le lien de l'email", "Je vais sur le site officiel de la marque directement dans mon navigateur", "Je partage l'offre a mes amis d'abord"],
         answer: 1,
         expl: "Les arnaqueurs imitent parfaitement les emails des grandes marques. Tapez toujours l'adresse du site vous-meme dans le navigateur plutot que de cliquer sur un lien dans un email."
+      },
+      {
+        q: "Un site marchand que vous ne connaissez pas affiche le cadenas 🔒 et « https ». Est-ce un gage de confiance ?",
+        opts: ["Oui, le cadenas veut dire que le site est vérifié", "Non : le cadenas protège la connexion, il ne dit rien de l'honnêteté du vendeur", "Oui, surtout s'il accepte la carte bancaire"],
+        answer: 1,
+        expl: "Idée reçue très répandue, et dangereuse. Le cadenas signifie seulement que personne n'espionne la connexion — les sites frauduleux en ont un aussi, il est gratuit. Ce qui compte vraiment : les mentions légales, l'ancienneté du site, les avis en dehors du site, et un moyen de paiement sécurisé (jamais de virement)."
       }
     ]
   },
@@ -9640,7 +9670,7 @@ var MODULES = [
     questions: [
       {
         q: "Vous etes dans un cafe et vous connectez a un Wi-Fi gratuit nomme 'Free_Cafe_Wifi'. Quel risque prenez-vous ?",
-        opts: ["Aucun si j'ai un antivirus", "Un pirate peut intercepter tout ce que vous envoyez et recevez", "Le risque est seulement si je fais des achats"],
+        opts: ["Aucun : mon antivirus me protege deja", "Un pirate peut intercepter tout ce que vous envoyez et recevez", "Le risque est seulement si je fais des achats"],
         answer: 1,
         expl: "Un Wi-Fi public non securise permet a un pirate de voir tout votre trafic (attaque 'man in the middle'). Evitez les operations sensibles (banque, email) sur Wi-Fi public, ou utilisez un VPN."
       },
@@ -9658,7 +9688,7 @@ var MODULES = [
       },
       {
         q: "Vous perdez votre telephone. Quelle est la premiere chose a faire ?",
-        opts: ["Appeler votre operateur pour bloquer la SIM", "Bloquer le telephone a distance ET signaler la perte a votre operateur", "Attendre de le retrouver"],
+        opts: ["Appeler votre operateur pour bloquer la SIM", "Bloquer le telephone a distance ET signaler la perte a votre operateur", "Attendre un peu : il est peut-etre chez moi"],
         answer: 1,
         expl: "Bloquez immediatement le telephone a distance (Find My iPhone ou Google Find My Device) ET appelez votre operateur pour bloquer la carte SIM. Faites les deux en parallele."
       },
@@ -9667,6 +9697,12 @@ var MODULES = [
         opts: ["Aucun risque si ce n'est pas une prise secteur", "Un cable USB piege peut installer un logiciel espion", "Le risque est seulement si votre telephone est deverrouille"],
         answer: 1,
         expl: "C'est l'attaque dite 'juice jacking'. Un cable USB peut transferer des donnees en plus de l'electricite. Utilisez uniquement votre propre chargeur ou des prises secteur officielles."
+      },
+      {
+        q: "Votre téléphone propose une mise à jour. On vous a dit que « les mises à jour ralentissent l'appareil ». Que faites-vous ?",
+        opts: ["Je repousse pour garder mon téléphone rapide", "Je l'installe seulement si mon téléphone fonctionne mal", "Je l'installe : elle bouche des failles que les pirates connaissent déjà"],
+        answer: 2,
+        expl: "Une mise à jour corrige des failles DÉJÀ connues des pirates : repousser, c'est laisser la porte ouverte. En revanche, retenez bien ceci : une vraie mise à jour s'installe depuis les réglages du téléphone — jamais depuis un lien reçu par SMS ni une fenêtre qui s'ouvre pendant que vous naviguez."
       }
     ]
   },
@@ -9678,19 +9714,19 @@ var MODULES = [
     questions: [
       {
         q: "Votre petite-fille vous ecrit sur WhatsApp : Mamie, j'ai casse mon telephone, c'est mon nouveau numero, vire-moi 800 euros d'urgence. Que faites-vous ?",
-        opts: ["Je vire l'argent, c'est urgent", "J'appelle ma petite-fille sur son ancien numero pour verifier", "Je lui envoie les sous via un autre canal"],
+        opts: ["Je vire l'argent : je le rembourserai si c'est une erreur", "J'appelle ma petite-fille sur son ancien numero pour verifier", "Je lui envoie les sous via un autre canal"],
         answer: 1,
         expl: "C'est l'arnaque au faux proche. Appelez TOUJOURS la personne sur son numero habituel pour verifier. En cas d'arnaque, signalez-le a la police et a votre banque immediatement."
       },
       {
         q: "Un technicien Microsoft vous appelle : votre ordinateur emet des virus, je dois me connecter a distance pour le reparer. Que faites-vous ?",
-        opts: ["J'accepte, c'est Microsoft", "Je raccroche — Microsoft ne vous appellerait jamais de lui-meme", "Je demande ses identifiants avant d'accepter"],
+        opts: ["J'accepte : le message vient d'une fenetre Windows", "Je raccroche — Microsoft ne vous appellerait jamais de lui-meme", "Je demande ses identifiants avant d'accepter"],
         answer: 1,
         expl: "Microsoft, Apple ou votre banque ne vous appelleront JAMAIS de facon spontanee pour un probleme technique. C'est une arnaque au faux support technique. Raccrochez immediatement."
       },
       {
         q: "Vous recevez un email contenant votre ancien mot de passe et vous menaçant de publier des videos compromettantes si vous ne payez pas en bitcoin. Que faites-vous ?",
-        opts: ["Je paye pour proteger ma reputation", "Je signale a la police et je change tous mes mots de passe", "Je reponds pour negocier"],
+        opts: ["Je paye pour proteger ma reputation", "Je signale a la police et je change tous mes mots de passe", "Je reponds pour gagner du temps"],
         answer: 1,
         expl: "C'est une arnaque a la 'sextorsion'. Ils ont seulement votre email et un ancien mot de passe (trouve dans une fuite de donnees). Il n'y a aucune video. Ne payez pas, signalez sur cybermalveillance.gouv.fr"
       },
@@ -9702,9 +9738,15 @@ var MODULES = [
       },
       {
         q: "Un officier de police vous appelle, tres serieux, en vous disant que votre compte bancaire sert a blanchir de l'argent et que vous devez transferer vos economies sur un 'compte securise'. Que faites-vous ?",
-        opts: ["Je coopere, c'est la police", "Je raccroche et j'appelle le 17 (police) pour verifier", "Je demande un numero de badge"],
+        opts: ["Je coopere : il m'a donne un numero de service", "Je raccroche et j'appelle le 17 (police) pour verifier", "Je demande un numero de badge"],
         answer: 1,
         expl: "C'est l'arnaque au faux policier. La vraie police ne vous demandera JAMAIS de transferer de l'argent. Raccrochez et appelez le 17 pour signaler. Vos economies sont en danger."
+      },
+      {
+        q: "Un « conseiller bancaire » vous appelle : il connaît votre nom, votre banque et vos derniers achats. Est-ce la preuve qu'il est authentique ?",
+        opts: ["Oui, seul un vrai conseiller peut connaître ces informations", "Non : ces informations circulent après les fuites de données", "Oui, s'il connaît en plus les derniers chiffres de ma carte"],
+        answer: 1,
+        expl: "C'est LA technique qui fait tomber le plus de monde : mettre en confiance en récitant de vraies informations, souvent achetées après une fuite. Savoir des choses sur vous ne prouve strictement rien. Une seule règle tient dans tous les cas : vous raccrochez, et vous rappelez le numéro au dos de votre carte."
       }
     ]
   },
@@ -9743,6 +9785,12 @@ var MODULES = [
         opts: ["Je paye la rancon, j'ai besoin de mes fichiers", "Je ne paye pas — je contacte un professionnel et signale a la police", "Je reformate immediatement"],
         answer: 1,
         expl: "Ne payez JAMAIS une rancon : rien ne garantit la recuperation de vos fichiers et vous financez des criminels. Contactez un professionnel, signalez a la police, et restaurez depuis une sauvegarde."
+      },
+      {
+        q: "Vous venez de donner votre code de carte à un faux conseiller. Quel est le tout premier geste ?",
+        opts: ["Je surveille mon compte pour voir si de l'argent part", "Je change d'abord tous mes mots de passe", "Je fais opposition immédiatement (0 892 705 705), puis je préviens ma banque"],
+        answer: 2,
+        expl: "Chaque minute compte : l'opposition bloque la carte tout de suite, c'est le geste numéro un. Les mots de passe viennent juste après. Surtout, ne restez pas à « regarder ce qui va se passer » : plus vous agissez vite, plus le remboursement par la banque est simple à obtenir."
       }
     ]
   },
@@ -9781,6 +9829,12 @@ var MODULES = [
         opts: ["Je clique vite pour ne pas perdre mon compte", "Je regarde l'adresse de l'expediteur : si ce n'est pas un domaine officiel, c'est une arnaque et je ne clique pas", "Je reponds a l'email pour demander des explications"],
         answer: 1,
         expl: "L'IA permet de rediger de faux courriers administratifs parfaits, avec urgence (24h) et numero de dossier bidon. Verifiez toujours le domaine apres le @ : un vrai email Meta vient de @meta.com, jamais d'un domaine inconnu. Ne cliquez jamais : rendez-vous directement sur le site officiel en tapant l'adresse vous-meme."
+      },
+      {
+        q: "Quelle est la parade réellement efficace contre une voix clonée par intelligence artificielle ?",
+        opts: ["Écouter attentivement : une voix artificielle a toujours un petit défaut", "Convenir à l'avance d'un mot secret en famille, à demander en cas de doute", "Demander à la personne de répéter plusieurs fois la même phrase"],
+        answer: 1,
+        expl: "Votre oreille ne suffit plus : quelques secondes de voix trouvées sur internet suffisent à produire un clone convaincant, capable de répéter n'importe quoi. La parade est humaine, pas technique : un mot secret connu de la famille seule — ou raccrocher et rappeler la personne sur son vrai numéro."
       }
     ]
   },
@@ -9819,6 +9873,12 @@ var MODULES = [
         opts: ["Accepter, c'est ma seule chance de revoir mon argent", "Refuser : c'est l'arnaque au recouvrement, souvent les MEMES escrocs qui reviennent", "Payer seulement la moitie d'avance"],
         answer: 1,
         expl: "L'arnaque au recouvrement est la double peine : les victimes sont fichees et recontactees par de faux 'recuperateurs de fonds' ou faux avocats. Personne de serieux ne demande d'argent d'avance pour recuperer des fonds. Les seuls interlocuteurs legitimes : la police (plainte), votre banque, et l'AMF. En cas de doute, bouton SOS Despy."
+      },
+      {
+        q: "Un placement promet 8 % par an sans risque et affiche un numéro d'agrément AMF. Que faites-vous ?",
+        opts: ["Je vérifie moi-même sur amf-france.org : les escrocs affichent de faux agréments", "J'y vais : un agrément AMF est une garantie de l'État", "Je refuse par principe, aucun placement n'est fiable"],
+        answer: 0,
+        expl: "Les escrocs affichent de faux numéros d'agrément, et usurpent parfois le nom d'une vraie société agréée. Vérifiez toujours vous-même sur amf-france.org (registre officiel ET liste noire). Et gardez ce repère simple : un rendement élevé « garanti sans risque » n'existe pas — c'est la signature de l'arnaque."
       }
     ]
   }
@@ -9832,6 +9892,24 @@ function getCurrentModule() {
 
 // XP par defaut (questions anciennes formatees)
 var QUIZZES = getCurrentModule().questions;
+
+// Mélange l'ordre d'affichage des réponses.
+// Sans ça, la bonne réponse était en 2e position dans 49 questions sur 50 :
+// on pouvait tout réussir sans lire, et le score ne voulait plus rien dire.
+// L'ordre est tiré une fois par question et conservé (pas de saut au re-rendu).
+var _despyOrdres = {};
+function despyOrdre(cle, n) {
+  if (!_despyOrdres[cle] || _despyOrdres[cle].length !== n) {
+    var a = [];
+    for (var i = 0; i < n; i++) a.push(i);
+    for (var k = a.length - 1; k > 0; k--) {          // Fisher-Yates
+      var r = Math.floor(Math.random() * (k + 1));
+      var t = a[k]; a[k] = a[r]; a[r] = t;
+    }
+    _despyOrdres[cle] = a;
+  }
+  return _despyOrdres[cle];
+}
 
 // === NIVEAUX DE PROGRESSION ===
 var LEVELS = [
@@ -10063,7 +10141,10 @@ function showChronoQuestion() {
   zone.appendChild(qText);
 
   // Options
-  q.opts.forEach(function(opt, i) {
+  // Réponses mélangées à l'affichage ; les id/onclick gardent l'index d'ORIGINE,
+  // donc answerChrono et son affichage du corrigé fonctionnent sans changement.
+  despyOrdre('chrono:' + _chronoState.questionIndex, q.opts.length).forEach(function(i) {
+    var opt = q.opts[i];
     var btn = document.createElement('button');
     btn.style.cssText = 'display:block;width:100%;text-align:left;padding:13px 16px;margin-bottom:9px;background:#fff;border:1.5px solid var(--border);border-radius:11px;font-size:14px;color:var(--text);cursor:pointer;transition:all .15s;font-family:inherit';
     btn.textContent = opt;
@@ -10317,8 +10398,11 @@ function showQuizModal() {
     var html = '<div style="background:var(--bg2);border-radius:14px;padding:20px">';
     html += '<div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.6;margin-bottom:16px">' + q.q + '</div>';
     html += '<div id="quiz-opts" style="display:flex;flex-direction:column;gap:10px">';
-    for (var i = 0; i < q.opts.length; i++) {
-      html += '<button onclick="answerQuiz(' + i + ')" style="text-align:left;padding:13px 16px;background:#fff;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;font-family:inherit;transition:all .2s;width:100%">' + q.opts[i] + '</button>';
+    // Réponses mélangées : l'index d'origine reste porté par data-idx.
+    var ordreQ = despyOrdre('mod' + (mod.id || 1) + ':' + (window._quizIdx || 0), q.opts.length);
+    for (var oi = 0; oi < ordreQ.length; oi++) {
+      var io_ = ordreQ[oi];
+      html += '<button data-idx="' + io_ + '" onclick="answerQuiz(' + io_ + ')" style="text-align:left;padding:13px 16px;background:#fff;border:1.5px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);cursor:pointer;font-family:inherit;transition:all .2s;width:100%">' + q.opts[io_] + '</button>';
     }
     html += '</div></div>';
     zone.innerHTML = html;
@@ -10419,11 +10503,14 @@ function answerQuiz(idx) {
   var opts = document.querySelectorAll('#quiz-opts button');
   for (var i = 0; i < opts.length; i++) {
     opts[i].disabled = true;
-    if (i === q.answer) {
+    // ordre mélangé : on compare l'index d'ORIGINE, pas la place à l'écran
+    var oi = parseInt(opts[i].getAttribute('data-idx'), 10);
+    if (isNaN(oi)) oi = i;
+    if (oi === q.answer) {
       opts[i].style.background = 'var(--ok-bg)';
       opts[i].style.borderColor = '#16a34a';
       opts[i].style.color = 'var(--ok)';
-    } else if (i === idx) {
+    } else if (oi === idx) {
       opts[i].style.background = '#fef2f2';
       opts[i].style.borderColor = '#ef4444';
       opts[i].style.color = '#dc2626';
