@@ -201,6 +201,14 @@
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
 
+[functions.monthly-training]
+  schedule = "0 8 1 * *"           # 1er du mois 8h — génère « L'arnaque du mois »
+                                   # à partir des alertes nationales et des
+                                   # signalements réels des membres. Créé en
+                                   # BROUILLON : rien n'est visible des clients
+                                   # tant que le module n'a pas été validé à la
+                                   # main via les boutons de l'email.
+
 [functions.nudge-push]
   schedule = "0 9 * * 3"           # Mercredi 9h UTC (~11h Paris) — notifs « douces »
                                    # de réengagement, RÉSERVÉES aux comptes gratuits

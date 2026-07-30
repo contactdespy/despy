@@ -807,6 +807,31 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .offline-bar svg{ flex:none; margin-top:1px; opacity:.9; }
 @media (prefers-reduced-motion:reduce){ .offline-bar.on{ animation:none; } }
 
+
+/* ── niveaux & mises en situation ── */
+.lvl-badge{ font-size:11.5px; font-weight:800; padding:4px 10px; border-radius:20px; letter-spacing:.02em; }
+.lvl-1{ background:#E6F6EF; color:#0F6E56; }
+.lvl-2{ background:#FFF4E0; color:#8A5A00; }
+.lvl-3{ background:#F3E8FF; color:#6B21A8; }
+.sc-situation{ background:#111a2e; color:#fff; border-radius:16px; padding:16px; font-size:16px; line-height:1.55; margin:0 0 14px; }
+.sc-suite{ margin-top:11px; background:#FFF7E6; border:1px solid #F5C451; border-radius:14px; padding:13px 14px; font-size:14.5px; line-height:1.55; color:#6b4a00; }
+.sc-suite span{ display:block; font-size:11.5px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#8A5A00; margin-bottom:4px; }
+.sc-note{ font-size:13.5px; line-height:1.5; color:var(--p-muted); background:#EEF4FF; border:1px solid #cfe0ff; border-radius:13px; padding:12px 13px; }
+.sc-row .fm-s{ color:#6B21A8; font-weight:700; }
+.sc-row.fm-lock .fm-s{ color:var(--p-gold,#B4892E); }
+.sc-intro{ padding:0 16px 12px; font-size:13.5px; line-height:1.5; color:var(--p-muted); }
+/* ── L'arnaque du mois ── */
+.mois-card{ display:block; width:100%; text-align:left; font-family:inherit; cursor:pointer; border:0; margin-bottom:16px;
+  background:linear-gradient(125deg,#1a3a8f,#2D5BFF); color:#fff; border-radius:18px; padding:16px 17px;
+  box-shadow:0 10px 26px rgba(45,91,255,.32); }
+.mois-card:active{ transform:scale(.985); }
+.mois-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.mois-tag{ font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:rgba(255,255,255,.20); padding:4px 10px; border-radius:20px; }
+.mois-date{ font-size:12px; color:#c7d8ff; text-transform:capitalize; }
+.mois-t{ display:block; font-size:17.5px; font-weight:850; line-height:1.3; }
+.mois-s{ display:block; font-size:13px; color:#c7d8ff; margin-top:5px; line-height:1.45; }
+.mois-lock{ background:linear-gradient(125deg,#3a4459,#5a6478); box-shadow:0 8px 20px rgba(20,30,50,.22); }
+
 </style>
 </head>
 <body>
@@ -1157,6 +1182,22 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
   <div class="mod-scroll"><div id="victime-body"></div></div>
 </div>
 
+<!-- ═══ MISE EN SITUATION (niveau expert) ═══ -->
+<div id="scenario" class="modscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeScenario()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Mise en situation</div><div class="mod-htitle">Expert</div></div>
+    </div>
+    <div class="mod-steps" id="sc-steps"></div>
+  </div>
+  <div class="mod-scroll"><div id="sc-body"></div></div>
+  <div class="mod-cta-bar">
+    <button class="mod-cta" id="sc-cta"></button>
+    <div class="mod-astuce" id="sc-astuce"></div>
+  </div>
+</div>
+
 <!-- ═══ PROTÉGER MON TÉLÉPHONE (plein écran) ═══ -->
 <div id="bouclier" class="fmscreen">
   <div class="mod-top">
@@ -1180,7 +1221,11 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <div style="height:6px;border-radius:20px;background:rgba(255,255,255,.18);overflow:hidden"><div id="fm-headbar" style="height:100%;width:0;border-radius:20px;background:#5CE0A0;transition:width .9s cubic-bezier(.2,.7,.3,1)"></div></div>
     </div>
   </div>
-  <div class="mod-scroll"><div class="plist" id="fm-list"></div></div>
+  <div class="mod-scroll">
+    <div id="fm-mois"></div>
+    <div class="plist" id="fm-list"></div>
+    <div id="fm-scenarios"></div>
+  </div>
 </div>
 
 <!-- ═══ MODULE DE FORMATION (plein écran) ═══ -->
@@ -2813,6 +2858,7 @@ function openFormation() {
   document.getElementById('formation').classList.add('on');
   document.body.style.overflow = 'hidden';
   renderFormationList();
+  if (!MODULE_DU_MOIS) chargerModuleDuMois();   // se re-rend tout seul à l'arrivée
 }
 function closeFormation() {
   document.getElementById('formation').classList.remove('on');
@@ -2826,8 +2872,30 @@ function fmCountDone() { var n = 0; for (var i = 1; i <= MODULES_FORMATION.lengt
 // (L'urgence et les outils de secours restent gratuits — ici c'est de la formation.)
 var FM_GRATUITS = 3;
 function fmLocked(id) {
-  if (id <= FM_GRATUITS) return false;
+  if (id !== 'mois' && id <= FM_GRATUITS) return false;
   return !((session.get() || {}).subscribed);
+}
+
+// « L'arnaque du mois » : module renouvelé chaque mois à partir des vraies
+// arnaques observées (alertes nationales + signalements des membres).
+// C'est ce qui fait qu'on ne « termine » jamais la formation.
+var MODULE_DU_MOIS = null;
+
+function fmGet(id) {
+  return (id === 'mois') ? MODULE_DU_MOIS : MODULES_FORMATION[id - 1];
+}
+
+function chargerModuleDuMois() {
+  var s = session.get();
+  if (!s || !s.email) return;
+  fetch('/.netlify/functions/monthly-module', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify({ email: s.email })
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    MODULE_DU_MOIS = (d && d.module) ? d.module : null;
+    if (document.getElementById('formation').classList.contains('on')) renderFormationList();
+  }).catch(function () {});
 }
 
 function renderFormationList() {
@@ -2857,6 +2925,56 @@ function renderFormationList() {
       '</button>';
   });
   z.innerHTML = h;
+  renderMoisCard();
+  renderScenarioList();
+}
+
+// « L'arnaque du mois » — en tête de la formation : c'est le contenu frais,
+// celui qui donne une raison de revenir même quand les 10 modules sont finis.
+function renderMoisCard() {
+  var z = document.getElementById('fm-mois');
+  if (!z) return;
+  if (!MODULE_DU_MOIS) { z.innerHTML = ''; return; }
+  var M = MODULE_DU_MOIS;
+  var lock = !!M.locked;
+  var fait = !lock && fmDone('mois');
+  var quand = '';
+  try {
+    var p = String(M.period || '').split('-');
+    if (p.length === 2) quand = new Date(p[0], p[1] - 1, 1).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  } catch (e) {}
+  z.innerHTML =
+    '<button class="mois-card' + (lock ? ' mois-lock' : '') + '" onclick="' + (lock ? 'openPaywall()' : "openModule('mois')") + '">' +
+      '<span class="mois-top"><span class="mois-tag">Nouveau ce mois-ci</span>' + (quand ? '<span class="mois-date">' + quand + '</span>' : '') + '</span>' +
+      '<span class="mois-t">' + M.title + '</span>' +
+      '<span class="mois-s">' + (lock ? 'Inclus dans l’abonnement 🔒'
+        : fait ? 'Vous l’avez terminé ✓'
+        : 'Tiré des arnaques qui circulent en ce moment') + '</span>' +
+    '</button>';
+}
+
+// Niveau expert : les mises en situation, sous la liste des modules.
+function renderScenarioList() {
+  var z = document.getElementById('fm-scenarios');
+  if (!z || typeof SCENARIOS === 'undefined') return;
+  var lock = scLocked();
+  var faits = scCountDone();
+  var h = '<div class="fm-sep" style="border-top:0;padding-top:20px">Niveau expert · mises en situation</div>' +
+    '<div class="sc-intro">De vraies situations qui se déroulent étape par étape : l’escroc insiste, change de ton, revient. ' +
+    (lock ? 'Incluses dans l’abonnement.' : faits + ' / ' + SCENARIOS.length + ' terminées.') + '</div>' +
+    '<div class="plist">';
+  SCENARIOS.forEach(function (S) {
+    var ok = !lock && scDone(S.id);
+    h += '<button class="fm-row sc-row' + (lock ? ' fm-lock' : '') + '" onclick="openScenario(' + S.id + ')">' +
+      '<span class="fm-ic" style="background:' + S.color + '1f;color:' + S.color + '">' + S.icon + '</span>' +
+      '<span class="fm-m"><span class="fm-t">' + S.title + '</span>' +
+      '<span class="fm-s">' + (lock ? 'Inclus dans l’abonnement' : S.steps.length + ' étapes · niveau expert') + '</span></span>' +
+      (lock ? '<span class="fm-key">🔒</span>'
+            : ok ? '<span class="fm-check">✓</span>'
+            : '<span class="fm-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></span>') +
+      '</button>';
+  });
+  z.innerHTML = h + '</div>';
 }
 
 // Carte « Activer les alertes » : visible seulement si la permission n'est pas accordée.
@@ -3819,36 +3937,42 @@ var MODULES_FORMATION = [
     color: "#ef4444",
     questions: [
       {
+        lvl: 1,
         q: "Vous recevez ce SMS : Votre colis La Poste est bloque, cliquez ici : lapost-livraison.com. Que faites-vous ?",
         opts: ["Je clique : l'adresse ressemble a celle de La Poste", "Je signale au 33700 et je supprime", "Je rappelle le numero indique dans le message"],
         answer: 1,
         expl: "Ce SMS est une arnaque. La Poste utilise toujours laposte.fr. Signalez au 33700 (service officiel anti-spam SMS) et supprimez immediatement."
       },
       {
+        lvl: 1,
         q: "Un inconnu vous appelle : Je suis de votre banque, votre compte est compromis, donnez-moi votre code SMS recu a l'instant.",
         opts: ["Je donne le code, c'est urgent", "Je raccroche et j'appelle ma banque sur le numero au dos de ma carte", "Je lui demande son identifiant employe"],
         answer: 1,
         expl: "Aucune banque ne demande jamais votre code SMS par telephone. Ce code est votre signature electronique. Raccrochez et appelez le numero officiel au dos de votre carte."
       },
       {
+        lvl: 1,
         q: "Vous recevez un SMS : Votre espace Ameli est suspendu. Regularisez ici : ameli-sante-gouv.fr. Est-ce legitime ?",
         opts: ["Oui : le message reprend le logo et le ton d'Ameli", "Non, le vrai site est ameli.fr", "Je ne sais pas, je clique pour verifier"],
         answer: 1,
         expl: "Le seul site officiel de l'Assurance Maladie est ameli.fr. Les arnaqueurs creent des domaines similaires. En cas de doute, tapez vous-meme l'adresse dans votre navigateur."
       },
       {
+        lvl: 1,
         q: "Votre operateur vous appelle pour vous offrir une remise de 50% sur votre facture en echange de vos coordonnees bancaires. Que faites-vous ?",
         opts: ["J'accepte, c'est une bonne affaire", "Je raccroche et je rappelle le service client officiel", "Je donne mes coordonnees mais je surveille mon compte"],
         answer: 1,
         expl: "Les vrais operateurs ne demandent jamais vos coordonnees bancaires par telephone pour une promotion. C'est une arnaque classique. Raccrochez et rappelez le numero officiel."
       },
       {
+        lvl: 1,
         q: "Vous recevez 10 SMS identiques vous disant que vous avez gagne un iPhone. Quelle est la premiere chose a faire ?",
         opts: ["Repondre STOP pour se desabonner", "Supprimer et signaler au 33700", "Cliquer sur le lien pour voir ce que c'est"],
         answer: 1,
         expl: "Supprimer et signaler au 33700. Ne repondez jamais a ces SMS, meme par STOP — cela confirme que votre numero est actif et vous expose a encore plus d'arnaques."
       },
       {
+        lvl: 2,
         q: "Vous attendez vraiment un colis. Un SMS « Colissimo » vous donne un suivi, sans rien demander d'autre. Que faites-vous ?",
         opts: ["Je clique sur le lien du SMS puisque j'attends bien un colis", "Je vais moi-même sur laposte.fr et je saisis mon numéro de suivi", "Je supprime : un SMS de colis est toujours une arnaque"],
         answer: 1,
@@ -3863,36 +3987,42 @@ var MODULES_FORMATION = [
     color: "#8b5cf6",
     questions: [
       {
+        lvl: 1,
         q: "Quel mot de passe est le plus securise ?",
         opts: ["MonChat2024!", "j7Kp#mR9!xQw", "Soleil123"],
         answer: 1,
         expl: "Un mot de passe fort melange lettres majuscules, minuscules, chiffres et symboles de facon aleatoire. Plus c'est imprevisible, mieux c'est. Utilisez un gestionnaire de mots de passe."
       },
       {
+        lvl: 1,
         q: "Vous utilisez le meme mot de passe sur votre email, Facebook et votre banque. Quel est le risque ?",
         opts: ["Aucun, c'est plus pratique", "Si un site est pirate, tous vos comptes sont en danger", "Le risque est faible si le mot de passe est long"],
         answer: 1,
         expl: "Si un seul site est pirate, les hackers testent vos identifiants sur tous les autres sites. C'est ce qu'on appelle le 'credential stuffing'. Utilisez un mot de passe unique par site."
       },
       {
+        lvl: 1,
         q: "Qu'est-ce qu'un gestionnaire de mots de passe ?",
         opts: ["Un carnet pour noter ses mots de passe", "Un logiciel qui cree et stocke vos mots de passe de facon securisee", "Une fonctionnalite de votre navigateur uniquement"],
         answer: 1,
         expl: "Un gestionnaire comme Bitwarden ou 1Password cree des mots de passe uniques et complexes pour chaque site, et les stocke de facon chiffree. Vous n'avez a retenir qu'un seul mot de passe maitre."
       },
       {
+        lvl: 1,
         q: "Un site vous demande de creer un mot de passe. Quelle regle est la plus importante ?",
         opts: ["Utiliser votre date de naissance pour s'en souvenir", "Ne jamais utiliser ce mot de passe ailleurs", "Inclure le nom du site dans le mot de passe"],
         answer: 1,
         expl: "L'unicite est la regle numero 1. Meme un mot de passe simple est acceptable s'il n'est utilise qu'une seule fois. La reutilisation est le danger principal."
       },
       {
+        lvl: 1,
         q: "Votre banque vous envoie un email vous demandant de changer votre mot de passe en cliquant sur un lien. Que faites-vous ?",
         opts: ["Je clique et je change mon mot de passe", "Je vais directement sur le site de ma banque sans cliquer", "Je reponds a l'email pour confirmer"],
         answer: 1,
         expl: "Ne cliquez jamais sur un lien dans un email pour vous connecter. Tapez toujours l'adresse de votre banque directement dans votre navigateur. C'est la regle d'or anti-phishing."
       },
       {
+        lvl: 2,
         q: "Vous payez un achat en ligne et votre banque vous envoie aussitôt un code à 6 chiffres. Que faites-vous ?",
         opts: ["Je le saisis sur la page de paiement : c'est moi qui viens de lancer l'achat", "Je ne le saisis jamais : un code reçu par SMS est toujours une arnaque", "Je le dicte au conseiller qui m'appelle pour valider l'opération"],
         answer: 0,
@@ -3907,36 +4037,42 @@ var MODULES_FORMATION = [
     color: "#f59e0b",
     questions: [
       {
+        lvl: 1,
         q: "Vous recevez un email de service@amazon-confirmation.net vous disant que votre commande est bloquee. Est-ce legitime ?",
         opts: ["Oui, Amazon utilise ce type d'adresse", "Non, Amazon utilise uniquement @amazon.fr ou @amazon.com", "Je clique pour verifier ma commande"],
         answer: 1,
         expl: "Amazon utilise uniquement des adresses officielles (@amazon.fr, @amazon.com). Tout autre domaine est une arnaque. Verifiez toujours l'adresse email complete de l'expediteur."
       },
       {
+        lvl: 1,
         q: "Comment reconnaitre un email de phishing ? (choisissez la meilleure reponse)",
         opts: ["Il contient souvent des fautes d'orthographe", "Il cree un sentiment d'urgence et menace", "Les deux reponses sont correctes"],
         answer: 2,
         expl: "Le signal le plus fiable est l'urgence et la menace ('Votre compte sera bloque dans 24h'). Attention : avec l'IA, les fautes d'orthographe ont presque disparu — un email parfaitement ecrit peut tout a fait etre une arnaque. Fiez-vous au contenu et a l'adresse de l'expediteur, jamais a la qualite du texte."
       },
       {
+        lvl: 1,
         q: "Votre ami vous envoie par email un lien vers une video de chat tres drole. Que faites-vous ?",
         opts: ["Je clique : le lien vient d'un expediteur connu", "Je verifie l'adresse email de l'expediteur et je survole le lien avant de cliquer", "Je partage : autant prevenir mes proches"],
         answer: 1,
         expl: "Les comptes email de vos proches peuvent etre pirates. Verifiez que c'est bien son adresse habituelle et survolez le lien pour voir la vraie destination avant de cliquer."
       },
       {
+        lvl: 1,
         q: "Un email vous informe que vous avez gagne 50 000 euros a une loterie europeenne a laquelle vous n'avez pas participe. C'est quoi ?",
         opts: ["Une vraie loterie europeenne", "Une arnaque a l'avance de frais", "Une erreur d'envoi"],
         answer: 1,
         expl: "C'est une arnaque classique : 'avance de frais'. On vous demande de payer des frais pour recevoir vos gains qui n'existent pas. On ne gagne pas a une loterie a laquelle on n'a pas participe."
       },
       {
+        lvl: 1,
         q: "Que signifie le cadenas vert (https) dans la barre d'adresse d'un site web ?",
         opts: ["Le site est totalement securise et fiable", "La connexion est chiffree mais cela ne garantit pas la fiabilite du site", "Que le site appartient au gouvernement"],
         answer: 1,
         expl: "Le cadenas signifie que votre connexion est chiffree. Mais des sites d'arnaque peuvent aussi avoir ce cadenas. Verifiez toujours l'adresse complete du site, pas seulement le cadenas."
       },
       {
+        lvl: 2,
         q: "Un email des impôts annonce un remboursement. L'adresse se termine bien par @dgfip.finances.gouv.fr. Que faites-vous ?",
         opts: ["Je clique sur le lien, l'adresse d'expéditeur est officielle", "Rien : l'administration n'envoie jamais d'email", "Je me connecte moi-même sur impots.gouv.fr pour vérifier"],
         answer: 2,
@@ -3951,36 +4087,42 @@ var MODULES_FORMATION = [
     color: "#06b6d4",
     questions: [
       {
+        lvl: 1,
         q: "Vous publiez vos photos de vacances en temps reel sur Facebook. Quel est le risque ?",
         opts: ["Aucun si votre profil est prive", "Les cambrioleurs peuvent savoir que votre maison est vide", "Seulement si vous mentionnez votre adresse"],
         answer: 1,
         expl: "Publier des photos de vacances en direct indique que votre logement est inoccupe. Partagez vos photos apres votre retour. Les cambrioleurs surveillent les reseaux sociaux."
       },
       {
+        lvl: 1,
         q: "Un inconnu vous envoie une demande d'amis sur Facebook avec une jolie photo de profil. Que faites-vous ?",
         opts: ["J'accepte, plus on a d'amis mieux c'est", "Je verifie si on a des amis en commun et si le profil semble authentique", "J'accepte seulement si la personne est jolie"],
         answer: 1,
         expl: "Les faux profils ('catfishing') servent a collecter vos informations personnelles ou vous manipuler. Verifiez les amis en commun, l'anciennete du profil et la coherence des publications."
       },
       {
+        lvl: 1,
         q: "Quelle information NE doit JAMAIS apparaitre sur vos reseaux sociaux ?",
         opts: ["Vos hobbies et centres d'interet", "Votre adresse complete et vos horaires habituels", "Vos voyages (une fois rentres)"],
         answer: 1,
         expl: "Votre adresse, vos horaires (Je suis au travail de 9h a 18h), et vos absences regulieres sont des informations precieuses pour les cambrioleurs et les arnaqueurs."
       },
       {
+        lvl: 1,
         q: "Vous recevez un message WhatsApp d'un numero inconnu : Bonjour c'est maman, j'ai change de telephone, reponds-moi. Que faites-vous ?",
         opts: ["Je reponds, c'est peut-etre vrai", "J'appelle ma mere sur son ancien numero pour verifier", "J'envoie de l'argent si elle demande"],
         answer: 1,
         expl: "C'est l'arnaque dite 'du faux proche'. Appelez toujours la personne sur son numero habituel pour verifier. Ne jamais envoyer d'argent sans confirmation vocale directe."
       },
       {
+        lvl: 1,
         q: "Que faire si vous recevez un message disant que quelqu'un a accede a votre compte Facebook depuis un autre pays ?",
         opts: ["Cliquer sur le lien dans le message pour securiser le compte", "Aller directement sur facebook.com et verifier les appareils connectes dans les parametres", "Partager le message pour prevenir vos amis"],
         answer: 1,
         expl: "Ne cliquez jamais sur un lien dans un message d'alerte. Allez directement sur le site officiel. Facebook vous alertera dans les parametres de securite de votre compte."
       },
       {
+        lvl: 2,
         q: "Une amie vous écrit depuis un NOUVEAU compte Facebook : « j'ai perdu l'accès à l'ancien », puis vous demande de l'argent. Que faites-vous ?",
         opts: ["Je l'appelle sur son téléphone habituel avant de faire quoi que ce soit", "Je l'aide : je reconnais ses photos et sa façon d'écrire", "Je bloque le compte, c'est forcément un faux"],
         answer: 0,
@@ -3995,36 +4137,42 @@ var MODULES_FORMATION = [
     color: "#10b981",
     questions: [
       {
+        lvl: 1,
         q: "Vous trouvez un iPhone 15 neuf a 150 euros sur un site inconnu. Que faites-vous ?",
         opts: ["J'achete immediatement avant que ca parte", "Je recherche des avis sur ce site et je compare les prix officiels", "J'achete mais je paye en liquide a la livraison"],
         answer: 1,
         expl: "Un prix anormalement bas est le signe d'une arnaque ou d'un produit vole. Recherchez les avis sur des sites comme Trustpilot, verifiez les mentions legales du site et comparez avec les prix officiels."
       },
       {
+        lvl: 1,
         q: "Quel moyen de paiement est le plus securise pour un achat en ligne ?",
         opts: ["Virement bancaire direct", "Carte bancaire ou PayPal", "Western Union ou Moneygram"],
         answer: 1,
         expl: "La carte bancaire et PayPal permettent une contestation et un remboursement en cas de fraude. Un virement ou Western Union sont irreversibles — l'argent est parti pour toujours en cas d'arnaque."
       },
       {
+        lvl: 1,
         q: "Un site d'achat en ligne ne mentionne pas d'adresse physique ni de numero de telephone. Est-ce normal ?",
         opts: ["Oui, beaucoup de sites fonctionnent ainsi", "Non, tout site de vente doit afficher ses coordonnees legales", "Seulement si le site est etranger"],
         answer: 1,
         expl: "La loi francaise oblige tout site de vente a afficher ses mentions legales completes : raison sociale, adresse, SIRET, telephone ou email. L'absence de ces informations est un signal d'alarme."
       },
       {
+        lvl: 1,
         q: "Vous achetez sur un site et vous recevez un produit de mauvaise qualite. Quelle est votre protection ?",
         opts: ["Aucune si vous avez clique 'J'accepte les CGV'", "Vous pouvez contester le debit aupres de votre banque", "Vous n'avez recours que si vous avez paye par PayPal"],
         answer: 1,
         expl: "En cas de fraude, vous pouvez contester le debit aupres de votre banque (procedure de chargeback). Conservez toujours vos emails de confirmation et captures d'ecran des annonces."
       },
       {
+        lvl: 1,
         q: "C'est les soldes et vous recevez un email de promotion d'une marque que vous connaissez. Quelle est la bonne pratique ?",
         opts: ["Je clique directement sur le lien de l'email", "Je vais sur le site officiel de la marque directement dans mon navigateur", "Je partage l'offre a mes amis d'abord"],
         answer: 1,
         expl: "Les arnaqueurs imitent parfaitement les emails des grandes marques. Tapez toujours l'adresse du site vous-meme dans le navigateur plutot que de cliquer sur un lien dans un email."
       },
       {
+        lvl: 2,
         q: "Un site marchand que vous ne connaissez pas affiche le cadenas 🔒 et « https ». Est-ce un gage de confiance ?",
         opts: ["Oui, le cadenas veut dire que le site est vérifié", "Non : le cadenas protège la connexion, il ne dit rien de l'honnêteté du vendeur", "Oui, surtout s'il accepte la carte bancaire"],
         answer: 1,
@@ -4039,36 +4187,42 @@ var MODULES_FORMATION = [
     color: "#64748b",
     questions: [
       {
+        lvl: 1,
         q: "Vous etes dans un cafe et vous connectez a un Wi-Fi gratuit nomme 'Free_Cafe_Wifi'. Quel risque prenez-vous ?",
         opts: ["Aucun : mon antivirus me protege deja", "Un pirate peut intercepter tout ce que vous envoyez et recevez", "Le risque est seulement si je fais des achats"],
         answer: 1,
         expl: "Un Wi-Fi public non securise permet a un pirate de voir tout votre trafic (attaque 'man in the middle'). Evitez les operations sensibles (banque, email) sur Wi-Fi public, ou utilisez un VPN."
       },
       {
+        lvl: 1,
         q: "Votre telephone vous demande de faire une mise a jour du systeme. Que faites-vous ?",
         opts: ["Je la refuse, les mises a jour ralentissent le telephone", "Je la fais des que possible, elle corrige des failles de securite", "J'attends de voir si d'autres ont des problemes"],
         answer: 1,
         expl: "Les mises a jour contiennent des correctifs de securite critiques. Les hackers exploitent precisement les appareils non mis a jour. Activez les mises a jour automatiques."
       },
       {
+        lvl: 1,
         q: "Une application gratuite vous demande l'acces a vos contacts, photos, microphone et localisation. Que faites-vous ?",
         opts: ["J'accepte tout, c'est necessaire pour que ca marche", "Je n'autorise que les permissions vraiment necessaires au fonctionnement", "Je telecharge une autre application"],
         answer: 1,
         expl: "Principe du moindre privilege : accordez uniquement les permissions necessaires. Une lampe de poche n'a pas besoin de vos contacts. Verifiez et limitez les autorisations dans vos parametres."
       },
       {
+        lvl: 1,
         q: "Vous perdez votre telephone. Quelle est la premiere chose a faire ?",
         opts: ["Appeler votre operateur pour bloquer la SIM", "Bloquer le telephone a distance ET signaler la perte a votre operateur", "Attendre un peu : il est peut-etre chez moi"],
         answer: 1,
         expl: "Bloquez immediatement le telephone a distance (Find My iPhone ou Google Find My Device) ET appelez votre operateur pour bloquer la carte SIM. Faites les deux en parallele."
       },
       {
+        lvl: 1,
         q: "Un inconnu vous offre de recharger votre telephone sur sa batterie externe. Quel est le risque ?",
         opts: ["Aucun risque si ce n'est pas une prise secteur", "Un cable USB piege peut installer un logiciel espion", "Le risque est seulement si votre telephone est deverrouille"],
         answer: 1,
         expl: "C'est l'attaque dite 'juice jacking'. Un cable USB peut transferer des donnees en plus de l'electricite. Utilisez uniquement votre propre chargeur ou des prises secteur officielles."
       },
       {
+        lvl: 2,
         q: "Votre téléphone propose une mise à jour. On vous a dit que « les mises à jour ralentissent l'appareil ». Que faites-vous ?",
         opts: ["Je repousse pour garder mon téléphone rapide", "Je l'installe seulement si mon téléphone fonctionne mal", "Je l'installe : elle bouche des failles que les pirates connaissent déjà"],
         answer: 2,
@@ -4083,36 +4237,42 @@ var MODULES_FORMATION = [
     color: "#dc2626",
     questions: [
       {
+        lvl: 1,
         q: "Votre petite-fille vous ecrit sur WhatsApp : Mamie, j'ai casse mon telephone, c'est mon nouveau numero, vire-moi 800 euros d'urgence. Que faites-vous ?",
         opts: ["Je vire l'argent : je le rembourserai si c'est une erreur", "J'appelle ma petite-fille sur son ancien numero pour verifier", "Je lui envoie les sous via un autre canal"],
         answer: 1,
         expl: "C'est l'arnaque au faux proche. Appelez TOUJOURS la personne sur son numero habituel pour verifier. En cas d'arnaque, signalez-le a la police et a votre banque immediatement."
       },
       {
+        lvl: 1,
         q: "Un technicien Microsoft vous appelle : votre ordinateur emet des virus, je dois me connecter a distance pour le reparer. Que faites-vous ?",
         opts: ["J'accepte : le message vient d'une fenetre Windows", "Je raccroche — Microsoft ne vous appellerait jamais de lui-meme", "Je demande ses identifiants avant d'accepter"],
         answer: 1,
         expl: "Microsoft, Apple ou votre banque ne vous appelleront JAMAIS de facon spontanee pour un probleme technique. C'est une arnaque au faux support technique. Raccrochez immediatement."
       },
       {
+        lvl: 1,
         q: "Vous recevez un email contenant votre ancien mot de passe et vous menaçant de publier des videos compromettantes si vous ne payez pas en bitcoin. Que faites-vous ?",
         opts: ["Je paye pour proteger ma reputation", "Je signale a la police et je change tous mes mots de passe", "Je reponds pour gagner du temps"],
         answer: 1,
         expl: "C'est une arnaque a la 'sextorsion'. Ils ont seulement votre email et un ancien mot de passe (trouve dans une fuite de donnees). Il n'y a aucune video. Ne payez pas, signalez sur cybermalveillance.gouv.fr"
       },
       {
+        lvl: 1,
         q: "Vous voyez une annonce : Travaillez de chez vous, 5000 euros par mois garanti, sans experience. C'est quoi ?",
         opts: ["Une vraie opportunite de travail", "Tres probablement une arnaque (mule financiere ou faux travail)", "Une offre pour des travailleurs tres qualifies"],
         answer: 1,
         expl: "Ces annonces recrutent souvent des 'mules financieres' — des personnes qui transfèrent de l'argent vole sans le savoir, ce qui est illegal et punissable. Aucun vrai emploi ne garantit de tels revenus sans experience."
       },
       {
+        lvl: 1,
         q: "Un officier de police vous appelle, tres serieux, en vous disant que votre compte bancaire sert a blanchir de l'argent et que vous devez transferer vos economies sur un 'compte securise'. Que faites-vous ?",
         opts: ["Je coopere : il m'a donne un numero de service", "Je raccroche et j'appelle le 17 (police) pour verifier", "Je demande un numero de badge"],
         answer: 1,
         expl: "C'est l'arnaque au faux policier. La vraie police ne vous demandera JAMAIS de transferer de l'argent. Raccrochez et appelez le 17 pour signaler. Vos economies sont en danger."
       },
       {
+        lvl: 2,
         q: "Un « conseiller bancaire » vous appelle : il connaît votre nom, votre banque et vos derniers achats. Est-ce la preuve qu'il est authentique ?",
         opts: ["Oui, seul un vrai conseiller peut connaître ces informations", "Non : ces informations circulent après les fuites de données", "Oui, s'il connaît en plus les derniers chiffres de ma carte"],
         answer: 1,
@@ -4127,36 +4287,42 @@ var MODULES_FORMATION = [
     color: "#f97316",
     questions: [
       {
+        lvl: 1,
         q: "Vous pensez avoir ete victime d'une arnaque en ligne. Quelle est la premiere chose a faire ?",
         opts: ["Contacter l'arnaqueur pour recuperer mon argent", "Bloquer ma carte bancaire et appeler ma banque immediatement", "Attendre de voir si l'argent disparait vraiment"],
         answer: 1,
         expl: "Appelez votre banque IMMEDIATEMENT pour bloquer votre carte et contester les transactions. Chaque minute compte. Ensuite, deposez plainte et signalez sur cybermalveillance.gouv.fr"
       },
       {
+        lvl: 1,
         q: "Vous avez clique sur un lien suspect et votre antivirus s'est active. Que faites-vous ?",
         opts: ["Je continue a utiliser l'ordinateur normalement", "Je deconnecte d'internet, je fais un scan complet et je change mes mots de passe importants", "Je redemarrerai demain"],
         answer: 1,
         expl: "Deconnectez d'internet immediatement pour limiter les degats, puis faites un scan complet avec votre antivirus. Changez ensuite vos mots de passe depuis un autre appareil sain."
       },
       {
+        lvl: 1,
         q: "Vous recevez un email avec une piece jointe inattendue d'un collegue nomme 'Facture_urgent.exe'. Que faites-vous ?",
         opts: ["Je l'ouvre, c'est un collegue de confiance", "Je ne l'ouvre pas — un .exe est un programme executable potentiellement dangereux", "Je l'ouvre avec mon antivirus active"],
         answer: 1,
         expl: "Un fichier .exe est un programme qui s'execute sur votre ordinateur. Ne jamais ouvrir un .exe recu par email, meme d'un collegue (son compte peut etre pirate). Verifiez par telephone avec lui."
       },
       {
+        lvl: 1,
         q: "Ou signaler une tentative d'escroquerie en ligne en France ?",
         opts: ["Sur les reseaux sociaux pour prevenir les autres", "Sur cybermalveillance.gouv.fr et au commissariat", "Uniquement aupres de sa banque"],
         answer: 1,
         expl: "Signalez sur cybermalveillance.gouv.fr (plateforme officielle), deposez plainte au commissariat ou en ligne sur masecurite.fr, et contactez votre banque si votre argent est en jeu."
       },
       {
+        lvl: 1,
         q: "Votre ordinateur est verrouille par un message demandant une rancon pour recuperer vos fichiers. Que faites-vous ?",
         opts: ["Je paye la rancon, j'ai besoin de mes fichiers", "Je ne paye pas — je contacte un professionnel et signale a la police", "Je reformate immediatement"],
         answer: 1,
         expl: "Ne payez JAMAIS une rancon : rien ne garantit la recuperation de vos fichiers et vous financez des criminels. Contactez un professionnel, signalez a la police, et restaurez depuis une sauvegarde."
       },
       {
+        lvl: 2,
         q: "Vous venez de donner votre code de carte à un faux conseiller. Quel est le tout premier geste ?",
         opts: ["Je surveille mon compte pour voir si de l'argent part", "Je change d'abord tous mes mots de passe", "Je fais opposition immédiatement (0 892 705 705), puis je préviens ma banque"],
         answer: 2,
@@ -4171,36 +4337,42 @@ var MODULES_FORMATION = [
     color: "#6366f1",
     questions: [
       {
+        lvl: 1,
         q: "Vous recevez un email parfaitement redige, sans aucune faute, qui semble venir de votre banque et vous presse de confirmer vos informations. L'absence de fautes prouve-t-elle que c'est fiable ?",
         opts: ["Oui, un vrai escroc ferait toujours des fautes", "Non : l'IA ecrit aujourd'hui des messages parfaits, c'est le contenu et l'urgence qui comptent", "Oui, si le logo de la banque est present"],
         answer: 1,
         expl: "L'IA permet aux escrocs d'ecrire des messages parfaits, sans la moindre faute. Le vieux reflexe 'il y a des fautes donc c'est faux' ne marche plus. Jugez le contenu (on vous demande des infos sensibles, on vous presse d'agir) et verifiez toujours l'adresse exacte de l'expediteur."
       },
       {
+        lvl: 1,
         q: "Votre fils vous appelle, c'est exactement sa voix : Maman, j'ai eu un accident, envoie-moi 2000 euros tout de suite. Que faites-vous ?",
         opts: ["J'envoie l'argent, j'ai reconnu sa voix", "Je raccroche et je rappelle mon fils sur son vrai numero pour verifier", "J'envoie une partie de la somme par prudence"],
         answer: 1,
         expl: "L'IA peut cloner une voix a partir de quelques secondes de video trouvee en ligne. La voix n'est plus une preuve. Raccrochez et rappelez la personne sur son numero habituel. Astuce : convenez en famille d'un mot de passe secret a demander en cas de doute."
       },
       {
+        lvl: 1,
         q: "Un lien vous mene sur un site identique a celui de votre banque : logo, couleurs, tout est parfait. Comment etre sur que c'est le vrai ?",
         opts: ["Si le design est parfait, c'est forcement le vrai", "Je verifie l'adresse exacte dans la barre, et je prefere taper l'adresse moi-meme", "Je me fie au petit cadenas en haut"],
         answer: 1,
         expl: "L'IA recree des copies parfaites de sites officiels. Le design ne prouve rien, le cadenas non plus (les sites d'arnaque en ont un aussi). Seule l'adresse exacte compte : mefiez-vous des variantes comme labanque-securite.com. Le plus sur : tapez vous-meme l'adresse ou passez par votre application officielle."
       },
       {
+        lvl: 1,
         q: "Sur Facebook, une video montre une personnalite connue qui recommande un placement garanti sans risque. La video a l'air vraie. Que penser ?",
         opts: ["C'est fiable, c'est une personnalite connue", "C'est tres probablement un deepfake : l'IA fabrique de fausses videos pour des arnaques a l'investissement", "Je teste avec une petite somme pour voir"],
         answer: 1,
         expl: "L'IA fabrique de fausses videos (deepfakes) ou des personnalites semblent recommander des placements. Aucun placement serieux n'est garanti sans risque. Ne cliquez pas et ne versez rien. Verifiez toute proposition d'investissement sur le registre officiel de l'AMF (amf-france.org)."
       },
       {
+        lvl: 1,
         q: "Vous recevez un email tres professionnel de Meta for Business annoncant la suspension de votre compte sous 24h, avec un bouton pour contester. Quel est le bon premier reflexe ?",
         opts: ["Je clique vite pour ne pas perdre mon compte", "Je regarde l'adresse de l'expediteur : si ce n'est pas un domaine officiel, c'est une arnaque et je ne clique pas", "Je reponds a l'email pour demander des explications"],
         answer: 1,
         expl: "L'IA permet de rediger de faux courriers administratifs parfaits, avec urgence (24h) et numero de dossier bidon. Verifiez toujours le domaine apres le @ : un vrai email Meta vient de @meta.com, jamais d'un domaine inconnu. Ne cliquez jamais : rendez-vous directement sur le site officiel en tapant l'adresse vous-meme."
       },
       {
+        lvl: 2,
         q: "Quelle est la parade réellement efficace contre une voix clonée par intelligence artificielle ?",
         opts: ["Écouter attentivement : une voix artificielle a toujours un petit défaut", "Convenir à l'avance d'un mot secret en famille, à demander en cas de doute", "Demander à la personne de répéter plusieurs fois la même phrase"],
         answer: 1,
@@ -4215,36 +4387,42 @@ var MODULES_FORMATION = [
     color: "#f59e0b",
     questions: [
       {
+        lvl: 1,
         q: "Une publicite ou un contact vous propose un placement crypto avec 10% de gains par mois, garantis et sans risque. Qu'en pensez-vous ?",
         opts: ["C'est interessant, la crypto rapporte beaucoup", "Un gain eleve GARANTI n'existe pas : c'est la signature d'une arnaque", "Je teste avec une petite somme pour verifier"],
         answer: 1,
         expl: "Regle d'or absolue : rendement eleve + garanti + sans risque = arnaque, a tous les coups. Aucun placement legal ne peut garantir de tels gains. Et 'tester avec une petite somme' est exactement ce que veut l'escroc : les premiers 'gains' affiches ne sont que du theatre pour vous faire verser plus."
       },
       {
+        lvl: 1,
         q: "Un 'conseiller en investissement' tres sympathique vous contacte spontanement sur WhatsApp ou apres un clic sur une pub. Il vous accompagne pas a pas pour investir. Bon signe ?",
         opts: ["Oui, il est patient et repond a toutes mes questions", "Non : un vrai conseiller ne demarche jamais par WhatsApp et ne vous presse jamais de verser", "Oui, s'il travaille pour une grande plateforme connue"],
         answer: 1,
         expl: "Le 'gentil conseiller' patient et disponible est LE personnage central des arnaques crypto : il cree une relation de confiance sur des semaines. Les vrais professionnels sont enregistres (ORIAS/AMF) et ne demarchent pas sur WhatsApp. Sa gentillesse est une technique, pas une qualite."
       },
       {
+        lvl: 1,
         q: "Avant de verser de l'argent sur une plateforme d'investissement que vous ne connaissez pas, quel est LE reflexe indispensable ?",
         opts: ["Verifier que le site est joli et professionnel", "Verifier la liste noire de l'AMF (amf-france.org) et que la plateforme est autorisee en France", "Lire les avis affiches sur le site lui-meme"],
         answer: 1,
         expl: "L'AMF (le gendarme de la bourse) publie une liste noire des sites d'investissement frauduleux et un registre des acteurs autorises. Un site peut etre magnifique et 100% frauduleux ; les avis affiches sur le site sont fabriques. Seule la verification officielle compte. En cas de doute, demandez a votre Conseiller Despy."
       },
       {
+        lvl: 1,
         q: "Votre compte crypto affiche +8 500 euros de gains, mais pour retirer votre argent, la plateforme exige d'abord des 'frais de deblocage' de 900 euros. Que se passe-t-il ?",
         opts: ["C'est normal, il y a toujours des frais", "C'est l'arnaque du retrait : les gains sont faux, chaque paiement de frais sera suivi d'un autre", "Je negocie les frais a la baisse"],
         answer: 1,
         expl: "Les gains affiches n'ont jamais existe : c'est un tableau de bord truque. Les 'frais de deblocage' (puis 'taxes', puis 'assurance'...) se succederont tant que vous paierez. Regle : on ne paie JAMAIS pour recuperer son propre argent. Arretez tout versement immediatement."
       },
       {
+        lvl: 1,
         q: "Apres avoir perdu de l'argent dans une arnaque crypto, une societe vous contacte : elle peut recuperer vos fonds contre 500 euros de frais de dossier. Que faire ?",
         opts: ["Accepter, c'est ma seule chance de revoir mon argent", "Refuser : c'est l'arnaque au recouvrement, souvent les MEMES escrocs qui reviennent", "Payer seulement la moitie d'avance"],
         answer: 1,
         expl: "L'arnaque au recouvrement est la double peine : les victimes sont fichees et recontactees par de faux 'recuperateurs de fonds' ou faux avocats. Personne de serieux ne demande d'argent d'avance pour recuperer des fonds. Les seuls interlocuteurs legitimes : la police (plainte), votre banque, et l'AMF. En cas de doute, bouton SOS Despy."
       },
       {
+        lvl: 2,
         q: "Un placement promet 8 % par an sans risque et affiche un numéro d'agrément AMF. Que faites-vous ?",
         opts: ["Je vérifie moi-même sur amf-france.org : les escrocs affichent de faux agréments", "J'y vais : un agrément AMF est une garantie de l'État", "Je refuse par principe, aucun placement n'est fiable"],
         answer: 0,
@@ -4253,6 +4431,292 @@ var MODULES_FORMATION = [
     ]
   }
 ];
+
+// ─── NIVEAU EXPERT : mises en situation à plusieurs étapes ───
+// Chaque étape a une conséquence : l'escroc insiste, change de ton, revient.
+// C'est ce qui entraîne à tenir sous pression, pas juste à connaître la règle.
+var SCENARIOS = [
+  {
+    id: 1, title: "Le faux conseiller bancaire", icon: "🏦", color: "#C62828",
+    intro: "L’arnaque qui fait le plus de dégâts en France. Vous allez la vivre étape par étape — l’escroc ne lâche pas au premier refus.",
+    steps: [
+      {
+        s: "14 h. Votre téléphone sonne : l’écran affiche le numéro de VOTRE banque. « Bonjour, service sécurité. Nous voyons trois paiements suspects de 890 € en Belgique. Vous les reconnaissez ? »",
+        opts: ["Je confirme que ce n’est pas moi et je le laisse les annuler",
+               "Je raccroche et je rappelle le numéro au dos de ma carte",
+               "Je lui demande de prouver qu’il est bien de ma banque"],
+        answer: 1,
+        expl: "Le numéro affiché ne prouve RIEN : il se falsifie en quelques secondes. Demander une preuve ne sert à rien non plus — l’escroc en a toujours une toute prête, et chaque seconde passée en ligne joue contre vous. Un seul geste est sûr : raccrocher et rappeler vous-même.",
+        suite: "Vous avez raccroché. Trois minutes plus tard, le téléphone sonne à nouveau."
+      },
+      {
+        s: "« Ne raccrochez pas, c’est urgent ! Pour bloquer les paiements je dois vérifier votre identité : quel est le code à 6 chiffres que vous venez de recevoir par SMS ? »",
+        opts: ["Je donne le code, il vient bien de ma banque",
+               "Je donne seulement les trois premiers chiffres, par prudence",
+               "Je ne donne rien : ce code VALIDE une opération, il ne vérifie pas mon identité"],
+        answer: 2,
+        expl: "Ce code n’est pas une vérification d’identité : c’est votre signature. En le dictant, c’est VOUS qui validez le virement de l’escroc. Aucun conseiller ne le demandera jamais. Et donner « seulement trois chiffres » est un piège classique : il vous met en confiance et redemande le reste ensuite.",
+        suite: "Vous refusez. Le ton change brutalement."
+      },
+      {
+        s: "« Madame, si vous ne coopérez pas maintenant, la banque ne pourra pas vous rembourser et votre compte sera bloqué ce soir. Je vous passe mon responsable. »",
+        opts: ["Je cède, je ne veux pas perdre mon argent",
+               "Je raccroche : la peur et l’urgence sont la signature de l’arnaque",
+               "Je parle au responsable pour en avoir le cœur net"],
+        answer: 1,
+        expl: "L’urgence et la menace sont l’outil numéro un de l’escroc : sous stress, on réfléchit mal, et c’est exactement le but. Une vraie banque ne menace jamais et vous laisse toujours rappeler. Le « responsable » est un complice qui joue un rôle rassurant pour finir de vous convaincre.",
+        suite: "Vous avez raccroché pour de bon. Mais le doute reste : et si c’était vrai ?"
+      },
+      {
+        s: "Une heure plus tard, à froid. Que faites-vous ?",
+        opts: ["Rien, j’ai raccroché, l’affaire est close",
+               "J’attends mon prochain relevé pour vérifier",
+               "Je rappelle ma banque au numéro au dos de ma carte et je signale l’appel"],
+        answer: 2,
+        expl: "Le bon réflexe final. Rappeler vous confirme qu’il n’y avait aucun problème — et surtout votre banque enregistre la tentative. Signalez aussi le numéro au 33700. Ne restez jamais dans le doute : c’est précisément ce doute que l’escroc reviendra exploiter dans quelques jours.",
+        suite: ""
+      }
+    ]
+  },
+  {
+    id: 2, title: "Le colis qui n’existe pas", icon: "📦", color: "#B4892E",
+    intro: "Vous attendez vraiment un colis — c’est justement ce qui rend cette arnaque si efficace.",
+    steps: [
+      {
+        s: "SMS : « Votre colis est en attente de livraison. Frais de douane à régler : 1,49 € » suivi d’un lien. Vous attendez effectivement une commande.",
+        opts: ["Je paie, 1,49 € ce n’est rien",
+               "Je vérifie sur le site du transporteur avec mon numéro de suivi",
+               "Je clique juste pour voir la page, sans payer"],
+        answer: 1,
+        expl: "Le montant est ridicule EXPRÈS : à 1,49 € on ne réfléchit pas. Mais l’objectif n’a jamais été ces 1,49 € — c’est votre numéro de carte, qui servira ensuite pour de gros débits. Et « juste voir la page » est déjà risqué. Passez toujours par le site officiel, avec votre numéro de suivi.",
+        suite: "Vous n’avez pas cliqué. Le lendemain, un SMS arrive d’un autre numéro."
+      },
+      {
+        s: "« DERNIER AVIS avant retour à l’expéditeur. » Le lien est différent du premier.",
+        opts: ["Cette fois je clique, c’est vraiment le dernier avis",
+               "Je réponds STOP pour ne plus être dérangé",
+               "Je supprime et je signale au 33700"],
+        answer: 2,
+        expl: "La relance fait partie du script : l’insistance vise à user votre vigilance, et le changement de numéro à contourner votre blocage. Surtout, ne répondez JAMAIS STOP à un SMS frauduleux : cela confirme que votre numéro est actif et vous en attirera bien davantage. Le 33700 est le service officiel de signalement.",
+        suite: "Votre vraie commande arrive normalement quelques jours plus tard. Mais votre voisine, elle, a payé et donné sa carte."
+      },
+      {
+        s: "Elle vous appelle, paniquée. Que lui conseillez-vous en tout premier ?",
+        opts: ["Faire opposition tout de suite au 0 892 705 705, puis prévenir sa banque",
+               "Attendre de voir si de l’argent part vraiment",
+               "Changer d’abord son mot de passe bancaire"],
+        answer: 0,
+        expl: "L’opposition immédiate est le geste numéro un : elle bloque la carte avant le débit. Le reste vient après — signalement sur Perceval, plainte, surveillance du compte. Savoir aider un proche dans la minute fait partie de votre protection : dans ces situations, c’est presque toujours quelqu’un d’autre qui donne l’alerte.",
+        suite: ""
+      }
+    ]
+  },
+  {
+    id: 3, title: "La voix de votre petit-fils", icon: "🎭", color: "#7C3AED",
+    intro: "L’arnaque qui monte le plus vite : l’intelligence artificielle clone une voix à partir de quelques secondes trouvées en ligne.",
+    steps: [
+      {
+        s: "Un appel. C’est exactement la voix de votre petit-fils, en larmes : « Mamie, j’ai eu un accident, je suis au commissariat, il me faut 3 000 € tout de suite… et surtout ne dis rien à papa. »",
+        opts: ["J’envoie l’argent, j’ai reconnu sa voix",
+               "Je raccroche et j’appelle mon petit-fils sur son numéro habituel",
+               "Je pose des questions que lui seul peut connaître"],
+        answer: 1,
+        expl: "Quelques secondes de voix publiées sur internet suffisent à produire un clone parfait, capable de pleurer et de répondre du tac au tac. Poser des questions ne protège plus : l’IA improvise, et l’escroc a fait ses recherches. Le « ne dis rien à papa » est le vrai signal d’alarme : il sert à vous isoler de ceux qui vous détromperaient.",
+        suite: "Vous raccrochez. On vous rappelle immédiatement : « Mamie, ne raccroche pas, c’est grave ! »"
+      },
+      {
+        s: "La voix supplie, pleure, parle d’une garde à vue. Que faites-vous ?",
+        opts: ["Je reste en ligne, il a l’air désespéré",
+               "Je propose d’envoyer une petite somme seulement",
+               "Je raccroche de nouveau et j’appelle son vrai numéro, puis ses parents"],
+        answer: 2,
+        expl: "Rester en ligne, c’est rester sous emprise — l’escroc compte exactement là-dessus. Envoyer « juste un peu » est de l’argent déjà perdu, et surtout cela vous signale comme une bonne cible pour la suite. Couper le contact et vérifier par un autre canal est la seule parade qui fonctionne.",
+        suite: "Vous appelez votre petit-fils : il est au travail, en pleine forme. Il n’a jamais appelé."
+      },
+      {
+        s: "Comment protéger toute la famille du prochain appel de ce type ?",
+        opts: ["Convenir en famille d’un mot secret à demander en cas de doute",
+               "Ne plus répondre aux numéros inconnus",
+               "Supprimer toutes les photos et vidéos des réseaux sociaux"],
+        answer: 0,
+        expl: "Un mot secret connu de la famille seule est la parade la plus simple et la plus efficace : l’IA ne peut pas le deviner. Publier moins aide, mais ne suffira jamais (une vidéo suffit). Et ne plus répondre aux inconnus vous couperait de votre médecin, de la mairie ou du laboratoire — la bonne protection ne doit pas vous isoler.",
+        suite: ""
+      }
+    ]
+  },
+  {
+    id: 4, title: "Le faux dépannage informatique", icon: "🖥️", color: "#0EA5E9",
+    intro: "Elle commence par une fenêtre qui fait peur et finit, si on la laisse aller au bout, par un vol sur votre compte.",
+    steps: [
+      {
+        s: "Vous naviguez sur internet. Une fenêtre rouge occupe l’écran avec un signal sonore : « Votre ordinateur est infecté. Appelez immédiatement le support Microsoft au 01 84 XX XX XX. »",
+        opts: ["J’appelle le numéro affiché",
+               "Je ferme la fenêtre : Microsoft n’affiche jamais de numéro de téléphone",
+               "Je lance un scan antivirus, puis j’appelle"],
+        answer: 1,
+        expl: "Ni Microsoft ni Apple n’affichent jamais de numéro de téléphone dans une alerte : c’est le signe qui ne trompe pas. Cette fenêtre est une simple page web conçue pour effrayer, le son fait partie du décor. Fermez-la (ou fermez le navigateur) — votre ordinateur n’a rien.",
+        suite: "Vous avez fermé. Mais imaginons que vous ayez appelé : un « technicien » très aimable et rassurant décroche."
+      },
+      {
+        s: "« Pour établir le diagnostic, installez ce petit logiciel qui me permettra de voir votre écran. » Il vous guide pas à pas.",
+        opts: ["J’installe, il faut bien qu’il voie le problème",
+               "J’installe mais je surveille ce qu’il fait",
+               "Je refuse et je raccroche : donner la main sur son ordinateur, c’est tout donner"],
+        answer: 2,
+        expl: "La prise en main à distance donne accès à TOUT : votre banque en ligne, vos fichiers, vos mots de passe enregistrés. « Surveiller » ne sert à rien — il va plus vite que vous et peut même noircir votre écran. Ces logiciels sont parfaitement légitimes ; c’est l’usage qu’on vous en fait faire qui ne l’est pas.",
+        suite: "Dernière étape du piège : le « remboursement »."
+      },
+      {
+        s: "« Je me suis trompé en saisissant : je vous ai remboursé 5 000 € au lieu de 500 €. Regardez votre compte… Renvoyez-moi la différence, sinon je perds mon emploi. »",
+        opts: ["Je renvoie la différence, c’est honnête",
+               "Je ne renvoie rien : ce qui s’affiche est truqué, l’argent n’est jamais arrivé",
+               "Je renvoie après avoir vérifié le solde qu’il me montre"],
+        answer: 1,
+        expl: "C’est l’arnaque au remboursement. Ayant la main sur votre ordinateur, il modifie ce que vous VOYEZ : le virement n’existe pas, mais l’argent que vous enverriez, lui, serait bien réel. Ne vérifiez jamais un solde sur un écran qu’un inconnu contrôle. Éteignez l’ordinateur, débranchez-le, et appelez votre banque depuis un autre appareil.",
+        suite: ""
+      }
+    ]
+  },
+  {
+    id: 5, title: "Le placement qui rapporte trop", icon: "📈", color: "#0F6E56",
+    intro: "Ici, l’escroc ne vous vole pas d’un coup : il vous fait gagner (sur le papier) pour mieux vous faire investir.",
+    steps: [
+      {
+        s: "Une publicité montre une retraitée : « J’ai doublé mon épargne en 6 mois. » Vous laissez vos coordonnées par curiosité. Un conseiller très professionnel rappelle dès le lendemain.",
+        opts: ["J’écoute ce qu’il propose, ça ne coûte rien",
+               "Je vérifie la société sur amf-france.org avant tout échange",
+               "Je demande un rendez-vous dans une agence"],
+        answer: 1,
+        expl: "Le rappel fait partie du tunnel : ce « conseiller » est un vendeur entraîné à la persuasion, et chaque minute d’écoute vous engage un peu plus. Vérifiez AVANT de parler : registre officiel ET liste noire sur amf-france.org, en tapant l’adresse vous-même. Une agence à visiter n’existe presque jamais.",
+        suite: "Admettons que vous ayez écouté. Il se veut rassurant : « Commencez petit, 250 € pour tester. »"
+      },
+      {
+        s: "250 € seulement, pour voir. Que faites-vous ?",
+        opts: ["J’essaie avec 250 €, le risque est minime",
+               "J’investis 250 € mais je surveille tous les jours",
+               "Je refuse : la petite mise est l’hameçon, pas le piège"],
+        answer: 2,
+        expl: "La petite somme est le cœur du système. Votre « compte » affichera très vite de beaux gains — entièrement fictifs — pour vous convaincre d’investir beaucoup plus, parfois vos économies entières. Ce que vous voyez à l’écran est un décor. Ces 250 € ne sont pas un test : ils achètent votre confiance.",
+        suite: "Trois mois plus tard, votre compte affiche fièrement 4 800 €. Vous demandez à retirer."
+      },
+      {
+        s: "« Pour débloquer votre retrait, il faut d’abord régler 900 € de frais fiscaux. »",
+        opts: ["Je paie, c’est la dernière étape avant de récupérer mes gains",
+               "Je négocie pour que les frais soient prélevés sur mes gains",
+               "Je ne paie rien, je signale à l’AMF et je porte plainte"],
+        answer: 2,
+        expl: "C’est l’arnaque au retrait, la phase finale : on ne rend jamais l’argent, on en réclame encore, sous des prétextes toujours nouveaux. Aucun placement légitime n’exige de payer pour récupérer son propre argent — et des frais ne peuvent pas être prélevés sur des gains qui n’existent pas. Signalez à l’AMF, appelez Info Escroqueries (0 805 805 817) et portez plainte.",
+        suite: ""
+      }
+    ]
+  }
+];
+
+var _scId = null, _scStep = 0, _scRep = {}, _scOrder = {};
+
+function scDone(id) { try { return localStorage.getItem('despy_scenario_' + id) === '1'; } catch (e) { return false; } }
+function scCountDone() { var n = 0; for (var i = 0; i < SCENARIOS.length; i++) if (scDone(SCENARIOS[i].id)) n++; return n; }
+function scLocked() { return !((session.get() || {}).subscribed); }
+
+function scOrdre(si, n) {
+  if (!_scOrder[si]) {
+    var a = []; for (var i = 0; i < n; i++) a.push(i);
+    for (var k = a.length - 1; k > 0; k--) { var r = Math.floor(Math.random() * (k + 1)); var t = a[k]; a[k] = a[r]; a[r] = t; }
+    _scOrder[si] = a;
+  }
+  return _scOrder[si];
+}
+
+function openScenario(id) {
+  if (scLocked()) { openPaywall(); return; }
+  _scId = id; _scStep = 0; _scRep = {}; _scOrder = {};
+  document.getElementById('scenario').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  scRender();
+}
+function closeScenario() {
+  document.getElementById('scenario').classList.remove('on');
+  if (document.getElementById('formation').classList.contains('on')) renderFormationList();
+  else document.body.style.overflow = '';
+}
+function scAller(n) { _scStep = Math.max(0, n); scRender(); }
+function scRepondre(si, choix) { if (_scRep[si] != null) return; _scRep[si] = choix; scRender(); }
+
+function scRender() {
+  var S = null;
+  for (var i = 0; i < SCENARIOS.length; i++) if (SCENARIOS[i].id === _scId) S = SCENARIOS[i];
+  if (!S) return;
+  var ns = S.steps.length;
+  var lab = document.querySelector('#scenario .mod-label');
+  if (lab) lab.textContent = 'Mise en situation · Expert';
+  var tit = document.querySelector('#scenario .mod-htitle');
+  if (tit) tit.textContent = S.title;
+
+  var el = document.getElementById('sc-steps');
+  if (el) {
+    var hh = '';
+    for (var q = 1; q <= ns + 1; q++) {
+      var c = _scStep > q ? '#5CE0A0' : (_scStep === q ? '#fff' : 'rgba(255,255,255,.25)');
+      hh += '<i style="flex:1;height:5px;border-radius:20px;background:' + c + '"></i>';
+    }
+    el.innerHTML = hh;
+  }
+
+  var z = document.getElementById('sc-body'), h = '', cta = '', astuce = '';
+
+  if (_scStep === 0) {
+    h += '<div style="font-size:40px;margin-bottom:6px">' + S.icon + '</div>' +
+      '<div style="font-size:22px;font-weight:850;color:var(--p-ink);line-height:1.25;margin-bottom:12px">' + S.title + '</div>' +
+      '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">' +
+        '<span class="lvl-badge lvl-3">Niveau expert</span>' +
+        '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF">' + ns + ' étapes</span></div>' +
+      '<div style="background:#fff;border:1px solid var(--p-line,#E7EBF3);border-radius:16px;padding:15px;margin-bottom:11px">' +
+        '<div style="font-size:15.5px;line-height:1.6;color:var(--p-muted)">' + S.intro + '</div></div>' +
+      '<div class="sc-note">Ici, l’escroc réagit à chacun de vos choix : l’histoire continue même quand vous répondez bien. C’est ça, la vraie vie.</div>';
+    cta = 'Commencer';
+
+  } else if (_scStep >= 1 && _scStep <= ns) {
+    var si = _scStep - 1, E = S.steps[si], rep = _scRep[si];
+    h += '<span style="display:inline-block;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF;margin-bottom:12px">Étape ' + _scStep + ' sur ' + ns + '</span>' +
+      '<div class="sc-situation">' + E.s + '</div>';
+    var ordre = scOrdre(si, E.opts.length);
+    for (var o = 0; o < ordre.length; o++) h += fmOption(si, ordre[o], E.opts[ordre[o]], rep, E.answer, o);
+    if (rep != null) {
+      var bon = rep === E.answer;
+      h += '<div style="border-radius:15px;padding:14px;margin-top:2px;background:' + (bon ? '#E9F7EE' : '#FDECEC') + ';border:1px solid ' + (bon ? '#B7E0C4' : '#F0C4C4') + '">' +
+        '<div style="font-size:14px;font-weight:850;margin-bottom:5px;color:' + (bon ? '#15803D' : '#C62828') + '">' + (bon ? '✓ Bon réflexe' : '✕ Attention') + '</div>' +
+        '<div style="font-size:15px;line-height:1.55;color:var(--p-ink)">' + E.expl + '</div></div>';
+      if (E.suite) h += '<div class="sc-suite"><span>Ce qui se passe ensuite</span>' + E.suite + '</div>';
+    }
+    cta = (_scStep < ns) ? 'Continuer' : 'Voir mon bilan';
+    if (rep == null) astuce = 'Que faites-vous ?';
+
+  } else {
+    try { localStorage.setItem('despy_scenario_' + _scId, '1'); } catch (e) {}
+    var score = 0;
+    for (var k2 = 0; k2 < ns; k2++) if (_scRep[k2] === S.steps[k2].answer) score++;
+    var parfait = score === ns;
+    h += '<div style="text-align:center;padding:6px 0 0">' +
+      '<div style="width:86px;height:86px;border-radius:50%;background:' + (parfait ? '#15803D' : '#B4892E') + ';color:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;margin:6px auto 14px">' + (parfait ? '✓' : '!') + '</div>' +
+      '<div style="font-size:22px;font-weight:850;color:var(--p-ink);margin-bottom:8px">' + (parfait ? 'Vous avez tenu jusqu’au bout' : 'Situation terminée') + '</div>' +
+      '<p style="font-size:16px;line-height:1.6;color:var(--p-muted);margin:0 0 16px">' + score + ' bon' + (score > 1 ? 's' : '') + ' réflexe' + (score > 1 ? 's' : '') + ' sur ' + ns + '.' +
+      (parfait ? ' Face à un escroc qui insiste, c’est exactement ce qu’il faut faire.' : ' Refaites-la dans quelques semaines : c’est la répétition qui ancre le réflexe.') + '</p></div>';
+    cta = 'Terminer';
+  }
+
+  z.innerHTML = h;
+
+  var bloque = (_scStep >= 1 && _scStep <= ns && _scRep[_scStep - 1] == null);
+  var btn = document.getElementById('sc-cta');
+  btn.textContent = cta;
+  btn.disabled = bloque;
+  if (bloque) btn.onclick = null;
+  else if (_scStep > ns) btn.onclick = closeScenario;
+  else btn.onclick = function () { scAller(_scStep + 1); };
+  var ast = document.getElementById('sc-astuce');
+  if (ast) ast.textContent = astuce;
+  var sc = document.querySelector('#scenario .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
 
 var _fmId = null, _fmStep = 0, _fmRep = {}, _fmOrder = {};
 
@@ -4322,10 +4786,12 @@ function fmOption(qi, idx, texte, rep, bonne, pos) {
 }
 
 function fmRender() {
-  var m = MODULES_FORMATION[_fmId - 1];
+  var m = fmGet(_fmId);
   if (!m) return;
+  var mois = (_fmId === 'mois');
   var nq = m.questions.length, last = nq + 1;
-  var lab = document.querySelector('#module .mod-label'); if (lab) lab.textContent = 'Module ' + _fmId + ' sur ' + MODULES_FORMATION.length;
+  var lab = document.querySelector('#module .mod-label');
+  if (lab) lab.textContent = mois ? 'L’arnaque du mois' : ('Module ' + _fmId + ' sur ' + MODULES_FORMATION.length);
   var tit = document.querySelector('#module .mod-htitle'); if (tit) tit.textContent = m.title;
   fmSteps(last);
 
@@ -4337,12 +4803,17 @@ function fmRender() {
       '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px">' +
         '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF">' + nq + ' questions</span>' +
         '<span style="font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E6F6EF;color:#0F6E56">Corrigés expliqués</span></div>' +
-      fmCarte('<div style="font-size:15.5px;line-height:1.6;color:var(--p-muted)">Répondez à votre rythme. Après chaque question, on vous explique la bonne réponse — même si vous vous trompez, vous apprenez.</div>');
+      fmCarte('<div style="font-size:15.5px;line-height:1.6;color:var(--p-muted)">' +
+        (mois && m.intro ? m.intro + '<br><br>' : '') +
+        'Répondez à votre rythme. Après chaque question, on vous explique la bonne réponse — même si vous vous trompez, vous apprenez.</div>');
     cta = 'Commencer le module';
 
   } else if (_fmStep >= 1 && _fmStep <= nq) {
     var qi = _fmStep - 1, Q = m.questions[qi], rep = _fmRep[qi];
-    h += '<span style="display:inline-block;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF;margin-bottom:12px">Question ' + _fmStep + ' sur ' + nq + '</span>' +
+    var niv = mois ? '<span class="lvl-badge lvl-3" style="margin-left:7px">Actualité</span>'
+                   : (Q.lvl === 2) ? '<span class="lvl-badge lvl-2" style="margin-left:7px">Confirmé</span>'
+                                   : '<span class="lvl-badge lvl-1" style="margin-left:7px">Découverte</span>';
+    h += '<div style="margin-bottom:12px"><span style="display:inline-block;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:20px;background:#E8EEFC;color:#1E40AF">Question ' + _fmStep + ' sur ' + nq + '</span>' + niv + '</div>' +
       '<div style="font-size:18px;font-weight:800;line-height:1.4;color:var(--p-ink);margin:0 0 14px">' + Q.q + '</div>';
     var ordre = fmOrdre(qi, Q.opts.length);   // réponses mélangées (voir fmOrdre)
     for (var o = 0; o < ordre.length; o++) h += fmOption(qi, ordre[o], Q.opts[ordre[o]], rep, Q.answer, o);
@@ -4431,7 +4902,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-6';
+var APP_BUILD = '2026-07-27-7';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
