@@ -876,6 +876,44 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .ent-c-s{ display:block; font-size:12.5px; color:rgba(255,255,255,.78); margin-top:3px; }
 .ent-card .chev{ color:rgba(255,255,255,.55); flex:none; }
 
+
+/* ── Près de chez moi (Alerte Secteur) ── */
+.sec-hero{ border-radius:18px; padding:20px 18px; text-align:center; margin-bottom:14px; background:linear-gradient(125deg,#1a3a8f,#2D5BFF); color:#fff; box-shadow:0 10px 26px rgba(45,91,255,.28); }
+.sec-hero.sec-alerte{ background:linear-gradient(125deg,#7a1114,#c0322f); box-shadow:0 10px 26px rgba(197,50,47,.28); }
+.sec-hero.sec-calme{ background:linear-gradient(125deg,#0e3b2a,#12664a); box-shadow:0 10px 26px rgba(16,102,74,.24); }
+.sec-hero-ic{ font-size:32px; display:block; margin-bottom:8px; }
+.sec-hero-t{ font-size:19px; font-weight:850; line-height:1.25; }
+.sec-hero-s{ font-size:14px; line-height:1.55; color:rgba(255,255,255,.84); margin-top:7px; }
+.sec-conf{ background:#EEF4FF; border:1px solid #cfe0ff; color:#1e3a6b; border-radius:14px; padding:13px 15px; font-size:14px; line-height:1.55; }
+.sec-conf b{ display:block; color:#0f2c57; margin-bottom:2px; }
+.sec-ou{ text-align:center; font-size:13px; color:var(--p-muted); margin:14px 0 10px; }
+.sec-lab{ display:block; font-size:13.5px; font-weight:800; color:var(--p-ink); margin:14px 0 6px; }
+.sec-cp-row{ display:flex; gap:9px; align-items:stretch; }
+.sec-cp-row .auth-input{ flex:1 1 auto; min-width:0; }
+/* le bouton hérite d'un width:100% — on le ramène à sa taille utile */
+.sec-cp-row button{ flex:0 0 auto; width:auto !important; padding-left:20px; padding-right:20px; }
+.sec-lieu{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; font-size:15px; font-weight:800; color:var(--p-ink); }
+.sec-lieu button{ background:none; border:0; color:var(--p-blue); font-family:inherit; font-weight:800; font-size:13.5px; cursor:pointer; }
+.sec-list{ display:flex; flex-direction:column; gap:9px; }
+.sec-item{ background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:14px; padding:14px 15px; }
+.sec-i-h{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.sec-i-v{ font-size:15.5px; font-weight:850; color:var(--p-ink); }
+.sec-i-n{ font-size:12.5px; font-weight:800; color:#fff; background:var(--p-blue); border-radius:99px; padding:3px 10px; flex:none; }
+.sec-i-c{ font-size:14px; color:var(--p-ink); margin-top:6px; line-height:1.45; }
+.sec-i-d{ font-size:12.5px; color:var(--p-muted); margin-top:5px; }
+.sec-vide{ background:var(--p-card,#fff); border:1px dashed var(--p-line,#E7EBF3); border-radius:14px; padding:16px; font-size:14.5px; line-height:1.6; color:var(--p-ink); text-align:center; }
+.sec-vide span{ display:block; font-size:13px; color:var(--p-muted); margin-top:7px; }
+.sec-ailleurs{ text-align:center; font-size:13px; color:var(--p-muted); margin-top:14px; }
+.sec-cta{ display:flex; align-items:center; gap:13px; width:100%; text-align:left; font-family:inherit; cursor:pointer; border:0; margin-top:20px;
+  background:var(--p-ink,#111a2e); color:#fff; border-radius:16px; padding:15px 16px; }
+.sec-cta:active{ transform:scale(.985); }
+.sec-cta-ic{ font-size:22px; flex:none; }
+.sec-cta-m .a{ display:block; font-size:15.5px; font-weight:850; }
+.sec-cta-m .b{ display:block; font-size:12.5px; color:#a9b7d1; margin-top:3px; }
+.sec-merci{ background:#E9F7EE; border:1px solid #B7E0C4; color:#14532d; border-radius:14px; padding:15px; font-size:14.5px; line-height:1.55; margin-top:14px; }
+.sec-merci b{ display:block; margin-bottom:3px; }
+#secteur textarea.auth-input{ resize:vertical; font-family:inherit; }
+
 </style>
 </head>
 <body>
@@ -1074,6 +1112,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
       <div class="sec">Communauté</div>
       <div class="plist">
+        <button class="listrow" onclick="openTool('secteur')"><span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span><span class="m"><span class="a">Près de chez moi</span><span class="b">Les arnaques signalées dans votre secteur</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="listrow" onclick="openTool('alertes')"><span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span><span class="m"><span class="a">Alertes nationales</span><span class="b">Les arnaques qui circulent en ce moment</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="listrow" onclick="openTool('signaler')"><span class="ic ic-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></svg></span><span class="m"><span class="a">Signaler un numéro</span><span class="b">Protégez les autres membres</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="listrow" onclick="openTool('site')"><span class="ic ic-blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><span class="m"><span class="a">Vérifier un site</span><span class="b">Avant d'acheter, on contrôle</span></span><svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -1241,6 +1280,18 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     <div class="mod-astuce" id="sc-astuce"></div>
   </div>
 
+</div>
+
+
+<!-- ═══ PRÈS DE CHEZ MOI (Alerte Secteur) ═══ -->
+<div id="secteur" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeSecteur()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Alerte Secteur</div><div class="mod-htitle">Près de chez moi</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="sec-body"></div></div>
 </div>
 
 <!-- ═══ ENTRAÎNEMENT GRANDEUR NATURE ═══ -->
@@ -1895,6 +1946,7 @@ function openTool(name) {
     case 'privacy':    return openPrivacy();
     case 'diag':       return openDiag();
     case 'bouclier':   return openBouclier();
+    case 'secteur':    return openSecteur();
     case 'entrainement': return openEntrainement();
     default: toast('Outil bientôt disponible');
   }
@@ -4505,6 +4557,225 @@ var MODULES_FORMATION = [
   }
 ];
 
+// ─── PRÈS DE CHEZ MOI (Alerte Secteur) ───
+// Volontairement SANS carte : les cartes sont l'objet d'interface le plus
+// hostile pour une personne âgée (pincer, zoomer, viser un marqueur). Une
+// liste lisible répond à la vraie question — « ça arrive près de chez moi ? ».
+var SEC_CATS = {
+  faux_artisan:      'Faux artisan / dépanneur',
+  faux_agent:        'Faux agent (EDF, eau, police…)',
+  demarchage_abusif: 'Démarchage abusif à domicile',
+  arnaque_telephone: 'Arnaque par téléphone',
+  faux_livreur:      'Faux livreur / faux colis',
+  vol_ruse:          'Vol par ruse',
+  autre:             'Autre arnaque locale'
+};
+var SEC_DATA = null, SEC_VUE = 'liste';
+
+function secCommune() {
+  try { return JSON.parse(localStorage.getItem('despy_commune') || 'null'); } catch (e) { return null; }
+}
+function secSetCommune(ville, cp) {
+  try { localStorage.setItem('despy_commune', JSON.stringify({ ville: ville, cp: cp })); } catch (e) {}
+}
+
+function openSecteur() {
+  document.getElementById('secteur').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  SEC_VUE = 'liste';
+  document.getElementById('sec-body').innerHTML = '<div class="spinner" style="margin:60px auto"></div>';
+  fetch('/.netlify/functions/fraud-map')
+    .then(function (r) { return r.json(); })
+    .then(function (d) { SEC_DATA = d; renderSecteur(); })
+    .catch(function () { SEC_DATA = { communes: [], total: 0 }; renderSecteur(); });
+}
+function closeSecteur() {
+  document.getElementById('secteur').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+// ── Géolocalisation : jamais au démarrage, toujours sur un geste explicite ──
+function secLocaliser() {
+  if (!navigator.geolocation) { toast('Votre téléphone ne permet pas la localisation'); return; }
+  var b = document.getElementById('sec-geo-btn');
+  if (b) { b.disabled = true; b.textContent = 'Recherche de votre commune…'; }
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    fetch('/.netlify/functions/geo-commune', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lat: pos.coords.latitude, lon: pos.coords.longitude })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.trouve) {
+        secSetCommune(d.ville, d.code_postal);
+        toast('Commune trouvée : ' + d.ville);
+        renderSecteur();
+      } else {
+        toast('Commune introuvable — saisissez votre code postal');
+        renderSecteur();
+      }
+    }).catch(function () { toast('Recherche impossible pour le moment'); renderSecteur(); });
+  }, function () {
+    // Refus ou échec : on ne culpabilise pas, on propose l'autre chemin.
+    toast('Pas de souci — indiquez simplement votre code postal');
+    renderSecteur();
+  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+}
+
+function secValiderCP() {
+  var v = (document.getElementById('sec-cp') || {}).value || '';
+  var cp = v.replace(/\D/g, '').slice(0, 5);
+  if (cp.length !== 5) { toast('Indiquez un code postal à 5 chiffres'); return; }
+  fetch('/.netlify/functions/geo-commune', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cp: cp })
+  }).catch(function () {});
+  // Le nom exact viendra des signalements ; le code postal suffit à filtrer.
+  var trouve = null;
+  ((SEC_DATA && SEC_DATA.communes) || []).forEach(function (c) { if (c.code_postal === cp) trouve = c.ville; });
+  secSetCommune(trouve || ('Code postal ' + cp), cp);
+  renderSecteur();
+}
+
+function secOublierCommune() {
+  try { localStorage.removeItem('despy_commune'); } catch (e) {}
+  renderSecteur();
+}
+
+function secDateFr(iso) {
+  try { return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }); }
+  catch (e) { return ''; }
+}
+
+function renderSecteur() {
+  var z = document.getElementById('sec-body');
+  if (!z) return;
+  var moi = secCommune();
+  var d = SEC_DATA || { communes: [], total: 0 };
+  var h = '';
+
+  // ── Pas encore de commune : deux chemins, à égalité ──
+  if (!moi) {
+    h += '<div class="sec-hero"><span class="sec-hero-ic">📍</span>' +
+         '<div class="sec-hero-t">Ce qui se passe près de chez vous</div>' +
+         '<div class="sec-hero-s">Les arnaques signalées par les autres membres, dans votre commune et votre département.</div></div>';
+    h += '<div class="sec-conf"><b>Votre position reste chez vous.</b>Despy ne retient que le nom de votre commune — jamais votre adresse, jamais vos déplacements. Vous pouvez aussi l’indiquer à la main.</div>';
+    h += '<button id="sec-geo-btn" class="btn-primary" style="margin-top:14px" onclick="secLocaliser()">Utiliser ma position</button>';
+    h += '<div class="sec-ou">ou</div>';
+    h += '<label class="sec-lab" for="sec-cp">Mon code postal</label>' +
+         '<div class="sec-cp-row"><input id="sec-cp" class="auth-input" type="tel" inputmode="numeric" maxlength="5" placeholder="67100" style="margin:0">' +
+         '<button class="btn-secondary" style="margin:0;white-space:nowrap" onclick="secValiderCP()">Valider</button></div>';
+    z.innerHTML = h;
+    return;
+  }
+
+  // ── Commune connue ──
+  var dep = (moi.cp || '').slice(0, 2);
+  var communes = d.communes || [];
+  var ici = communes.filter(function (c) { return c.code_postal === moi.cp; });
+  var autour = communes.filter(function (c) { return c.code_postal !== moi.cp && (c.code_postal || '').slice(0, 2) === dep; });
+  var ailleurs = communes.filter(function (c) { return (c.code_postal || '').slice(0, 2) !== dep; });
+  var nbIci = ici.reduce(function (a, c) { return a + (c.count || 0); }, 0);
+  var nbAutour = autour.reduce(function (a, c) { return a + (c.count || 0); }, 0);
+  var nbAilleurs = ailleurs.reduce(function (a, c) { return a + (c.count || 0); }, 0);
+
+  h += '<div class="sec-lieu"><span>📍 ' + moi.ville + '</span>' +
+       '<button onclick="secOublierCommune()">Changer</button></div>';
+
+  // Bandeau d'état, honnête dans les deux cas
+  if (nbIci > 0) {
+    h += '<div class="sec-hero sec-alerte"><span class="sec-hero-ic">⚠️</span>' +
+         '<div class="sec-hero-t">' + nbIci + ' signalement' + (nbIci > 1 ? 's' : '') + ' dans votre commune</div>' +
+         '<div class="sec-hero-s">Ces 60 derniers jours. Restez vigilant, et parlez-en autour de vous.</div></div>';
+  } else {
+    h += '<div class="sec-hero sec-calme"><span class="sec-hero-ic">🛡️</span>' +
+         '<div class="sec-hero-t">Rien de signalé chez vous</div>' +
+         '<div class="sec-hero-s">Aucune arnaque signalée à ' + moi.ville + ' ces 60 derniers jours. C’est une bonne nouvelle — et ça peut aussi vouloir dire que personne n’a encore signalé.</div></div>';
+  }
+
+  function bloc(titre, liste) {
+    if (!liste.length) return '';
+    var x = '<div class="sec">' + titre + '</div><div class="sec-list">';
+    liste.forEach(function (c) {
+      var cats = Object.keys(c.categories || {}).map(function (k) {
+        return (SEC_CATS[k] || k) + (c.categories[k] > 1 ? ' ×' + c.categories[k] : '');
+      });
+      x += '<div class="sec-item"><div class="sec-i-h"><span class="sec-i-v">' + c.ville + '</span>' +
+           '<span class="sec-i-n">' + c.count + '</span></div>' +
+           '<div class="sec-i-c">' + cats.join(' · ') + '</div>' +
+           '<div class="sec-i-d">Dernier signalement le ' + secDateFr(c.last_at) + '</div></div>';
+    });
+    return x + '</div>';
+  }
+
+  h += bloc('Dans votre commune', ici);
+  h += bloc('Dans votre département', autour);
+  if (!ici.length && !autour.length) {
+    h += '<div class="sec-vide">Aucun signalement dans votre département pour le moment.' +
+         (nbAilleurs ? ' ' + nbAilleurs + ' ' + (nbAilleurs > 1 ? 'ont été signalés' : 'a été signalé') + ' ailleurs en France.' : '') +
+         '<span>Vous êtes parmi les premiers : chaque signalement protège vos voisins.</span></div>';
+  } else if (nbAilleurs) {
+    h += '<div class="sec-ailleurs">' + nbAilleurs + ' autre' + (nbAilleurs > 1 ? 's' : '') + ' signalement' + (nbAilleurs > 1 ? 's' : '') + ' ailleurs en France</div>';
+  }
+
+  h += '<button class="sec-cta" onclick="secFormulaire()">' +
+       '<span class="sec-cta-ic">📢</span><span class="sec-cta-m">' +
+       '<span class="a">Signaler une arnaque</span>' +
+       '<span class="b">Protégez vos voisins en 30 secondes</span></span></button>';
+
+  z.innerHTML = h;
+  var sc = document.querySelector('#secteur .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+// ── Formulaire de signalement ──
+function secFormulaire() {
+  var moi = secCommune() || { ville: '', cp: '' };
+  var opts = Object.keys(SEC_CATS).map(function (k) {
+    return '<option value="' + k + '">' + SEC_CATS[k] + '</option>';
+  }).join('');
+  var z = document.getElementById('sec-body');
+  z.innerHTML =
+    '<button class="vic-retour" onclick="renderSecteur()">‹ Retour</button>' +
+    '<div class="sec-conf"><b>Merci d’aider les autres.</b>Votre signalement est relu avant publication. Votre nom n’apparaît jamais — seule la commune est affichée.</div>' +
+    '<label class="sec-lab" for="sec-f-cat">De quoi s’agit-il ?</label>' +
+    '<select id="sec-f-cat" class="auth-input">' + opts + '</select>' +
+    '<label class="sec-lab" for="sec-f-desc">Que s’est-il passé ?</label>' +
+    '<textarea id="sec-f-desc" class="auth-input" rows="4" placeholder="Un homme s’est présenté comme agent EDF pour entrer chez moi…"></textarea>' +
+    '<label class="sec-lab" for="sec-f-cp">Code postal</label>' +
+    '<input id="sec-f-cp" class="auth-input" type="tel" inputmode="numeric" maxlength="5" value="' + (moi.cp || '') + '">' +
+    '<div id="sec-f-res"></div>' +
+    '<button class="btn-primary" style="margin-top:14px" onclick="secEnvoyer()">Envoyer mon signalement</button>';
+  var sc = document.querySelector('#secteur .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+async function secEnvoyer() {
+  var s = session.get();
+  if (!s || !s.email) { toast('Connectez-vous pour signaler'); return; }
+  var cat = (document.getElementById('sec-f-cat') || {}).value || 'autre';
+  var desc = ((document.getElementById('sec-f-desc') || {}).value || '').trim();
+  var cp = (((document.getElementById('sec-f-cp') || {}).value || '').replace(/\D/g, '')).slice(0, 5);
+  if (desc.length < 15) { toast('Décrivez un peu plus ce qui s’est passé'); return; }
+  if (cp.length !== 5) { toast('Indiquez un code postal à 5 chiffres'); return; }
+
+  var res = document.getElementById('sec-f-res');
+  res.innerHTML = '<div class="spinner" style="margin:18px auto"></div>';
+  try {
+    var r = await fetch('/.netlify/functions/report-fraud', {
+      method: 'POST',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+      body: JSON.stringify({ category: cat, description: desc, code_postal: cp, user_email: s.email })
+    });
+    var d = await r.json();
+    if (!r.ok || d.error) {
+      res.innerHTML = '<div class="result-card" style="color:#991b1b;margin-top:14px">' + (d.error || 'Envoi impossible pour le moment.') + '</div>';
+      return;
+    }
+    res.innerHTML = '<div class="sec-merci"><b>Merci, c’est envoyé.</b>Votre signalement est relu par Despy avant d’apparaître. Vos voisins vous en sauront gré.</div>';
+    if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+  } catch (e) {
+    res.innerHTML = '<div class="result-card" style="color:#991b1b;margin-top:14px">Envoi impossible pour le moment.</div>';
+  }
+}
+
 // ─── ENTRAÎNEMENT GRANDEUR NATURE ───
 // Un faux message-test, envoyé sans prévenir, à un rythme choisi par le membre.
 // C'est le seul exercice qui ne s'épuise jamais : on ne « finit » pas un
@@ -5136,7 +5407,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-10';
+var APP_BUILD = '2026-07-27-11';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
