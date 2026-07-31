@@ -231,6 +231,25 @@ async function createPhotoStory(photoId, pageId, pageToken) {
 // ── Handler ──────────────────────────────────
 
 exports.handler = async (event) => {
+  // ⚠ SÉCURITÉ — cette fonction PUBLIE sur la page Facebook de Despy.
+  // Elle n'est plus planifiée (schedule commenté ci-dessous), donc la
+  // plateforme ne la protège pas : un simple GET sur son URL suffisait à
+  // publier une story. On exige désormais explicitement, au choix :
+  //   · un vrai déclenchement planifié (si le cron est réactivé un jour), ou
+  //   · l'en-tête interne x-internal-secret (déclenchement manuel maîtrisé).
+  const { isScheduled } = require('./_is-scheduled');
+  const secretRecu = event.headers &&
+    (event.headers['x-internal-secret'] || event.headers['X-Internal-Secret']);
+  const autorise = isScheduled(event) ||
+    (process.env.INTERNAL_SECRET && secretRecu === process.env.INTERNAL_SECRET);
+  if (!autorise) {
+    return {
+      statusCode: 403,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Publication réservée au planificateur Despy.' })
+    };
+  }
+
   const isManual = event && event.httpMethod === 'POST';
   const isPreview = isManual && (event.queryStringParameters || {}).preview === '1';
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

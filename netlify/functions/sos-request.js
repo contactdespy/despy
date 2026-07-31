@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { rateLimit } = require('./_auth');
 
 async function sendResend(to, subject, html) {
   const res = await fetch("https://api.resend.com/emails", {
@@ -61,6 +62,17 @@ exports.handler = async (event) => {
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
   if (event.httpMethod !== 'POST')    return { statusCode: 405, headers, body: '{"error":"Method not allowed"}' };
+
+  // Anti-inondation. Volontairement PAS d'authentification : quelqu'un en
+  // détresse ne doit jamais être bloqué par un écran de connexion. Une limite
+  // large par IP (5 par heure) n'entrave aucun usage réel mais empêche de
+  // noyer la boîte mail et la table sous des demandes fabriquées.
+  if (!rateLimit(event, 'sos', 5, 60 * 60 * 1000)) {
+    return {
+      statusCode: 429, headers,
+      body: JSON.stringify({ error: "Plusieurs demandes viennent d'être envoyées depuis cet appareil. Si c'est urgent, appelez directement le 06 89 14 83 95." })
+    };
+  }
 
   try {
     const body = JSON.parse(event.body || '{}');
