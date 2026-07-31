@@ -12344,7 +12344,12 @@ function _csShowQuestion() {
   var q = CYBER_SCORE_QUESTIONS[idx];
   var pct = Math.round((idx / total) * 100);
 
-  var answersHtml = q.answers.map(function(a, i) {
+  // Réponses mélangées : la meilleure réponse était en 3e position dans les
+  // 10 questions (100 %) — le score de sécurité s'obtenait sans rien lire.
+  // L'index d'ORIGINE reste passé à _csAnswer, donc le calcul des points
+  // et le reste du parcours sont inchangés.
+  var answersHtml = despyOrdre('cs:' + idx, q.answers.length).map(function(i) {
+    var a = q.answers[i];
     return '<button class="cs-answer-btn" onclick="_csAnswer(' + i + ')" style="display:block;width:100%;text-align:left;padding:14px 16px;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:14.5px;color:var(--text);font-weight:500;cursor:pointer;font-family:inherit;margin-bottom:10px;transition:all .15s ease;line-height:1.4">' + a.txt + '</button>';
   }).join('');
 
