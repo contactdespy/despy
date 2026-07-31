@@ -201,6 +201,14 @@
 [functions.onboarding-sequence]
   schedule = "0 11 * * *"          # Chaque jour 11h (important pour les nouveaux inscrits)
 
+[functions.training-cycle]
+  schedule = "0 10 * * 2,4"        # Mardi + jeudi 10h — entraînement récurrent.
+                                   # Passage fréquent mais envoi RARE : chaque
+                                   # membre ne reçoit un test que selon SON rythme
+                                   # (mensuel/bimestriel/trimestriel), et le jour
+                                   # est tiré au hasard après l'échéance — un test
+                                   # attendu à date fixe n'entraînerait à rien.
+
 [functions.monthly-training]
   schedule = "0 8 1 * *"           # 1er du mois 8h — génère « L'arnaque du mois »
                                    # à partir des alertes nationales et des

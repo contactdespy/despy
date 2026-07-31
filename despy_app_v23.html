@@ -832,6 +832,50 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .mois-s{ display:block; font-size:13px; color:#c7d8ff; margin-top:5px; line-height:1.45; }
 .mois-lock{ background:linear-gradient(125deg,#3a4459,#5a6478); box-shadow:0 8px 20px rgba(20,30,50,.22); }
 
+
+/* ── entraînement grandeur nature ── */
+.ent-hero{ border-radius:18px; padding:20px 18px; text-align:center; margin-bottom:14px; }
+.ent-on{ background:linear-gradient(125deg,#0e3b2a,#12664a); color:#fff; box-shadow:0 10px 26px rgba(16,102,74,.26); }
+.ent-off{ background:linear-gradient(125deg,#1e2842,#39445e); color:#fff; box-shadow:0 10px 24px rgba(20,30,50,.22); }
+.ent-ic{ font-size:34px; display:block; margin-bottom:8px; }
+.ent-h-t{ font-size:19px; font-weight:850; line-height:1.25; }
+.ent-h-s{ font-size:14px; line-height:1.55; color:rgba(255,255,255,.82); margin-top:7px; }
+.ent-note{ background:#EEF4FF; border:1px solid #cfe0ff; color:#1e3a6b; border-radius:14px; padding:13px 15px; font-size:14px; line-height:1.55; }
+.ent-note b{ display:block; color:#0f2c57; margin-bottom:2px; }
+.ent-switch{ border-top:0 !important; margin-top:14px !important; background:var(--p-card,#fff) !important; border:1px solid var(--p-line,#E7EBF3) !important; border-radius:15px; padding:14px 15px !important; }
+.ent-rythmes{ display:flex; flex-direction:column; gap:9px; }
+.ent-r{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; width:100%; text-align:left;
+  background:var(--p-card,#fff); border:1.5px solid var(--p-line,#E7EBF3); border-radius:14px; padding:14px 15px; font-family:inherit; cursor:pointer; }
+.ent-r-t{ font-size:15px; font-weight:800; color:var(--p-ink); }
+.ent-r-s{ font-size:12.5px; color:var(--p-muted); }
+.ent-r.on{ border-color:var(--p-blue); background:#EEF2FF; }
+.ent-r.on .ent-r-t{ color:var(--p-blue); }
+.ent-proch{ margin-top:12px; font-size:13.5px; line-height:1.5; color:var(--p-muted); background:#FFF7E6; border:1px solid #F5C451; color:#6b4a00; border-radius:13px; padding:12px 14px; }
+.ent-proch span{ display:block; font-size:12.5px; margin-top:3px; color:#8A5A00; }
+.ent-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.ent-s{ background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:14px; padding:14px 8px; text-align:center; }
+.ent-s .n{ font-size:26px; font-weight:850; line-height:1; font-variant-numeric:tabular-nums; }
+.ent-s .k{ font-size:11px; color:var(--p-muted); margin-top:5px; line-height:1.3; }
+.ent-hist{ margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.ent-l{ display:flex; align-items:center; gap:12px; background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:13px; padding:12px 14px; }
+.ent-l-p{ width:26px; height:26px; border-radius:50%; background:#15803D; color:#fff; font-weight:900; font-size:14px; display:flex; align-items:center; justify-content:center; flex:none; }
+.ent-l.piege .ent-l-p{ background:#B4892E; }
+.ent-l-m{ flex:1; min-width:0; }
+.ent-l-t{ display:block; font-size:14.5px; font-weight:800; color:var(--p-ink); line-height:1.3; }
+.ent-l-s{ display:block; font-size:12.5px; color:var(--p-muted); margin-top:2px; }
+.ent-bien{ margin-top:14px; background:#E9F7EE; border:1px solid #B7E0C4; color:#14532d; border-radius:14px; padding:14px 15px; font-size:14px; line-height:1.55; }
+.ent-bien b{ display:block; margin-bottom:3px; }
+.ent-vide{ margin-top:16px; text-align:center; font-size:14px; line-height:1.6; color:var(--p-muted); }
+.ent-card{ display:flex; align-items:center; gap:13px; width:100%; text-align:left; font-family:inherit; cursor:pointer; border:0;
+  background:linear-gradient(125deg,#0e3b2a,#12664a); color:#fff; border-radius:16px; padding:15px 16px; box-shadow:0 8px 22px rgba(16,102,74,.24); }
+.ent-card:active{ transform:scale(.985); }
+.ent-card-lock{ background:linear-gradient(125deg,#3a4459,#5a6478); }
+.ent-c-ic{ font-size:24px; flex:none; }
+.ent-c-m{ flex:1; min-width:0; }
+.ent-c-t{ display:block; font-size:15.5px; font-weight:850; line-height:1.3; }
+.ent-c-s{ display:block; font-size:12.5px; color:rgba(255,255,255,.78); margin-top:3px; }
+.ent-card .chev{ color:rgba(255,255,255,.55); flex:none; }
+
 </style>
 </head>
 <body>
@@ -1196,6 +1240,18 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     <button class="mod-cta" id="sc-cta"></button>
     <div class="mod-astuce" id="sc-astuce"></div>
   </div>
+
+</div>
+
+<!-- ═══ ENTRAÎNEMENT GRANDEUR NATURE ═══ -->
+<div id="entrainement" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeEntrainement()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Entraînement</div><div class="mod-htitle">Grandeur nature</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="ent-body"></div></div>
 </div>
 
 <!-- ═══ PROTÉGER MON TÉLÉPHONE (plein écran) ═══ -->
@@ -1225,6 +1281,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     <div id="fm-mois"></div>
     <div class="plist" id="fm-list"></div>
     <div id="fm-scenarios"></div>
+    <div id="fm-entrainement"></div>
   </div>
 </div>
 
@@ -1838,7 +1895,7 @@ function openTool(name) {
     case 'privacy':    return openPrivacy();
     case 'diag':       return openDiag();
     case 'bouclier':   return openBouclier();
-    case 'entrainement': window.location.href = '/mon-entrainement'; return;
+    case 'entrainement': return openEntrainement();
     default: toast('Outil bientôt disponible');
   }
 }
@@ -2953,6 +3010,21 @@ function renderMoisCard() {
     '</button>';
 }
 
+// L'entraînement clôt le parcours : Découverte → Confirmé → Expert → réel.
+function renderEntCard() {
+  var z = document.getElementById('fm-entrainement');
+  if (!z) return;
+  var lock = !((session.get() || {}).subscribed);
+  z.innerHTML =
+    '<div class="fm-sep" style="border-top:0;padding-top:20px">En conditions réelles</div>' +
+    '<button class="ent-card' + (lock ? ' ent-card-lock' : '') + '" onclick="' + (lock ? 'openPaywall()' : 'closeFormation();setTimeout(openEntrainement,260)') + '">' +
+      '<span class="ent-c-ic">🎯</span>' +
+      '<span class="ent-c-m"><span class="ent-c-t">L’entraînement grandeur nature</span>' +
+      '<span class="ent-c-s">' + (lock ? 'Inclus dans l’abonnement' : 'Un faux message-test, sans prévenir') + '</span></span>' +
+      (lock ? '<span class="fm-key">🔒</span>' : '<svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>') +
+    '</button>';
+}
+
 // Niveau expert : les mises en situation, sous la liste des modules.
 function renderScenarioList() {
   var z = document.getElementById('fm-scenarios');
@@ -2975,6 +3047,7 @@ function renderScenarioList() {
       '</button>';
   });
   z.innerHTML = h + '</div>';
+  renderEntCard();
 }
 
 // Carte « Activer les alertes » : visible seulement si la permission n'est pas accordée.
@@ -4432,6 +4505,167 @@ var MODULES_FORMATION = [
   }
 ];
 
+// ─── ENTRAÎNEMENT GRANDEUR NATURE ───
+// Un faux message-test, envoyé sans prévenir, à un rythme choisi par le membre.
+// C'est le seul exercice qui ne s'épuise jamais : on ne « finit » pas un
+// entraînement, on entretient un réflexe.
+var ENT_MODELES = {
+  colis_laposte: 'Faux SMS de colis (La Poste)',
+  chronopost:    'Faux avis de livraison (Chronopost)',
+  ameli:         'Faux message de l’Assurance Maladie',
+  impots:        'Faux courrier des impôts',
+  caf:           'Faux message de la Caf',
+  banque:        'Faux conseiller bancaire',
+  netflix:       'Faux problème de paiement (Netflix)',
+  amazon:        'Fausse commande (Amazon)',
+  edf:           'Fausse facture (EDF)',
+  faux_proche:   'Faux message d’un proche'
+};
+var ENT_RYTHMES = [
+  ['mensuel',     'Chaque mois',     'Le plus efficace'],
+  ['bimestriel',  'Tous les 2 mois', 'Bon équilibre'],
+  ['trimestriel', 'Chaque trimestre','Tranquille']
+];
+var ENT_ETAT = null;
+
+function openEntrainement() {
+  document.getElementById('entrainement').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('ent-body').innerHTML = '<div class="spinner" style="margin:60px auto"></div>';
+  chargerEntrainement();
+}
+function closeEntrainement() {
+  document.getElementById('entrainement').classList.remove('on');
+  if (document.getElementById('formation').classList.contains('on')) renderFormationList();
+  else document.body.style.overflow = '';
+}
+
+function chargerEntrainement() {
+  var s = session.get();
+  if (!s || !s.email) { renderEntrainement(null); return; }
+  fetch('/.netlify/functions/training-settings', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify({ email: s.email, action: 'get' })
+  }).then(function (r) { return r.json(); })
+    .then(function (d) { ENT_ETAT = d; renderEntrainement(d); })
+    .catch(function () { renderEntrainement(null); });
+}
+
+function entMaj(champ, valeur) {
+  var s = session.get();
+  if (!s || !s.email) return;
+  if (ENT_ETAT) ENT_ETAT[champ === 'active' ? 'actif' : 'rythme'] = valeur;
+  renderEntrainement(ENT_ETAT);                       // retour immédiat
+  var corps = { email: s.email, action: 'set' };
+  corps[champ] = valeur;
+  fetch('/.netlify/functions/training-settings', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify(corps)
+  }).then(function (r) { return r.json(); }).then(function (d) {
+    if (d && d.ok === false) { toast('Réglage non enregistré, réessayez'); return; }
+    ENT_ETAT = d; renderEntrainement(d);
+    if (champ === 'active') toast(valeur ? 'Entraînement activé' : 'Entraînement mis en pause');
+  }).catch(function () { toast('Réglage non enregistré'); });
+}
+
+function entDateFr(iso) {
+  try { return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }); }
+  catch (e) { return ''; }
+}
+
+function renderEntrainement(d) {
+  var z = document.getElementById('ent-body');
+  if (!z) return;
+
+  if (d && d.abonne === false) {
+    z.innerHTML =
+      '<div class="ent-hero ent-off"><span class="ent-ic">🎯</span>' +
+        '<div class="ent-h-t">L’entraînement grandeur nature</div>' +
+        '<div class="ent-h-s">Un faux message d’arnaque, envoyé sans prévenir, pour tester vos réflexes en conditions réelles — sans le moindre risque.</div></div>' +
+      '<div class="ent-note">C’est l’exercice qui protège le mieux : on n’apprend jamais aussi bien qu’en se faisant piéger… par Despy plutôt que par un escroc.</div>' +
+      '<button class="btn-primary" style="margin-top:16px" onclick="closeEntrainement();setTimeout(openPaywall,260)">Débloquer avec l’abonnement</button>';
+    return;
+  }
+
+  if (d && d.disponible === false) {
+    z.innerHTML = '<div class="card pad" style="text-align:center;color:var(--p-muted)">L’entraînement sera disponible très bientôt sur votre compte.</div>';
+    return;
+  }
+  if (!d) {
+    z.innerHTML = '<div class="card pad" style="text-align:center;color:var(--p-muted)">Impossible de charger votre entraînement pour le moment. Réessayez dans un instant.</div>';
+    return;
+  }
+
+  var actif = !!d.actif;
+  var st = d.stats || { recus: 0, pieges: 0, evites: 0 };
+  var h = '';
+
+  // ── Bandeau d'état ──
+  h += '<div class="ent-hero ' + (actif ? 'ent-on' : 'ent-off') + '">' +
+        '<span class="ent-ic">' + (actif ? '🎯' : '💤') + '</span>' +
+        '<div class="ent-h-t">' + (actif ? 'Entraînement actif' : 'Entraînement en pause') + '</div>' +
+        '<div class="ent-h-s">' +
+          (actif
+            ? 'Un faux message-test vous sera envoyé sans prévenir. Vous ne saurez pas lequel, ni quand — c’est tout l’intérêt.'
+            : 'Activez-le pour recevoir de temps en temps un faux message d’arnaque, et vérifier vos réflexes pour de vrai.') +
+        '</div></div>';
+
+  // ── Réassurance : le point le plus important pour un senior ──
+  h += '<div class="ent-note"><b>Aucun danger, jamais.</b> Ces messages sont fabriqués par Despy. Le lien qu’ils contiennent ne mène que vers une page de conseils — aucune donnée n’est demandée, rien ne peut être volé.</div>';
+
+  // ── Interrupteur ──
+  h += '<button class="a11y-row ent-switch' + (actif ? ' on' : '') + '" role="switch" aria-checked="' + (actif ? 'true' : 'false') + '" onclick="entMaj(\'active\',' + (actif ? 'false' : 'true') + ')">' +
+        '<span class="a11y-m"><span class="a11y-t">Recevoir des tests surprises</span>' +
+        '<span class="a11y-s">Vous pouvez mettre en pause à tout moment</span></span>' +
+        '<span class="a11y-sw" aria-hidden="true"><i></i></span></button>';
+
+  // ── Rythme ──
+  if (actif) {
+    h += '<div class="sec" style="padding-top:20px">À quel rythme ?</div><div class="ent-rythmes">';
+    ENT_RYTHMES.forEach(function (r) {
+      var on = (d.rythme || 'mensuel') === r[0];
+      h += '<button class="ent-r' + (on ? ' on' : '') + '" onclick="entMaj(\'rythme\',\'' + r[0] + '\')">' +
+            '<span class="ent-r-t">' + r[1] + '</span><span class="ent-r-s">' + r[2] + '</span></button>';
+    });
+    h += '</div>';
+    if (d.prochain) {
+      h += '<div class="ent-proch">Prochain test : autour du <b>' + entDateFr(d.prochain) + '</b><span>La date exacte reste une surprise — sinon ce ne serait plus un test.</span></div>';
+    }
+  }
+
+  // ── Vigilance ──
+  if (st.recus > 0) {
+    h += '<div class="sec" style="padding-top:22px">Votre vigilance</div>' +
+      '<div class="ent-stats">' +
+        '<div class="ent-s"><div class="n" style="color:var(--p-safe,#15803D)">' + st.evites + '</div><div class="k">test' + (st.evites > 1 ? 's' : '') + ' déjoué' + (st.evites > 1 ? 's' : '') + '</div></div>' +
+        '<div class="ent-s"><div class="n" style="color:var(--p-gold,#B4892E)">' + st.pieges + '</div><div class="k">fois piégé' + (st.pieges > 1 ? 'es' : '') + '</div></div>' +
+        '<div class="ent-s"><div class="n" style="color:var(--p-blue)">' + st.recus + '</div><div class="k">au total</div></div>' +
+      '</div>';
+
+    h += '<div class="ent-hist">';
+    (d.tests || []).forEach(function (t) {
+      var piege = !!t.clicked_at;
+      h += '<div class="ent-l' + (piege ? ' piege' : '') + '">' +
+            '<span class="ent-l-p">' + (piege ? '!' : '✓') + '</span>' +
+            '<span class="ent-l-m"><span class="ent-l-t">' + (ENT_MODELES[t.template_id] || 'Message-test') + '</span>' +
+            '<span class="ent-l-s">' + entDateFr(t.sent_at) + ' · ' + (piege ? 'vous avez cliqué' : 'vous ne vous êtes pas laissé avoir') + '</span></span>' +
+          '</div>';
+    });
+    h += '</div>';
+
+    if (st.pieges > 0) {
+      h += '<div class="ent-bien"><b>S’être fait piéger ici, c’est une bonne nouvelle.</b>C’est exactement à ça que sert l’entraînement : le jour où le vrai message arrivera, vous le reconnaîtrez. Personne n’est prévenu, rien n’est noté contre vous.</div>';
+    }
+  } else if (actif) {
+    h += '<div class="ent-vide">Votre premier test arrivera bientôt, sans prévenir. Vivez normalement — c’est le but.</div>';
+  }
+
+  z.innerHTML = h;
+  var sc = document.querySelector('#entrainement .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
 // ─── NIVEAU EXPERT : mises en situation à plusieurs étapes ───
 // Chaque étape a une conséquence : l'escroc insiste, change de ton, revient.
 // C'est ce qui entraîne à tenir sous pression, pas juste à connaître la règle.
@@ -4902,7 +5136,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-9';
+var APP_BUILD = '2026-07-27-10';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
