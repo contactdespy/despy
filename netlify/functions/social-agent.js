@@ -210,6 +210,37 @@ async function getContextData(supabase) {
 
   ctx.statsWeek = { scams: scamCount || 0, total: totalCount || 0, phones: phoneReports || 0 };
 
+  // Thèmes dominants — déduits par mots-clés. On ne transmet JAMAIS le texte
+  // collé par les clients (données personnelles) : uniquement des comptages.
+  const THEMES = {
+    'colis / livraison':        /colis|livraison|chronopost|la ?poste|suivi/i,
+    'faux conseiller bancaire': /banque|conseiller|virement|carte bancaire|code (?:sms|secret)/i,
+    'impôts / administration':  /imp[oô]ts|dgfip|amendes?|antai|caf\b|ameli|assurance maladie/i,
+    'compte à débloquer':       /compte (?:bloqu|suspendu|d[ée]sactiv)|r[ée]activ/i,
+    'gain / loterie':           /gagn|loterie|tirage|cadeau|iphone gratuit/i,
+    'proche en difficulté':     /maman|papa|fils|fille|nouveau num[ée]ro|whatsapp/i,
+    'placement / crypto':       /placement|investi|crypto|bitcoin|rendement/i
+  };
+  const compte = {};
+  (scams || []).forEach(r => {
+    const t = (r.content || '');
+    Object.keys(THEMES).forEach(k => { if (THEMES[k].test(t)) compte[k] = (compte[k] || 0) + 1; });
+  });
+  ctx.themes = Object.entries(compte).sort(([, a], [, b]) => b - a).slice(0, 3)
+    .map(([nom, n]) => ({ nom, n }));
+
+  // Signalements locaux publiés (Alerte Secteur) — commune + catégorie
+  // uniquement : déjà publics sur la carte, modérés, jamais de nom.
+  try {
+    const { data: locaux } = await supabase
+      .from('fraud_reports')
+      .select('category, ville, created_at')
+      .eq('status', 'published')
+      .gte('created_at', weekAgo)
+      .limit(20);
+    ctx.locaux = locaux || [];
+  } catch (e) { ctx.locaux = []; }
+
   return ctx;
 }
 
@@ -218,146 +249,143 @@ async function getContextData(supabase) {
 function buildPrompt(postType, ctx) {
   const dateFr = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  // Stratégie CTA : on varie pour éviter la lassitude algorithmique
-  // 33% sans CTA · 33% CTA discret · 33% CTA fort
-  const ctaRoll = Math.random();
-  const ctaStrategy = ctaRoll < 0.33 ? 'none' : (ctaRoll < 0.66 ? 'soft' : 'strong');
+  // On varie la présence de Despy pour ne pas lasser (et parce qu'un post
+  // sans marque est souvent celui qui porte le plus loin).
+  const roll = Math.random();
+  const cta = roll < 0.4 ? 'none' : (roll < 0.75 ? 'soft' : 'strong');
 
-  const baseRules = `RÈGLES D'ÉCRITURE (à respecter STRICTEMENT) :
-- Français parlé, vivant. Comme si tu parlais à un ami sénior au café.
-- AUCUN jargon technique, AUCUN anglicisme inutile.
-- Vouvoiement uniquement.
-- Pas de markdown, pas de gras Unicode, pas de soulignement.
-  → Texte naturel uniquement. Facebook récompense le contenu humain.
-- Maximum 2 emojis pertinents dans tout le post. Zéro si possible.
-- Longueur OBLIGATOIRE : 40 à 80 mots maximum. Pas plus.
-  → Sur Facebook, l'engagement chute après 80 mots. Reste court.
-- 1 SEULE idée par post. Pas d'accumulation, pas de liste à puces.
-- N'invente JAMAIS de chiffres précis, dates ou noms.
-  Si tu cites une victime fictive, dis-le clairement ou reste vague ("une dame", "un retraité").
+  // ── Ce que Despy a RÉELLEMENT observé. Seul matériau autorisé. ──
+  const st = ctx.statsWeek || {};
+  const lignes = [];
+  if (st.total)   lignes.push(`- ${st.total} message(s) soumis à l'analyseur Despy cette semaine, dont ${st.scams || 0} identifié(s) comme arnaque.`);
+  if (st.phones)  lignes.push(`- ${st.phones} numéro(s) signalé(s) par des membres cette semaine.`);
+  if ((ctx.themes || []).length) {
+    lignes.push(`- Thèmes d'arnaque les plus vus cette semaine : ` +
+      ctx.themes.map(t => `${t.nom} (${t.n} cas)`).join(', ') + '.');
+  }
+  if ((ctx.topDomains || []).length) {
+    lignes.push(`- Faux sites revenus plusieurs fois en 24 h : ` +
+      ctx.topDomains.map(d => `${d.dom} (${d.count}×)`).join(', ') + '.');
+  }
+  if ((ctx.locaux || []).length) {
+    const villes = {};
+    ctx.locaux.forEach(l => { const k = l.ville || 'commune non précisée'; villes[k] = (villes[k] || 0) + 1; });
+    lignes.push(`- Signalements locaux publiés : ` +
+      Object.entries(villes).map(([v, n]) => `${v} (${n})`).join(', ') + '.');
+  }
+  if ((ctx.nationalAlerts || []).length) {
+    lignes.push(`- Alertes nationales en cours : ` +
+      ctx.nationalAlerts.slice(0, 3).map(a => `« ${a.title} »`).join(' ; ') + '.');
+  }
+  const donnees = lignes.length
+    ? lignes.join('\n')
+    : '(aucune donnée exploitable cette semaine)';
 
-TON ET STYLE :
-- Direct, humain, parfois un peu rugueux.
-- Évite TOUTES les formulations "marketing" type :
-  ✗ "Despy vous protège" (creux)
-  ✗ "Activez votre cybersécurité dès maintenant" (slogan publicitaire)
-  ✗ "Ne soyez pas la prochaine victime" (alarmiste/cliché)
-  ✗ "Despy est votre allié français contre les arnaques" (corporate)
-- À la place, privilégie :
-  ✓ Des phrases qui surprennent ("Hier, une dame de 78 ans m'a appelé en pleurs.")
-  ✓ Des chiffres isolés qui frappent ("800 €. Voilà ce qu'une seule arnaque coûte en moyenne à un sénior.")
-  ✓ Des questions qui font réagir ("Vous décrocheriez si votre banque vous appelait à 21h ?")
-- Le post doit pouvoir être lu À HAUTE VOIX naturellement, sans buter.
+  const socle = `QUI PARLE
+Tu écris à la place de Yacine, fondateur de Despy, à Strasbourg. Il se déplace
+chez des particuliers — souvent des retraités — pour nettoyer leur téléphone,
+sécuriser leurs comptes, et les aider quand ils se sont fait avoir.
+Il écrit à la première personne. Il a des convictions et il les dit.
+Son ennemi, ce sont les escrocs — JAMAIS les victimes. Il ne se moque jamais
+de quelqu'un qui s'est fait piéger : ça peut arriver à tout le monde, et il
+le pense vraiment.
 
-MENTION DE DESPY :
-${ctaStrategy === 'none'
-  ? `- Pour ce post, NE MENTIONNE PAS Despy ni despy.fr du tout.
-  → L'objectif est de créer du contenu de valeur pur, qui s'imprime dans l'esprit.
-  → Les lecteurs reviendront naturellement vers vous pour le contenu suivant.`
-  : ctaStrategy === 'soft'
-  ? `- À la fin du post, ajoute UNE seule ligne discrète : "👉 Plus d'infos en commentaire" ou "👉 Comment se protéger : commentaires" ou similaire.
-  → Le lien despy.fr sera posté en premier commentaire (logique Facebook).
-  → Ne mets PAS le lien dans le corps du post (l'algorithme pénalise).`
-  : `- À la fin du post, ajoute UN SEUL CTA simple et humain :
-  Choisis UNE formulation parmi :
-   - "Si vous voulez en parler, c'est sur despy.fr."
-   - "Pour ceux qui veulent comprendre comment, despy.fr."
-   - "On en parle ? despy.fr."
-   - "Plus d'infos sur despy.fr — sans engagement."
-  ÉVITE les CTA agressifs ("Vérifiez maintenant", "Activez", "Ne tardez pas").`
-}
+HONNÊTETÉ — RÈGLE ABSOLUE, AUCUNE EXCEPTION
+- N'invente JAMAIS : ni témoignage, ni prénom, ni âge, ni lieu, ni date,
+  ni montant, ni pourcentage, ni source.
+- Tu ne peux citer que ce qui figure dans DONNÉES RÉELLES ci-dessous.
+- Interdit d'écrire « hier, une dame de 78 ans m'a appelé » : cet appel
+  n'a pas eu lieu. Décris le SCHÉMA qui revient (c'est vrai) plutôt qu'une
+  personne inventée (c'est faux) :
+    OUI  « Le scénario qui revient le plus en ce moment, c'est celui-là. »
+    NON  « Hier, une dame de 78 ans m'a appelé en pleurs. »
+- Aucun chiffre qui ne vienne pas des DONNÉES RÉELLES. Jamais de
+  « selon l'ANSSI » ou « selon Cybermalveillance » : tu n'as pas ces études.
+- Une marque anti-arnaque qui invente des témoignages se détruit. C'est
+  la règle la plus importante de toutes.
 
-ANTI-PIÈGES IMPORTANTS :
-- N'utilise JAMAIS de mise en page bullet/liste (Facebook tronque).
-- N'utilise JAMAIS "selon une étude" sans source réelle.
-- Ne dis JAMAIS "merci d'avoir lu" ou "n'hésitez pas à partager".
+CE QUI FAIT QU'UN POST EST LU JUSQU'AU BOUT
+Un post qui marche ouvre une boucle et la referme par une bascule.
+On croit savoir → surprise → la raison, en une ligne.
+Mécanique à imiter (surtout PAS à recopier) :
+   Elle a raccroché.
+   Elle a rappelé sa banque.
+   Elle a fait exactement ce qu'il fallait faire.
+   Elle a quand même tout perdu.
+   Parce que le numéro qu'elle a rappelé, c'était celui qu'il lui avait donné.
+Ce n'est pas le style qui compte, c'est la STRUCTURE : tension, puis bascule.
+Un post qui dit tout dans la première phrase ne sera pas lu.
 
-Renvoie UNIQUEMENT le texte du post Facebook, prêt à publier. Pas de balises markdown. Pas d'introduction. Pas de signature.`;
+FORME
+- Phrases courtes. Beaucoup de retours à la ligne : ça se lit sur un téléphone.
+- 50 à 110 mots.
+- Pas de markdown, pas de gras, pas de liste à puces. 1 emoji maximum, zéro de préférence.
+- Vouvoiement.
+- Pas de morale finale. Jamais « soyez vigilants », jamais « restez prudents ».
+- Pas de formule marketing : « Despy vous protège », « votre allié », « dès maintenant » sont interdits.
 
-  let topic = '';
-  let dataBlock = '';
+MENTION DE DESPY
+${cta === 'none'
+  ? `- Ne mentionne ni Despy ni despy.fr. Ce post vaut pour lui-même.`
+  : cta === 'soft'
+  ? `- Termine par une ligne discrète : « 👉 J'explique comment en commentaire. »
+  (le lien sera mis en premier commentaire — pas de lien dans le post)`
+  : `- Termine par une seule phrase simple, au choix :
+   « Si vous voulez en parler, c'est sur despy.fr. »
+   « J'explique tout ça sur despy.fr. »
+  Jamais d'injonction du type « vérifiez maintenant » ou « activez ».`}
 
+DONNÉES RÉELLES (semaine du ${dateFr}) — ton seul matériau chiffré :
+${donnees}`;
+
+  let format;
   switch (postType) {
 
     case 'scene-vecue':
-      topic = `FORMAT : Scène vécue / mini-histoire (storytelling humain).
-Mission : raconter une scène CONCRÈTE, en 2-3 phrases, qui se passe dans la vraie vie.
-Le but : faire dire au lecteur "C'EST EXACTEMENT CE QUI M'EST ARRIVÉ" ou "Ma mère/voisine vient de me raconter ça".
-
-Modèles d'accroche (choisis-en un et adapte) :
-- "Hier, une dame de [âge] m'a appelé en pleurs."
-- "Ce matin, j'ai eu Mme [prénom fictif] au téléphone."
-- "Un voisin de mon père m'a raconté ça la semaine dernière."
-- "J'ai eu [X] appels comme celui-là cette semaine."
-
-Puis, en 2 phrases : ce qui s'est passé + ce qui a fait basculer la situation (un détail qui aurait dû alerter, ou un réflexe qui a sauvé).
-
-Pas de morale. Pas de leçon. Pas de "Despy aurait évité ça". Juste la scène.`;
-      dataBlock = `Type d'arnaque possible (varie chaque semaine) : faux conseiller bancaire, faux SMS Chronopost/La Poste, arnaque "votre fils est en garde à vue", faux remboursement Ameli, faux site marchand.`;
+      format = `FORMAT : le détail qui change tout.
+Choisis UN schéma d'arnaque présent dans les DONNÉES RÉELLES (ou, si elles
+sont vides, un schéma que tout le monde connaît : faux SMS de colis, faux
+conseiller bancaire).
+Montre une personne qui fait les BONS gestes… et qui se fait avoir quand même.
+Puis révèle en une seule ligne le détail qui a tout fait basculer.
+Ne donne ni prénom ni âge inventé : dis « une personne », « un retraité »,
+ou parle directement au « vous ».
+Le lecteur doit se dire « j'aurais fait pareil ». C'est le but.`;
       break;
 
     case 'chiffre-choc':
-      topic = `FORMAT : Chiffre choc isolé (data-driven).
-Mission : poser UN seul chiffre frappant en haut du post, isolé sur sa propre ligne, puis 2 phrases d'explication maximum.
-
-Structure exacte demandée :
-[CHIFFRE et unité, en gros]
-
-[Phrase 1 : ce que ce chiffre signifie concrètement]
-[Phrase 2 : pourquoi ça concerne le lecteur]
-
-Exemples de chiffres possibles (utilise des sources crédibles, ANSSI / Cybermalveillance / études publiques) :
-- "850 €" (montant moyen perdu par arnaque téléphonique en France, source Cybermalveillance)
-- "1 senior sur 3" (proportion ayant été ciblée par une arnaque dans l'année)
-- "12 minutes" (temps moyen pour vider un compte une fois le code SMS communiqué)
-- "73 %" (taux de re-ciblage d'une victime dans les 6 mois suivants)
-
-Le chiffre est l'accroche. Le reste est minimal.`;
-      dataBlock = `Date du jour : ${dateFr}. Choisis un chiffre crédible. Si tu n'es pas sûr d'une source, reste vague ("plusieurs centaines d'euros en moyenne") plutôt que d'inventer.`;
+      format = `FORMAT : ce qu'on a vraiment vu cette semaine.
+Utilise UNIQUEMENT un chiffre présent dans les DONNÉES RÉELLES.
+Structure :
+   [le chiffre, seul sur sa ligne]
+   [ce que ça veut dire concrètement]
+   [le signe précis à repérer, en une phrase]
+Si les DONNÉES RÉELLES ne contiennent aucun chiffre exploitable, n'invente
+rien : écris à la place un post « le détail qui change tout » (voir l'autre
+format) sans aucun chiffre.`;
       break;
 
     case 'question-directe':
-      topic = `FORMAT : Question directe pour engagement commentaires.
-Mission : poser une question simple qui invite le lecteur à RÉPONDRE en commentaire avec son vécu personnel.
-
-La question doit être :
-- Concrète (pas abstraite, pas philosophique)
-- Universelle (95 % des seniors ont vécu ça)
-- Sans piège ni jugement
-
-Exemples de bonnes questions :
-- "Combien de fois cette semaine avez-vous reçu un SMS qui dit 'votre colis est en attente, cliquez ici' ?"
-- "Vous avez déjà raccroché au nez d'un conseiller bancaire qui demandait un code SMS ? Racontez."
-- "Quel est le pire SMS d'arnaque que vous ayez reçu récemment ?"
-- "À votre avis : que faut-il dire à un proche qui vient d'être arnaqué ?"
-
-Format du post :
-[Une phrase de mise en contexte ultra-courte]
-[LA question, claire et directe]
-[Invitation à commenter, très courte]
-
-Pas de CTA Despy dans ce type de post (l'engagement organique se fait dans les commentaires).`;
-      dataBlock = `Date : ${dateFr}. Choisis une question d'actualité (arnaques saisonnières si pertinent).`;
+      format = `FORMAT : la question qui fait répondre.
+Ouvre par une micro-situation très concrète (2 lignes maximum), tirée des
+DONNÉES RÉELLES si possible.
+Puis UNE seule question, courte, à laquelle presque tout le monde a une
+réponse vécue.
+Termine par une invitation à répondre en commentaire, en quelques mots,
+sans supplier ni mendier l'engagement.
+Pas de mention de Despy dans ce format.`;
       break;
 
     default:
-      topic = `Post court de cybersécurité, format libre. 40-80 mots maximum, ton humain.`;
-      dataBlock = '';
+      format = `Post court, structure à bascule, 50-110 mots.`;
   }
 
-  return `${baseRules}
+  return `${socle}
 
-CONTEXTE :
-- Date du jour : ${dateFr}
-- Type de post demandé : ${postType}
-- Stratégie CTA pour CE post : ${ctaStrategy}
+FORMAT DEMANDÉ :
+${format}
 
-THÈME :
-${topic}
-
-${dataBlock}
-
-Rédige maintenant LE post Facebook (texte brut, 40-80 mots).`;
+Rédige maintenant LE post Facebook. Texte brut uniquement, rien d'autre.`;
 }
 
 // ── Génération via Claude ────────────────────
@@ -409,12 +437,20 @@ async function publishToFacebook(message, pageToken) {
 // ── Handler principal ────────────────────────
 
 exports.handler = async (event) => {
-  // Publication automatique Facebook : uniquement sur déclenchement planifié.
   const { isScheduled, notScheduled } = require('./_is-scheduled');
-  if (!isScheduled(event)) return notScheduled();
 
-  const isManual = event && event.httpMethod === 'POST';
-  const isPreview = isManual && (event.queryStringParameters || {}).preview === '1';
+  const isManual  = event && event.httpMethod === 'POST';
+  const veutVoir  = isManual && (event.queryStringParameters || {}).preview === '1';
+  const secretOk  = process.env.INTERNAL_SECRET &&
+    (event.headers || {})['x-internal-secret'] === process.env.INTERNAL_SECRET;
+
+  // L'APERÇU ne publie rien : il génère le texte et le range en base pour
+  // relecture. On l'autorise avec la clé interne, afin de pouvoir juger la
+  // qualité d'un post AVANT qu'il ne parte sur la page.
+  const isPreview = veutVoir && secretOk;
+
+  // La PUBLICATION reste réservée au planificateur (ou à la clé interne).
+  if (!isPreview && !isScheduled(event) && !secretOk) return notScheduled();
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
