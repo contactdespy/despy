@@ -3,7 +3,10 @@
 // fonctionne), repli sur le cache si pas de réseau ; « cache d'abord » pour
 // les visuels ; les fonctions Netlify ne sont JAMAIS mises en cache.
 
-var CACHE = 'despy-v1';
+// v2 : le cache v1 a pu être pollué — toute navigation y était rangée sous
+// APP_URL, si bien qu'une visite du site écrasait l'appli. Changer de nom
+// force la purge de l'ancien cache à l'activation (voir 'activate').
+var CACHE = 'despy-v2';
 var APP_URL = '/despy_app_v23.html';
 var CORE = [
   APP_URL,
@@ -44,17 +47,29 @@ self.addEventListener('fetch', function (event) {
   if (url.origin !== self.location.origin) return;        // autres domaines : on laisse passer
   if (url.pathname.indexOf('/.netlify/') === 0) return;   // fonctions : jamais de cache
 
-  // L'appli (document) : réseau d'abord, repli cache. Couvre /app, la page
-  // et l'appel de mise à jour (fetch no-store) → le réseau gagne quand il y en a.
-  var isDoc = req.mode === 'navigate' || url.pathname === APP_URL || url.pathname === '/app';
-  if (isDoc) {
+  // Documents : réseau d'abord, repli cache.
+  var estAppli   = url.pathname === APP_URL || url.pathname === '/app';
+  var navigation = req.mode === 'navigate';
+
+  if (estAppli || navigation) {
     event.respondWith(
       fetch(req).then(function (resp) {
-        var copy = resp.clone();
-        caches.open(CACHE).then(function (c) { c.put(APP_URL, copy); });
+        // On ne met à jour le cache de l'appli QUE pour l'appli elle-même.
+        // Avant, TOUTE navigation était rangée sous APP_URL : une simple
+        // visite du site (lien « Mentions légales », par exemple) écrasait
+        // l'appli en cache, et hors ligne l'utilisateur se retrouvait devant
+        // la page d'accueil du site au lieu de son application.
+        if (estAppli && resp && resp.ok) {
+          var copy = resp.clone();
+          caches.open(CACHE).then(function (c) { c.put(APP_URL, copy); });
+        }
         return resp;
       }).catch(function () {
-        return caches.match(APP_URL);                     // hors-ligne : appli en cache
+        // Hors ligne : on ne sert l'appli que si c'est bien elle qu'on
+        // demandait. Pour une autre page, renvoyer l'appli donnerait
+        // l'impression que le lien « ne fait rien ».
+        if (estAppli) return caches.match(APP_URL);
+        return caches.match(req);
       })
     );
     return;
