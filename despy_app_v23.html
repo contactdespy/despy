@@ -1234,7 +1234,14 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       </div>
 
       <button class="logout" onclick="appLogout()">Se déconnecter</button>
-      <div class="legal">Despy · SIRET 103 694 212 00012<br>33 rue de la Klebsau, 67100 Strasbourg</div>
+      <!-- L'adresse n'est plus affichée ici : la loi demande qu'elle soit
+           ACCESSIBLE, pas imprimée sur l'écran de chaque client. Elle reste
+           dans les mentions légales, atteignables en un tap. -->
+      <div class="legal">Despy · Entreprise individuelle française · SIRET 103 694 212 00012<br>
+        <a href="https://despy.fr/?legal=mentions" target="_blank" rel="noopener">Mentions légales</a> ·
+        <a href="https://despy.fr/?legal=cgv" target="_blank" rel="noopener">CGV</a> ·
+        <a href="https://despy.fr/?legal=confidentialite" target="_blank" rel="noopener">Confidentialité</a>
+      </div>
 
     </div>
   </div>
@@ -5407,7 +5414,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-11';
+var APP_BUILD = '2026-07-27-12';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

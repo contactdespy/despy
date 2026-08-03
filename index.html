@@ -16,6 +16,11 @@
     if (p === '/' || p === '/index.html') window.location.replace('/app');
   } catch (e) {}
 })();
+/* On mémorise la requête AVANT tout autre script : le routeur interne
+   réécrit l'URL en « pathname + hash » pendant l'analyse de la page, ce qui
+   efface les paramètres. Sans cette capture, ?signup=1 et ?legal=… sont
+   perdus avant même d'avoir été lus. */
+window._despyQS = window.location.search || '';
 </script>
 <title>Despy — Cybersécurité pour particuliers</title>
 <meta name="description" content="Despy protège votre vie numérique : audit, détection d'arnaques, conseiller expert. Simple, sans jargon. 9,99€/mois. France métropolitaine.">
@@ -1737,7 +1742,7 @@ body.despy-abonne #outils-upsell{display:none!important}
               En ligne · Répond en quelques secondes
             </div>
           </div>
-          <div id="chat-quota-display" style="margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg2);border-radius:20px;padding:4px 10px;border:1px solid var(--border)">3 questions gratuites</div>
+          <div id="chat-quota-display" style="margin-left:auto;font-size:11px;color:var(--text3);background:var(--bg2);border-radius:20px;padding:4px 10px;border:1px solid var(--border)">5 questions par mois</div>
         </div>
 
         <!-- Messages -->
@@ -1748,7 +1753,7 @@ body.despy-abonne #outils-upsell{display:none!important}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div style="background:var(--bg2);border-radius:0 12px 12px 12px;padding:12px 16px;font-size:14px;color:var(--text2);line-height:1.6;max-width:85%">
-              Bonjour ! Je suis votre Conseiller Despy. Pour commencer, créez votre compte gratuit — c’est rapide et sans carte bancaire. Vous aurez ensuite 3 questions offertes !
+              Bonjour ! Je suis votre Conseiller Despy. Pour commencer, créez votre compte gratuit — c’est rapide et sans carte bancaire. Vous aurez ensuite 5 questions offertes chaque mois !
             </div>
           </div>
         </div>
@@ -1761,7 +1766,7 @@ body.despy-abonne #outils-upsell{display:none!important}
           </button>
         </div>
       </div>
-      <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">3 questions gratuites · Accès illimité avec abonnement<br>Réponses générées par IA (Claude, Anthropic) · <span onclick="showLegal('confidentialite')" style="cursor:pointer;color:var(--blue);text-decoration:underline">Politique de confidentialité</span></p>
+      <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">5 questions par mois · Accès illimité avec l’abonnement<br>Réponses générées par IA (Claude, Anthropic) · <span onclick="showLegal('confidentialite')" style="cursor:pointer;color:var(--blue);text-decoration:underline">Politique de confidentialité</span></p>
     </div>
   </div>
 </section>
@@ -2890,7 +2895,7 @@ function triggerPWAInstall() {
 
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:2.5rem;font-size:13px;color:var(--text2);line-height:1.8">
     <strong style="color:var(--text)">Despy — Entreprise individuelle française</strong><br>
-    SIRET 103 694 212 00012 · 33 rue de la Klebsau, 67100 Strasbourg<br>
+    SIRET 103 694 212 00012 · Strasbourg<br>
     <a href="mailto:contact.despy@gmail.com" style="color:var(--blue)">contact.despy@gmail.com</a>
   </div>
 
@@ -3120,7 +3125,7 @@ function triggerPWAInstall() {
       </div>
       <div style="display:flex;gap:10px;padding:14px;background:#f5f3ff;border-left:4px solid #7c3aed;border-radius:8px;font-size:14px;color:#5b21b6;line-height:1.6">
         <span style="font-size:20px;flex-shrink:0">💡</span>
-        <div>Le Conseiller est <strong>illimité avec l'abonnement</strong>. Sans abonnement, vous avez 3 questions gratuites pour tester.</div>
+        <div>Le Conseiller est <strong>illimité avec l'abonnement</strong>. Sans abonnement, vous avez 5 questions par mois pour tester.</div>
       </div>
     </div>
 
@@ -5068,7 +5073,7 @@ async function subscribeFraudAlerts() {
         <div id="compte-sub-content">
           <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:14px;margin-bottom:12px">
             <div style="font-size:13px;font-weight:800;color:#92400e">Compte gratuit</div>
-            <div style="font-size:12px;color:#92400e;margin-top:4px;opacity:.8">3 questions IA · Fonctionnalités limitées</div>
+            <div style="font-size:12px;color:#92400e;margin-top:4px;opacity:.8">5 questions IA par mois · Fonctionnalités limitées</div>
           </div>
           <button onclick="showPage('tarifs')" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">
             Passer à l'abonnement →
@@ -5219,7 +5224,7 @@ async function subscribeFraudAlerts() {
         <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:5px 11px">🔒 Paiement Stripe</span>
         <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:5px 11px">✓ RGPD</span>
       </div>
-      <p style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7">SIRET 103 694 212 00012<br>33 rue de la Klebsau, 67100 Strasbourg</p>
+      <p style="margin-top:14px;font-size:12px;color:rgba(255,255,255,.5);line-height:1.7">SIRET 103 694 212 00012<br>Strasbourg, France</p>
     </div>
     <div>
       <div class="footer-title">Navigation</div>
@@ -5347,10 +5352,19 @@ document.addEventListener('DOMContentLoaded', function(){
   try { updateNavForSession(); } catch(e){}
   // Ouverture directe de l'inscription depuis une page SEO externe (?signup=1)
   try {
-    var _sp = new URLSearchParams(window.location.search);
+    // On lit la requête MÉMORISÉE en tête de page (voir window._despyQS) :
+    // à ce stade, le routeur l'a déjà effacée de l'URL.
+    var _sp = new URLSearchParams(window._despyQS || window.location.search);
     if (_sp.get('signup') === '1') {
       window.history.replaceState({}, '', window.location.pathname);
       setTimeout(function(){ try { showFreeSignup(); } catch(e){} }, 400);
+    }
+    // Accès direct aux pages légales (?legal=mentions) — permet à l'appli d'y
+    // renvoyer sans avoir à recopier l'adresse sur chacun de ses écrans.
+    var _lg = _sp.get('legal');
+    if (_lg && ['mentions', 'cgv', 'confidentialite', 'resiliation'].indexOf(_lg) !== -1) {
+      window.history.replaceState({}, '', window.location.pathname);
+      setTimeout(function(){ try { showLegal(_lg); } catch(e){} }, 400);
     }
   } catch(e){}
 });
@@ -6743,7 +6757,7 @@ async function sendChat() {
 
   // Quota gratuit : c'est désormais le serveur qui arbitre (il renvoie
   // limit_reached), et non plus le front. Une urgence — carte volée, virement
-  // parti — reçoit ainsi sa réponse même si les 3 questions sont épuisées.
+  // parti — reçoit ainsi sa réponse même si le quota du mois est épuisé.
 
   // Afficher message utilisateur
   var vieillesChips = document.getElementById('chat-chips');
@@ -6789,7 +6803,8 @@ async function sendChat() {
     if (data.playbook) _chatFreeCount = Math.max(0, _chatFreeCount - 1);
 
     // Mettre à jour le compteur affiché
-    if (session && !session.subscribed) updateChatQuotaDisplay(Math.max(0, 3 - _chatFreeCount));
+    // Le décompte exact vit côté serveur (quota mensuel) : on rappelle la règle.
+    if (session && !session.subscribed) updateChatQuotaDisplay(null);
 
     // Après 2 questions, suggérer l'abonnement
     if (_chatFreeCount === 2) {
@@ -9208,7 +9223,7 @@ function showFreeSignup(prefillEmail) {
 
   var sub = document.createElement('div');
   sub.className = 'sub-modal-sub';
-  sub.innerHTML = 'Gratuit · <strong>3 questions IA</strong> incluses · Sans carte bancaire';
+  sub.innerHTML = 'Gratuit · <strong>5 questions IA par mois</strong> · Sans carte bancaire';
 
   // Champs
   function makeField(labelText, id, type, placeholder, required) {
@@ -10696,6 +10711,14 @@ document.addEventListener('DOMContentLoaded', function(){
 function updateChatQuotaDisplay(remaining) {
   var el = document.getElementById('chat-quota-display');
   if (!el) return;
+  // null = on ne connaît pas le reste : on rappelle simplement la règle.
+  if (remaining === null || remaining === undefined) {
+    el.textContent = '5 questions par mois';
+    el.style.color = '';
+    el.style.background = '';
+    el.style.borderColor = '';
+    return;
+  }
   if (remaining <= 0) {
     el.textContent = 'Quota épuisé';
     el.style.background = '#fef2f2';
@@ -10718,8 +10741,10 @@ function updateChatQuotaDisplay(remaining) {
       body: JSON.stringify({ email: s.email })
     }).then(function(r){ return r.json(); }).then(function(d){
       if (d.exists) {
-        var used = d.questions_used || 0;
-        updateChatQuotaDisplay(Math.max(0, 3 - used));
+        // `questions_used` est le CUMUL à vie, pas le quota du mois : on ne
+        // peut pas en déduire un reste. On affiche la règle, et le serveur
+        // signale lui-même l'épuisement (limit_reached).
+        updateChatQuotaDisplay(null);
       }
     }).catch(function(){});
   } else if (s && s.subscribed) {
