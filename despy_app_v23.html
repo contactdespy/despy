@@ -914,6 +914,18 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .sec-merci b{ display:block; margin-bottom:3px; }
 #secteur textarea.auth-input{ resize:vertical; font-family:inherit; }
 
+
+/* ── textes légaux affichés dans l'appli ── */
+.legal-lien{ background:none; border:0; padding:0; font-family:inherit; font-size:inherit;
+  color:var(--p-blue,#2D5BFF); font-weight:700; text-decoration:underline; cursor:pointer; }
+.legal-txt{ font-size:15px; line-height:1.65; color:var(--p-ink,#1c2536); }
+.legal-txt h4{ font-size:15.5px; font-weight:850; color:var(--p-ink,#0f1830); margin:16px 0 6px; }
+.legal-txt h4:first-child{ margin-top:0; }
+.legal-txt p{ margin:0 0 10px; }
+.legal-txt a{ color:var(--p-blue,#2D5BFF); font-weight:700; }
+.legal-txt ul{ margin:0 0 10px; padding-left:20px; }
+.legal-txt li{ margin-bottom:5px; }
+
 </style>
 </head>
 <body>
@@ -1238,9 +1250,10 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
            ACCESSIBLE, pas imprimée sur l'écran de chaque client. Elle reste
            dans les mentions légales, atteignables en un tap. -->
       <div class="legal">Despy · Entreprise individuelle française · SIRET 103 694 212 00012<br>
-        <a href="https://despy.fr/?legal=mentions" target="_blank" rel="noopener">Mentions légales</a> ·
-        <a href="https://despy.fr/?legal=cgv" target="_blank" rel="noopener">CGV</a> ·
-        <a href="https://despy.fr/?legal=confidentialite" target="_blank" rel="noopener">Confidentialité</a>
+        <button class="legal-lien" onclick="ouvrirLegal('mentions')">Mentions légales</button> ·
+        <button class="legal-lien" onclick="ouvrirLegal('cgv')">CGV</button> ·
+        <button class="legal-lien" onclick="ouvrirLegal('confidentialite')">Confidentialité</button> ·
+        <button class="legal-lien" onclick="ouvrirLegal('resiliation')">Résiliation</button>
       </div>
 
     </div>
@@ -1906,6 +1919,39 @@ function switchAppTab(tab) {
 // → « Bilan mensuel »), le nettoyage différé (300 ms) écrasait le contenu
 // fraîchement ouvert par un spinner qui tournait ensuite dans le vide.
 var _sheetResetTimer = null;
+
+// ─── TEXTES LÉGAUX, EMBARQUÉS DANS L'APPLI ───
+// Ils étaient auparavant ouverts sur despy.fr : le client sortait de son
+// application, et l'ouverture dépendait de trois mécanismes fragiles
+// (redirection de l'appli installée, service worker, paramètres d'URL).
+// Embarqués ici, ils s'affichent toujours — même sans connexion.
+// ⚠ Copie verbatim du bloc LEGAL de index.html : toute modification
+//   juridique doit être reportée AUX DEUX ENDROITS.
+var LEGAL_APP = {
+  mentions: {
+    title: 'Mentions légales',
+    html: '<h4>Éditeur</h4><p>Yacine Bourefis, Entrepreneur Individuel · SIRET 103 694 212 00012 · APE 6202A<br>33 rue de la Klebsau, 67100 Strasbourg<br>contact.despy@gmail.com</p><h4>Hébergement</h4><p>Netlify Inc. · 512 2nd Street, San Francisco, CA 94107 · netlify.com<br>Données hébergées en Europe (Supabase · Paris 🇫🇷)</p><h4>Propriété intellectuelle</h4><p>L&#39;ensemble du site despy.fr est protégé par le droit d&#39;auteur. Toute reproduction sans autorisation est interdite.</p>'
+  },
+  cgv: {
+    title: 'Conditions Générales de Vente',
+    html: '<p><em>En vigueur au 14/04/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Intervention à distance : 49€ (téléphone ou visio)<br>• Intervention à domicile : 89€ (Strasbourg ±15km)<br>• Forfait complet : 129€ (tous appareils + rapport)</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Service SOS Humain &mdash; Nature et limites</h4><p>Le service SOS Humain consiste en un accompagnement par téléphone et par écrit, à des fins de conseil, de coordination et de rédaction de courriers. Despy n&#39;est ni une banque, ni un avocat, ni une autorité judiciaire ou de police. Despy ne se substitue à aucun de ces acteurs et ne garantit pas la récupération de sommes débitées ou la résolution juridique d&#39;un litige. L&#39;utilisateur reste seul responsable de ses comptes, mots de passe et démarches officielles. Despy peut rédiger des courriers à des fins d&#39;accompagnement, mais l&#39;utilisateur en reste signataire et responsable. <strong>Délais de rappel garantis :</strong> 15 minutes pour les cas critiques, 30 minutes en soirée et week-end, 4 heures en journée semaine, lendemain matin pour les demandes de nuit. <strong>Inclusion abonnement 9,99€/mois :</strong> conseil humain illimité (téléphone, rédaction de courriers, accompagnement banque/police). <strong>Non-inclus :</strong> les interventions techniques sur appareil (désinstallation, sécurisation, reset) qui restent facturées à l&#39;acte au tarif public (49€ distance, 89€ domicile, 129€ forfait complet), pour abonnés comme non-abonnés.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
+  },
+  confidentialite: {
+    title: "Politique de confidentialité",
+    html: "<p><em>Conforme RGPD · Version 1.0 · Avril 2026</em></p><h4>Responsable du traitement</h4><p>Bourefis Yacine · SIRET 103 694 212 00012 · contact.despy@gmail.com</p><h4>Données collectées</h4><p>Email, prénom, diagnostics de sécurité, progression. Base légale : contrat (art. 6.1.b RGPD).</p><h4>Sous-traitants</h4><p>• Stripe · Paiements · PCI-DSS<br>• Supabase · Base de données · Europe (Paris) 🇫🇷<br>• Anthropic · Conseiller IA (Claude) · USA · CCT · <em>vos messages de chat sont traités aux USA</em><br>• Have I Been Pwned (HIBP) · Vérification fuites email · USA · CCT · données non conservées<br>• Meta Platforms (Facebook) · Mesure de nos campagnes publicitaires · USA · CCT · <em>uniquement si vous acceptez les cookies</em></p><h4>Durée de conservation</h4><p>Données actives : durée abonnement + 3 ans. Suppression sur demande sous 30 jours.</p><h4>Vos droits</h4><p>Accès, rectification, suppression, portabilité : contact.despy@gmail.com<br>Réclamation : cnil.fr</p><h4>Cookies</h4><p>Cookies essentiels au fonctionnement du site, déposés sans consentement. Un cookie de mesure publicitaire (Pixel Meta) est déposé <strong>uniquement après votre acceptation</strong> via la bannière cookies, pour mesurer l'efficacité de nos campagnes. Vous pouvez le refuser à tout moment ; aucune donnée n'est alors transmise à Meta.</p>"
+  },
+  resiliation: {
+    title: "Résilier votre abonnement",
+    html: '<p><strong>Gratuit, immédiat, sans justification.</strong> Effet en fin de période déjà payée — vous gardez l’accès jusque-là.</p><div style="background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin:14px 0"><p><strong>2 façons de résilier :</strong><br>1. Bouton ci-dessous → portail sécurisé Stripe, résiliation en 1 clic<br>2. Email : <a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="color:var(--blue)">contact.despy@gmail.com</a> — on s’en occupe pour vous</p></div><p><strong>Garantie satisfait ou remboursé</strong><br>30 jours, sans condition. Contactez-nous par email.</p><div style="margin-top:16px;display:flex;flex-direction:column;gap:10px"><button onclick="openBillingPortal()" style="display:inline-block;padding:12px 22px;background:var(--blue);border:none;border-radius:10px;color:#fff;font-weight:700;font-family:inherit;font-size:15px;cursor:pointer">Gérer / résilier mon abonnement →</button><a href="mailto:contact.despy@gmail.com?subject=Résiliation Despy" style="display:inline-block;padding:12px 22px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:10px;color:var(--blue);font-weight:700;text-decoration:none;text-align:center">Demander par email →</a></div>'
+  }
+};
+
+function ouvrirLegal(type) {
+  var d = LEGAL_APP[type];
+  if (!d) return;
+  openSheet(d.title, '<div class="legal-txt">' + d.html + '</div>');
+}
+
 
 function openSheet(title, html) {
   if (_sheetResetTimer) { clearTimeout(_sheetResetTimer); _sheetResetTimer = null; }
@@ -5414,7 +5460,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-12';
+var APP_BUILD = '2026-07-27-13';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
