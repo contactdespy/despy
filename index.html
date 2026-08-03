@@ -12,6 +12,11 @@
     var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
                   || window.navigator.standalone === true;
     if (!standalone) return;
+    // Une requête dans l'URL (?legal=…, ?signup=1…) veut dire qu'on nous envoie
+    // à un endroit PRÉCIS : on ne détourne pas. Sans cette réserve, un lien
+    // « Mentions légales » ouvert depuis l'appli installée était renvoyé
+    // aussitôt vers /app — le bouton semblait ne rien faire.
+    if (window.location.search) return;
     var p = window.location.pathname;
     if (p === '/' || p === '/index.html') window.location.replace('/app');
   } catch (e) {}
