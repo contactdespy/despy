@@ -6,6 +6,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 const { issueToken, rateLimit } = require('./_auth');
+const { couvertureFamille } = require('./_famille');
 
 // Vérifie le mot de passe — compatible scrypt (nouveau) et SHA-256 (legacy)
 function verifyPassword(password, stored) {
@@ -69,6 +70,11 @@ exports.handler = async (event) => {
           body: JSON.stringify({ exists: false, error: 'Email ou mot de passe incorrect' })
         };
       }
+      // Un proche rattaché à une formule Famille n'a pas d'abonnement à son
+      // nom : sa protection vient de celle du payeur. On l'accorde ici.
+      const famC = client.subscribed ? { couvert: false }
+                                     : await couvertureFamille(supabase, client.email);
+
       // Mot de passe valide → on renvoie les données personnelles
       return {
         statusCode: 200,
@@ -81,8 +87,9 @@ exports.handler = async (event) => {
           prenom: client.prenom,
           nom: client.nom,
           telephone: client.telephone,
-          plan: client.plan || 'free',
-          subscribed: client.subscribed || false,
+          plan: famC.couvert ? 'family_member' : (client.plan || 'free'),
+          subscribed: client.subscribed || famC.couvert,
+          famille_de: famC.couvert ? famC.owner : null,
           created_at: client.created_at,
           questions_used: client.questions_used || 0
         })
@@ -94,13 +101,15 @@ exports.handler = async (event) => {
     if (!client) {
       return { statusCode: 200, headers, body: JSON.stringify({ exists: false }) };
     }
+    const fam = client.subscribed ? { couvert: false }
+                                  : await couvertureFamille(supabase, client.email);
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         exists: true,
-        plan: client.plan || 'free',
-        subscribed: client.subscribed || false,
+        plan: fam.couvert ? 'family_member' : (client.plan || 'free'),
+        subscribed: client.subscribed || fam.couvert,
         questions_used: client.questions_used || 0
       })
     };

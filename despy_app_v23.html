@@ -926,6 +926,28 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .legal-txt ul{ margin:0 0 10px; padding-left:20px; }
 .legal-txt li{ margin-bottom:5px; }
 
+
+/* ── Ma famille ── */
+.fam-hero{ border-radius:18px; padding:20px 18px; text-align:center; margin-bottom:14px; color:#fff; }
+.fam-on{ background:linear-gradient(125deg,#4c1d95,#7c3aed); box-shadow:0 10px 26px rgba(124,58,237,.26); }
+.fam-off{ background:linear-gradient(125deg,#1e2842,#39445e); box-shadow:0 10px 24px rgba(20,30,50,.22); }
+.fam-ic{ font-size:32px; display:block; margin-bottom:8px; }
+.fam-h-t{ font-size:19px; font-weight:850; line-height:1.25; }
+.fam-h-s{ font-size:14px; line-height:1.55; color:rgba(255,255,255,.85); margin-top:7px; }
+.fam-note{ background:#EEF4FF; border:1px solid #cfe0ff; color:#1e3a6b; border-radius:14px; padding:13px 15px; font-size:14px; line-height:1.55; }
+.fam-list{ display:flex; flex-direction:column; gap:9px; }
+.fam-item{ display:flex; align-items:center; gap:11px; background:var(--p-card,#fff); border:1px solid var(--p-line,#E7EBF3); border-radius:14px; padding:13px 14px; }
+.fam-p{ width:26px; height:26px; border-radius:50%; color:#fff; font-weight:900; font-size:14px; display:flex; align-items:center; justify-content:center; flex:none; }
+.fam-p.ok{ background:#15803D; } .fam-p.att{ background:#B4892E; }
+.fam-m{ flex:1; min-width:0; }
+.fam-t{ display:block; font-size:14.5px; font-weight:800; color:var(--p-ink); line-height:1.3; word-break:break-word; }
+.fam-s{ display:block; font-size:12.5px; color:var(--p-muted); margin-top:2px; }
+.fam-mini{ background:none; border:0; font-family:inherit; font-size:12.5px; font-weight:800; color:var(--p-blue); cursor:pointer; flex:none; padding:4px; }
+.fam-rm{ color:#B4892E; }
+.fam-share{ width:100%; margin-top:-4px; background:#F3E8FF; color:#6B21A8; border:1px solid #e2d0f7; border-radius:12px; padding:11px; font-family:inherit; font-weight:800; font-size:13.5px; cursor:pointer; }
+.fam-plein{ margin-top:16px; text-align:center; font-size:13.5px; color:var(--p-muted); line-height:1.5; }
+.fam-sep{ text-align:center; font-size:13px; color:var(--p-muted); margin:18px 0 14px; }
+
 </style>
 </head>
 <body>
@@ -1185,6 +1207,11 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           <span class="m"><span class="a">Gérer mon abonnement</span><span class="b" id="sub-status-desc">Voir les forfaits</span></span>
           <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
+        <button class="listrow" onclick="openFamille()">
+          <span class="ic ic-violet" style="background:#F3E8FF;color:#6B21A8"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg></span>
+          <span class="m"><span class="a">Ma famille</span><span class="b">Protéger deux proches avec mon abonnement</span></span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
         <button class="listrow" onclick="openTool('parrainage')">
           <span class="ic ic-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18"/><path d="M12 8S9 2 7 4s5 4 5 4 3-6 5-4-5 4-5 4z"/></svg></span>
           <span class="m"><span class="a">Code parrainage</span><span class="b">1 mois offert par filleul</span></span>
@@ -1302,6 +1329,18 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
 </div>
 
+
+
+<!-- ═══ MA FAMILLE ═══ -->
+<div id="famille" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeFamille()" aria-label="Retour"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Abonnement Famille</div><div class="mod-htitle">Ma famille</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="fam-body"></div></div>
+</div>
 
 <!-- ═══ PRÈS DE CHEZ MOI (Alerte Secteur) ═══ -->
 <div id="secteur" class="fmscreen">
@@ -1424,7 +1463,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <div class="pw-plan" id="pw-famille" onclick="pwSetPlan('famille')">
         <div class="pw-plan-h">
           <span class="pw-radio"></span>
-          <div><div class="pw-name">Famille</div><div class="pw-who">jusqu'à 4 personnes</div></div>
+          <div><div class="pw-name">Famille</div><div class="pw-who">vous et vos deux parents</div></div>
           <div class="pw-price"><span class="p" data-pw-price="famille">139 €</span><span class="per" data-pw-per="famille">/an</span></div>
         </div>
         <div class="pw-foot" data-pw-foot="famille"><span class="pw-equiv">soit <b>11,58 €/mois</b></span><span class="pw-gift">🎁 Livret offert (135 p.)</span></div>
@@ -4610,6 +4649,167 @@ var MODULES_FORMATION = [
   }
 ];
 
+// ─── MA FAMILLE ───
+// L'offre Famille était vendue sans exister : aucun moyen d'ajouter qui que
+// ce soit. Voici le chaînon manquant — le payeur invite 2 proches, chacun
+// garde SON compte, et sa protection dure tant que l'abonnement du payeur.
+var FAM_ETAT = null;
+
+function openFamille() {
+  document.getElementById('famille').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('fam-body').innerHTML = '<div class="spinner" style="margin:60px auto"></div>';
+  chargerFamille();
+}
+function closeFamille() {
+  document.getElementById('famille').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function famAppel(corps) {
+  var s = session.get();
+  if (!s || !s.email) return Promise.reject(new Error('non connecte'));
+  return fetch('/.netlify/functions/famille', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify(Object.assign({ email: s.email }, corps))
+  }).then(function (r) { return r.json(); });
+}
+
+function chargerFamille() {
+  famAppel({ action: 'etat' })
+    .then(function (d) { FAM_ETAT = d; renderFamille(d); })
+    .catch(function () { renderFamille(null); });
+}
+
+function famInviter() {
+  famAppel({ action: 'inviter' }).then(function (d) {
+    if (!d || !d.ok) {
+      var m = { complet: 'Vos 2 places sont déjà prises.',
+                pas_famille: 'Réservé à la formule Famille.',
+                migration_absente: 'Fonction bientôt disponible.' };
+      toast(m[d && d.raison] || 'Invitation impossible pour le moment');
+      return;
+    }
+    toast('Code créé : ' + d.code);
+    chargerFamille();
+  }).catch(function () { toast('Invitation impossible'); });
+}
+
+function famRetirer(id) {
+  famAppel({ action: 'retirer', id: id }).then(function () {
+    toast('Retiré');
+    chargerFamille();
+  }).catch(function () { toast('Impossible pour le moment'); });
+}
+
+function famAccepter() {
+  var el = document.getElementById('fam-code');
+  var code = ((el && el.value) || '').trim().toUpperCase();
+  if (code.length < 6) { toast('Saisissez le code reçu'); return; }
+  famAppel({ action: 'accepter', code: code }).then(function (d) {
+    if (!d || !d.ok) {
+      var m = { code_invalide: 'Ce code n’est pas valide ou a déjà servi.',
+                deja_membre: 'Vous êtes déjà rattaché à une famille.',
+                soi_meme: 'C’est votre propre code.',
+                migration_absente: 'Fonction bientôt disponible.' };
+      toast(m[d && d.raison] || 'Code refusé');
+      return;
+    }
+    toast('C’est fait, vous êtes protégé !');
+    // La protection change : on rafraîchit la session auprès du serveur.
+    if (typeof revalidateSession === 'function') { try { revalidateSession(); } catch (e) {} }
+    chargerFamille();
+  }).catch(function () { toast('Impossible pour le moment'); });
+}
+
+function famCopier(code) {
+  if (navigator.clipboard) navigator.clipboard.writeText(code);
+  toast('Code copié : ' + code);
+}
+function famPartager(code) {
+  var t = 'Je t’offre la protection Despy contre les arnaques. Installe l’application sur despy.fr/app, ' +
+          'crée ton compte gratuit, puis saisis ce code dans « Ma famille » : ' + code;
+  if (navigator.share) navigator.share({ title: 'Despy', text: t }).catch(function () {});
+  else famCopier(t);
+}
+
+function renderFamille(d) {
+  var z = document.getElementById('fam-body');
+  if (!z) return;
+  if (!d) {
+    z.innerHTML = '<div class="card pad" style="text-align:center;color:var(--p-muted)">Impossible de charger pour le moment. Réessayez dans un instant.</div>';
+    return;
+  }
+  if (d.disponible === false) {
+    z.innerHTML = '<div class="card pad" style="text-align:center;color:var(--p-muted)">Cette fonction sera disponible très bientôt.</div>';
+    return;
+  }
+
+  var h = '';
+
+  // ── Un proche déjà protégé ──
+  if (d.couvertPar) {
+    h += '<div class="fam-hero fam-on"><span class="fam-ic">👨‍👩‍👧</span>' +
+         '<div class="fam-h-t">Vous êtes protégé</div>' +
+         '<div class="fam-h-s">Grâce à l’abonnement Famille de <b>' + d.couvertPar + '</b>. ' +
+         'Vous avez accès à toutes les protections Despy, comme un abonné.</div></div>' +
+         '<div class="fam-note">Votre compte reste le vôtre : vos données, vos questions et votre formation ne sont visibles que par vous.</div>';
+    z.innerHTML = h;
+    return;
+  }
+
+  // ── Le payeur ──
+  if (d.estPayeur) {
+    var pris = (d.membres || []).length;
+    h += '<div class="fam-hero fam-on"><span class="fam-ic">👨‍👩‍👧</span>' +
+         '<div class="fam-h-t">' + (pris) + ' place' + (pris > 1 ? 's' : '') + ' sur ' + d.places + ' utilisée' + (pris > 1 ? 's' : '') + '</div>' +
+         '<div class="fam-h-s">Votre abonnement protège vous et deux proches. Chacun garde son propre compte.</div></div>';
+
+    h += '<div class="fam-note">Envoyez un code à la personne de votre choix. Elle crée son compte gratuit sur Despy, saisit le code, et se trouve protégée aussitôt.</div>';
+
+    if ((d.membres || []).length) {
+      h += '<div class="sec" style="padding-top:20px">Vos proches</div><div class="fam-list">';
+      d.membres.forEach(function (m) {
+        var actif = m.status === 'active';
+        h += '<div class="fam-item">' +
+               '<span class="fam-p ' + (actif ? 'ok' : 'att') + '">' + (actif ? '✓' : '…') + '</span>' +
+               '<span class="fam-m">' +
+                 '<span class="fam-t">' + (actif ? m.member_email : 'Invitation en attente') + '</span>' +
+                 '<span class="fam-s">' + (actif ? 'Protégé' : 'Code ' + m.code + ' — pas encore utilisé') + '</span>' +
+               '</span>' +
+               (actif ? '' : '<button class="fam-mini" onclick="famCopier(\'' + m.code + '\')">Copier</button>') +
+               '<button class="fam-mini fam-rm" onclick="famRetirer(' + m.id + ')">Retirer</button>' +
+             '</div>';
+        if (!actif) {
+          h += '<button class="fam-share" onclick="famPartager(\'' + m.code + '\')">📤 Envoyer l’invitation</button>';
+        }
+      });
+      h += '</div>';
+    }
+
+    if (d.restantes > 0) {
+      h += '<button class="btn-primary" style="margin-top:18px" onclick="famInviter()">Inviter un proche (' + d.restantes + ' place' + (d.restantes > 1 ? 's' : '') + ')</button>';
+    } else {
+      h += '<div class="fam-plein">Vos deux places sont utilisées. Retirez un proche pour en inviter un autre.</div>';
+    }
+    z.innerHTML = h;
+    return;
+  }
+
+  // ── Tous les autres : saisir un code, ou découvrir l'offre ──
+  h += '<div class="fam-hero fam-off"><span class="fam-ic">👨‍👩‍👧</span>' +
+       '<div class="fam-h-t">Un proche vous a invité ?</div>' +
+       '<div class="fam-h-s">Saisissez le code qu’il vous a envoyé : vous serez protégé par son abonnement, avec votre propre compte.</div></div>';
+  h += '<label class="sec-lab" for="fam-code">Mon code d’invitation</label>' +
+       '<input id="fam-code" class="auth-input" type="text" maxlength="7" placeholder="ABC-123" autocapitalize="characters">' +
+       '<button class="btn-primary" style="margin-top:12px" onclick="famAccepter()">Rejoindre</button>';
+  h += '<div class="fam-sep">ou</div>';
+  h += '<div class="fam-note">Avec la formule Famille, un seul abonnement protège <b>vous et vos deux parents</b> — moins cher que deux abonnements séparés.</div>' +
+       '<button class="btn-secondary" style="margin-top:12px" onclick="closeFamille();setTimeout(openPaywall,260)">Découvrir la formule Famille</button>';
+  z.innerHTML = h;
+}
+
 // ─── PRÈS DE CHEZ MOI (Alerte Secteur) ───
 // Volontairement SANS carte : les cartes sont l'objet d'interface le plus
 // hostile pour une personne âgée (pincer, zoomer, viser un marqueur). Une
@@ -5460,7 +5660,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-13';
+var APP_BUILD = '2026-07-27-15';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

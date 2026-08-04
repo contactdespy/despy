@@ -2372,9 +2372,9 @@ function triggerPWAInstall() {
   <div class="famille-band" style="max-width:1100px;margin:0 auto 8px;background:linear-gradient(135deg,#0a1f3a 0%,#1a3fd9 100%);border-radius:22px;padding:clamp(1.6rem,4vw,2.4rem);color:#fff;display:grid;grid-template-columns:1fr auto;gap:clamp(1.2rem,4vw,2.4rem);align-items:center;box-shadow:0 14px 40px rgba(26,63,217,.25)">
     <div>
       <div style="display:inline-block;background:rgba(94,228,255,.15);color:#5ee4ff;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:12px">👨‍👩‍👧‍👦 Nouveau · Offre Famille</div>
-      <h3 style="font-size:clamp(22px,3.5vw,30px);font-weight:900;margin:0 0 10px;line-height:1.2">Protégez aussi vos proches</h3>
+      <h3 style="font-size:clamp(22px,3.5vw,30px);font-weight:900;margin:0 0 10px;line-height:1.2">Protégez aussi vos parents</h3>
       <p style="font-size:15px;line-height:1.65;color:#dbe4ff;margin:0 0 14px;max-width:560px">
-        Un seul abonnement pour <strong style="color:#fff">jusqu’à 4 personnes</strong> : vous, votre conjoint, vos parents, vos enfants. Chacun son compte, toutes les protections Despy incluses. C’est <strong style="color:#fff">moins cher que 2 abonnements individuels</strong>.
+        <strong style="color:#fff">Vous, et vos deux parents.</strong> Un seul abonnement, trois personnes protégées — et vous êtes prévenu si l’un d’eux est en difficulté. C’est <strong style="color:#fff">moins cher que 2 abonnements individuels</strong>.
       </p>
       <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(217,119,6,.28);border:1px solid rgba(245,158,11,.55);color:#ffd9a8;font-size:13.5px;font-weight:700;padding:8px 15px;border-radius:99px;margin:0 0 14px">🎁 Livret de formation OFFERT (valeur 29,90€) avec l'annuel</div>
       <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:baseline">
@@ -6328,8 +6328,8 @@ function showSubscribeModal(plan) {
   var PLAN_LABELS = {
     monthly:        { price: '9,99\u20ac/mois',  savings: '' },
     annual:         { price: '89\u20ac/an',      savings: ' \u00b7 2 mois offerts' },
-    family_monthly: { price: '14,99\u20ac/mois', savings: ' \u00b7 Famille, jusqu\u2019\u00e0 4 personnes' },
-    family_annual:  { price: '139\u20ac/an',     savings: ' \u00b7 Famille, jusqu\u2019\u00e0 4 personnes' }
+    family_monthly: { price: '14,99\u20ac/mois', savings: ' \u00b7 Famille, 3 personnes' },
+    family_annual:  { price: '139\u20ac/an',     savings: ' \u00b7 Famille, 3 personnes' }
   };
   var pl = PLAN_LABELS[plan] || PLAN_LABELS.monthly;
   var price = pl.price;
@@ -7602,7 +7602,7 @@ function fillCompteInfo() {
       var _switchSub = {
         monthly:        'Passez à l’annuel (2 mois offerts) ou en famille',
         family_monthly: 'Passez à l’annuel · 2 mois offerts',
-        annual:         'Passez en famille · jusqu’à 4 personnes',
+        annual:         'Passez en famille · vous et vos deux parents',
         family_annual:  'Modifier votre formule ou votre paiement'
       };
       var _switchTitle = (s.plan === 'family_annual') ? 'Gérer ma formule' : 'Changer de formule';
@@ -8832,7 +8832,7 @@ function renderAccountPanel() {
     var switchSub = {
       monthly:        'Passez à l’annuel (2 mois offerts) ou en famille',
       family_monthly: 'Passez à l’annuel · 2 mois offerts',
-      annual:         'Passez en famille · jusqu’à 4 personnes',
+      annual:         'Passez en famille · vous et vos deux parents',
       family_annual:  'Modifier votre formule ou votre paiement'
     };
     html += '<button onclick="openBillingPortal()" style="width:100%;padding:12px 14px;background:#fff;border:1.5px solid rgba(184,160,106,.4);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s;margin-bottom:10px" onmouseover="this.style.borderColor=\'#b8a06a\'" onmouseout="this.style.borderColor=\'rgba(184,160,106,.4)\'">';
