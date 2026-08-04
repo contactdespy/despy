@@ -34,7 +34,11 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email, name, plan, source, marketing_consent } = JSON.parse(event.body || '{}');
+    // telephone/dob : saisis au formulaire d'abonnement. Ils transitent par la
+    // métadonnée Stripe car le compte n'est créé qu'au retour du webhook — sans
+    // ça, le numéro du client était perdu, alors que c'est lui qui sert à
+    // « un vrai humain vous rappelle ».
+    const { email, name, plan, source, marketing_consent, telephone, dob } = JSON.parse(event.body || '{}');
 
     // Validation
     if (!email || !email.includes('@')) {
@@ -135,10 +139,13 @@ exports.handler = async (event, context) => {
       ),
       metadata: {
         despy_email: email,
+        despy_name: name || '',
         despy_plan: plan,
         despy_source: source || 'site',
         despy_bonus_months_used: String(bonusMonths),
-        despy_consent: marketing_consent ? '1' : '0'
+        despy_consent: marketing_consent ? '1' : '0',
+        despy_tel: (telephone || '').toString().slice(0, 40),
+        despy_dob: (dob || '').toString().slice(0, 20)
       }
     });
 

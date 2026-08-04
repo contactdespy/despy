@@ -101,7 +101,11 @@ exports.handler = async (event) => {
       const baseDays = plan === 'annual' ? 365 : 30;
       const endDate = new Date(Date.now() + (baseDays + bonusUsed * 30) * 24 * 60 * 60 * 1000).toISOString();
 
-      await supabase.from('clients').upsert({
+      // NB : password_hash n'est volontairement PAS dans cette charge — un
+      // abonné qui a déjà choisi son mot de passe (set-initial-password peut
+      // passer avant nous, la redirection est plus rapide que le webhook) ne
+      // doit pas le voir écrasé. Un upsert ne touche que les colonnes citées.
+      const fiche = {
         email,
         name,
         prenom,
@@ -112,7 +116,19 @@ exports.handler = async (event) => {
         stripe_customer_id: session.customer,
         stripe_subscription_id: session.subscription,
         updated_at: new Date().toISOString(),
-      }, { onConflict: 'email' });
+      };
+      // Téléphone et date de naissance saisis au formulaire d'abonnement.
+      if (session.metadata?.despy_tel) fiche.telephone = session.metadata.despy_tel;
+      if (session.metadata?.despy_dob) fiche.date_naissance = session.metadata.despy_dob;
+
+      const { error: eFiche } = await supabase.from('clients').upsert(fiche, { onConflict: 'email' });
+      if (eFiche) {
+        // Une colonne optionnelle absente ne doit pas faire échouer
+        // l'activation de l'abonnement : on rejoue sans les champs annexes.
+        delete fiche.telephone; delete fiche.date_naissance;
+        await supabase.from('clients').upsert(fiche, { onConflict: 'email' });
+        console.warn('webhook clients upsert (repli sans tel/dob):', eFiche.message);
+      }
 
       await supabase.from('subscriptions').upsert({
         email,

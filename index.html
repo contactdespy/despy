@@ -6503,19 +6503,16 @@ async function confirmSub(plan) {
 
   var fullName = prenom + ' ' + nom;
 
-  // Enregistrer dans Supabase
-  try {
-    await fetch('/.netlify/functions/register-free', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, nom, prenom, tel, dob, name: fullName })
-    });
-  } catch(e) {}
+  // NB : on n'appelle plus register-free ici — il EXIGE un mot de passe et
+  // répondait donc 400 à chaque abonnement, silencieusement. Le compte est
+  // créé par le webhook Stripe ; prénom/nom/téléphone/date de naissance
+  // voyagent par la métadonnée de la session, et le mot de passe est choisi
+  // à l'écran juste après le paiement (despyCreerMotDePasse).
 
-  await launchCheckout(email, fullName, plan);
+  await launchCheckout(email, fullName, plan, tel, dob);
 }
 
-async function launchCheckout(email, name, plan) {
+async function launchCheckout(email, name, plan, telephone, dob) {
   // Loader visible pendant le fetch (sinon l'utilisateur ne sait pas qu'il se passe quelque chose)
   var loader = document.createElement('div');
   loader.id = 'checkout-loader';
@@ -6546,7 +6543,7 @@ async function launchCheckout(email, name, plan) {
     var r = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site', marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
+      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site', telephone: telephone || '', dob: dob || '', marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
     });
     if (!r.ok) {
       var err = await r.json();
@@ -6596,8 +6593,123 @@ function showCheckoutErrorToast(message) {
   setTimeout(function(){ if (toast.parentNode) toast.remove(); }, 12000);
 }
 
+// ─── APRÈS LE PAIEMENT : choisir son mot de passe ───
+// Sans cet écran, l'abonné payait puis se heurtait à « Email ou mot de passe
+// incorrect » en ouvrant l'appli : le formulaire d'abonnement ne demande pas
+// de mot de passe, et le compte créé par le webhook n'en a donc aucun.
+// On le fait ici, à l'écran, pendant qu'il est encore là — pas par email.
+// Bienvenue « simple » — pour qui possède déjà un mot de passe (client
+// gratuit qui passe à l'abonnement), ou si Stripe ne nous a pas renvoyé
+// d'identifiant de session.
+function despyBienvenueAbonne() {
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.style.textAlign = 'center';
+  box.innerHTML =
+    '<div style="font-size:52px;margin-bottom:12px">✅</div>' +
+    '<div class="sub-modal-title" style="font-size:22px;color:#16a34a">Bienvenue dans Despy !</div>' +
+    '<div style="font-size:14px;color:var(--text2);margin:8px 0 24px;line-height:1.7">' +
+      'Votre abonnement est actif. Un email de confirmation vous a été envoyé.<br>' +
+      'Ouvrez l’application avec vos identifiants habituels.</div>';
+  var b1 = document.createElement('button');
+  b1.className = 'sub-btn'; b1.style.background = 'var(--ok)';
+  b1.textContent = 'Accéder à mon espace client →';
+  b1.onclick = function(){ showClientArea(); modal.remove(); };
+  var b2 = document.createElement('button');
+  b2.className = 'sub-cancel'; b2.style.marginTop = '10px'; b2.textContent = 'Continuer';
+  b2.onclick = function(){ modal.remove(); };
+  box.appendChild(b1); box.appendChild(b2);
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+}
+
+function despyCreerMotDePasse(sessionId) {
+  var modal = document.createElement('div');
+  modal.className = 'sub-modal-overlay';
+  var box = document.createElement('div');
+  box.className = 'sub-modal';
+  box.style.cssText = 'max-width:440px;text-align:center';
+
+  box.innerHTML =
+    '<div style="font-size:52px;margin-bottom:10px">✅</div>' +
+    '<div class="sub-modal-title" style="font-size:22px;color:#16a34a">Bienvenue dans Despy !</div>' +
+    '<div style="font-size:14px;color:var(--text2);margin:8px 0 20px;line-height:1.7">' +
+      'Votre abonnement est actif. Dernière étape : <strong>choisissez votre mot de passe</strong>, ' +
+      'il vous servira à ouvrir l’application sur votre téléphone.</div>' +
+    '<div style="position:relative;margin-bottom:10px">' +
+      '<input id="pwd-new" type="password" placeholder="Mot de passe (8 min.)" autocomplete="new-password" ' +
+        'style="width:100%;box-sizing:border-box;padding:13px 46px 13px 14px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit">' +
+      '<button type="button" id="pwd-eye" aria-label="Afficher le mot de passe" ' +
+        'style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:0;font-size:17px;cursor:pointer;padding:6px">👁</button>' +
+    '</div>' +
+    '<div id="pwd-err" class="sub-error" style="display:none"></div>' +
+    '<button id="pwd-go" class="sub-btn" style="background:var(--ok)">Créer mon mot de passe</button>' +
+    '<div style="font-size:11.5px;color:var(--text3);margin-top:12px;line-height:1.6">' +
+      'Notez-le quelque part. Si vous le perdez, vous pourrez toujours le réinitialiser depuis « Mot de passe oublié ».</div>';
+
+  modal.appendChild(box);
+  document.body.appendChild(modal);
+
+  var champ = box.querySelector('#pwd-new');
+  var err   = box.querySelector('#pwd-err');
+  var btn   = box.querySelector('#pwd-go');
+
+  box.querySelector('#pwd-eye').onclick = function () {
+    champ.type = champ.type === 'password' ? 'text' : 'password';
+  };
+
+  function echec(m) {
+    err.textContent = m; err.style.display = 'block';
+    btn.textContent = 'Créer mon mot de passe'; btn.disabled = false;
+  }
+
+  btn.onclick = async function () {
+    var pwd = (champ.value || '').trim();
+    if (pwd.length < 8) { echec('8 caractères minimum.'); return; }
+    err.style.display = 'none';
+    btn.textContent = '⏳ Création…'; btn.disabled = true;
+    try {
+      var r = await fetch('/.netlify/functions/set-initial-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, password: pwd })
+      });
+      var d = await r.json();
+      if (d && d.raison === 'deja_defini') {
+        // Cas normal : il avait déjà un compte Despy avant de s'abonner.
+        modal.remove();
+        despyNotify('Vous avez déjà un compte — connectez-vous avec votre mot de passe habituel.', 'info');
+        showPage('login');
+        return;
+      }
+      if (!r.ok || !d || !d.ok) { echec((d && d.error) || 'Création impossible. Réessayez.'); return; }
+
+      // Il vient de payer : on le connecte directement, sans lui redemander.
+      siteSession.set({
+        email: d.email, token: d.token, name: d.name, prenom: d.prenom, nom: d.nom,
+        telephone: d.telephone, plan: d.plan, subscribed: d.subscribed
+      });
+      if (typeof updateNavForSession === 'function') updateNavForSession();
+      modal.remove();
+      despyNotify('C’est fait — vous pouvez ouvrir l’application avec ce mot de passe.', 'success');
+      showClientArea();
+    } catch (e) {
+      echec('Connexion impossible. Réessayez dans un instant.');
+    }
+  };
+
+  champ.addEventListener('keydown', function (e) { if (e.key === 'Enter') btn.click(); });
+  setTimeout(function () { champ.focus(); }, 120);
+}
+
 function handleStripeReturn() {
-  var params = new URLSearchParams(window.location.search);
+  // On lit la requête MÉMORISÉE en tête de page (window._despyQS) : le routeur
+  // SPA l'a déjà effacée de l'URL quand cette fonction s'exécute. Sans ça, le
+  // retour de paiement passait totalement inaperçu — ni écran de bienvenue,
+  // ni conversion Meta côté navigateur, ni retour du portail Stripe.
+  var params = new URLSearchParams(window._despyQS || window.location.search);
   if (params.get('payment') === 'success') {
     var stripeSessionId = params.get('session_id') || undefined;
     window.history.replaceState({}, '', window.location.pathname);
@@ -6607,21 +6719,11 @@ function handleStripeReturn() {
       var pv = 9.99; try { pv = parseFloat(localStorage.getItem('despy_pending_value')) || 9.99; localStorage.removeItem('despy_pending_value'); } catch(e){}
       try { window.despyTrack('Purchase', { content_name: 'abonnement_despy', currency: 'EUR', value: pv }, stripeSessionId); } catch(e){}
     }
-        var modal = document.createElement('div');
-    modal.className = 'sub-modal-overlay';
-    var box = document.createElement('div');
-    box.className = 'sub-modal';
-    box.style.textAlign = 'center';
-    var ico = document.createElement('div'); ico.style.cssText='font-size:52px;margin-bottom:12px'; ico.textContent='✅';
-    var ttl = document.createElement('div'); ttl.className='sub-modal-title'; ttl.style.cssText='font-size:22px;color:#16a34a'; ttl.textContent='Bienvenue dans Despy !';
-    var dsc = document.createElement('div'); dsc.style.cssText='font-size:14px;color:var(--text2);margin:8px 0 24px;line-height:1.7'; dsc.textContent='Votre abonnement est actif. Un email de confirmation vous a été envoyé.';
-    var b1 = document.createElement('button'); b1.className='sub-btn'; b1.style.background='var(--ok)'; b1.textContent='Accéder à mon espace client →';
-    b1.onclick = function(){ showClientArea(); modal.remove(); };
-    var b2 = document.createElement('button'); b2.className='sub-cancel'; b2.style.marginTop='10px'; b2.textContent='Continuer';
-    b2.onclick = function(){ modal.remove(); };
-    box.appendChild(ico); box.appendChild(ttl); box.appendChild(dsc); box.appendChild(b1); box.appendChild(b2);
-    modal.appendChild(box);
-    document.body.appendChild(modal);
+    // Déjà connecté = compte créé via register-free, qui EXIGE un mot de
+    // passe : il en a donc un. On ne lui redemande rien.
+    var dejaConnecte = (function(){ try { var x = siteSession.get(); return !!(x && x.email && x.token); } catch(e){ return false; } })();
+    if (dejaConnecte || !stripeSessionId) { despyBienvenueAbonne(); }
+    else { despyCreerMotDePasse(stripeSessionId); }
   } else if (params.get('payment') === 'cancel') {
     window.history.replaceState({}, '', window.location.pathname);
   } else if (params.get('portal') === 'return') {

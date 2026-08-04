@@ -990,6 +990,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <input id="login-email" class="auth-input" type="email" placeholder="Votre email" autocomplete="email">
       <input id="login-password" class="auth-input" type="password" placeholder="Mot de passe" autocomplete="current-password">
       <button class="btn-primary" onclick="doLoginApp()">Se connecter</button>
+      <div class="auth-toggle" style="margin-top:14px"><button onclick="appMotDePasseOublie()" style="background:none;border:0;font-family:inherit;font-size:14px;font-weight:700;color:var(--blue);cursor:pointer;padding:6px 4px">Mot de passe oublié ?</button></div>
       <div class="auth-toggle">Pas encore de compte ? <button onclick="toggleAuthMode('signup')">Créer un compte</button></div>
     </div>
 
@@ -1558,6 +1559,41 @@ function backToWelcome() {
   document.getElementById('welcome-view').classList.add('active');
   window.scrollTo(0, 0);
 }
+
+// ─── MOT DE PASSE OUBLIÉ ───
+// Indispensable ici : un abonné qui vient de payer n'a pas encore choisi de
+// mot de passe s'il a fermé la page trop tôt, et l'appli était jusque-là un
+// cul-de-sac (aucun lien de récupération, contrairement au site).
+// Le lien envoyé par email ouvre le site, où le parcours existe déjà.
+async function appMotDePasseOublie() {
+  var champ = document.getElementById('login-email');
+  var email = ((champ && champ.value) || '').trim().toLowerCase();
+  if (!email || email.indexOf('@') === -1) {
+    toast('Saisissez d’abord votre email ci-dessus');
+    if (champ) champ.focus();
+    return;
+  }
+  toast('Envoi en cours…');
+  try {
+    await fetch('/.netlify/functions/request-password-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+  } catch (e) { /* la réponse est volontairement neutre : on n'en dépend pas */ }
+  // Réponse toujours identique, que le compte existe ou non (anti-énumération).
+  openSheet('Vérifiez vos emails', '' +
+    '<div style="font-size:15px;line-height:1.65;color:var(--text2)">' +
+      '<p>Si un compte Despy existe avec <b>' + email.replace(/</g, '&lt;') + '</b>, ' +
+      'un email vient d’y être envoyé avec un lien pour choisir un nouveau mot de passe.</p>' +
+      '<p style="margin-top:12px">Le lien est valable <b>30 minutes</b>. Il ouvre le site Despy ; ' +
+      'une fois votre mot de passe choisi, revenez ici pour vous connecter.</p>' +
+      '<p style="margin-top:12px;color:var(--text3);font-size:13.5px">Vous ne le trouvez pas ? ' +
+      'Regardez dans les courriers indésirables ou l’onglet « Promotions ». ' +
+      'Sinon appelez-nous au <b>06 89 14 83 95</b>, on s’en occupe avec vous.</p>' +
+    '</div>');
+}
+
 
 function toggleAuthMode(mode) {
   document.getElementById('login-form').style.display = mode === 'login' ? 'block' : 'none';
@@ -5675,7 +5711,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-16';
+var APP_BUILD = '2026-08-04-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
