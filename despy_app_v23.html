@@ -1873,10 +1873,18 @@ function refreshProfile() {
   document.getElementById('profile-avatar').textContent = initial;
   var planEl = document.getElementById('profile-plan');
   var subDescEl = document.getElementById('sub-status-desc');
-  if (s.subscribed) {
+  if (s.plan === 'family_member') {
+    // Proche rattaché : couvert par l'abonnement d'un autre, il ne paie rien
+    // et n'a rien à gérer. Le dire clairement évite qu'il cherche sa facture.
+    planEl.textContent = '⭐ Protégé par un proche';
+    planEl.classList.add('active');
+    if (subDescEl) subDescEl.textContent = 'Place Famille · rien à payer';
+  } else if (s.subscribed) {
     planEl.textContent = '⭐ Abonné Premium';
     planEl.classList.add('active');
-    if (subDescEl) subDescEl.textContent = (s.plan === 'annual' ? '89€/an' : '9,99€/mois') + ' · actif';
+    var PRIX = { monthly: '9,99€/mois', annual: '89€/an',
+                 family_monthly: '14,99€/mois', family_annual: '139€/an' };
+    if (subDescEl) subDescEl.textContent = (PRIX[s.plan] || 'Abonnement') + ' · actif';
   } else {
     planEl.textContent = 'Compte gratuit';
     planEl.classList.remove('active');
@@ -2050,6 +2058,9 @@ function openSubscription() {
   // résiliation). Surtout PAS vers /#tarifs : les boutons de la page de vente
   // ouvrent un nouveau paiement, ce qui créait un second abonnement en
   // parallèle du premier.
+  // Un proche rattaché n'a pas d'abonnement Stripe : le portail lui répondrait
+  // « indisponible ». On l'amène là où sa situation est expliquée.
+  if (s.plan === 'family_member') { openFamille(); return; }
   if (s.subscribed) { openBillingPortal(); }
   else { openPaywall(); }
 }
@@ -2058,6 +2069,10 @@ function openSubscription() {
 async function openBillingPortal() {
   var s = session.get() || {};
   if (!s.email) { toast('Connectez-vous d\'abord'); return; }
+  if (s.plan === 'family_member') {
+    toast('Vous êtes couvert par l’abonnement d’un proche — rien à gérer de votre côté.');
+    return;
+  }
 
   var loader = document.createElement('div');
   loader.id = 'portal-loader';
@@ -5660,7 +5675,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-07-27-15';
+var APP_BUILD = '2026-07-27-16';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

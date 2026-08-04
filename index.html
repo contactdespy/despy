@@ -8774,6 +8774,140 @@ function initClientSpace() {
   switchTab('dashboard');
 }
 
+// ─── MA FAMILLE (espace client du site) ───
+// Même mécanisme que dans l'appli : le payeur dispose de 2 invitations, le
+// proche rattaché voit qui le protège. Sans ça, un abonné Famille qui passe
+// par le site ne pouvait inviter personne.
+function famSiteAppel(corps) {
+  var s = siteSession.get();
+  if (!s || !s.email) return Promise.reject(new Error('non connecte'));
+  return fetch('/.netlify/functions/famille', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify(Object.assign({ email: s.email }, corps))
+  }).then(function (r) { return r.json(); });
+}
+
+function famSiteCharger() {
+  var z = document.getElementById('fam-site');
+  if (!z) return;
+  z.innerHTML = '<div style="padding:12px 14px;font-size:13px;color:var(--text3)">Chargement…</div>';
+  famSiteAppel({ action: 'etat' })
+    .then(famSiteRender)
+    .catch(function () { z.innerHTML = ''; });
+}
+
+function famSiteInviter() {
+  famSiteAppel({ action: 'inviter' }).then(function (d) {
+    if (!d || !d.ok) {
+      var m = { complet: 'Vos 2 places sont déjà prises.',
+                pas_famille: 'Réservé à la formule Famille.',
+                migration_absente: 'Fonction bientôt disponible.' };
+      despyNotify(m[d && d.raison] || 'Invitation impossible pour le moment', 'info');
+      return;
+    }
+    famSiteCharger();
+  }).catch(function () { despyNotify('Invitation impossible', 'info'); });
+}
+
+function famSiteRetirer(id) {
+  famSiteAppel({ action: 'retirer', id: id }).then(famSiteCharger).catch(function () {});
+}
+
+function famSiteCopier(code) {
+  if (navigator.clipboard) navigator.clipboard.writeText(code);
+  despyNotify('Code copié : ' + code, 'success');
+}
+
+function famSiteOuvrirCode() {
+  var c = document.getElementById('fam-site-code');
+  var l = document.getElementById('fam-site-lien');
+  if (!c) return;
+  c.style.display = 'block';
+  if (l) l.style.display = 'none';
+  var ch = document.getElementById('fam-site-champ');
+  if (ch) ch.focus();
+}
+
+function famSiteAccepter() {
+  var el = document.getElementById('fam-site-champ');
+  var code = ((el && el.value) || '').trim().toUpperCase();
+  if (code.length < 6) { despyNotify('Saisissez le code reçu', 'info'); return; }
+  famSiteAppel({ action: 'accepter', code: code }).then(function (d) {
+    if (!d || !d.ok) {
+      var m = { code_invalide: 'Ce code n’est pas valide ou a déjà servi.',
+                deja_membre: 'Vous êtes déjà rattaché à une famille.',
+                soi_meme: 'C’est votre propre code.',
+                migration_absente: 'Fonction bientôt disponible.' };
+      despyNotify(m[d && d.raison] || 'Code refusé', 'info');
+      return;
+    }
+    despyNotify('C’est fait, vous êtes protégé !', 'success');
+    // La couverture vient de changer : on resynchronise la session serveur.
+    if (typeof revalidateSiteSession === 'function') {
+      try { Promise.resolve(revalidateSiteSession()).then(famSiteCharger); return; } catch (e) {}
+    }
+    famSiteCharger();
+  }).catch(function () { despyNotify('Impossible pour le moment', 'info'); });
+}
+
+function famSiteRender(d) {
+  var z = document.getElementById('fam-site');
+  if (!z || !d) return;
+  if (d.disponible === false) { z.innerHTML = ''; return; }
+
+  var box = 'background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px';
+
+  // Proche rattaché : il constate simplement d'où vient sa protection
+  if (d.couvertPar) {
+    z.innerHTML = '<div style="' + box + '">' +
+      '<div style="font-weight:700;font-size:13.5px;color:var(--text);margin-bottom:4px">👨‍👩‍👧 Vous êtes protégé</div>' +
+      '<div style="font-size:12.5px;color:var(--text3);line-height:1.6">Grâce à l’abonnement Famille de <strong>' + d.couvertPar +
+      '</strong>. Votre compte reste le vôtre : vos données et vos questions ne sont visibles que par vous.</div></div>';
+    return;
+  }
+  // Ni payeur, ni couvert : il peut avoir reçu un code. Replié par défaut,
+  // pour ne pas encombrer le panneau de ceux que ça ne concerne pas.
+  if (!d.estPayeur) {
+    z.innerHTML = '<div style="' + box + '">' +
+      '<button onclick="famSiteOuvrirCode()" id="fam-site-lien" style="width:100%;background:none;border:0;padding:0;font-family:inherit;font-size:13px;font-weight:700;color:var(--text);text-align:left;cursor:pointer">' +
+        '👨\u200d👩\u200d👧 Un proche vous a invité ? <span style="color:var(--blue)">Saisir mon code</span></button>' +
+      '<div id="fam-site-code" style="display:none;margin-top:10px">' +
+        '<div style="font-size:12.5px;color:var(--text3);line-height:1.6;margin-bottom:8px">Saisissez le code qu’il vous a envoyé : vous serez protégé par son abonnement, tout en gardant votre propre compte.</div>' +
+        '<div style="display:flex;gap:8px">' +
+          '<input id="fam-site-champ" type="text" maxlength="7" placeholder="ABC-123" autocapitalize="characters" style="flex:1;min-width:0;padding:10px;border:1px solid var(--border);border-radius:9px;font-family:inherit;font-size:14px;background:var(--bg);color:var(--text)">' +
+          '<button onclick="famSiteAccepter()" style="flex:0 0 auto;width:auto;padding:10px 16px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer">Rejoindre</button>' +
+        '</div></div></div>';
+    return;
+  }
+
+  var pris = (d.membres || []).length;
+  var h = '<div style="' + box + '">' +
+    '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px">' +
+      '<span style="font-weight:700;font-size:13.5px;color:var(--text)">👨‍👩‍👧 Ma famille</span>' +
+      '<span style="font-size:12px;color:var(--text3)">' + pris + ' / ' + d.places + ' place' + (d.places > 1 ? 's' : '') + '</span></div>' +
+    '<div style="font-size:12.5px;color:var(--text3);line-height:1.6;margin-bottom:10px">Envoyez un code à un proche : il crée son compte gratuit, saisit le code, et se trouve protégé aussitôt.</div>';
+
+  (d.membres || []).forEach(function (m) {
+    var actif = m.status === 'active';
+    h += '<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--border)">' +
+      '<span style="width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px;background:' + (actif ? '#15803d' : '#b4892e') + '">' + (actif ? '✓' : '…') + '</span>' +
+      '<span style="flex:1;min-width:0"><span style="display:block;font-size:13px;font-weight:700;color:var(--text);word-break:break-word">' +
+        (actif ? m.member_email : 'Invitation en attente') + '</span>' +
+      '<span style="display:block;font-size:11.5px;color:var(--text3)">' + (actif ? 'Protégé' : 'Code ' + m.code) + '</span></span>' +
+      (actif ? '' : '<button onclick="famSiteCopier(\'' + m.code + '\')" style="background:none;border:0;font-family:inherit;font-size:12px;font-weight:700;color:var(--blue);cursor:pointer">Copier</button>') +
+      '<button onclick="famSiteRetirer(' + m.id + ')" style="background:none;border:0;font-family:inherit;font-size:12px;font-weight:700;color:#b4892e;cursor:pointer">Retirer</button></div>';
+  });
+
+  if (d.restantes > 0) {
+    h += '<button onclick="famSiteInviter()" style="width:100%;margin-top:10px;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer">Inviter un proche (' + d.restantes + ' place' + (d.restantes > 1 ? 's' : '') + ')</button>';
+  } else {
+    h += '<div style="margin-top:10px;font-size:12px;color:var(--text3);text-align:center">Vos deux places sont utilisées.</div>';
+  }
+  z.innerHTML = h + '</div>';
+}
+
+
 function renderAccountPanel() {
   var panel = document.getElementById('panel-compte');
   if (!panel) return;
@@ -8784,13 +8918,15 @@ function renderAccountPanel() {
   var nom = session.nom || '—';
   var email = session.email || '—';
   var tel = session.telephone || session.tel || '—';
-  var plan = session.subscribed ? '⭐ Abonné Premium' : 'Compte gratuit';
+  var plan = session.plan === 'family_member' ? '⭐ Protégé par un proche'
+           : (session.subscribed ? '⭐ Abonné Premium' : 'Compte gratuit');
   // Libellé exact de la formule (le champ session est `plan`)
   var PLAN_LABELS = {
     monthly:        'Solo · 9,99€/mois',
     annual:         'Solo Annuel · 89€/an',
     family_monthly: 'Famille · 14,99€/mois',
-    family_annual:  'Famille Annuel · 139€/an'
+    family_annual:  'Famille Annuel · 139€/an',
+    family_member:  'Place Famille · offerte par un proche'
   };
   var planSub = session.subscribed
     ? (PLAN_LABELS[session.plan] || 'Abonnement actif')
@@ -8817,7 +8953,13 @@ function renderAccountPanel() {
     html += '<button onclick="siteSubscribe(\'monthly\')" style="padding:8px 14px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">S\'abonner</button>';
   }
   html += '</div>';
-  if (session.subscribed) {
+  // Ma famille — hors de toute condition d'abonnement : le rendu décide seul
+  // (payeur → ses places, proche rattaché → qui le protège, compte gratuit →
+  // saisie du code reçu). C'est justement l'invité, non abonné, qui en a le
+  // plus besoin.
+  html += '<div id="fam-site" style="margin-bottom:10px"></div>';
+  var gereSonAbo = session.subscribed && session.plan !== 'family_member';
+  if (gereSonAbo) {
     // Livret offert — rappel du cadeau pour les plans annuels
     if (isAnnualPlan) {
       html += '<a href="/despy-livret-cybersecurite-2026-edition-1.pdf" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;padding:12px 14px;background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:10px;text-decoration:none;margin-bottom:10px">';
@@ -8828,6 +8970,7 @@ function renderAccountPanel() {
       html +=   '<span style="font-size:12px;font-weight:700;color:#d97706;white-space:nowrap">Télécharger ↓</span>';
       html += '</a>';
     }
+
     // Changer de formule — Portail Client Stripe (prorata automatique)
     var switchSub = {
       monthly:        'Passez à l’annuel (2 mois offerts) ou en famille',
@@ -8843,8 +8986,8 @@ function renderAccountPanel() {
     html +=   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
     html += '</button>';
   }
-  // Accès résiliation — clair et toujours visible pour les abonnés
-  if (session.subscribed) {
+  // Accès résiliation — pour ceux qui ont réellement un abonnement à résilier
+  if (gereSonAbo) {
     html += '<button onclick="showLegal(\'resiliation\')" style="width:100%;padding:12px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor=\'#fca5a5\';this.style.color=\'#dc2626\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text2)\'">';
     html +=   '<span style="display:flex;align-items:center;gap:8px;text-align:left">';
     html +=     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
@@ -8878,6 +9021,7 @@ function renderAccountPanel() {
 
   panel.innerHTML = html;
   try { loadTrustedContact(); } catch(e) {}
+  if (document.getElementById('fam-site')) famSiteCharger();
 }
 
 // Surcharger showPage pour init client
