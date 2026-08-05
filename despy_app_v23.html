@@ -484,6 +484,18 @@ body{ background:var(--p-paper); }
 
 /* ── lignes de liste ── */
 .plist{ background:var(--p-card); border-radius:18px; box-shadow:0 6px 20px rgba(12,25,55,.07); overflow:hidden; }
+.pc-hero{ background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; border-radius:16px; padding:18px 17px;
+  box-shadow:0 10px 26px rgba(16,102,74,.24); margin-bottom:16px; }
+.pc-hero .t{ font-size:18px; font-weight:900; letter-spacing:-.01em; display:flex; align-items:center; gap:9px; }
+.pc-hero .s{ font-size:13.5px; color:#9FE6C2; margin-top:6px; line-height:1.55; }
+.pc-fact{ display:flex; gap:11px; align-items:flex-start; padding:11px 0; border-top:1px solid rgba(255,255,255,.14); margin-top:12px; }
+.pc-fact:first-of-type{ border-top:0; margin-top:14px; padding-top:0; }
+.pc-fact .e{ font-size:16px; flex:none; line-height:1.4; }
+.pc-fact .a{ display:block; font-size:14px; font-weight:800; line-height:1.35; }
+.pc-fact .b{ display:block; font-size:12.5px; color:#9FE6C2; margin-top:2px; line-height:1.45; }
+.pc-alerte{ background:#FFF6E5; border:1px solid #F0D18A; border-radius:13px; padding:13px 15px; margin-bottom:16px;
+  font-size:13.5px; line-height:1.6; color:#7A5A12; }
+.pc-alerte b{ color:#5C4207; }
 .prot-auto{ margin-top:12px; padding:11px 13px; border-radius:11px; background:#EAF6EF; border:1px solid #BFE3CD;
   font-size:13px; line-height:1.55; color:#14603F; display:flex; gap:9px; align-items:flex-start; }
 .prot-auto b{ color:#0E4A31; }
@@ -1153,6 +1165,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <div class="pbar"><i id="prot-bar"></i></div>
         <div class="prot-auto" id="prot-auto" style="display:none"></div>
       </div>
+
+      <div id="prot-complet" style="display:none"></div>
 
       <div class="sec">Vos six protections</div>
       <div class="plist" id="prot-liste"></div>
@@ -3315,8 +3329,78 @@ var PROT_ETAPES = [
     f: 'Vous vous entraînez pour de vrai', go: 'entrainement' }
 ];
 
-function renderProtection(checklist) {
+
+var PROT_STATS = null;
+
+// Une fois les six gestes faits, la liste n'a plus rien à raconter. On montre
+// alors ce qui, lui, ne s'arrête jamais : les contrôles automatiques, la
+// personne qui veille, et les rendez-vous du mois. Uniquement des données
+// réelles — si une information manque, la ligne ne s'affiche pas.
+function renderProtectionComplete(st) {
+  var z = document.getElementById('prot-complet');
+  if (!z) return;
+  st = st || {};
+  var h = '';
+
+  // Une fuite connue reste une action à mener : on ne la noie pas dans le vert.
+  var fuites = st.breach_count || 0;
+  if (fuites > 0) {
+    h += '<div class="pc-alerte">⚠️ <b>' + fuites + ' fuite' + (fuites > 1 ? 's' : '') + '</b> concerne' + (fuites > 1 ? 'nt' : '') +
+         ' votre adresse. Ce n’est pas grave en soi — ce qui compte, c’est que le mot de passe de ces comptes ne serve nulle part ailleurs. ' +
+         '<span style="color:var(--p-blue);font-weight:800;cursor:pointer" onclick="openTool(\'darkweb\')">Voir lesquelles</span></div>';
+  }
+
+  h += '<div class="pc-hero">' +
+       '<div class="t"><span>🛡️</span><span>Votre protection est complète</span></div>' +
+       '<div class="s">Les six gestes sont faits. À partir d’ici, c’est Despy qui travaille — vous n’avez plus rien à activer.</div>';
+
+  // Surveillance : date réelle du dernier contrôle, sinon on n'invente pas.
+  var dernier = '';
+  if (st.last_hibp_check) {
+    try {
+      var d0 = new Date(st.last_hibp_check);
+      var jours = Math.floor((Date.now() - d0.getTime()) / 86400000);
+      dernier = jours <= 0 ? 'aujourd’hui' : (jours === 1 ? 'hier' : 'il y a ' + jours + ' jours');
+    } catch (e) {}
+  }
+  h += '<div class="pc-fact"><span class="e">🔎</span><span>' +
+       '<span class="a">Surveillance de vos données</span>' +
+       '<span class="b">' +
+         (dernier ? 'Dernier contrôle ' + dernier + ' · ' : '') +
+         'Prochain contrôle ' + (typeof prochainControleFr === 'function' ? prochainControleFr() : 'cette semaine') + '.' +
+       '</span></span></div>';
+
+  if (st.trusted_name || st.trusted_email) {
+    h += '<div class="pc-fact"><span class="e">👥</span><span>' +
+         '<span class="a">' + (st.trusted_name || st.trusted_email) + ' veille sur vous</span>' +
+         '<span class="b">Prévenu' + (st.trusted_name ? 'e' : '') + ' en cas de fuite, d’arnaque grave ou d’appel à l’aide.</span>' +
+         '</span></div>';
+  }
+
+  h += '</div>';
+
+  // Ce qui revient — la raison pour laquelle l'abonnement garde du sens
+  // une fois la mise en route terminée.
+  h += '<div class="sec">Vos rendez-vous</div><div class="plist">' +
+       protRdv('📅', 'Le module du mois', 'Une nouvelle arnaque décortiquée, chaque mois', 'quiz') +
+       protRdv('🎯', 'L’entraînement surprise', 'Un faux SMS un jour où vous ne l’attendez pas', 'entrainement') +
+       protRdv('📊', 'Votre bilan mensuel', 'Ce que Despy a fait pour vous, en une page', 'bilan') +
+       '</div>';
+
+  z.innerHTML = h;
+}
+
+function protRdv(emoji, titre, sous, cible) {
+  return '<button class="listrow" onclick="openTool(\'' + cible + '\')">' +
+    '<span class="ic" style="background:var(--p-line)">' + emoji + '</span>' +
+    '<span class="m"><span class="a">' + titre + '</span><span class="b">' + sous + '</span></span>' +
+    '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+    '</button>';
+}
+
+function renderProtection(checklist, stats) {
   if (!checklist) return;
+  PROT_STATS = stats || PROT_STATS;
   var faits = PROT_ETAPES.filter(function (e) { return !!checklist[e.k]; }).length;
 
   var cpt = document.getElementById('prot-count');
@@ -3327,11 +3411,23 @@ function renderProtection(checklist) {
   var barre = document.getElementById('prot-bar');
   if (barre) setTimeout(function () { barre.style.width = (faits / PROT_ETAPES.length * 100) + '%'; }, 60);
 
+  // Six gestes faits : la checklist n'a plus rien à dire. On montre alors
+  // l'état réel de la protection, qui lui continue de vivre.
+  var complet = document.getElementById('prot-complet');
+  if (complet) {
+    if (faits === PROT_ETAPES.length) {
+      renderProtectionComplete(PROT_STATS);
+      complet.style.display = 'block';
+    } else {
+      complet.style.display = 'none';
+    }
+  }
+
   // Ce qui tourne SANS le client : c'est ce qu'il paie, il doit le voir.
   var auto = document.getElementById('prot-auto');
   if (auto) {
     var abonne = !!(session.get() || {}).subscribed;
-    if (abonne) {
+    if (abonne && faits < PROT_ETAPES.length) {
       auto.innerHTML = '<span>🛡️</span><span>Pendant ce temps, <b>Despy surveille vos données en continu</b> — ' +
         'sans que vous ayez quoi que ce soit à faire. Prochain contrôle ' +
         (typeof prochainControleFr === 'function' ? prochainControleFr() : 'cette semaine') + '.</span>';
@@ -3578,7 +3674,7 @@ function refreshHomeScore() {
       if (titleEl) titleEl.textContent = d.label || 'Votre score de sécurité';
       if (eyEl && d.emoji) eyEl.textContent = d.emoji + ' Votre protection';
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
-      renderProtection(d.checklist);
+      renderProtection(d.checklist, d.stats);
       renderHomeStats(d.stats);
       renderVeille(d.stats);          // surveillance rendue visible (abonnés)
       renderAccountState();  // réapplique le cadre « gratuit » après la donnée
@@ -5995,7 +6091,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-05-02';
+var APP_BUILD = '2026-08-05-03';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

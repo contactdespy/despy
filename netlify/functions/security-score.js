@@ -66,7 +66,7 @@ exports.handler = async (event) => {
     const cleanEmail = email.toLowerCase().trim();
     const { data: client, error } = await supabase
       .from('clients')
-      .select('subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan, trusted_contact_email')
+      .select('subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan, trusted_contact_email, trusted_contact_name')
       .eq('email', cleanEmail)
       .maybeSingle();
 
@@ -124,6 +124,10 @@ exports.handler = async (event) => {
           last_hibp_check:   client.last_hibp_check || null,
           quizzes_completed: client.quizzes_completed || 0,
           member_since:      client.created_at,
+          // Qui veille sur le client — affiché dans l'onglet Protection une
+          // fois les six gestes faits, pour que « protégé » ait un visage.
+          trusted_name:      client.trusted_contact_name || null,
+          trusted_email:     client.trusted_contact_email || null,
           plan:              client.subscribed ? client.plan : 'free',
         }
       })
