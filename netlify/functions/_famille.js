@@ -11,9 +11,11 @@
 const PLANS_FAMILLE = ['family_monthly', 'family_annual'];
 const MAX_INVITES = 2;              // le payeur + 2 proches = 3 personnes
 
-// Renvoie { couvert, owner } — dégrade en douceur si la table n'existe pas.
+// Renvoie { couvert, owner, ownerPrenom } — dégrade en douceur si la table
+// n'existe pas. Le prénom sert à l'affichage : « protégé par Yacine » vaut
+// mieux qu'une adresse email, qu'on ne doit d'ailleurs pas étaler à l'écran.
 async function couvertureFamille(supabase, email) {
-  const vide = { couvert: false, owner: null };
+  const vide = { couvert: false, owner: null, ownerPrenom: null };
   const em = (email || '').toLowerCase().trim();
   if (!em) return vide;
 
@@ -29,12 +31,13 @@ async function couvertureFamille(supabase, email) {
     // Le payeur est-il TOUJOURS abonné, et à une formule Famille ?
     const { data: payeur } = await supabase
       .from('clients')
-      .select('subscribed, plan')
+      .select('subscribed, plan, prenom, name')
       .eq('email', lien.owner_email)
       .maybeSingle();
 
     if (payeur && payeur.subscribed && PLANS_FAMILLE.includes(payeur.plan)) {
-      return { couvert: true, owner: lien.owner_email };
+      const prenom = (payeur.prenom || (payeur.name || '').split(' ')[0] || '').trim();
+      return { couvert: true, owner: lien.owner_email, ownerPrenom: prenom || null };
     }
     return vide;
   } catch (e) {

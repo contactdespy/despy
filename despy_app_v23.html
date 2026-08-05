@@ -718,6 +718,17 @@ body{ background:var(--p-paper); }
 .fm-row.fm-lock .fm-s{ color:var(--p-gold,#B4892E); font-weight:700; }
 .fm-key{ flex:none; font-size:15px; opacity:.75; }
 /* Bande « surveillance active » — rend visible le travail de fond (abonnés) */
+.famband{ width:100%; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px;
+  text-align:left; font-family:inherit; border:0; }
+.famband.fb-payeur{ background:linear-gradient(120deg,#3b1d63,#5b2a94); color:#fff; box-shadow:0 8px 22px rgba(91,42,148,.25); cursor:pointer; }
+.famband.fb-payeur:active{ transform:scale(.985); }
+.famband.fb-couvert{ background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; box-shadow:0 8px 22px rgba(16,102,74,.22); }
+.fb-ic{ width:38px; height:38px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.14); font-size:19px; }
+.fb-m{ flex:1; min-width:0; }
+.fb-a{ display:block; font-size:15px; font-weight:800; line-height:1.3; }
+.fb-b{ display:block; font-size:12.5px; margin-top:3px; line-height:1.45; color:rgba(255,255,255,.82); }
+.famband .chev{ color:rgba(255,255,255,.55); flex:none; }
 .veille{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:inherit; cursor:pointer;
   background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; border:0; border-radius:16px; padding:14px 16px;
   box-shadow:0 8px 22px rgba(16,102,74,.25); }
@@ -1057,6 +1068,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
         <span class="sos-btn">Appeler</span>
       </button>
+      <div class="famband" id="home-fam" style="display:none"></div>
+
       <button class="veille" id="home-veille" style="display:none" onclick="openBilan()">
         <span class="v-dot" aria-hidden="true"></span>
         <span class="v-m">
@@ -1068,7 +1081,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
       <div class="upsell" id="home-upsell" style="display:none">
         <div class="a">Passez à la protection complète</div>
-        <div class="b">Ligne SOS humaine, conseiller illimité, surveillance en continu, votre livret offert… dès 9,99 €/mois, sans engagement.</div>
+        <div class="b">Ligne SOS humaine, conseiller illimité, surveillance en continu, votre livret offert… dès 9,99 €/mois, sans engagement.<br><b style="color:#fff">Formule Famille : vous et vos deux parents</b> — moins cher que deux abonnements séparés.</div>
         <button class="u-btn" onclick="openPaywall()">Découvrir l'abonnement →</button>
       </div>
 
@@ -1677,6 +1690,8 @@ async function doLoginApp() {
       prenom: data.prenom || '', nom: data.nom || '',
       telephone: data.telephone || '',
       subscribed: !!data.subscribed, plan: data.plan || 'free',
+      famille_de: data.famille_de || null,
+      famille_prenom: data.famille_prenom || null,
       created_at: data.created_at
     });
     enterApp();
@@ -1855,6 +1870,10 @@ async function revalidateSession() {
     var changed = false;
     if (typeof data.subscribed === 'boolean' && data.subscribed !== s.subscribed) { s.subscribed = data.subscribed; changed = true; }
     if (data.plan && data.plan !== s.plan) { s.plan = data.plan; changed = true; }
+    var fdNouveau = data.famille_de || null;
+    if (fdNouveau !== (s.famille_de || null)) { s.famille_de = fdNouveau; changed = true; }
+    var fpNouveau = data.famille_prenom || null;
+    if (fpNouveau !== (s.famille_prenom || null)) { s.famille_prenom = fpNouveau; changed = true; }
     if (changed) {
       session.set(s);
       refreshProfile();
@@ -3031,16 +3050,92 @@ function heroPlaceholderRing() {
     '</svg>';
 }
 
+
+// ─── BANDEAU FAMILLE SUR L'ACCUEIL ───
+// Le badge seul ne suffisait pas : un payeur Famille pouvait n'utiliser
+// qu'une place sur trois sans jamais le savoir (il paie pour 3 personnes et
+// n'en protège qu'une), et un proche rattaché lisait « Abonné Premium », ce
+// qui est faux — il n'a pas d'abonnement, il est couvert par quelqu'un.
+function renderHomeFamille() {
+  var z = document.getElementById('home-fam');
+  if (!z) return;
+  var s = session.get() || {};
+
+  // ── Le proche rattaché : aucune requête, la session suffit ──
+  if (s.plan === 'family_member') {
+    // Replis successifs : prénom fourni par le serveur → nom présentable
+    // déduit de l'email → formule neutre. Jamais d'adresse email brute à
+    // l'écran, et jamais un « protégé par  » vide.
+    var qui = (s.famille_prenom || '').trim()
+           || (s.famille_de ? (friendlyDisplayName(s.famille_de) || '').trim() : '');
+    var titre = qui ? ('Vous êtes protégé par ' + qui) : 'Vous êtes protégé par un proche';
+    // Sans prénom, « un proche n'y a pas accès » sonne faux : on tourne la
+    // phrase autrement plutôt que de répéter une formule vague.
+    var confid = qui
+      ? ('Vos données et vos questions restent les vôtres : ' + qui + ' n’y a pas accès.')
+      : 'Vos données et vos questions restent les vôtres — personne d’autre n’y a accès.';
+    z.className = 'famband fb-couvert';
+    z.removeAttribute('role'); z.onclick = null;
+    z.innerHTML =
+      '<span class="fb-ic">👨‍👩‍👧</span>' +
+      '<span class="fb-m">' +
+        '<span class="fb-a">' + titre + '</span>' +
+        '<span class="fb-b">Vous avez tout Despy. ' + confid + '</span>' +
+      '</span>';
+    z.style.display = 'flex';
+    return;
+  }
+
+  // ── Le payeur : on ne parle que s'il lui reste des places ──
+  if (s.plan === 'family_monthly' || s.plan === 'family_annual') {
+    // FAM_ETAT est déjà le cache de l'écran Famille : on le partage plutôt
+    // que d'interroger deux fois le serveur pour la même chose.
+    if (FAM_ETAT) { peindreBandeauPayeur(FAM_ETAT); return; }
+    famAppel({ action: 'etat' })
+      .then(function (d) { FAM_ETAT = d; peindreBandeauPayeur(d); })
+      .catch(function () { /* hors ligne : rien plutôt qu'un chiffre faux */ });
+    return;
+  }
+
+  z.style.display = 'none';
+}
+
+function peindreBandeauPayeur(d) {
+  var z = document.getElementById('home-fam');
+  if (!z) return;
+  if (!d || d.disponible === false || !d.estPayeur) { z.style.display = 'none'; return; }
+  // Les trois places prises : plus rien à dire, on se tait.
+  if (!d.restantes || d.restantes <= 0) { z.style.display = 'none'; return; }
+
+  var proteges = 1 + (d.membres || []).filter(function (m) { return m.status === 'active'; }).length;
+  z.className = 'famband fb-payeur';
+  z.setAttribute('role', 'button');
+  z.onclick = function () { openFamille(); };
+  z.innerHTML =
+    '<span class="fb-ic">👨‍👩‍👧</span>' +
+    '<span class="fb-m">' +
+      '<span class="fb-a">Vous protégez ' + proteges + ' personne' + (proteges > 1 ? 's' : '') + ' sur 3</span>' +
+      '<span class="fb-b">Votre abonnement Famille couvre deux proches, sans rien payer de plus. ' +
+        (d.restantes > 1 ? 'Deux places vous attendent.' : 'Une place vous attend.') + '</span>' +
+    '</span>' +
+    '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  z.style.display = 'flex';
+}
+
 // Badge doré « Abonné Premium » dans l'en-tête.
 function refreshPlanBadge() {
   var el = document.getElementById('home-plan'), lab = document.getElementById('home-plan-label');
   if (!el) return;
   var s = session.get() || {};
-  if (!s.subscribed) { el.classList.remove('on'); return; }
+  if (!s.subscribed) { el.classList.remove('on'); try { renderHomeFamille(); } catch (e) {} return; }
+  // family_member = proche couvert par le plan d'un tiers. Lui afficher
+  // « Abonné Premium » serait faux : il n'a pas d'abonnement à son nom.
   var noms = { monthly: 'Abonné Premium', annual: 'Premium annuel',
-               family_monthly: 'Premium Famille', family_annual: 'Premium Famille' };
+               family_monthly: 'Premium Famille', family_annual: 'Premium Famille',
+               family_member: 'Protection Famille' };
   if (lab) lab.textContent = noms[s.plan] || 'Abonné Premium';
   el.classList.add('on');
+  try { renderHomeFamille(); } catch (e) {}
 }
 
 // Progression « Votre protection » — 6 gestes réels renvoyés par security-score.
@@ -5711,7 +5806,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-04-01';
+var APP_BUILD = '2026-08-05-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

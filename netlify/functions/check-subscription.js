@@ -90,6 +90,7 @@ exports.handler = async (event) => {
           plan: famC.couvert ? 'family_member' : (client.plan || 'free'),
           subscribed: client.subscribed || famC.couvert,
           famille_de: famC.couvert ? famC.owner : null,
+          famille_prenom: famC.couvert ? (famC.ownerPrenom || null) : null,
           created_at: client.created_at,
           questions_used: client.questions_used || 0
         })
@@ -110,6 +111,10 @@ exports.handler = async (event) => {
         exists: true,
         plan: fam.couvert ? 'family_member' : (client.plan || 'free'),
         subscribed: client.subscribed || fam.couvert,
+        // Qui le protège — l'accueil de l'appli l'affiche au proche rattaché,
+        // pour qu'il sache d'où vient sa protection (et à qui la redemander).
+        famille_de: fam.couvert ? fam.owner : null,
+        famille_prenom: fam.couvert ? (fam.ownerPrenom || null) : null,
         questions_used: client.questions_used || 0
       })
     };
