@@ -2045,7 +2045,10 @@ function switchAppTab(tab) {
   window.scrollTo(0, 0);
   if (navigator.vibrate) navigator.vibrate(5);
   if (tab === 'conseiller') mountConseiller();
-  if (tab === 'protection') refreshHomeScore();
+  // L'accueil affiche des compteurs vivants (questions posées, fuites,
+  // surveillance) : sans ce rafraîchissement, ils restaient figés sur les
+  // valeurs du démarrage de l'appli.
+  if (tab === 'home' || tab === 'protection') refreshHomeScore();
 }
 
 // Minuteur du nettoyage de la feuille. Sans lui, quand on enchaîne
@@ -2511,6 +2514,13 @@ async function runConseiller() {
     var reponse = data.reply || "Je n'ai pas pu répondre. Réessayez.";
     advBulle('them', reponse);
     _advHist.push({ role: 'assistant', content: reponse });
+
+    // Le serveur renvoie le compteur à jour : on l'applique tout de suite
+    // plutôt que d'attendre le prochain chargement de l'accueil.
+    if (typeof data.questions_month === 'number') {
+      var cq = document.getElementById('stat-questions');
+      if (cq) cq.textContent = data.questions_month;
+    }
 
     if (data.limit_reached) {
       advChips([]);
@@ -3460,7 +3470,12 @@ function renderHomeStats(stats) {
   if (!stats) return;
   var f = document.getElementById('stat-fuites'), q = document.getElementById('stat-questions'), si = document.getElementById('stat-sites');
   if (f) f.textContent = stats.breach_count || 0;
-  if (q) q.textContent = stats.questions_used || 0;
+  // Le titre dit « Ce mois-ci » : on affiche donc le compteur MENSUEL.
+  // `questions_used` est le cumul depuis l'inscription — le montrer ici
+  // donnait un nombre qui ne redescendait jamais au 1er du mois.
+  if (q) q.textContent = (typeof stats.questions_month === 'number')
+    ? stats.questions_month
+    : (stats.questions_used || 0);
   // « sites surveillés » : nombre indicatif de courtiers/annuaires suivis pour un abonné.
   if (si) si.textContent = (session.get() || {}).subscribed ? '30+' : '—';
 }
@@ -6091,7 +6106,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-05-03';
+var APP_BUILD = '2026-08-06-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

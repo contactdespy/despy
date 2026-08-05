@@ -57,6 +57,10 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify(buildPlaybookReply(fiche)) };
     }
 
+    // Renvoyé au client pour que le compteur « Ce mois-ci » bouge tout de
+    // suite, sans attendre un rechargement de l'accueil.
+    let questionsCeMois = null;
+
     // ── Vérification quota pour les comptes gratuits ──
     // 5 questions découverte PAR MOIS, réellement remises à zéro le 1er.
     // `questions_used` reste le total cumulé (bilan, rapport mensuel,
@@ -84,12 +88,16 @@ exports.handler = async (event) => {
       }
       const client = res.data;
 
-      if (client && !client.subscribed) {
+      if (client) {
         const used = avecPeriode
           ? (client.chat_period === periode ? (client.chat_period_used || 0) : 0)
           : (client.questions_used || 0);
 
-        if (used >= FREE_CHAT_PAR_MOIS) {
+        // Le quota ne s'applique qu'aux comptes gratuits — mais le COMPTAGE,
+        // lui, vaut pour tout le monde. Auparavant l'incrémentation était
+        // enfermée dans ce test : un abonné Premium voyait donc « 0 question
+        // posée » à vie sur son accueil, alors qu'il en posait tous les jours.
+        if (!client.subscribed && used >= FREE_CHAT_PAR_MOIS) {
           return {
             statusCode: 200,
             headers,
@@ -102,13 +110,14 @@ exports.handler = async (event) => {
           };
         }
 
-        // Incrémenter avant l'appel IA
+        // Incrémenter avant l'appel IA — pour tous, abonnés compris.
         const patch = {
           questions_used: (client.questions_used || 0) + 1,
           updated_at: new Date().toISOString()
         };
         if (avecPeriode) { patch.chat_period = periode; patch.chat_period_used = used + 1; }
         await supabase.from('clients').update(patch).eq('email', em);
+        questionsCeMois = used + 1;
       }
     }
 
@@ -155,7 +164,9 @@ SIRET Despy : 103 694 212 00012.`,
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ reply }),
+      body: JSON.stringify(
+        questionsCeMois === null ? { reply } : { reply, questions_month: questionsCeMois }
+      ),
     };
 
   } catch (err) {

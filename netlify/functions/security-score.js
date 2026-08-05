@@ -64,11 +64,20 @@ exports.handler = async (event) => {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
     const cleanEmail = email.toLowerCase().trim();
-    const { data: client, error } = await supabase
-      .from('clients')
-      .select('subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan, trusted_contact_email, trusted_contact_name')
-      .eq('email', cleanEmail)
-      .maybeSingle();
+
+    // Cette fonction porte tout l'accueil : si une colonne récente manque en
+    // base, on doit dégrader, pas renvoyer « Compte introuvable » et laisser
+    // l'écran vide. On retente donc avec le jeu de colonnes historique.
+    const COLONNES_BASE = 'subscribed, questions_used, breach_count, last_hibp_check, telephone, quizzes_completed, created_at, known_breaches, plan';
+    const COLONNES_PLUS = COLONNES_BASE + ', trusted_contact_email, trusted_contact_name, chat_period, chat_period_used';
+
+    let { data: client, error } = await supabase
+      .from('clients').select(COLONNES_PLUS).eq('email', cleanEmail).maybeSingle();
+    if (error) {
+      console.warn('security-score : colonnes récentes absentes, repli —', error.message);
+      ({ data: client, error } = await supabase
+        .from('clients').select(COLONNES_BASE).eq('email', cleanEmail).maybeSingle());
+    }
 
     if (error || !client) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Compte introuvable' }) };
@@ -120,6 +129,12 @@ exports.handler = async (event) => {
         checklist,
         stats: {
           questions_used:    client.questions_used || 0,
+          // Le compteur affiché sous « Ce mois-ci » doit être MENSUEL.
+          // `questions_used` est le cumul depuis l'inscription (gardé tel quel
+          // car onboarding-sequence filtre dessus) : l'afficher sous un titre
+          // mensuel donnait un chiffre faux qui ne redescendait jamais.
+          questions_month:   (client.chat_period === new Date().toISOString().slice(0, 7))
+                               ? (client.chat_period_used || 0) : 0,
           breach_count:      client.breach_count || 0,
           last_hibp_check:   client.last_hibp_check || null,
           quizzes_completed: client.quizzes_completed || 0,
