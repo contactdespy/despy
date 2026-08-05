@@ -596,6 +596,10 @@ body{ background:var(--p-paper); }
 .vic-step.done .vic-txt{ text-decoration:line-through; }
 .vic-step.done .vic-tick{ background:#16a34a; border-color:#16a34a; color:#fff; }
 .vic-foot{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+.vic-help-sos{ background:linear-gradient(120deg,#7f1d1d,#dc2626) !important; color:#fff !important;
+  box-shadow:0 8px 22px rgba(220,38,38,.24); }
+.vic-help-sos span{ color:rgba(255,255,255,.86) !important; }
+.vic-help-sos:active{ transform:scale(.985); }
 .vic-help{ display:block; text-decoration:none; background:#111a2e; color:#fff; border-radius:14px; padding:14px 16px; font-weight:800; font-size:15px; }
 .vic-help span{ display:block; font-weight:500; font-size:12.5px; color:#a9b7d1; margin-top:3px; }
 .vic-help-2{ background:var(--p-card,#fff); color:var(--p-ink,#0f1830); border:1px solid var(--p-line,#E7EBF3); }
@@ -2841,11 +2845,105 @@ function renderVictimeTriage() {
     h += '<button class="vic-cat" onclick="renderVictimePlan(\'' + c[0] + '\')"><span class="vic-cat-ic">' + c[1] + '</span><span class="vic-cat-t">' + c[2] + '</span>' + chev + '</button>';
   });
   h += '</div>';
-  h += '<div class="vic-foot">' + _vicDespyHelp() +
+  h += '<div class="vic-foot">' + _vicRappelBouton('doute') + _vicDespyHelp() +
        '<a href="tel:0805805817" class="vic-help vic-help-2">📞 Info Escroqueries (gratuit)<span>0 805 805 817 · police &amp; gendarmerie, lun-ven 9h-18h30</span></a></div>';
   document.getElementById('victime-body').innerHTML = h;
   var sc = document.querySelector('#victime .mod-scroll'); if (sc) sc.scrollTop = 0;
 }
+
+// ─── DEMANDER DE L'AIDE POUR DE VRAI ───
+// Jusqu'ici le SOS de l'appli n'envoyait aucun signal : ni à Yacine, ni à la
+// personne de confiance — alors que l'appli lui promet d'être prévenue en cas
+// d'appel à l'aide. `sos-request` fait déjà tout ce travail (Telegram, email
+// à Yacine, confirmation au client, alerte du proche) ; l'appli ne l'appelait
+// simplement jamais.
+//
+// L'action est explicite à dessein : consulter les conseils ne doit alerter
+// personne. C'est demander de l'aide qui déclenche.
+var VIC_URGENT = { paiement: true, compte: true };   // argent ou compte pris
+
+function _vicRappelBouton(type) {
+  // On ne promet l'alerte du proche que si le client en a réellement désigné
+  // un — PROT_STATS vient de security-score, chargé par l'accueil.
+  var aUnProche = !!(typeof PROT_STATS !== 'undefined' && PROT_STATS && PROT_STATS.trusted_email);
+  return '<button class="vic-help vic-help-sos" onclick="vicDemanderRappel(\'' + type + '\')" ' +
+         'style="width:100%;text-align:left;font-family:inherit;border:0;cursor:pointer">' +
+         '🆘 Demander de l’aide maintenant' +
+         '<span>Un conseiller vous rappelle' + (VIC_URGENT[type] ? ' en priorité' : '') +
+         (aUnProche ? ' — et votre personne de confiance est prévenue' : '') +
+         '</span></button>';
+}
+
+function vicDemanderRappel(type) {
+  var s = session.get() || {};
+  var p = VIC_PLANS[type] || { title: 'Demande d’aide' };
+  openSheet('Être rappelé',
+    '<p class="sheet-help">Laissez votre numéro : quelqu’un vous rappelle' +
+      (VIC_URGENT[type] ? ' <b>en priorité</b>' : '') + '. Si vous avez désigné une personne de confiance, ' +
+      'elle est prévenue en même temps.</p>' +
+    '<label class="sec-lab" for="vic-tel">Votre téléphone</label>' +
+    '<input id="vic-tel" class="auth-input" type="tel" inputmode="tel" placeholder="06 12 34 56 78" ' +
+      'autocomplete="tel" value="' + String(s.telephone || '').replace(/"/g, '&quot;') + '">' +
+    '<label class="sec-lab" for="vic-ctx" style="margin-top:14px">En deux mots, que s’est-il passé ?</label>' +
+    '<textarea id="vic-ctx" class="auth-input" rows="3" style="resize:vertical" ' +
+      'placeholder="Ex. : j’ai donné mon code par téléphone ce matin"></textarea>' +
+    '<div id="vic-err" style="display:none;margin-top:10px;font-size:13.5px;color:#b4892e;line-height:1.5"></div>' +
+    '<button class="btn-primary" style="margin-top:16px" id="vic-go" onclick="vicEnvoyerRappel(\'' + type + '\')">Envoyer ma demande</button>' +
+    '<div class="fam-note" style="margin-top:14px">Vous préférez appeler tout de suite ? ' +
+      '<a href="tel:+33689148395"><b>06 89 14 83 95</b></a></div>');
+}
+
+function vicEnvoyerRappel(type) {
+  var s = session.get() || {};
+  var p = VIC_PLANS[type] || { title: 'Demande d’aide' };
+  var tel = ((document.getElementById('vic-tel') || {}).value || '').trim();
+  var ctx = ((document.getElementById('vic-ctx') || {}).value || '').trim();
+  var err = document.getElementById('vic-err');
+  var btn = document.getElementById('vic-go');
+  function echec(m) {
+    if (err) { err.textContent = m; err.style.display = 'block'; }
+    if (btn) { btn.textContent = 'Envoyer ma demande'; btn.disabled = false; }
+  }
+  if (tel.replace(/[^0-9]/g, '').length < 9) { echec('Indiquez un numéro où vous joindre.'); return; }
+  if (err) err.style.display = 'none';
+  if (btn) { btn.textContent = 'Envoi…'; btn.disabled = true; }
+
+  fetch('/.netlify/functions/sos-request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      user_email: s.email || '',
+      type: type,
+      type_label: p.title,
+      is_critical: !!VIC_URGENT[type],
+      phone: tel,
+      context: ctx || p.title,
+      subscribed: !!s.subscribed,
+      submitted_at: new Date().toISOString()
+    })
+  }).then(function (r) {
+    // On ne dit « c'est parti » que si ça l'est vraiment. Quelqu'un en
+    // détresse ne doit pas attendre un rappel qui n'a jamais été demandé.
+    if (!r.ok) { echec('Envoi impossible. Appelez-nous directement au 06 89 14 83 95.'); return; }
+    // Le numéro servira aux prochaines fois.
+    try { if (!s.telephone) { s.telephone = tel; session.set(s); } } catch (e) {}
+    closeSheet();
+    setTimeout(function () {
+      openSheet('C’est envoyé',
+        '<div style="text-align:center;padding:6px 0 2px"><div style="font-size:52px">🤝</div>' +
+        '<div style="font-size:19px;font-weight:800;color:var(--p-txt);margin-top:8px">Quelqu’un vous rappelle</div>' +
+        '<div style="font-size:15px;color:var(--p-txt2);line-height:1.65;margin-top:10px">' +
+          'Au <b>' + tel.replace(/</g, '&lt;') + '</b>' + (VIC_URGENT[type] ? ', en priorité' : '') + '. ' +
+          'En attendant : <b>ne payez rien</b> et ne communiquez aucun code, même à quelqu’un qui dit être votre banque.' +
+        '</div>' +
+        '<div style="font-size:13.5px;color:var(--p-muted);line-height:1.6;margin-top:14px">' +
+          'Si c’est urgent, n’attendez pas : <a href="tel:+33689148395"><b>06 89 14 83 95</b></a></div></div>');
+    }, 260);
+  }).catch(function () {
+    echec('Connexion impossible. Appelez-nous au 06 89 14 83 95.');
+  });
+}
+
 
 function renderVictimePlan(type) {
   var p = VIC_PLANS[type];
@@ -2859,7 +2957,7 @@ function renderVictimePlan(type) {
          '<button class="vic-tick" onclick="this.closest(\'.vic-step\').classList.toggle(\'done\')" aria-label="C’est fait">✓</button></div>';
   });
   h += '</div>';
-  h += '<div class="vic-foot">' + _vicDespyHelp() +
+  h += '<div class="vic-foot">' + _vicRappelBouton(type) + _vicDespyHelp() +
        '<a href="tel:0805805817" class="vic-help vic-help-2">📞 Info Escroqueries (gratuit)<span>0 805 805 817 · police &amp; gendarmerie, lun-ven 9h-18h30</span></a>' +
        '<a href="https://www.cybermalveillance.gouv.fr" target="_blank" rel="noopener" class="vic-help vic-help-2">🌐 Cybermalveillance.gouv.fr<span>Assistance officielle aux victimes</span></a></div>';
   document.getElementById('victime-body').innerHTML = h;
@@ -6106,7 +6204,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-06-01';
+var APP_BUILD = '2026-08-06-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
