@@ -30,3 +30,16 @@ CREATE INDEX IF NOT EXISTS family_member_idx ON family_members (member_email, st
 -- Une même personne ne peut pas être rattachée deux fois activement
 CREATE UNIQUE INDEX IF NOT EXISTS family_member_unique
   ON family_members (member_email) WHERE status = 'active';
+
+-- ── Verrouillage ──
+-- Aucune clé Supabase n'est exposée au navigateur (tout passe par les
+-- fonctions Netlify avec la clé service, qui contourne RLS par conception).
+-- On active quand même RLS sans aucune policy : la table ne contient que des
+-- adresses email de clients, et si un jour du code côté navigateur parlait à
+-- Supabase, elle resterait fermée.
+ALTER TABLE family_members ENABLE ROW LEVEL SECURITY;
+
+-- ── Vérification ──
+-- Doit renvoyer 3 lignes (les 3 index) et rls_active = true.
+SELECT indexname FROM pg_indexes WHERE tablename = 'family_members';
+SELECT relrowsecurity AS rls_active FROM pg_class WHERE relname = 'family_members';
