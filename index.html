@@ -6740,10 +6740,10 @@ function handleStripeReturn() {
 // ======================================
 // CONSEILLER
 // ======================================
-var _conseilType = 'standard';
+var _conseilType = 'distance';   // la carte pré-sélectionnée à l'écran
 function selectConseil(type, el) {
   _conseilType = type;
-  document.querySelectorAll('#cs-standard,#cs-urgent').forEach(function(c){
+  document.querySelectorAll('#cs-standard,#cs-urgent,#cs-forfait').forEach(function(c){
     c.style.border = '1.5px solid var(--border)';
     c.style.background = '#fff';
     c.querySelector('div').style.color = 'var(--text)';
@@ -6756,38 +6756,49 @@ function selectConseil(type, el) {
 async function sendConseil() {
   var name  = (document.getElementById('c-name')||{}).value||'';
   var email = (document.getElementById('c-email')||{}).value||'';
+  var tel   = (document.getElementById('c-tel')||{}).value||'';
   var msg   = (document.getElementById('c-msg')||{}).value||'';
   var errEl = document.getElementById('conseil-error');
   var btn   = document.getElementById('conseil-btn');
 
-  if (!name.trim() || !email.trim() || !msg.trim()) {
-    if(errEl){ errEl.textContent='Remplissez tous les champs obligatoires.'; errEl.style.display='block'; }
-    return;
+  function echec(m) {
+    if (errEl) { errEl.textContent = m; errEl.style.display = 'block'; }
+    if (btn) { btn.textContent = 'Envoyer ma demande'; btn.disabled = false; }
   }
-  if (!email.includes('@')) {
-    if(errEl){ errEl.textContent='Email invalide.'; errEl.style.display='block'; }
-    return;
-  }
-  if(errEl) errEl.style.display='none';
-  if(btn){ btn.textContent='Envoi...'; btn.disabled=true; }
 
+  if (!name.trim() || !email.trim() || !msg.trim()) {
+    return echec('Remplissez tous les champs obligatoires.');
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    return echec('Email invalide.');
+  }
+  if (errEl) errEl.style.display = 'none';
+  if (btn) { btn.textContent = 'Envoi…'; btn.disabled = true; }
+
+  // On n'affiche « envoyé » que si le serveur l'a réellement envoyé.
+  // C'est précisément ce qui manquait : l'ancien code affichait le succès
+  // même quand la requête échouait, et personne ne s'en apercevait.
   try {
-    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        service_id:'service_despy',
-        template_id:'template_despy',
-        user_id:'despy_public',
-        template_params:{ from_name:name, from_email:email, message:msg, type:_conseilType }
+    var r = await fetch('/.netlify/functions/conseil-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.trim(), email: email.trim(), tel: tel.trim(),
+        message: msg.trim(), type: _conseilType
       })
     });
-  } catch(e){}
+    var d = await r.json();
+    if (!r.ok || !d || !d.ok) {
+      return echec((d && d.error) || 'Envoi impossible. Appelez-nous au 06 89 14 83 95.');
+    }
+  } catch (e) {
+    return echec('Connexion impossible. Réessayez, ou appelez le 06 89 14 83 95.');
+  }
 
   var form = document.getElementById('conseil-form');
   var succ = document.getElementById('conseil-success');
-  if(form) form.style.display='none';
-  if(succ) succ.style.display='block';
+  if (form) form.style.display = 'none';
+  if (succ) succ.style.display = 'block';
 }
 
 // ======================================
