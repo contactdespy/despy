@@ -484,6 +484,14 @@ body{ background:var(--p-paper); }
 
 /* ── lignes de liste ── */
 .plist{ background:var(--p-card); border-radius:18px; box-shadow:0 6px 20px rgba(12,25,55,.07); overflow:hidden; }
+.prot-auto{ margin-top:12px; padding:11px 13px; border-radius:11px; background:#EAF6EF; border:1px solid #BFE3CD;
+  font-size:13px; line-height:1.55; color:#14603F; display:flex; gap:9px; align-items:flex-start; }
+.prot-auto b{ color:#0E4A31; }
+.pstep-ok{ background:#15803d !important; color:#fff !important; }
+.pstep-num{ background:var(--p-line); color:var(--p-muted); font-weight:800; font-size:13px; }
+.listrow.pstep-fait .a{ color:var(--p-txt2); }
+.listrow.pstep-fait .b{ color:var(--p-muted); }
+.pstep-go{ flex:none; font-size:12.5px; font-weight:800; color:var(--p-blue); }
 .listrow{ display:flex; align-items:center; gap:13px; padding:13px 16px; border-top:1px solid var(--p-line); width:100%; text-align:left; background:none; border-left:0; border-right:0; border-bottom:0; font-family:inherit; cursor:pointer; }
 .listrow:first-child{ border-top:0; }
 .listrow .ic{ width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex:none; }
@@ -1143,12 +1151,11 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <div class="card pad" id="prot-panel">
         <div class="prot-top"><span class="t">Votre protection</span><span class="pill pill-blue" id="prot-count">— / 6</span></div>
         <div class="pbar"><i id="prot-bar"></i></div>
-        <button class="next" id="prot-next" style="display:none">
-          <span class="k" id="prot-next-ic">🛡️</span>
-          <span class="m"><span class="a" id="prot-next-t"></span><span class="b" id="prot-next-d"></span></span>
-          <span class="go">Activer</span>
-        </button>
+        <div class="prot-auto" id="prot-auto" style="display:none"></div>
       </div>
+
+      <div class="sec">Vos six protections</div>
+      <div class="plist" id="prot-liste"></div>
 
       <div class="sec">Surveillance</div>
       <div class="plist">
@@ -1354,6 +1361,17 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     </div>
   </div>
   <div class="mod-scroll"><div id="fam-body"></div></div>
+</div>
+
+<!-- ═══ PERSONNE DE CONFIANCE ═══ -->
+<div id="confiance" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeConfiance()" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Votre protection</div><div class="mod-htitle">Personne de confiance</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="conf-body"></div></div>
 </div>
 
 <!-- ═══ PRÈS DE CHEZ MOI (Alerte Secteur) ═══ -->
@@ -2102,6 +2120,7 @@ function openTool(name) {
     case 'diag':       return openDiag();
     case 'bouclier':   return openBouclier();
     case 'secteur':    return openSecteur();
+    case 'confiance':  return openConfiance();
     case 'entrainement': return openEntrainement();
     default: toast('Outil bientôt disponible');
   }
@@ -3139,18 +3158,167 @@ function refreshPlanBadge() {
 }
 
 // Progression « Votre protection » — 6 gestes réels renvoyés par security-score.
+
+// ─── PERSONNE DE CONFIANCE ───
+// Cet écran manquait purement et simplement dans l'appli : la fonction
+// serveur `trusted-contact` existait depuis longtemps et le site l'utilisait,
+// mais l'appli n'y touchait jamais. L'étape « Ajouter un proche de confiance »
+// de la checklist était donc IMPOSSIBLE à réaliser — et comme elle bloquait
+// l'affichage des étapes suivantes, plus rien ne pouvait avancer.
+var CONF_ETAT = null;
+
+function openConfiance() {
+  document.getElementById('confiance').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('conf-body').innerHTML = '<div class="spinner" style="margin:60px auto"></div>';
+  chargerConfiance();
+}
+function closeConfiance() {
+  document.getElementById('confiance').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function confAppel(corps) {
+  var s = session.get();
+  if (!s || !s.email) return Promise.reject(new Error('non connecte'));
+  return fetch('/.netlify/functions/trusted-contact', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify(Object.assign({ email: s.email }, corps))
+  }).then(function (r) { return r.json(); });
+}
+
+function chargerConfiance() {
+  confAppel({})
+    .then(function (d) { CONF_ETAT = d; renderConfiance(d); })
+    .catch(function () {
+      document.getElementById('conf-body').innerHTML =
+        '<div class="card pad" style="text-align:center;color:var(--p-muted)">Impossible de charger pour le moment. Réessayez dans un instant.</div>';
+    });
+}
+
+function renderConfiance(d) {
+  var z = document.getElementById('conf-body');
+  if (!z) return;
+  var nom = (d && d.contact_name) || '';
+  var mail = (d && d.contact_email) || '';
+  var actif = !!mail;
+
+  var h = '';
+
+  if (actif) {
+    h += '<div class="veille" style="cursor:default;margin-bottom:16px">' +
+           '<span class="v-dot"></span>' +
+           '<span class="v-m"><span class="v-a">' + (nom ? nom : mail) + ' veille sur vous</span>' +
+           '<span class="v-b">' + (nom ? mail : 'Prévenu en cas de danger') + '</span></span></div>';
+  }
+
+  h += '<div class="card pad" style="margin-bottom:16px">' +
+       '<div style="font-size:15px;line-height:1.65;color:var(--p-txt)">' +
+         'Désignez quelqu’un en qui vous avez confiance — un enfant, un ami, un voisin. ' +
+         '<b>Il ne verra rien de votre vie privée</b>, mais il sera prévenu par email dans trois cas précis :' +
+       '</div>' +
+       '<div style="margin-top:12px;font-size:14.5px;line-height:2.05;color:var(--p-txt2)">' +
+         '🕵️ Vos données apparaissent dans une fuite<br>' +
+         '🚨 Une arnaque grave est détectée dans vos messages<br>' +
+         '🆘 Vous déclenchez un appel à l’aide (SOS)' +
+       '</div>' +
+       '<div style="margin-top:12px;font-size:13px;color:var(--p-muted);line-height:1.6">' +
+         'C’est utile le jour où quelque chose vous échappe : quelqu’un d’autre le voit en même temps que vous.' +
+       '</div></div>';
+
+  h += '<label class="sec-lab" for="conf-nom">Son prénom</label>' +
+       '<input id="conf-nom" class="auth-input" type="text" maxlength="80" placeholder="Sophie" autocomplete="name" value="' + nom.replace(/"/g, '&quot;') + '">' +
+       '<label class="sec-lab" for="conf-mail" style="margin-top:14px">Son adresse email</label>' +
+       '<input id="conf-mail" class="auth-input" type="email" maxlength="120" placeholder="sophie@exemple.fr" autocomplete="email" value="' + mail.replace(/"/g, '&quot;') + '">' +
+       '<div id="conf-err" style="display:none;margin-top:10px;font-size:13.5px;color:#b4892e;line-height:1.5"></div>' +
+       '<button class="btn-primary" style="margin-top:16px" onclick="enregistrerConfiance()">' +
+         (actif ? 'Enregistrer les modifications' : 'Désigner cette personne') + '</button>';
+
+  if (actif) {
+    h += '<button class="btn-secondary" style="margin-top:10px" onclick="retirerConfiance()">Retirer cette personne</button>';
+  }
+
+  h += '<div class="fam-note" style="margin-top:16px">Elle recevra un email lui expliquant son rôle. ' +
+       'Vous pouvez la changer ou la retirer à tout moment.</div>';
+
+  z.innerHTML = h;
+}
+
+function confErreur(m) {
+  var e = document.getElementById('conf-err');
+  if (e) { e.textContent = m; e.style.display = 'block'; }
+}
+
+function enregistrerConfiance() {
+  var nom  = ((document.getElementById('conf-nom') || {}).value || '').trim();
+  var mail = ((document.getElementById('conf-mail') || {}).value || '').trim().toLowerCase();
+  var e = document.getElementById('conf-err');
+  if (e) e.style.display = 'none';
+
+  if (!mail || mail.indexOf('@') === -1 || mail.indexOf('.') === -1) {
+    confErreur('Saisissez une adresse email valide pour votre proche.'); return;
+  }
+  var moi = ((session.get() || {}).email || '').toLowerCase();
+  if (mail === moi) {
+    confErreur('Choisissez quelqu’un d’autre que vous — c’est tout l’intérêt.'); return;
+  }
+
+  toast('Enregistrement…');
+  confAppel({ action: 'set', contact_name: nom, contact_email: mail })
+    .then(function (d) {
+      if (!d || d.error) { confErreur(d && d.error ? d.error : 'Enregistrement impossible.'); return; }
+      toast('C’est fait — ' + (nom || mail) + ' veille sur vous.');
+      CONF_ETAT = d;
+      renderConfiance(d);
+      // La checklist de protection change : on la recharge (c'est
+      // refreshHomeScore qui interroge security-score et repeint la liste).
+      if (typeof refreshHomeScore === 'function') { try { refreshHomeScore(); } catch (x) {} }
+    })
+    .catch(function () { confErreur('Connexion impossible. Réessayez dans un instant.'); });
+}
+
+function retirerConfiance() {
+  toast('Retrait…');
+  confAppel({ action: 'set', contact_name: '', contact_email: '' })
+    .then(function (d) {
+      if (!d || d.error) { confErreur((d && d.error) || 'Retrait impossible.'); return; }
+      toast('Personne de confiance retirée.');
+      CONF_ETAT = { contact_name: null, contact_email: null };
+      renderConfiance(CONF_ETAT);
+      if (typeof refreshHomeScore === 'function') { try { refreshHomeScore(); } catch (x) {} }
+    })
+    .catch(function () { confErreur('Connexion impossible. Réessayez.'); });
+}
+
+// `d` = pourquoi le faire (tant que ce n'est pas fait).
+// `f` = ce que ça vous apporte désormais (une fois fait) — pour que la ligne
+//       barrée reste une bonne nouvelle et pas une simple case cochée.
 var PROT_ETAPES = [
-  { k: 'darkweb',    i: '🔎', t: 'Vérifier vos fuites de données', d: 'Le contrôle le plus utile', go: 'darkweb' },
-  { k: 'trusted',    i: '👥', t: 'Ajouter un proche de confiance', d: 'Prévenu si quelque chose cloche', go: 'score' },
-  { k: 'conseiller', i: '💬', t: 'Poser une question au Conseiller', d: 'Il répond en moins d\'une minute', go: 'conseiller' },
-  { k: 'formation',  i: '🎓', t: 'Faire votre premier quiz', d: 'Pour repérer les pièges', go: 'quiz' },
-  { k: 'privacy',    i: '🧹', t: 'Lancer l\'effacement de vos données', d: 'Demandes RGPD envoyées pour vous', go: 'privacy' },
-  { k: 'training',   i: '🎯', t: 'Passer un entraînement', d: 'Un faux SMS, sans danger', go: 'entrainement' }
+  { k: 'darkweb',    i: '🔎', t: 'Vérifier vos fuites de données',
+    d: 'Savoir si votre email circule déjà chez les escrocs',
+    f: 'Vos fuites sont connues et surveillées', go: 'darkweb' },
+  { k: 'trusted',    i: '👥', t: 'Désigner une personne de confiance',
+    d: 'Quelqu’un de prévenu si un danger vous vise',
+    f: 'Vous n’êtes plus seul face à une alerte', go: 'confiance' },
+  { k: 'conseiller', i: '💬', t: 'Poser une question au Conseiller',
+    d: 'Un doute sur un SMS ? Montrez-le, on répond',
+    f: 'Le réflexe est pris : au moindre doute, demandez', go: 'conseiller' },
+  { k: 'formation',  i: '🎓', t: 'Faire votre premier quiz',
+    d: 'Apprendre à reconnaître les pièges courants',
+    f: 'Vous repérez les pièges les plus fréquents', go: 'quiz' },
+  { k: 'privacy',    i: '🧹', t: 'Lancer l’effacement de vos données',
+    d: 'On écrit aux sites qui vous exposent, à votre place',
+    f: 'Vos demandes de suppression sont parties', go: 'privacy' },
+  { k: 'training',   i: '🎯', t: 'Passer un entraînement',
+    d: 'Un faux SMS d’arnaque, sans aucun danger',
+    f: 'Vous vous entraînez pour de vrai', go: 'entrainement' }
 ];
 
 function renderProtection(checklist) {
   if (!checklist) return;
   var faits = PROT_ETAPES.filter(function (e) { return !!checklist[e.k]; }).length;
+
   var cpt = document.getElementById('prot-count');
   if (cpt) {
     cpt.textContent = faits + ' / ' + PROT_ETAPES.length + ' activées';
@@ -3158,15 +3326,36 @@ function renderProtection(checklist) {
   }
   var barre = document.getElementById('prot-bar');
   if (barre) setTimeout(function () { barre.style.width = (faits / PROT_ETAPES.length * 100) + '%'; }, 60);
-  var suite = PROT_ETAPES.filter(function (e) { return !checklist[e.k]; })[0];
-  var bloc = document.getElementById('prot-next');
-  if (!bloc) return;
-  if (!suite) { bloc.style.display = 'none'; return; }
-  bloc.style.display = 'flex';
-  document.getElementById('prot-next-ic').textContent = suite.i;
-  document.getElementById('prot-next-t').textContent = suite.t;
-  document.getElementById('prot-next-d').textContent = suite.d;
-  bloc.onclick = function () { openTool(suite.go); };
+
+  // Ce qui tourne SANS le client : c'est ce qu'il paie, il doit le voir.
+  var auto = document.getElementById('prot-auto');
+  if (auto) {
+    var abonne = !!(session.get() || {}).subscribed;
+    if (abonne) {
+      auto.innerHTML = '<span>🛡️</span><span>Pendant ce temps, <b>Despy surveille vos données en continu</b> — ' +
+        'sans que vous ayez quoi que ce soit à faire. Prochain contrôle ' +
+        (typeof prochainControleFr === 'function' ? prochainControleFr() : 'cette semaine') + '.</span>';
+      auto.style.display = 'flex';
+    } else {
+      auto.style.display = 'none';
+    }
+  }
+
+  // Les SIX étapes, toutes visibles. Avant, seule la première non faite
+  // était affichée : une étape impossible bloquait donc tout le reste.
+  var z = document.getElementById('prot-liste');
+  if (!z) return;
+  var h = '';
+  PROT_ETAPES.forEach(function (e, n) {
+    var fait = !!checklist[e.k];
+    h += '<button class="listrow' + (fait ? ' pstep-fait' : '') + '" onclick="openTool(\'' + e.go + '\')">' +
+      '<span class="ic ' + (fait ? 'pstep-ok' : 'pstep-num') + '">' + (fait ? '✓' : (n + 1)) + '</span>' +
+      '<span class="m"><span class="a">' + e.t + '</span><span class="b">' + (fait ? e.f : e.d) + '</span></span>' +
+      (fait ? '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>'
+            : '<span class="pstep-go">Activer</span>') +
+      '</button>';
+  });
+  z.innerHTML = h;
 }
 
 
@@ -5806,7 +5995,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-05-01';
+var APP_BUILD = '2026-08-05-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
