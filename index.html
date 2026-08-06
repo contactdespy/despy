@@ -6031,6 +6031,28 @@ async function siteLogin() {
 // ════════════════════════════════════════
 // MOT DE PASSE OUBLIÉ
 // ════════════════════════════════════════
+// Pont entre la fenêtre de connexion et le parcours de récupération, qui vit
+// dans la page de connexion. On ne duplique pas le formulaire : on ferme la
+// fenêtre, on ouvre la page, et on y reporte l'email déjà saisi.
+function oubliDepuisModale(modal) {
+  var saisi = ((document.getElementById('login-email') || {}).value || '').trim();
+  if (modal) modal.remove();
+  // ⚠ On ne navigue PAS tout de suite : fermer une fenêtre déclenche un
+  // history.back() (mécanisme « le bouton retour ferme la modale »), donc un
+  // popstate qui rejoue la page précédente — l'accueil — et annulerait notre
+  // showPage('login'). On attend que l'historique se stabilise.
+  setTimeout(function () {
+    if (typeof showPage === 'function') showPage('login');
+    var champ = document.getElementById('forgot-email');
+    if (champ && saisi) champ.value = saisi;
+    var boite = document.getElementById('forgot-box');
+    if (boite && boite.style.display !== 'block') {
+      try { showForgotPassword(); } catch (e) {}
+    }
+    if (champ) champ.focus();
+  }, 320);
+}
+
 function showForgotPassword() {
   var box = document.getElementById('forgot-box');
   if (!box) return;
@@ -7119,6 +7141,17 @@ function showLoginModal() {
   btn.textContent = 'Se connecter →';
   btn.onclick = function() { siteLogin(); };
 
+  // Cette fenêtre n'avait AUCUN lien de récupération : le seul existant vit
+  // dans la page de connexion. Or c'est ici que les gens se connectent —
+  // quelqu'un qui a oublié son mot de passe (ou qui s'est inscrit via Google
+  // et n'en a jamais eu) se retrouvait sans issue.
+  var oubliBtn = document.createElement('button');
+  oubliBtn.type = 'button';
+  oubliBtn.style.cssText = 'background:none;border:0;font-family:inherit;font-size:13.5px;' +
+    'font-weight:700;color:var(--blue);cursor:pointer;padding:10px 4px 2px;width:100%';
+  oubliBtn.textContent = 'Mot de passe oublié ?';
+  oubliBtn.onclick = function(){ oubliDepuisModale(modal); };
+
   var backBtn = document.createElement('button');
   backBtn.className = 'sub-cancel';
   backBtn.textContent = 'Pas de compte ? Créer un compte gratuit';
@@ -7135,7 +7168,7 @@ function showLoginModal() {
   box.appendChild(googleSection);
   box.appendChild(emailWrap); box.appendChild(pwdWrap);
   box.appendChild(errDiv);
-  box.appendChild(btn); box.appendChild(backBtn); box.appendChild(trust);
+  box.appendChild(btn); box.appendChild(oubliBtn); box.appendChild(backBtn); box.appendChild(trust);
   modal.appendChild(box);
   modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
   document.body.appendChild(modal);
