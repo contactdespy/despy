@@ -51,8 +51,9 @@ exports.handler = async (event) => {
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email requis' }) };
     }
+    // requireAuth renvoie { ok, response } — surtout pas une réponse directe.
     const auth = requireAuth(event, body, email, headers);
-    if (auth) return auth;
+    if (!auth.ok) return auth.response;
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
