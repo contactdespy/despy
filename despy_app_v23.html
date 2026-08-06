@@ -3613,6 +3613,68 @@ function renderHomeStats(stats) {
 }
 
 // Carte « Ma formation » : progression lue dans localStorage.
+// ─── PROGRESSION DE LA FORMATION ───
+// Elle ne quittait jamais le téléphone : les 10 modules étaient cochés dans
+// le localStorage et nulle part ailleurs. Un client qui changeait d'appareil
+// repartait de zéro sans comprendre. Et comme rien ne remontait, l'étape
+// « Faire votre premier quiz » de la checklist Protection — qui lit
+// `quizzes_completed` — ne se validait jamais non plus.
+function formationAppel(corps) {
+  var s = session.get();
+  if (!s || !s.email) return Promise.reject(new Error('non connecte'));
+  return fetch('/.netlify/functions/formation-progress', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify(Object.assign({ email: s.email }, corps))
+  }).then(function (r) { return r.json(); });
+}
+
+function formationModulesLocaux() {
+  var l = [];
+  try {
+    for (var i = 1; i <= 10; i++) {
+      if (localStorage.getItem('despy_module_' + i) === '1') l.push(i);
+    }
+  } catch (e) {}
+  return l;
+}
+
+// Au démarrage : on récupère ce que le serveur sait, et on complète le
+// téléphone. L'union, jamais l'écrasement — sinon un client qui vient de
+// finir un module hors ligne le perdrait.
+function formationSync() {
+  var s = session.get();
+  if (!s || !s.email) return;
+  formationAppel({ action: 'etat' }).then(function (d) {
+    if (!d || !Array.isArray(d.modules)) return;
+    var locaux = formationModulesLocaux();
+    d.modules.forEach(function (id) {
+      try { localStorage.setItem('despy_module_' + id, '1'); } catch (e) {}
+    });
+    // Ce que le téléphone savait et pas le serveur : on le lui apprend.
+    var manquants = locaux.filter(function (id) { return d.modules.indexOf(id) === -1; });
+    if (manquants.length) {
+      formationAppel({ action: 'module', id: manquants[0], locaux: locaux }).catch(function () {});
+    }
+    if (typeof refreshFormationCard === 'function') { try { refreshFormationCard(); } catch (e) {} }
+  }).catch(function () { /* hors ligne : l'état local fait foi */ });
+}
+
+// Signale un module terminé. Sans réponse du serveur, l'état local reste :
+// on ne bloque jamais la formation sur un problème de réseau.
+function formationModuleFait(id) {
+  formationAppel({ action: 'module', id: id, locaux: formationModulesLocaux() })
+    .then(function () { if (typeof refreshHomeScore === 'function') refreshHomeScore(); })
+    .catch(function () {});
+}
+
+function formationQuizFait() {
+  formationAppel({ action: 'quiz' })
+    .then(function () { if (typeof refreshHomeScore === 'function') refreshHomeScore(); })
+    .catch(function () {});
+}
+
+
 function refreshFormationCard() {
   var done = 0, next = null;
   try {
@@ -4569,6 +4631,9 @@ function answerQuiz(idx) {
   var correct = idx === q.answer;
   if (correct) _quizState.score++;
   if (!session.get().subscribed) incrQuizQuota();
+  // Un quiz répondu compte comme formation faite — c'est ce que lit l'étape 4
+  // de la checklist Protection, qui ne se validait donc jamais.
+  if (!_quizState.signale) { _quizState.signale = true; try { formationQuizFait(); } catch (e) {} }
   var opts = document.querySelectorAll('.quiz-opt');
   opts.forEach(function(b){
     b.disabled = true; b.style.cursor = 'default';
@@ -6164,6 +6229,9 @@ function fmRender() {
 
   } else {
     try { localStorage.setItem('despy_module_' + _fmId, '1'); } catch (e) {}
+    // Le serveur doit le savoir : sinon la formation reste prisonnière de ce
+    // téléphone, et l'étape 4 de la checklist ne se coche jamais.
+    try { formationModuleFait(parseInt(_fmId, 10)); } catch (e) {}
     var score = 0;
     for (var k = 0; k < nq; k++) if (_fmRep[k] === m.questions[k].answer) score++;
     var done = fmCountDone();
@@ -6238,7 +6306,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-06-03';
+var APP_BUILD = '2026-08-06-04';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -6283,6 +6351,7 @@ document.addEventListener('DOMContentLoaded', function(){
   } catch (e) {}
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
+  setTimeout(function () { try { formationSync(); } catch (e) {} }, 900);
   initTextSize();                          // taille du texte (accessibilité)
   initA11yToggles();                       // contraste + confort de lecture
   initOfflineBar();                        // bandeau hors-ligne
