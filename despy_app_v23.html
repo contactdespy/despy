@@ -1033,7 +1033,11 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <input id="signup-prenom" class="auth-input" type="text" placeholder="Prénom" autocomplete="given-name">
       <input id="signup-nom" class="auth-input" type="text" placeholder="Nom" autocomplete="family-name">
       <input id="signup-email" class="auth-input" type="email" placeholder="Email" autocomplete="email">
+      <input id="signup-tel" class="auth-input" type="tel" inputmode="tel" placeholder="Téléphone (pour vous rappeler)" autocomplete="tel">
       <input id="signup-password" class="auth-input" type="password" placeholder="Mot de passe (8+ caractères)" autocomplete="new-password">
+      <button type="button" id="signup-ref-lien" onclick="appAfficherParrain()" style="background:none;border:0;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--blue);cursor:pointer;padding:8px 2px;display:block">On vous a donné un code parrainage ?</button>
+      <div id="signup-ref-note" style="display:none;font-size:13px;color:#15803d;font-weight:700;padding:2px 2px 6px">🎁 Code parrainage appliqué — 1 mois offert pour vous deux</div>
+      <input id="signup-ref" class="auth-input" type="text" maxlength="12" placeholder="Code parrainage" autocapitalize="characters" style="display:none">
       <button class="btn-primary" onclick="doSignupApp()">Créer mon compte</button>
       <div class="auth-toggle">Déjà inscrit ? <button onclick="toggleAuthMode('login')">Se connecter</button></div>
     </div>
@@ -1734,6 +1738,34 @@ async function doLoginApp() {
   } catch(e) { showAuthErr('Erreur réseau'); }
 }
 
+// ─── CODE DE PARRAINAGE (appli) ───
+// L'appli affiche « vous gagnez tous les deux 1 mois gratuit », mais son
+// inscription n'envoyait aucun code : un filleul ne pouvait pas en saisir.
+// Le champ reste replié pour ne pas alourdir l'inscription de ceux — la
+// majorité — qui n'en ont pas.
+function appAfficherParrain() {
+  var champ = document.getElementById('signup-ref');
+  var lien = document.getElementById('signup-ref-lien');
+  if (!champ) return;
+  champ.style.display = 'block';
+  if (lien) lien.style.display = 'none';
+  champ.focus();
+}
+
+// Saisi à la main, ou reçu par un lien « /app?ref=CODE ».
+function appCodeParrain() {
+  var saisi = ((document.getElementById('signup-ref') || {}).value || '')
+    .toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+  if (saisi) return saisi;
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var r = p.get('ref');
+    if (r) return r.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+  } catch (e) {}
+  return '';
+}
+
+
 async function doSignupApp() {
   var prenom = (document.getElementById('signup-prenom').value || '').trim();
   var nom    = (document.getElementById('signup-nom').value || '').trim();
@@ -1749,7 +1781,9 @@ async function doSignupApp() {
     var r = await fetch('/.netlify/functions/register-free', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: pwd, prenom: prenom, nom: nom })
+      body: JSON.stringify({ email: email, password: pwd, prenom: prenom, nom: nom,
+        telephone: ((document.getElementById('signup-tel') || {}).value || '').trim(),
+        referralCode: appCodeParrain() || undefined })
     });
     var data = await r.json();
     if (!r.ok || data.error) return showAuthErr(data.error || 'Création impossible');
@@ -6204,7 +6238,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-06-02';
+var APP_BUILD = '2026-08-06-03';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -6231,6 +6265,22 @@ function checkForUpdate() {
 document.addEventListener('DOMContentLoaded', function(){
   var s = session.get();
   if (s && s.email) { enterApp(); } else { toggleAuthMode('login'); }
+  // Arrivée par un lien de parrainage : on ouvre l'inscription, code déjà mis.
+  try {
+    var _ref = new URLSearchParams(window.location.search).get('ref');
+    if (_ref && !(s && s.email)) {
+      goToAuth('signup');
+      setTimeout(function () {
+        appAfficherParrain();
+        var c = document.getElementById('signup-ref');
+        if (c) c.value = _ref.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+        // Sans ce mot, l'arrivant voit une case pleine de lettres sans savoir
+        // pourquoi. On lui dit ce que ça lui rapporte.
+        var note = document.getElementById('signup-ref-note');
+        if (note) note.style.display = 'block';
+      }, 120);
+    }
+  } catch (e) {}
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   initTextSize();                          // taille du texte (accessibilité)

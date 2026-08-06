@@ -9469,6 +9469,29 @@ function despyWireEmail(input){
 // Brancher les champs email statiques présents dès le chargement (outils gratuits)
 (function(){ try{ var h=document.getElementById('hibp-email-input'); if(h) despyWireEmail(h); }catch(e){} })();
 
+// ─── CODE DE PARRAINAGE ───
+// Il arrive par un lien « despy.fr/?ref=CODE ». Deux pièges corrigés ici :
+//   1. On lisait `location.search` au moment d'ouvrir la modale — trop tard,
+//      le routeur SPA l'a déjà effacé. D'où un code TOUJOURS vide : aucun
+//      parrainage n'a jamais abouti. On lit `window._despyQS`, mémorisé en
+//      tête de page.
+//   2. On mémorise le code : le visiteur clique le lien, lit le site, et ne
+//      s'inscrit qu'un quart d'heure plus tard. Sans ça il était perdu.
+function despyCodeParrain() {
+  var code = '';
+  try {
+    var p = new URLSearchParams(window._despyQS || window.location.search);
+    var r = p.get('ref');
+    if (r) code = r.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
+  } catch (e) {}
+  try {
+    if (code) localStorage.setItem('despy_ref', code);
+    else code = localStorage.getItem('despy_ref') || '';
+  } catch (e) {}
+  return code;
+}
+
+
 function showFreeSignup(prefillEmail) {
   var modal = document.createElement('div');
   modal.className = 'sub-modal-overlay';
@@ -9509,11 +9532,7 @@ function showFreeSignup(prefillEmail) {
   // Plus affiché pour réduire les frictions, mais le parrainage reste fonctionnel.
   var refInp = document.createElement('input');
   refInp.type = 'hidden'; refInp.id = 'free-ref';
-  try {
-    var p = new URLSearchParams(window.location.search);
-    var r = p.get('ref');
-    if (r) refInp.value = r.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);
-  } catch(e){}
+  refInp.value = despyCodeParrain();
 
   // Erreur
   var errDiv = document.createElement('div');
