@@ -5158,7 +5158,10 @@ async function subscribeFraudAlerts() {
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-weight:700">Dashboard</div>
         <div style="font-size:24px;font-weight:900;color:var(--text);letter-spacing:-.02em">🔒 Admin — Groupes Facebook</div>
       </div>
-      <button onclick="showPage('home')" style="padding:10px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text2)">← Retour site</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="/admin" style="padding:10px 16px;background:var(--blue);border:0;border-radius:10px;font-weight:700;font-size:13px;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px">📊 Tableau de bord patron</a>
+        <button onclick="showPage('home')" style="padding:10px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;color:var(--text2)">← Retour site</button>
+      </div>
     </div>
 
     <!-- Suggestion du jour -->
@@ -12448,11 +12451,14 @@ async function fbAdminMarkPosted(groupId) {
 
 // Activation par URL #admin-fb (sans afficher de bouton sur le site)
 (function(){
-  if (window.location.hash === '#admin-fb' || window.location.hash === '#admin') {
+  // NB : « #admin » ne mène plus ici — cette adresse était ambiguë depuis la
+  // création du tableau de bord patron à /admin. L'admin Facebook garde son
+  // adresse explicite #admin-fb.
+  if (window.location.hash === '#admin-fb') {
     setTimeout(function(){ openFbAdmin(); }, 200);
   }
   window.addEventListener('hashchange', function(){
-    if (window.location.hash === '#admin-fb' || window.location.hash === '#admin') openFbAdmin();
+    if (window.location.hash === '#admin-fb') openFbAdmin();
   });
 })();
 
