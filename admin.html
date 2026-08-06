@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Despy — Tableau de bord</title>
+<!--
+  Page autonome, volontairement HORS du SPA index.html : le routeur y efface
+  les paramètres d'URL au chargement, ce qui a déjà cassé quatre
+  fonctionnalités (?signup=1, retour de paiement, ?legal=, ?ref=).
+  Ici, aucun paramètre, aucun routeur, aucune surprise.
+
+  L'accès est vérifié DEUX FOIS côté serveur : jeton de session signé, et
+  email présent dans ADMIN_EMAIL. Rien n'est protégé par ce fichier lui-même.
+-->
+<style>
+  :root{
+    --fond:#0d1424; --carte:#151f36; --bord:#22314f;
+    --txt:#eef3fb; --txt2:#9fb0cd; --txt3:#6b7d9c;
+    --bleu:#4d7cfe; --vert:#22c55e; --ambre:#f0b429; --rouge:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fond);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 18px 80px}
+  h1{font-size:26px;font-weight:900;letter-spacing:-.02em;margin:0}
+  .maj{font-size:12.5px;color:var(--txt3);margin-top:4px}
+  .sec{font-size:11.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--txt3);margin:32px 0 12px}
+
+  .carte{background:var(--carte);border:1px solid var(--bord);border-radius:14px;padding:16px 18px}
+  .grille{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .kpi .n{font-size:28px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .kpi .k{font-size:12.5px;color:var(--txt2);margin-top:2px}
+
+  .al{border-left:4px solid var(--bord);border-radius:12px;padding:14px 16px;
+    background:var(--carte);margin-bottom:10px}
+  .al-haute{border-left-color:var(--rouge)}
+  .al-moyenne{border-left-color:var(--ambre)}
+  .al-basse{border-left-color:var(--txt3)}
+  .al .t{font-weight:800;font-size:15.5px}
+  .al .q{font-size:13.5px;color:var(--txt2);margin-top:5px;line-height:1.6}
+  .al details{margin-top:9px}
+  .al summary{font-size:12.5px;color:var(--bleu);cursor:pointer;font-weight:700}
+  .al ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--txt2);
+    line-height:1.8;word-break:break-word}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--txt3);padding:0 8px 8px 0;font-weight:800}
+  td{padding:9px 8px 9px 0;border-top:1px solid var(--bord);color:var(--txt2)}
+  td b{color:var(--txt)}
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:800}
+  .tag-abo{background:rgba(34,197,94,.16);color:#6ee7a0}
+  .tag-gra{background:rgba(107,125,156,.18);color:var(--txt2)}
+  .scroll{overflow-x:auto}
+
+  input,button{font-family:inherit;font-size:15px}
+  input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--bord);
+    background:#0b1221;color:var(--txt);margin-bottom:10px}
+  button{width:100%;padding:13px;border-radius:10px;border:0;background:var(--bleu);
+    color:#fff;font-weight:800;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
+  .err{color:#fca5a5;font-size:13.5px;margin-top:10px;line-height:1.55}
+  .ok-vide{color:var(--vert);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="connexion" style="max-width:340px;margin:60px auto">
+    <h1 style="font-size:21px">Tableau de bord Despy</h1>
+    <div class="maj" style="margin-bottom:20px">Réservé à l’administrateur.</div>
+    <input id="ad-email" type="email" placeholder="Votre email" autocomplete="email">
+    <input id="ad-mdp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <button id="ad-go" onclick="entrer()">Entrer</button>
+    <div id="ad-err" class="err" style="display:none"></div>
+  </div>
+
+  <div id="board" style="display:none">
+    <h1>Tableau de bord</h1>
+    <div class="maj" id="maj"></div>
+
+    <div class="sec">Ce qui cloche</div>
+    <div id="alertes"></div>
+
+    <div class="sec">Le business</div>
+    <div class="grille" id="business"></div>
+
+    <div class="sec">Ce que font les clients</div>
+    <div class="grille" id="usage"></div>
+
+    <div class="sec">Les dix derniers inscrits</div>
+    <div class="carte scroll"><table id="derniers"></table></div>
+  </div>
+
+</div>
+
+<script>
+var SESSION = null;
+
+function ech(t){ return String(t == null ? '' : t)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function erreur(m){
+  var e = document.getElementById('ad-err');
+  e.textContent = m; e.style.display = 'block';
+  var b = document.getElementById('ad-go');
+  b.textContent = 'Entrer'; b.disabled = false;
+}
+
+// On réutilise la connexion normale : elle renvoie un jeton signé. C'est le
+// serveur qui décidera ensuite si cet email a le droit de voir le tableau.
+async function entrer(){
+  var email = (document.getElementById('ad-email').value || '').trim().toLowerCase();
+  var mdp   = document.getElementById('ad-mdp').value || '';
+  if (!email || !mdp) return erreur('Email et mot de passe requis.');
+  var b = document.getElementById('ad-go');
+  b.textContent = 'Vérification…'; b.disabled = true;
+  document.getElementById('ad-err').style.display = 'none';
+  try {
+    var r = await fetch('/.netlify/functions/check-subscription', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, password: mdp })
+    });
+    var d = await r.json();
+    if (!d || !d.exists || !d.token) return erreur('Email ou mot de passe incorrect.');
+    SESSION = { email: email, token: d.token };
+    try { sessionStorage.setItem('despy_admin', JSON.stringify(SESSION)); } catch(e){}
+    charger();
+  } catch(e){ erreur('Connexion impossible. Réessayez.'); }
+}
+
+async function charger(){
+  try {
+    var r = await fetch('/.netlify/functions/admin-stats', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + SESSION.token },
+      body: JSON.stringify({ adminEmail: SESSION.email })
+    });
+    var d = await r.json();
+    if (r.status === 403) return erreur(d.hint || 'Cet email n’a pas accès au tableau de bord.');
+    if (!r.ok) return erreur(d.error || 'Lecture impossible.');
+    afficher(d);
+  } catch(e){ erreur('Chargement impossible.'); }
+}
+
+// Les plans portent des noms techniques en base : on parle français ici.
+var PLANS = { monthly:'Solo mensuel', annual:'Solo annuel',
+              family_monthly:'Famille mensuel', family_annual:'Famille annuel',
+              family_member:'Place famille', free:'Gratuit', gratuit:'Gratuit' };
+function nomPlan(p){ return PLANS[p] || p || '—'; }
+function euros(n){ return (Number(n)||0).toFixed(2).replace('.', ',') + ' €'; }
+
+function kpi(n, k){
+  return '<div class="carte kpi"><div class="n">' + (n === null ? '—' : ech(n)) +
+         '</div><div class="k">' + ech(k) + '</div></div>';
+}
+
+function afficher(d){
+  document.getElementById('connexion').style.display = 'none';
+  document.getElementById('board').style.display = 'block';
+  document.getElementById('maj').textContent =
+    'Données du ' + new Date(d.genere_le).toLocaleString('fr-FR');
+
+  // ── Ce qui cloche : en tête, parce que c'est ce qui coûte ──
+  var a = document.getElementById('alertes');
+  if (!d.alertes.length) {
+    a.innerHTML = '<div class="carte"><span class="ok-vide">✓ Rien à signaler.</span> ' +
+      '<span style="color:var(--txt2)">Aucun abonné bloqué, inactif ou sans protection.</span></div>';
+  } else {
+    a.innerHTML = d.alertes.map(function(x){
+      return '<div class="al al-' + x.gravite + '">' +
+        '<div class="t">' + ech(x.titre) + '</div>' +
+        '<div class="q">' + ech(x.quoi) + '</div>' +
+        (x.qui && x.qui.length
+          ? '<details><summary>Voir qui</summary><ul>' +
+            x.qui.map(function(q){ return '<li>' + ech(q) + '</li>'; }).join('') + '</ul></details>'
+          : '') +
+      '</div>';
+    }).join('');
+  }
+
+  var b = d.business;
+  var plans = Object.keys(b.par_plan).map(function(p){
+    return ech(nomPlan(p)) + ' : ' + b.par_plan[p];
+  }).join(' · ') || '—';
+  document.getElementById('business').innerHTML =
+    kpi(b.abonnes, 'abonnés') +
+    kpi(euros(b.revenu_mensuel_estime), 'par mois (estimé)') +
+    kpi(b.gratuits, 'comptes gratuits') +
+    kpi(b.inscrits_7j, 'inscrits sur 7 jours') +
+    kpi(b.abonnes_30j, 'nouveaux abonnés sur 30 j') +
+    kpi(b.parrainages_aboutis, 'parrainages aboutis') +
+    '<div class="carte kpi" style="grid-column:1/-1"><div class="k">Répartition des formules</div>' +
+    '<div style="font-size:15px;font-weight:700;margin-top:6px">' + plans + '</div></div>';
+
+  var u = d.usage;
+  document.getElementById('usage').innerHTML =
+    kpi(u.questions_ce_mois, 'questions ce mois-ci') +
+    kpi(u.clients_actifs_ce_mois, 'clients actifs ce mois-ci') +
+    kpi(u.avec_personne_confiance, 'ont une personne de confiance') +
+    kpi(u.formation_commencee, 'ont commencé la formation') +
+    kpi(u.modules_termines, 'modules terminés (total)') +
+    kpi(u.sos_30j, 'SOS sur 30 jours') +
+    kpi(u.demandes_rgpd, 'demandes RGPD') +
+    kpi(u.signalements_arnaque, 'arnaques signalées') +
+    kpi(u.tests_entrainement, 'tests d’entraînement') +
+    kpi(u.leads_guide, 'leads du guide');
+
+  document.getElementById('derniers').innerHTML =
+    '<tr><th>Prénom</th><th>Email</th><th>Formule</th><th>Inscrit</th></tr>' +
+    d.derniers.map(function(c){
+      return '<tr><td><b>' + ech(c.prenom) + '</b>' + (c.parraine ? ' 🎁' : '') + '</td>' +
+        '<td>' + ech(c.email) + '</td>' +
+        '<td><span class="tag ' + (c.plan === 'gratuit' ? 'tag-gra' : 'tag-abo') + '">' +
+          ech(nomPlan(c.plan)) + '</span></td>' +
+        '<td>' + new Date(c.le).toLocaleDateString('fr-FR') + '</td></tr>';
+    }).join('');
+}
+
+// Session d'onglet : on ne redemande pas le mot de passe à chaque rechargement.
+try {
+  var s = JSON.parse(sessionStorage.getItem('despy_admin') || 'null');
+  if (s && s.token) { SESSION = s; charger(); }
+} catch(e){}
+</script>
+</body>
+</html>

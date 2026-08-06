@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Tableau de bord interne — jamais indexé
+Disallow: /admin
+Disallow: /admin.html
+
 Sitemap: https://despy.fr/sitemap.xml

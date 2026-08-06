@@ -71,6 +71,15 @@
   to = "/guide.html"
   status = 200
 
+# Tableau de bord patron (page autonome, hors SPA : le routeur y efface les
+# paramètres d'URL, ce qui a déjà cassé quatre fonctionnalités).
+# Non indexée, et l'accès est vérifié DEUX FOIS côté serveur (jeton signé +
+# ADMIN_EMAIL) — la page elle-même ne protège rien.
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
 # Page de coaching de l'entraînement anti-arnaque (page autonome)
 [[redirects]]
   from = "/entrainement"
