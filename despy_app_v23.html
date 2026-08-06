@@ -983,6 +983,42 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 .fam-plein{ margin-top:16px; text-align:center; font-size:13.5px; color:var(--p-muted); line-height:1.5; }
 .fam-sep{ text-align:center; font-size:13px; color:var(--p-muted); margin:18px 0 14px; }
 
+
+/* ═══ DESPY-SUR-GRAND-ECRAN ═══
+   L'appli est dessinée pour un téléphone. Ouverte en plein écran sur un Mac,
+   elle s'étirait sur 1440 px : bandes horizontales démesurées, boutons perdus
+   aux deux extrémités, texte minuscule au milieu du vide. Personne ne l'avait
+   jamais regardée ailleurs que sur un téléphone.
+   On la contient dans une colonne de largeur téléphone, centrée sur un fond
+   neutre. Rien ne change en dessous de 760 px.
+   Les éléments en position fixed (barre du bas, feuille, écrans pleins) ne
+   peuvent pas hériter de la colonne : on les recentre un par un via
+   left/width/margin-left — surtout pas via transform, qui sert déjà aux
+   animations d'ouverture. */
+@media (min-width: 760px) {
+  body { background: #e7ebf2; }
+
+  .view {
+    max-width: 440px;
+    margin: 0 auto;
+    background: var(--p-paper);
+    box-shadow: 0 0 0 1px rgba(11,18,32,.07), 0 18px 60px rgba(11,18,32,.12);
+  }
+
+  .bottom-nav,
+  .sheet,
+  .fmscreen,
+  .modscreen {
+    left: 50%;
+    right: auto;
+    width: 440px;
+    margin-left: -220px;
+  }
+
+  /* Le voile reste plein écran : il doit assombrir tout l'arrière-plan. */
+  .sheet-backdrop { left: 0; right: 0; width: auto; margin-left: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -6306,7 +6342,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-06-04';
+var APP_BUILD = '2026-08-07-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
