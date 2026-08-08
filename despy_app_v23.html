@@ -756,6 +756,10 @@ body{ background:var(--p-paper); }
 .veille{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:inherit; cursor:pointer;
   background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; border:0; border-radius:16px; padding:14px 16px;
   box-shadow:0 8px 22px rgba(16,102,74,.25); }
+.veille.veille-alerte{ background:linear-gradient(120deg,#5a4210,#8a6516);
+  box-shadow:0 8px 22px rgba(138,101,22,.25); }
+.veille.veille-alerte .v-dot{ background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.22); }
+.veille.veille-alerte .v-b{ color:#F5DFA6; }
 .veille:active{ transform:scale(.985); }
 .v-dot{ width:11px; height:11px; border-radius:50%; background:#4ade80; flex:none; box-shadow:0 0 0 4px rgba(74,222,128,.22); animation:vpulse 2.4s ease-in-out infinite; }
 @keyframes vpulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(74,222,128,.22); } 50%{ box-shadow:0 0 0 8px rgba(74,222,128,.10); } }
@@ -3633,11 +3637,26 @@ function renderProtection(checklist, stats) {
 }
 
 
+// Vert seulement quand il n'y a rien : une fuite connue demande une action
+// du client (changer le mot de passe des comptes concernés), Despy ne peut
+// pas la « résoudre » à sa place.
+function fuitesTeinte(n) { return n > 0 ? '#b4892e' : 'var(--p-safe)'; }
+
 // Bloc « Ce mois-ci, Despy a veillé sur vous ».
 function renderHomeStats(stats) {
   if (!stats) return;
   var f = document.getElementById('stat-fuites'), q = document.getElementById('stat-questions'), si = document.getElementById('stat-sites');
-  if (f) f.textContent = stats.breach_count || 0;
+  // Le nombre de fuites était affiché EN VERT, en dur, et au singulier :
+  // « 3 fuite détectée » en vert, juste à côté de « 30+ sites surveillés ».
+  // Pour une personne âgée, du vert veut dire « tout va bien » — l'inverse
+  // exact du message. On teinte selon la réalité et on accorde.
+  var nbFuites = stats.breach_count || 0;
+  if (f) {
+    f.textContent = nbFuites;
+    f.style.color = fuitesTeinte(nbFuites);
+    var lib = f.nextElementSibling;
+    if (lib) lib.textContent = nbFuites > 1 ? 'fuites détectées' : 'fuite détectée';
+  }
   // Le titre dit « Ce mois-ci » : on affiche donc le compteur MENSUEL.
   // `questions_used` est le cumul depuis l'inscription — le montrer ici
   // donnait un nombre qui ne redescendait jamais au 1er du mois.
@@ -3954,9 +3973,12 @@ function renderVeille(stats) {
   var fuites = st.breach_count || 0;
   var t = document.getElementById('veille-title');
   var b = document.getElementById('veille-sub');
+  // « sous surveillance » laissait croire que Despy s'en occupe. Non : la
+  // surveillance détecte, mais c'est au client de changer ses mots de passe.
   if (t) t.textContent = fuites > 0
-    ? (fuites + (fuites > 1 ? ' fuites sous surveillance' : ' fuite sous surveillance'))
+    ? (fuites + (fuites > 1 ? ' fuites vous concernent' : ' fuite vous concerne'))
     : 'Aucune fuite détectée';
+  el.classList.toggle('veille-alerte', fuites > 0);
   var bouts = [];
   if (st.last_hibp_check) { var q = timeAgoFr(st.last_hibp_check); if (q) bouts.push('vérifié ' + q); }
   bouts.push('prochain contrôle ' + prochainControleFr());
@@ -6342,7 +6364,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-07-01';
+var APP_BUILD = '2026-08-07-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
