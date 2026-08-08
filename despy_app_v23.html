@@ -742,6 +742,48 @@ body{ background:var(--p-paper); }
 .fm-row.fm-lock .fm-s{ color:var(--p-gold,#B4892E); font-weight:700; }
 .fm-key{ flex:none; font-size:15px; opacity:.75; }
 /* Bande « surveillance active » — rend visible le travail de fond (abonnés) */
+.appel-cta{ width:100%; display:flex; align-items:center; gap:13px; padding:16px 17px; border:0; cursor:pointer;
+  font-family:inherit; text-align:left; border-radius:16px; color:#fff;
+  background:linear-gradient(120deg,#1d3f7a,#2D5BFF); box-shadow:0 10px 26px rgba(45,91,255,.28); }
+.appel-cta:active{ transform:scale(.985); }
+.ac-ic{ width:42px; height:42px; border-radius:12px; flex:none; display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.16); font-size:21px; }
+.ac-m{ flex:1; min-width:0; }
+.ac-a{ display:block; font-size:16px; font-weight:900; line-height:1.25; letter-spacing:-.01em; }
+.ac-b{ display:block; font-size:12.5px; color:rgba(255,255,255,.82); margin-top:3px; line-height:1.4; }
+.appel-cta .chev{ color:rgba(255,255,255,.6); flex:none; }
+
+.ap-calme{ background:#EAF6EF; border:1px solid #BFE3CD; border-radius:13px; padding:13px 15px; margin-bottom:16px;
+  font-size:14.5px; line-height:1.6; color:#14603F; }
+.ap-calme b{ color:#0E4A31; }
+.ap-choix{ width:100%; display:flex; align-items:center; gap:12px; padding:15px 16px; margin-bottom:9px;
+  background:var(--p-card); border:1px solid var(--p-line); border-radius:14px; cursor:pointer;
+  font-family:inherit; text-align:left; }
+.ap-choix:active{ transform:scale(.99); }
+.ap-choix .e{ font-size:22px; flex:none; }
+.ap-choix .t{ font-size:16px; font-weight:800; color:var(--p-txt); line-height:1.3; }
+
+.ap-phrase{ background:linear-gradient(120deg,#0e2a5c,#2D5BFF); color:#fff; border-radius:16px;
+  padding:20px 18px; margin-bottom:16px; box-shadow:0 10px 26px rgba(45,91,255,.24); }
+.ap-phrase .lab{ font-size:11.5px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase;
+  color:rgba(255,255,255,.72); }
+.ap-phrase .txt{ font-size:21px; font-weight:800; line-height:1.4; margin-top:9px; letter-spacing:-.01em; }
+.ap-phrase .apres{ font-size:13px; color:rgba(255,255,255,.8); margin-top:12px; line-height:1.55; }
+
+.ap-jamais{ background:#FFF6E5; border:1px solid #F0D18A; border-radius:14px; padding:15px 16px; margin-bottom:16px; }
+.ap-jamais .h{ font-size:14px; font-weight:900; color:#7A5A12; margin-bottom:8px; }
+.ap-jamais ul{ margin:0; padding-left:19px; font-size:14.5px; line-height:1.75; color:#7A5A12; }
+
+.ap-num{ display:flex; align-items:center; gap:12px; width:100%; padding:15px 16px; margin-bottom:10px;
+  background:#15803d; color:#fff; border:0; border-radius:14px; text-decoration:none; font-family:inherit; }
+.ap-num .a{ display:block; font-size:16px; font-weight:900; }
+.ap-num .b{ display:block; font-size:12.5px; color:rgba(255,255,255,.85); margin-top:2px; line-height:1.45; }
+
+.ap-mot{ background:linear-gradient(120deg,#3b1d63,#5b2a94); color:#fff; border-radius:16px; padding:20px 18px;
+  margin-bottom:16px; text-align:center; box-shadow:0 10px 26px rgba(91,42,148,.26); }
+.ap-mot .lab{ font-size:11.5px; font-weight:800; letter-spacing:1.4px; color:rgba(255,255,255,.72); }
+.ap-mot .mot{ font-size:32px; font-weight:900; letter-spacing:1px; margin-top:8px; word-break:break-word; }
+.ap-mot .aide{ font-size:13px; color:rgba(255,255,255,.82); margin-top:12px; line-height:1.55; }
 .famband{ width:100%; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px;
   text-align:left; font-family:inherit; border:0; }
 .famband.fb-payeur{ background:linear-gradient(120deg,#3b1d63,#5b2a94); color:#fff; box-shadow:0 8px 22px rgba(91,42,148,.25); cursor:pointer; }
@@ -1136,6 +1178,13 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
         <span class="sos-btn">Appeler</span>
       </button>
+      <button class="appel-cta" onclick="openAppel()">
+        <span class="ac-ic">📞</span>
+        <span class="ac-m"><span class="ac-a">On m’appelle — j’ai un doute</span>
+        <span class="ac-b">Quoi dire, et quel numéro rappeler</span></span>
+        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
       <div class="famband" id="home-fam" style="display:none"></div>
 
       <button class="veille" id="home-veille" style="display:none" onclick="openBilan()">
@@ -1423,6 +1472,17 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     </div>
   </div>
   <div class="mod-scroll"><div id="fam-body"></div></div>
+</div>
+
+<!-- ═══ PENDANT L'APPEL ═══ -->
+<div id="appel" class="fmscreen">
+  <div class="mod-top">
+    <div class="mod-top-row">
+      <button class="mod-back" onclick="closeAppel()" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div><div class="mod-label">Vous êtes au téléphone</div><div class="mod-htitle" id="appel-titre">Qui vous appelle ?</div></div>
+    </div>
+  </div>
+  <div class="mod-scroll"><div id="appel-body"></div></div>
 </div>
 
 <!-- ═══ PERSONNE DE CONFIANCE ═══ -->
@@ -2216,6 +2276,7 @@ function openTool(name) {
     case 'bouclier':   return openBouclier();
     case 'secteur':    return openSecteur();
     case 'confiance':  return openConfiance();
+    case 'appel':      return openAppel();
     case 'entrainement': return openEntrainement();
     default: toast('Outil bientôt disponible');
   }
@@ -3363,6 +3424,182 @@ function refreshPlanBadge() {
 // l'affichage des étapes suivantes, plus rien ne pouvait avancer.
 var CONF_ETAT = null;
 
+// ─── PENDANT L'APPEL ───
+// Le seul moment que Despy ne couvrait pas. Tout le reste agit avant
+// (formation, surveillance) ou après (SOS, plan d'action) ; ici on est
+// pendant, avec quelqu'un au bout du fil qui met la pression.
+//
+// Ordre de traitement délibéré : d'abord LA PHRASE pour raccrocher — le
+// premier frein d'une personne âgée n'est pas l'ignorance, c'est qu'elle
+// n'ose pas. Ensuite ce qu'un vrai ne fera jamais. Enfin le vrai numéro.
+var APPEL_CAS = {
+  banque: {
+    e: '🏦', t: 'Ma banque',
+    phrase: 'Je ne traite jamais cela par téléphone. Je raccroche et je rappelle moi-même le numéro au dos de ma carte.',
+    apres: 'Vous avez le droit de raccrocher au milieu d’une phrase. Un vrai conseiller ne le prendra jamais mal.',
+    jamais: [
+      'Un conseiller ne demande <b>jamais</b> votre code de carte, ni vos identifiants.',
+      'Il ne vous demande <b>jamais</b> de valider une opération dans votre application « pour la bloquer ».',
+      'Il ne vous demande <b>jamais</b> de faire un virement « de test » ou vers un « compte sécurisé ».'
+    ],
+    num: { t: 'Le numéro au dos de votre carte', d: 'Celui-là seulement. Jamais un numéro donné au téléphone.', tel: '' }
+  },
+  proche: {
+    e: '👨‍👩‍👧', t: 'Un proche en difficulté',
+    phrase: 'Donne-moi notre mot de passe famille.',
+    apres: 'S’il hésite, invente une excuse et raccrochez. Rappelez ensuite votre proche sur son numéro habituel.',
+    jamais: [
+      'Quelques secondes de voix suffisent aujourd’hui à en fabriquer une imitation convaincante.',
+      'Un vrai proche <b>ne vous en voudra pas</b> de vérifier.',
+      'Ne payez jamais en cartes cadeaux, en cryptomonnaie, ni par un coursier qui passe chez vous.'
+    ],
+    mot: true
+  },
+  impots: {
+    e: '🏛️', t: 'Les impôts, la CAF, l’Assurance maladie',
+    phrase: 'Je vais vérifier moi-même sur mon compte en ligne. Au revoir.',
+    apres: 'Aucune administration ne vous pénalisera parce que vous avez raccroché pour vérifier.',
+    jamais: [
+      'L’administration ne demande <b>jamais</b> de payer par carte au téléphone.',
+      'Elle ne demande <b>jamais</b> un code reçu par SMS.',
+      'Un remboursement ne se réclame jamais par téléphone : il arrive tout seul.'
+    ],
+    num: { t: 'Impôts : 0 809 401 401', d: 'Service officiel. Ou connectez-vous à impots.gouv.fr vous-même.', tel: '0809401401' }
+  },
+  energie: {
+    e: '💡', t: 'EDF, l’eau, internet',
+    phrase: 'Envoyez-moi un courrier. Je ne décide rien par téléphone.',
+    apres: 'Personne ne coupe l’électricité dans l’heure. La menace d’une coupure immédiate est le signe de l’arnaque.',
+    jamais: [
+      'Aucun fournisseur n’exige un paiement immédiat sous menace de coupure.',
+      'Aucun ne demande votre RIB ou votre carte au téléphone à la suite d’un appel entrant.',
+      'Un vrai changement de contrat se confirme <b>toujours</b> par écrit.'
+    ],
+    num: { t: 'EDF : 09 69 32 15 15', d: 'Le numéro officiel, pas celui donné au téléphone.', tel: '0969321515' }
+  },
+  police: {
+    e: '👮', t: 'La police, la gendarmerie, un juge',
+    phrase: 'Je vais raccrocher et appeler le 17 pour vérifier.',
+    apres: 'Un vrai policier vous encouragera à le faire. Un escroc essaiera de vous en empêcher.',
+    jamais: [
+      'La police ne demande <b>jamais</b> d’argent, ni de retirer des espèces.',
+      'Elle ne demande <b>jamais</b> vos codes, ni de « mettre vos économies à l’abri ».',
+      'Elle ne vous menace jamais d’arrestation immédiate au téléphone.'
+    ],
+    num: { t: 'Police, gendarmerie : 17', d: 'Numéro d’urgence officiel, gratuit.', tel: '17' }
+  },
+  informatique: {
+    e: '💻', t: 'Un dépannage informatique',
+    phrase: 'Je ne donne accès à mon ordinateur à personne. Je raccroche.',
+    apres: 'Si vous avez déjà installé quelque chose : éteignez l’ordinateur et appelez-nous.',
+    jamais: [
+      'Microsoft, Apple et Orange <b>n’appellent jamais</b> pour un virus.',
+      'N’installez <b>jamais</b> AnyDesk, TeamViewer ou UltraViewer à la demande de quelqu’un au téléphone.',
+      'Une fenêtre d’alerte avec un numéro à appeler est <b>toujours</b> une arnaque.'
+    ]
+  },
+  artisan: {
+    e: '🔧', t: 'Un dépanneur, un artisan',
+    phrase: 'Je ne signe rien et je ne paie rien aujourd’hui.',
+    apres: 'Vous avez 14 jours pour vous rétracter sur tout démarchage. Prenez le temps de comparer.',
+    jamais: [
+      'Un artisan sérieux accepte que vous demandiez un autre devis.',
+      'Ne payez jamais en espèces sans facture détaillée.',
+      'Méfiez-vous d’un « diagnostic gratuit » qui découvre une urgence à 3 000 €.'
+    ]
+  },
+  autre: {
+    e: '❓', t: 'Je ne sais pas / autre',
+    phrase: 'Je vous rappelle.',
+    apres: 'Trois mots, et vous raccrochez. C’est la phrase la plus efficace qui existe : elle ne se discute pas.',
+    jamais: [
+      'Toute urgence est suspecte : un vrai interlocuteur vous laisse le temps.',
+      'Ne donnez aucun code, aucun mot de passe, aucun numéro de carte.',
+      'Le numéro affiché sur votre écran <b>peut être falsifié</b>. Il ne prouve rien.'
+    ]
+  }
+};
+
+function openAppel() {
+  document.getElementById('appel').classList.add('on');
+  document.body.style.overflow = 'hidden';
+  renderAppelChoix();
+}
+function closeAppel() {
+  document.getElementById('appel').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function renderAppelChoix() {
+  document.getElementById('appel-titre').textContent = 'Qui vous appelle ?';
+  var h = '<div class="ap-calme"><b>Respirez.</b> Vous avez le droit de raccrocher, et ce n’est pas impoli. ' +
+          'Personne d’honnête ne vous reprochera de vérifier.</div>';
+  h += '<div class="sec-lab" style="margin-bottom:8px">Cette personne dit être…</div>';
+  Object.keys(APPEL_CAS).forEach(function (k) {
+    var c = APPEL_CAS[k];
+    h += '<button class="ap-choix" onclick="renderAppelCas(\'' + k + '\')">' +
+         '<span class="e">' + c.e + '</span><span class="t">' + c.t + '</span></button>';
+  });
+  document.getElementById('appel-body').innerHTML = h;
+  var sc = document.querySelector('#appel .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+function renderAppelCas(k) {
+  var c = APPEL_CAS[k];
+  if (!c) return renderAppelChoix();
+  document.getElementById('appel-titre').textContent = c.t;
+  var s = session.get() || {};
+
+  var h = '<button class="vic-retour" onclick="renderAppelChoix()">‹ Ce n’est pas ça</button>';
+
+  // 1. La phrase — le vrai obstacle est de ne pas oser raccrocher.
+  h += '<div class="ap-phrase"><div class="lab">Dites exactement ceci</div>' +
+       '<div class="txt">« ' + c.phrase + ' »</div>' +
+       '<div class="apres">' + c.apres + '</div></div>';
+
+  // 2. Le mot de passe famille, pour le cas du faux proche.
+  if (c.mot) {
+    var mot = (CONF_ETAT && CONF_ETAT.family_word) || '';
+    if (mot) {
+      h += '<div class="ap-mot"><div class="lab">Votre mot de passe famille</div>' +
+           '<div class="mot">' + mot.replace(/</g, '&lt;') + '</div>' +
+           '<div class="aide">Demandez-le. Une voix s’imite en quelques secondes — ce mot, non.</div></div>';
+    } else {
+      h += '<div class="ap-mot" style="background:linear-gradient(120deg,#4a4a4a,#6b6b6b)">' +
+           '<div class="lab">Aucun mot de passe famille</div>' +
+           '<div class="aide" style="margin-top:8px">Convenez-en un avec vos proches, une fois pour toutes. ' +
+           'C’est la seule parade contre une voix imitée.</div>' +
+           '<button class="btn-primary" style="margin-top:14px;background:#fff;color:#3b1d63" ' +
+           'onclick="closeAppel();setTimeout(openConfiance,260)">En choisir un</button></div>';
+    }
+  }
+
+  // 3. Ce qu'un vrai ne fera jamais.
+  h += '<div class="ap-jamais"><div class="h">Ce qu’un vrai ' +
+       (k === 'proche' ? 'proche' : 'interlocuteur') + ' ne fera jamais</div><ul>' +
+       c.jamais.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></div>';
+
+  // 4. Le vrai numéro — celui qui s'affiche peut être falsifié.
+  if (c.num) {
+    h += c.num.tel
+      ? '<a class="ap-num" href="tel:' + c.num.tel + '"><span>📞</span><span><span class="a">' + c.num.t +
+        '</span><span class="b">' + c.num.d + '</span></span></a>'
+      : '<div class="ap-num" style="background:#0e3b2a"><span>💳</span><span><span class="a">' + c.num.t +
+        '</span><span class="b">' + c.num.d + '</span></span></div>';
+  }
+
+  // 5. Prévenir son proche, et garder une trace du numéro.
+  h += '<div class="vic-foot" style="margin-top:6px">' +
+       _vicRappelBouton('doute') +
+       '<button class="vic-help vic-help-2" style="width:100%;text-align:left;font-family:inherit;border:0;cursor:pointer" ' +
+       'onclick="closeAppel();setTimeout(function(){openTool(\'annuaire\')},260)">🔎 Vérifier ce numéro' +
+       '<span>Voir s’il a déjà été signalé par d’autres</span></button></div>';
+
+  document.getElementById('appel-body').innerHTML = h;
+  var sc = document.querySelector('#appel .mod-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+
 function openConfiance() {
   document.getElementById('confiance').classList.add('on');
   document.body.style.overflow = 'hidden';
@@ -3438,7 +3675,54 @@ function renderConfiance(d) {
   h += '<div class="fam-note" style="margin-top:16px">Elle recevra un email lui expliquant son rôle. ' +
        'Vous pouvez la changer ou la retirer à tout moment.</div>';
 
+  // ── Le mot de passe famille ──
+  // Despy enseigne cette parade dans deux quiz de sa formation sans l'avoir
+  // jamais fournie. Avec le clonage de voix, c'est la seule qui tienne
+  // contre « mamie c'est moi, j'ai eu un accident ».
+  var motActuel = (d && d.family_word) || '';
+  h += '<div class="sec" style="margin-top:26px">Le mot de passe famille</div>';
+  if (motActuel) {
+    h += '<div class="ap-mot" style="margin-bottom:14px"><div class="lab">Votre mot</div>' +
+         '<div class="mot">' + motActuel.replace(/</g, '&lt;') + '</div>' +
+         '<div class="aide">Il s’affiche aussi dans « On m’appelle » si un proche vous appelle en urgence.</div></div>';
+  }
+  h += '<div class="card pad" style="margin-bottom:14px">' +
+       '<div style="font-size:15px;line-height:1.65;color:var(--p-txt)">' +
+         'Choisissez un mot que <b>seule votre famille connaît</b> — un lieu de vacances, le nom d’un ancien animal, un surnom.' +
+       '</div>' +
+       '<div style="margin-top:10px;font-size:14px;line-height:1.65;color:var(--p-txt2)">' +
+         'Aujourd’hui, quelques secondes de voix suffisent pour en fabriquer une imitation convaincante. ' +
+         'Si « votre petit-fils » vous appelle en pleurant pour de l’argent, <b>demandez ce mot</b>. ' +
+         'Une voix s’imite ; ce mot, non.' +
+       '</div></div>';
+  h += '<label class="sec-lab" for="conf-mot">Notre mot</label>' +
+       '<input id="conf-mot" class="auth-input" type="text" maxlength="40" placeholder="Ex. : Trégastel" ' +
+         'value="' + motActuel.replace(/"/g, '&quot;') + '">' +
+       '<button class="btn-primary" style="margin-top:12px" onclick="enregistrerMotFamille()">' +
+         (motActuel ? 'Changer le mot' : 'Enregistrer ce mot') + '</button>' +
+       '<div class="fam-note" style="margin-top:12px">' +
+         (mail ? 'Votre personne de confiance le recevra par email pour l’apprendre.'
+               : 'Désignez d’abord une personne de confiance : elle recevra le mot pour l’apprendre.') +
+       '</div>';
+
   z.innerHTML = h;
+}
+
+function enregistrerMotFamille() {
+  var mot = ((document.getElementById('conf-mot') || {}).value || '').trim();
+  if (mot && mot.length < 3) { toast('Choisissez un mot d’au moins 3 lettres'); return; }
+  toast('Enregistrement…');
+  confAppel({ action: 'set_word', family_word: mot })
+    .then(function (d) {
+      if (!d || !d.ok) {
+        toast(d && d.raison === 'migration_absente' ? 'Fonction bientôt disponible' : 'Enregistrement impossible');
+        return;
+      }
+      toast(mot ? 'C’est noté : « ' + mot + ' »' : 'Mot retiré');
+      if (CONF_ETAT) CONF_ETAT.family_word = d.family_word;
+      renderConfiance(CONF_ETAT);
+    })
+    .catch(function () { toast('Connexion impossible. Réessayez.'); });
 }
 
 function confErreur(m) {
@@ -6364,7 +6648,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-07-02';
+var APP_BUILD = '2026-08-07-03';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
@@ -6410,6 +6694,9 @@ document.addEventListener('DOMContentLoaded', function(){
   initGoogle();
   setTimeout(checkForUpdate, 1200);   // vérifie la présence d'une nouvelle version
   setTimeout(function () { try { formationSync(); } catch (e) {} }, 900);
+  // Le mot de passe famille doit être disponible AVANT d'en avoir besoin :
+  // on ne va pas interroger le serveur pendant que l'escroc parle.
+  setTimeout(function () { try { chargerConfiance(); } catch (e) {} }, 1400);
   initTextSize();                          // taille du texte (accessibilité)
   initA11yToggles();                       // contraste + confort de lecture
   initOfflineBar();                        // bandeau hors-ligne

@@ -30,19 +30,72 @@ exports.handler = async (event) => {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
     // Le compte doit exister
-    const { data: client, error: selErr } = await supabase
-      .from('clients')
-      .select('email, prenom, name, trusted_contact_name, trusted_contact_email')
-      .eq('email', email)
-      .maybeSingle();
+    // `family_word` est récent : si la migration n'est pas passée, on retombe
+    // sur le jeu de colonnes historique plutôt que de casser la personne de
+    // confiance, qui elle fonctionne depuis longtemps.
+    const COLS_BASE = 'email, prenom, name, trusted_contact_name, trusted_contact_email';
+    let { data: client, error: selErr } = await supabase
+      .from('clients').select(COLS_BASE + ', family_word').eq('email', email).maybeSingle();
+    if (selErr) {
+      console.warn('trusted-contact : colonne family_word absente, repli —', selErr.message);
+      ({ data: client, error: selErr } = await supabase
+        .from('clients').select(COLS_BASE).eq('email', email).maybeSingle());
+    }
 
     if (selErr) {
-      // Colonnes pas encore créées dans Supabase → message explicite côté serveur
       console.error('trusted-contact select error:', selErr.message);
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Service momentanément indisponible' }) };
     }
     if (!client) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Compte introuvable' }) };
+    }
+
+    // ── Le mot de passe famille ──
+    // Despy enseigne cette parade dans sa formation (« convenez d'un mot
+    // secret ») sans l'avoir jamais fournie. Avec le clonage de voix par IA,
+    // c'est la seule défense qui tienne contre « mamie c'est moi ».
+    // Stocké en clair à dessein : il doit être affichable au client ET
+    // transmissible à son proche. Ce n'est pas un secret d'authentification,
+    // c'est un code de reconnaissance partagé.
+    if (body.action === 'set_word') {
+      const mot = String(body.family_word || '').trim().slice(0, 40);
+      const { error: eMot } = await supabase.from('clients')
+        .update({ family_word: mot || null, updated_at: new Date().toISOString() })
+        .eq('email', email);
+      if (eMot) {
+        console.error('trusted-contact set_word:', eMot.message);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: false, raison: 'migration_absente' }) };
+      }
+      // Le proche doit le connaître, sinon le mot ne sert à rien.
+      if (mot && client.trusted_contact_email) {
+        try {
+          const prenom = client.prenom || (client.name || '').split(' ')[0] || 'Un proche';
+          await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
+            body: JSON.stringify({ type: 'custom', data: {
+              email: client.trusted_contact_email,
+              subject: `Le mot de passe famille de ${prenom}`,
+              html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:26px;color:#fff;border-radius:14px 14px 0 0">
+                  <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
+                  <div style="font-size:21px;font-weight:900;margin-top:6px">🔑 Votre mot de passe famille</div>
+                </div>
+                <div style="border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:26px;font-size:15px;line-height:1.75;color:#333">
+                  <p><strong>${prenom}</strong> vient de convenir d'un mot de passe familial avec vous.</p>
+                  <div style="background:#f7f9fc;border:2px dashed #2D5BFF;border-radius:12px;padding:20px;text-align:center;margin:18px 0">
+                    <div style="font-size:12px;color:#666;letter-spacing:1px;font-weight:700">LE MOT</div>
+                    <div style="font-size:30px;font-weight:900;color:#0a1f3a;letter-spacing:1px;margin-top:6px">${mot}</div>
+                  </div>
+                  <p style="font-size:14px;color:#555"><strong>À quoi ça sert :</strong> aujourd'hui, quelques secondes de voix suffisent à en fabriquer une imitation convaincante. Si « ${prenom} » vous appelle en urgence pour de l'argent — ou si quelqu'un vous appelle en se faisant passer pour un proche — <strong>demandez ce mot</strong>. Une voix s'imite ; ce mot, non.</p>
+                  <p style="font-size:14px;color:#555">Apprenez-le par cœur, et ne le communiquez à personne d'autre.</p>
+                  <p style="font-size:11px;color:#aaa;text-align:center;margin-top:22px">Despy · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                </div></div>`
+            }})
+          });
+        } catch (e) { console.warn('Envoi du mot au proche échoué:', e.message); }
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ ok: true, family_word: mot || null }) };
     }
 
     if (body.action === 'set') {
@@ -114,7 +167,8 @@ exports.handler = async (event) => {
       headers,
       body: JSON.stringify({
         contact_name: client.trusted_contact_name || null,
-        contact_email: client.trusted_contact_email || null
+        contact_email: client.trusted_contact_email || null,
+        family_word: client.family_word || null
       })
     };
 
