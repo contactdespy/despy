@@ -1065,59 +1065,6 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
   .sheet-backdrop { left: 0; right: 0; width: auto; margin-left: 0; }
 }
 
-
-/* ═══ hierarchie-accueil ═══
-   Deux erreurs corrigées coup sur coup. D'abord quatre dégradés saturés
-   empilés : aucune hiérarchie, le SOS noyé parmi trois autres blocs criards.
-   Puis, en corrigeant, l'excès inverse — tout en #F4F6FB sur un fond
-   #EEF1F7, soit 2 % d'écart : des cartes qui ne se détachent de rien.
-
-   Principe retenu : UNE seule urgence a le droit d'occuper une grande
-   surface colorée (le SOS). Partout ailleurs, la couleur vit dans de PETITS
-   points précis — la pastille d'icône, un liseré, un chiffre — sur des
-   cartes blanches franchement détachées du fond. C'est ce qui donne de la
-   vie sans redonner du bruit.
-   Supprimer ce bloc suffit à revenir à l'état d'origine. */
-
-/* Cartes blanches, vraie élévation : elles existent enfin sur le fond. */
-.appel-cta, .famband, .veille{
-  background:var(--p-card) !important; color:var(--p-txt) !important;
-  border:0 !important; border-radius:16px !important; padding:14px 15px !important;
-  box-shadow:0 6px 18px rgba(12,25,55,.07) !important; }
-.appel-cta:active, .famband.fb-payeur:active, .veille:active{ transform:scale(.99); }
-
-/* Un liseré à gauche porte l'état, sans envahir la carte. */
-.appel-cta{ border-left:4px solid var(--p-blue) !important; }
-.famband.fb-payeur{ border-left:4px solid #7C3AED !important; }
-.famband.fb-couvert{ border-left:4px solid #15803d !important; }
-.veille{ border-left:4px solid #15803d !important; }
-.veille.veille-alerte{ border-left-color:#d97706 !important; }
-
-/* C'est ICI que vit la couleur : des pastilles franches, glyphe blanc. */
-.ac-ic{ background:linear-gradient(135deg,#2D5BFF,#1a3fd9) !important;
-  width:40px !important; height:40px !important; border-radius:12px !important;
-  font-size:19px !important; box-shadow:0 4px 12px rgba(45,91,255,.32) !important; }
-.fb-ic{ background:linear-gradient(135deg,#8B5CF6,#6D28D9) !important;
-  width:36px !important; height:36px !important; border-radius:11px !important;
-  font-size:17px !important; box-shadow:0 4px 12px rgba(109,40,217,.3) !important; }
-
-.ac-a{ font-size:16px !important; font-weight:900 !important; color:var(--p-txt) !important;
-  letter-spacing:-.01em !important; }
-.ac-b, .fb-b, .v-b{ color:var(--p-muted) !important; font-size:12.5px !important; }
-.fb-a, .v-a{ font-size:15px !important; font-weight:900 !important; color:var(--p-txt) !important;
-  line-height:1.3 !important; letter-spacing:-.01em !important; }
-.appel-cta .chev, .famband .chev, .veille .chev{ color:var(--p-blue) !important; opacity:.55; }
-
-/* La pulsation dit « quelque chose veille » — c'est littéralement le
-   produit. La supprimer avait tué le seul signe de vie de l'écran. */
-.v-dot{ width:10px !important; height:10px !important; margin:0 4px !important;
-  background:#15803d !important; box-shadow:0 0 0 4px rgba(21,128,61,.18) !important;
-  animation:vpulse 2.6s ease-in-out infinite !important; }
-.veille.veille-alerte .v-dot{ background:#d97706 !important;
-  box-shadow:0 0 0 4px rgba(217,119,6,.2) !important; }
-.veille.veille-alerte .v-a{ color:#9a5b06 !important; }
-@media (prefers-reduced-motion: reduce){ .v-dot{ animation:none !important; } }
-
 </style>
 </head>
 <body>
@@ -1255,6 +1202,12 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <button class="u-btn" onclick="openPaywall()">Découvrir l'abonnement →</button>
       </div>
 
+      <button class="card next" id="home-push" style="display:none;width:100%" onclick="requestPush()">
+        <span class="k">🔔</span>
+        <span class="m"><span class="a">Activer les alertes sur ce téléphone</span><span class="b">Être prévenu immédiatement en cas de danger</span></span>
+        <span class="go">Activer</span>
+      </button>
+
       <div class="sec">Accès rapide</div>
       <div class="tiles">
         <button class="tile" onclick="openTool('analyseur')">
@@ -1266,13 +1219,6 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           <span class="t">Mes données</span><span class="s">Surveillance &amp; nettoyage</span>
         </button>
       </div>
-
-      <button class="card next" id="home-push" style="display:none;width:100%" onclick="requestPush()">
-        <span class="k">🔔</span>
-        <span class="m"><span class="a">Activer les alertes sur ce téléphone</span><span class="b">Être prévenu immédiatement en cas de danger</span></span>
-        <span class="go">Activer</span>
-      </button>
-
 
       <button class="card qa-card" id="home-formation" onclick="openFormation()">
         <span class="qa-ic ic-gold" style="background:#FBF3E0;color:#B4892E"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
@@ -3410,8 +3356,7 @@ function renderHomeFamille() {
       '<span class="fb-ic">👨‍👩‍👧</span>' +
       '<span class="fb-m">' +
         '<span class="fb-a">' + titre + '</span>' +
-        '<span class="fb-b">' + (qui ? qui + ' n’a accès à aucune de vos données.' :
-          'Personne d’autre n’a accès à vos données.') + '</span>' +
+        '<span class="fb-b">Vous avez tout Despy. ' + confid + '</span>' +
       '</span>';
     z.style.display = 'flex';
     return;
@@ -3446,8 +3391,8 @@ function peindreBandeauPayeur(d) {
     '<span class="fb-ic">👨‍👩‍👧</span>' +
     '<span class="fb-m">' +
       '<span class="fb-a">Vous protégez ' + proteges + ' personne' + (proteges > 1 ? 's' : '') + ' sur 3</span>' +
-      '<span class="fb-b">' + (d.restantes > 1 ? 'Deux places' : 'Une place') +
-        ' vous attend' + (d.restantes > 1 ? 'ent' : '') + ' — sans rien payer de plus.</span>' +
+      '<span class="fb-b">Votre abonnement Famille couvre deux proches, sans rien payer de plus. ' +
+        (d.restantes > 1 ? 'Deux places vous attendent.' : 'Une place vous attend.') + '</span>' +
     '</span>' +
     '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
   z.style.display = 'flex';
@@ -6703,7 +6648,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-09-02';
+var APP_BUILD = '2026-08-09-03';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
