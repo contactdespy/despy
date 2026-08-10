@@ -635,6 +635,16 @@ body{ background:var(--p-paper); }
 .bcl-item.done .bcl-done .bcl-done-on{ display:inline; }
 
 /* ── onglet Conseiller (chat plein écran) ── */
+.ph-ic{ width:46px; height:46px; border-radius:14px; flex:none; display:flex;
+  align-items:center; justify-content:center; font-size:23px; font-weight:900; color:#fff;
+  box-shadow:0 6px 16px rgba(0,0,0,.22); }
+.ph-ic-vert{ background:linear-gradient(135deg,#34d399,#0e9f6e); }
+.ph-ic-bleu{ background:linear-gradient(135deg,#60a5fa,#2D5BFF); font-size:19px; letter-spacing:-.01em; }
+.ph-live{ display:flex; align-items:center; gap:6px; font-size:12.5px; color:#9FE6C2;
+  margin-top:3px; font-weight:600; }
+.ph-live .pt{ width:7px; height:7px; border-radius:50%; background:#4ade80; flex:none; }
+.ph-live.ph-live-ambre{ color:#F5DFA6; }
+.ph-live.ph-live-ambre .pt{ background:#fbbf24; }
 .cons-av{ width:40px; height:40px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; font-size:20px; background:linear-gradient(135deg,#5ce0a0,#2d5bff); }
 .cons-wrap{ display:flex; flex-direction:column; gap:9px; padding:16px 16px 12px; min-height:40vh; }
 .cons-msgs{ display:flex; flex-direction:column; gap:9px; }
@@ -1255,7 +1265,16 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
   </div>
 
   <div id="tab-protection" class="tab-pane">
-    <header class="pheader"><div class="psub">Votre bouclier</div><h1 class="ptitle">Protection</h1></header>
+    <header class="pheader">
+      <div class="ph-row" style="align-items:center;gap:12px">
+        <div class="ph-ic ph-ic-vert">🛡️</div>
+        <div style="flex:1;min-width:0">
+          <div class="psub">Votre bouclier</div>
+          <h1 class="ptitle">Protection</h1>
+          <div class="ph-live" id="prot-live"></div>
+        </div>
+      </div>
+    </header>
     <div class="pbody">
       <div class="card pad" id="prot-panel">
         <div class="prot-top"><span class="t">Votre protection</span><span class="pill pill-blue" id="prot-count">— / 6</span></div>
@@ -1308,19 +1327,35 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
   <div id="tab-profile" class="tab-pane">
 
     <header class="pheader">
-      <div class="psub">Profil</div>
-      <h1 class="ptitle">Mon compte</h1>
+      <div class="ph-row" style="align-items:center;gap:12px">
+        <div class="ph-ic ph-ic-bleu" id="acc-avatar">?</div>
+        <div style="flex:1;min-width:0">
+          <div class="psub">Profil</div>
+          <h1 class="ptitle" id="acc-titre">Mon compte</h1>
+          <div class="ph-live" id="acc-live"></div>
+        </div>
+      </div>
     </header>
 
     <div class="pbody">
 
-      <div class="card prof">
+      <!-- L'en-tête porte l'identité (initiale, prénom, formule) depuis la
+           refonte : cette carte ne répète plus, elle complète avec l'email
+           et la formule détaillée. -->
+      <div class="card prof" style="display:none">
         <div class="prof-av" id="profile-avatar">?</div>
         <div class="prof-id">
           <div class="a" id="profile-name">Utilisateur</div>
           <div class="b" id="profile-email">—</div>
         </div>
         <span class="prof-plan" id="profile-plan"></span>
+      </div>
+      <div class="card pad" id="prof-mail" style="display:flex;align-items:center;gap:11px;padding:14px 16px">
+        <span style="font-size:17px">✉️</span>
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-size:12px;color:var(--p-muted);font-weight:700">Votre identifiant</span>
+          <span style="display:block;font-size:14.5px;font-weight:700;color:var(--p-txt);word-break:break-all" id="prof-mail-txt">—</span>
+        </span>
       </div>
 
       <div class="sec">Mon suivi</div>
@@ -2183,6 +2218,7 @@ function switchAppTab(tab) {
   window.scrollTo(0, 0);
   if (navigator.vibrate) navigator.vibrate(5);
   if (tab === 'conseiller') mountConseiller();
+  if (tab === 'profile') { try { majEnteteCompte(); } catch (e) {} }
   // L'accueil affiche des compteurs vivants (questions posées, fuites,
   // surveillance) : sans ce rafraîchissement, ils restaient figés sur les
   // valeurs du démarrage de l'appli.
@@ -3864,8 +3900,50 @@ function protRdv(emoji, titre, sous, cible) {
     '</button>';
 }
 
+// ─── LES LIGNES VIVANTES DES EN-TÊTES ───
+// Un en-tête qui dit quelque chose vaut mieux qu'un en-tête décoré. On y
+// met ce que le client veut savoir en arrivant sur l'onglet : où en est sa
+// protection, depuis quand il est là.
+function majEnteteProtection(checklist) {
+  var el = document.getElementById('prot-live');
+  if (!el) return;
+  var faits = PROT_ETAPES.filter(function (e) { return !!(checklist || {})[e.k]; }).length;
+  var tout = faits === PROT_ETAPES.length;
+  el.className = 'ph-live' + (tout ? '' : ' ph-live-ambre');
+  el.innerHTML = '<span class="pt"></span>' + (tout
+    ? 'Tout est activé · prochain contrôle ' + (typeof prochainControleFr === 'function' ? prochainControleFr() : 'cette semaine')
+    : faits + ' protection' + (faits > 1 ? 's' : '') + ' sur ' + PROT_ETAPES.length + ' activée' + (faits > 1 ? 's' : ''));
+}
+
+function majEnteteCompte() {
+  var s = session.get() || {};
+  var mt = document.getElementById('prof-mail-txt');
+  if (mt) mt.textContent = s.email || '—';
+  var av = document.getElementById('acc-avatar');
+  var ti = document.getElementById('acc-titre');
+  var li = document.getElementById('acc-live');
+  var prenom = (typeof friendlyFirstName === 'function' ? friendlyFirstName(s) : '') || '';
+  if (av) av.textContent = (prenom || (s.email || '?')).charAt(0).toUpperCase();
+  if (ti) ti.textContent = prenom ? prenom : 'Mon compte';
+  if (!li) return;
+  var NOMS = { monthly: 'Abonné Premium', annual: 'Premium annuel',
+               family_monthly: 'Premium Famille', family_annual: 'Premium Famille',
+               family_member: 'Protection Famille' };
+  var depuis = '';
+  try {
+    if (s.created_at) depuis = new Date(s.created_at)
+      .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  } catch (e) {}
+  li.className = 'ph-live' + (s.subscribed ? '' : ' ph-live-ambre');
+  li.innerHTML = '<span class="pt"></span>' +
+    (s.subscribed ? (NOMS[s.plan] || 'Abonné Premium') : 'Compte gratuit') +
+    (depuis ? ' · depuis ' + depuis : '');
+}
+
+
 function renderProtection(checklist, stats) {
   if (!checklist) return;
+  try { majEnteteProtection(checklist); } catch (e) {}
   PROT_STATS = stats || PROT_STATS;
   var faits = PROT_ETAPES.filter(function (e) { return !!checklist[e.k]; }).length;
 
@@ -6698,7 +6776,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-09-04';
+var APP_BUILD = '2026-08-09-05';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
