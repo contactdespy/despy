@@ -6194,11 +6194,17 @@ function buyLivret() {
       '/conseiller':         'conseiller',
       '/qui-sommes-nous':    'qui-sommes-nous',
       '/carte-arnaques':     'carte-arnaques',
+      // /outils n'est pas une page du SPA mais une SECTION de l'accueil :
+      // on affiche l'accueil, puis on descend jusqu'au centre d'outils.
+      '/outils':             'home',
     };
     var targetPage = routes[path];
     if (targetPage) {
       setTimeout(function() {
         if (typeof showPage === 'function') showPage(targetPage);
+        if (path === '/outils' && typeof scrollToSection === 'function') {
+          setTimeout(function() { scrollToSection('centre-outils'); }, 260);
+        }
       }, 50);
     }
   } catch(e) { /* silencieux */ }

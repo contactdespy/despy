@@ -133,6 +133,13 @@
   to = "/index.html"
   status = 200
 
+# Outils gratuits (centre d'outils de l'accueil) — cible des emails de la
+# mini-formation : le lecteur atterrit SUR l'outil, pas en haut de l'accueil.
+[[redirects]]
+  from = "/outils"
+  to = "/index.html"
+  status = 200
+
 [[redirects]]
   from = "/comment-ca-marche"
   to = "/index.html"
