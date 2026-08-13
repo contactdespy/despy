@@ -37,7 +37,7 @@ const sendResend = async (to, subject, html, extras) => {
       // Le lien de désinscription visible n'est ajouté qu'aux emails
       // marketing : il n'a rien à faire sur un échec de paiement.
       html: html + (opt.unsub ? `
-        <p style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;color:#9aa3b2;text-align:center;line-height:1.7;margin:16px auto 0;max-width:600px">
+        <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11.5px;color:#9aa3b2;text-align:center;line-height:1.7;margin:16px auto 0;max-width:600px">
           Vous recevez cet email parce que vous avez laissé votre adresse à Despy.<br>
           <a href="${unsubUrl}" style="color:#9aa3b2;text-decoration:underline">Se désinscrire en un clic</a>
         </p>` : ''),
@@ -56,18 +56,18 @@ const sendResend = async (to, subject, html, extras) => {
 // L'en-tête reprend EXACTEMENT la couleur de fond du logo officiel (#010410) :
 // le logo se fond parfaitement, quel que soit le client mail.
 const brandHeader = (tagline) => `
-  <div style="background:#010410;padding:28px 32px 22px;text-align:center">
-    <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="150" style="color:#fff;font-size:22px;font-weight:900;width:150px;max-width:55%;height:auto;display:inline-block;border:0">
-    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:12px">${tagline || "Votre sécurité numérique, simplement"}</div>
+  <div style="background:#010410;padding:26px 32px 22px;text-align:center">
+    <img src="https://despy.fr/assets/logo-despy-email-h.png" alt="Despy" width="190" height="33" style="color:#fff;font-size:20px;font-weight:900;width:190px;max-width:62%;height:auto;display:inline-block;border:0">
+    <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:14px">${tagline || "Votre sécurité numérique, simplement"}</div>
   </div>
   <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>`;
 
 const trustStrip = () => `<p style="font-size:13px;color:#999;line-height:1.6;text-align:center;margin:26px 0 0">🔒 Vos données sont hébergées en France 🇫🇷, chiffrées et jamais revendues. Conforme RGPD.</p>`;
 
 const founderNote = () => `
-  <div style="background:#f7f9fc;border-radius:14px;padding:20px 22px;margin:26px 0">
-    <p style="font-size:15px;color:#444;line-height:1.65;margin:0;font-style:italic">« J'ai créé Despy parce que mes proches se faisaient piéger par des arnaques de plus en plus crédibles. Mon objectif : que vous ne soyez plus jamais seul face à un doute. »</p>
-    <div style="font-size:14px;color:#0a1f3a;font-weight:700;margin-top:12px">Le fondateur de Despy, Strasbourg</div>
+  <div style="border-top:1px solid #edf0f5;margin:28px 0 0;padding:24px 2px 0">
+    <p style="font-size:15.5px;color:#555;line-height:1.7;margin:0;font-style:italic">« J'ai créé Despy parce que mes proches se faisaient piéger par des arnaques de plus en plus crédibles. Mon objectif : que vous ne soyez plus jamais seul face à un doute. »</p>
+    <div style="font-size:13.5px;color:#2D5BFF;font-weight:700;margin-top:12px;letter-spacing:.02em">Le fondateur de Despy, Strasbourg</div>
   </div>`;
 
 const referralBlock = (code) => code ? `
@@ -114,7 +114,7 @@ const templates = {
         </div>` : '';
     return {
     subject: `${prenom || name}, votre abonnement Despy est confirmé ✅`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Abonnement confirmé")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Bienvenue ${prenom || name} 🎉</h1>
@@ -153,7 +153,7 @@ const templates = {
 
   welcome_free: ({ name, prenom, referralCode }) => ({
     subject: `${prenom || name}, bienvenue chez Despy — votre compte est prêt`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader()}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Bienvenue ${prenom || name} 👋</h1>
@@ -183,7 +183,7 @@ const templates = {
 
   cancelled: ({ name, prenom }) => ({
     subject: "Votre résiliation est prise en compte — la porte reste ouverte",
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("À bientôt, on l'espère")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Votre résiliation est bien prise en compte</h1>
@@ -209,7 +209,7 @@ const templates = {
 
   payment_failed: ({ name, prenom, attemptCount, invoiceUrl }) => ({
     subject: "Votre paiement Despy n'a pas abouti — réglons ça en 1 minute",
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Paiement à mettre à jour")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Un petit souci avec votre paiement</h1>
@@ -235,7 +235,7 @@ const templates = {
 
   relance_lead: ({ name, prenom }) => ({
     subject: "Et si on vérifiait les messages douteux à votre place ?",
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Votre protection vous attend")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Vous avez fait le premier pas 👏</h1>
@@ -272,7 +272,7 @@ const templates = {
         : `Ce mois-ci a été calme — aucune analyse demandée. Pensez à utiliser l'analyseur dès qu'un message vous semble suspect.`;
     return {
       subject: `Votre bilan Despy — ${monthName}`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
         ${brandHeader("Votre bilan mensuel")}
         <div style="background:#fff;padding:32px 24px 28px">
           <h1 style="margin:0 0 4px;font-size:24px;color:#0a1f3a">Votre mois Despy</h1>
@@ -321,7 +321,7 @@ const templates = {
 
   cyber_alert: ({ prenom, alertTitle, alertDesc, alertLink, alertSource }) => ({
     subject: `🔴 Alerte Despy — ${(alertTitle || "").substring(0, 60)}`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       <div style="background:#010410;padding:16px 32px;text-align:center">
         <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="color:#fff;font-size:22px;font-weight:900;width:92px;max-width:38%;height:auto;display:inline-block;border:0">
       </div>
@@ -344,7 +344,7 @@ const templates = {
   // Version "teaser" envoyée aux comptes gratuits (incite à s'abonner)
   cyber_alert_free: ({ prenom, alertTitle, alertSource }) => ({
     subject: `🔴 Une arnaque circule en ce moment — ${(alertTitle || "").substring(0, 50)}`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Alerte cybersécurité")}
       <div style="background:#fff;padding:32px">
         <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 16px">Bonjour ${prenom || "cher membre"},</p>
@@ -369,7 +369,7 @@ const templates = {
   // Sensibilisation : arnaques générées par IA (peut être envoyé aux gratuits comme aux abonnés)
   ia_scams_awareness: ({ name, prenom, referralCode }) => ({
     subject: `Les arnaques sont maintenant écrites par une IA — voici comment les repérer`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Nouvelle menace 2026")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 14px;font-size:23px;color:#0a1f3a;line-height:1.3">Bonjour ${prenom || name || "cher membre"},</h1>
@@ -420,7 +420,7 @@ const templates = {
   //   - un seul bouton dominant, l'offre commerciale reste en fin de course.
   guide_delivery: ({ prenom, guideUrl }) => ({
     subject: `${prenom ? prenom + ", v" : "V"}otre guide est prêt — les 5 arnaques qui visent vos parents`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       <!-- apercu-boite : la ligne affichée à côté de l'objet dans la boîte
            de réception. Sans elle, Gmail y mettait la baseline du logo. -->
       <div style="display:none;font-size:1px;color:#f7f9fc;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">Il est en pièce jointe. Les 5 arnaques qui visent vos parents, et le réflexe exact à leur transmettre.&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
@@ -430,7 +430,9 @@ const templates = {
         <p style="font-size:16.5px;color:#444;line-height:1.65;margin:0 0 26px">Il est <strong>joint à cet email</strong> — vous n'avez rien à télécharger. Cinq minutes de lecture, puis parlez-en avec eux : c'est souvent ce simple échange qui suffit à éviter le piège.</p>
 
         <div style="background:#0a1f3a;background-image:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px 28px;margin:0 0 30px;text-align:center">
-          <img src="https://despy.fr/assets/guide-cover.png" width="200" alt="Votre guide Despy en PDF" style="width:200px;max-width:60%;height:auto;border-radius:10px;border:1px solid #2b4470;display:block;margin:0 auto 22px;box-shadow:0 14px 36px rgba(0,0,0,.5)">
+          <div style="display:inline-block;background:#fff;border-radius:14px;padding:13px;margin:0 0 22px;box-shadow:0 16px 40px rgba(0,0,0,.45)">
+            <img src="https://despy.fr/assets/guide-cover.png" width="190" alt="Votre guide Despy en PDF" style="width:190px;max-width:100%;height:auto;border-radius:7px;display:block;border:0">
+          </div>
           <div style="font-size:12px;color:#5BE3F5;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:18px">PDF · 7 pages · gratuit</div>
           <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:17px 38px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16.5px">Ouvrir le guide</a>
           <div style="font-size:13px;color:#93a6c2;margin-top:14px">Si la pièce jointe ne s'affiche pas</div>
@@ -438,11 +440,11 @@ const templates = {
 
         <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 0 14px">Ce que vous allez y trouver</div>
         <div style="border:1px solid #edf0f5;border-radius:14px;overflow:hidden;margin:0 0 30px">
-          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">1</span>&nbsp;&nbsp;Le faux SMS de colis</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« Réglez 1,95 € de frais » — le piège le plus courant.</div></div>
-          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">2</span>&nbsp;&nbsp;Le faux conseiller bancaire</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« Validez ce virement pour bloquer une fraude. »</div></div>
-          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">3</span>&nbsp;&nbsp;Le faux support informatique</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">Le « technicien Microsoft » qui veut prendre la main.</div></div>
-          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">4</span>&nbsp;&nbsp;L'arnaque au faux proche</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« J'ai changé de numéro, peux-tu m'envoyer de l'argent ? »</div></div>
-          <div style="padding:15px 18px"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">5</span>&nbsp;&nbsp;Le faux gain, le faux cadeau</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">Et la règle d'or, valable pour toutes les arnaques.</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">1</span>&nbsp;&nbsp;Le faux SMS de colis</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">« Réglez 1,95 € de frais » — le piège le plus courant.</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">2</span>&nbsp;&nbsp;Le faux conseiller bancaire</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">« Validez ce virement pour bloquer une fraude. »</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">3</span>&nbsp;&nbsp;Le faux support informatique</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">Le « technicien Microsoft » qui veut prendre la main.</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">4</span>&nbsp;&nbsp;L'arnaque au faux proche</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">« J'ai changé de numéro, peux-tu m'envoyer de l'argent ? »</div></div>
+          <div style="padding:15px 18px"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">5</span>&nbsp;&nbsp;Le faux gain, le faux cadeau</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">Et la règle d'or, valable pour toutes les arnaques.</div></div>
         </div>
 
         <div style="border-left:4px solid #2D5BFF;background:#f7f9fc;border-radius:0 14px 14px 0;padding:20px 22px;margin:0 0 8px">
@@ -455,7 +457,7 @@ const templates = {
         <div style="border-top:1px solid #edf0f5;margin:28px 0 0;padding:26px 0 0;text-align:center">
           <div style="font-size:17px;color:#0a1f3a;font-weight:800;margin:0 0 10px">Vous ne pouvez pas être derrière eux 24h/24.</div>
           <p style="font-size:15.5px;color:#444;line-height:1.65;margin:0 0 16px">Despy, si. Un message douteux, un appel bizarre&nbsp;: ils nous l'envoient, un conseiller humain leur répond en quelques secondes. Dès <strong>9,99&nbsp;€/mois</strong>, ou <strong>14,99&nbsp;€ en Famille</strong> jusqu'à 4 proches — sans engagement.</p>
-          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#fff;color:#0a1f3a;border:1.5px solid #0a1f3a;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Découvrir Despy</a>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#0a1f3a;color:#ffffff;padding:15px 32px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15.5px">Découvrir Despy</a>
         </div>
 
         ${trustStrip()}
@@ -485,7 +487,7 @@ const templates = {
       <div style="border:1px solid #e8ecf3;border-radius:16px;background:#fcfdff">${rows}</div>`;
     return {
       subject: `${prenom || name}, voici tout ce que Despy sait faire pour vous 📖`,
-      html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Votre guide de démarrage")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a">Votre mode d'emploi, ${prenom || name} 📖</h1>
@@ -539,7 +541,7 @@ const templates = {
   // J+2 — Le piège n°1 en détail (valeur pure)
   nurture_j2: ({ prenom }) => ({
     subject: `${prenom || 'Bonjour'}, le piège n°1 des arnaques (à connaître absolument)`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Mini-formation · 1/4")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Le faux SMS de colis 📦</h1>
@@ -569,7 +571,7 @@ const templates = {
   // J+4 — Que faire si c'est déjà arrivé (rassure + montre le SOS)
   nurture_j4: ({ prenom }) => ({
     subject: `${prenom || 'Bonjour'}, et si vous aviez déjà cliqué ? (pas de panique)`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Mini-formation · 2/4")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Vous avez cliqué ? Voici quoi faire</h1>
@@ -595,7 +597,7 @@ const templates = {
   // J+6 — Histoire illustrative + preuve sociale (les 17 avis)
   nurture_j6: ({ prenom }) => ({
     subject: `${prenom || 'Bonjour'}, elle a failli virer 4 800 € à un faux conseiller`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Mini-formation · 3/4")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 12px;font-size:22px;color:#0a1f3a">« Votre compte est piraté, virez vite… »</h1>
@@ -622,7 +624,7 @@ const templates = {
   // J+8 — L'offre, en douceur (avec l'angle famille)
   nurture_j8: ({ prenom }) => ({
     subject: `${prenom || 'Bonjour'}, protégez vos proches (dès 9,99€/mois)`,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       ${brandHeader("Mini-formation · 4/4")}
       <div style="background:#fff;padding:36px 32px">
         <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">Vous ne pouvez pas être derrière eux 24h/24.</h1>
