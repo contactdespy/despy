@@ -53,10 +53,11 @@ const sendResend = async (to, subject, html, extras) => {
 };
 
 // ── Briques réutilisables (cohérence visuelle entre emails) ──
-// L'en-tête reprend EXACTEMENT la couleur de fond du logo officiel (#010410) :
-// le logo se fond parfaitement, quel que soit le client mail.
+// Le fond n'est plus le quasi-noir de l'ancien logo opaque : celui-ci est
+// détouré, donc l'en-tête prend le bleu profond échantillonné DANS le logo
+// (#203090 dans les ombres du bouclier), éclairci vers #16307A.
 const brandHeader = (tagline) => `
-  <div style="background:#010410;padding:26px 32px 22px;text-align:center">
+  <div style="background:#0E1F4F;background-image:linear-gradient(135deg,#0B1838 0%,#16307A 100%);padding:28px 32px 24px;text-align:center">
     <img src="https://despy.fr/assets/logo-despy-email-h.png" alt="Despy" width="190" height="33" style="color:#fff;font-size:20px;font-weight:900;width:190px;max-width:62%;height:auto;display:inline-block;border:0">
     <div style="font-size:11px;color:#5BE3F5;letter-spacing:.2em;text-transform:uppercase;margin-top:14px">${tagline || "Votre sécurité numérique, simplement"}</div>
   </div>
@@ -80,10 +81,10 @@ const referralBlock = (code) => code ? `
 // (le 06 personnel n'est pas exposé aux prospects/comptes gratuits).
 const brandFooter = (showPhone) => `
   <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
-  <div style="padding:26px 32px;text-align:center;background:#010410">
-    <p style="font-size:14px;color:#c5c8cc;margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
+  <div style="padding:28px 32px;text-align:center;background:#0E1F4F">
+    <p style="font-size:14px;color:#ccd4e4;margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
     <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr${showPhone ? ' · 06 89 14 83 95' : ''}</p>
-    <p style="font-size:11px;color:#7a7d81;margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
+    <p style="font-size:11px;color:#8494ae;margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
   </div>`;
 
 // Emails marketing : eux seuls portent un lien de désinscription visible.
@@ -322,8 +323,8 @@ const templates = {
   cyber_alert: ({ prenom, alertTitle, alertDesc, alertLink, alertSource }) => ({
     subject: `🔴 Alerte Despy — ${(alertTitle || "").substring(0, 60)}`,
     html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
-      <div style="background:#010410;padding:16px 32px;text-align:center">
-        <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="color:#fff;font-size:22px;font-weight:900;width:92px;max-width:38%;height:auto;display:inline-block;border:0">
+      <div style="background:#0E1F4F;padding:18px 32px;text-align:center">
+        <img src="https://despy.fr/assets/logo-despy-email-h.png" alt="Despy" width="140" height="24" style="width:140px;max-width:46%;height:auto;display:inline-block;border:0">
       </div>
       <div style="background:#ac2222;background-image:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:26px 32px;text-align:center">
         <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fecaca;font-weight:700">Alerte cybersécurité · ${alertSource || "ANSSI"}</div>
@@ -429,13 +430,13 @@ const templates = {
         <h1 style="margin:0 0 12px;font-size:24px;color:#0a1f3a;line-height:1.3">Voici votre guide${prenom ? ", " + prenom : ""}</h1>
         <p style="font-size:16.5px;color:#444;line-height:1.65;margin:0 0 26px">Il est <strong>joint à cet email</strong> — vous n'avez rien à télécharger. Cinq minutes de lecture, puis parlez-en avec eux : c'est souvent ce simple échange qui suffit à éviter le piège.</p>
 
-        <div style="background:#0a1f3a;background-image:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px 28px;margin:0 0 30px;text-align:center">
-          <div style="display:inline-block;background:#fff;border-radius:14px;padding:13px;margin:0 0 22px;box-shadow:0 16px 40px rgba(0,0,0,.45)">
+        <div style="background:#EFF4FD;border:1px solid #DBE4F7;border-radius:18px;padding:30px 24px 28px;margin:0 0 30px;text-align:center">
+          <div style="display:inline-block;background:#fff;border-radius:14px;padding:13px;margin:0 0 22px;box-shadow:0 10px 26px rgba(16,38,84,.16)">
             <img src="https://despy.fr/assets/guide-cover.png" width="190" alt="Votre guide Despy en PDF" style="width:190px;max-width:100%;height:auto;border-radius:7px;display:block;border:0">
           </div>
-          <div style="font-size:12px;color:#5BE3F5;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:18px">PDF · 7 pages · gratuit</div>
+          <div style="font-size:12px;color:#41639C;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:18px">PDF · 7 pages · gratuit</div>
           <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:17px 38px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16.5px">Ouvrir le guide</a>
-          <div style="font-size:13px;color:#93a6c2;margin-top:14px">Si la pièce jointe ne s'affiche pas</div>
+          <div style="font-size:13px;color:#7C8DAB;margin-top:14px">Si la pièce jointe ne s'affiche pas</div>
         </div>
 
         <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 0 14px">Ce que vous allez y trouver</div>
@@ -447,7 +448,7 @@ const templates = {
           <div style="padding:15px 18px"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="display:inline-block;width:23px;height:23px;line-height:23px;border-radius:8px;background:#eaf0ff;color:#2D5BFF;text-align:center;font-size:13px;font-weight:800;vertical-align:middle">5</span>&nbsp;&nbsp;Le faux gain, le faux cadeau</div><div style="font-size:14px;color:#6b7280;margin:4px 0 0 31px">Et la règle d'or, valable pour toutes les arnaques.</div></div>
         </div>
 
-        <div style="border-left:4px solid #2D5BFF;background:#f7f9fc;border-radius:0 14px 14px 0;padding:20px 22px;margin:0 0 8px">
+        <div style="border:1px solid #E2E9F6;background:#FBFCFE;border-radius:14px;padding:22px 24px;margin:0 0 8px">
           <div style="font-size:12px;color:#2D5BFF;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:8px">La règle d'or, tout de suite</div>
           <p style="font-size:15.5px;color:#333;line-height:1.7;margin:0">Un escroc a toujours besoin de deux choses : <strong>l'urgence</strong>, pour vous empêcher de réfléchir, et <strong>la peur ou l'appât du gain</strong>. Dès que l'une des deux apparaît, on s'arrête : on ne clique pas, on ne paye pas, on ne donne rien. Transmettez cette phrase telle quelle à vos parents — c'est la seule chose à retenir.</p>
         </div>
