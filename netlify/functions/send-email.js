@@ -419,15 +419,15 @@ const templates = {
   //   - l'email donne déjà quelque chose d'utile (la règle d'or) ;
   //   - un seul bouton dominant, l'offre commerciale reste en fin de course.
   guide_delivery: ({ prenom, guideUrl }) => ({
-    subject: `${prenom ? prenom + ", v" : "V"}otre guide est prêt — les 5 arnaques du moment`,
+    subject: `${prenom ? prenom + ", v" : "V"}otre guide est prêt — les 5 arnaques qui visent vos parents`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
       <!-- apercu-boite : la ligne affichée à côté de l'objet dans la boîte
            de réception. Sans elle, Gmail y mettait la baseline du logo. -->
-      <div style="display:none;font-size:1px;color:#f7f9fc;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">Il est en pièce jointe. Les 5 arnaques du moment, et la phrase exacte à dire pour raccrocher.&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
+      <div style="display:none;font-size:1px;color:#f7f9fc;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">Il est en pièce jointe. Les 5 arnaques qui visent vos parents, et le réflexe exact à leur transmettre.&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
       ${brandHeader("Votre guide est prêt")}
       <div style="background:#fff;padding:34px 28px 30px">
         <h1 style="margin:0 0 12px;font-size:24px;color:#0a1f3a;line-height:1.3">Voici votre guide${prenom ? ", " + prenom : ""}</h1>
-        <p style="font-size:16.5px;color:#444;line-height:1.65;margin:0 0 26px">Il est <strong>joint à cet email</strong> — vous n'avez rien à télécharger. Prenez cinq minutes : c'est court, et écrit sans jargon.</p>
+        <p style="font-size:16.5px;color:#444;line-height:1.65;margin:0 0 26px">Il est <strong>joint à cet email</strong> — vous n'avez rien à télécharger. Cinq minutes de lecture, puis parlez-en avec eux : c'est souvent ce simple échange qui suffit à éviter le piège.</p>
 
         <div style="background:#0a1f3a;background-image:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px 28px;margin:0 0 30px;text-align:center">
           <img src="https://despy.fr/assets/guide-cover.png" width="200" alt="Votre guide Despy en PDF" style="width:200px;max-width:60%;height:auto;border-radius:10px;border:1px solid #2b4470;display:block;margin:0 auto 22px;box-shadow:0 14px 36px rgba(0,0,0,.5)">
@@ -447,13 +447,14 @@ const templates = {
 
         <div style="border-left:4px solid #2D5BFF;background:#f7f9fc;border-radius:0 14px 14px 0;padding:20px 22px;margin:0 0 8px">
           <div style="font-size:12px;color:#2D5BFF;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:8px">La règle d'or, tout de suite</div>
-          <p style="font-size:15.5px;color:#333;line-height:1.7;margin:0">Un escroc a toujours besoin de deux choses : <strong>l'urgence</strong>, pour vous empêcher de réfléchir, et <strong>la peur ou l'appât du gain</strong>. Dès que vous ressentez l'une des deux, arrêtez-vous. Ne cliquez pas, ne payez pas, ne donnez rien — et parlez-en à quelqu'un.</p>
+          <p style="font-size:15.5px;color:#333;line-height:1.7;margin:0">Un escroc a toujours besoin de deux choses : <strong>l'urgence</strong>, pour vous empêcher de réfléchir, et <strong>la peur ou l'appât du gain</strong>. Dès que l'une des deux apparaît, on s'arrête : on ne clique pas, on ne paye pas, on ne donne rien. Transmettez cette phrase telle quelle à vos parents — c'est la seule chose à retenir.</p>
         </div>
 
         ${founderNote()}
 
         <div style="border-top:1px solid #edf0f5;margin:28px 0 0;padding:26px 0 0;text-align:center">
-          <p style="font-size:15.5px;color:#444;line-height:1.65;margin:0 0 16px">Un message douteux, un appel bizarre&nbsp;? Avec Despy, vous nous l'envoyez et un conseiller humain vous répond en quelques secondes. Dès <strong>9,99&nbsp;€/mois</strong>, sans engagement.</p>
+          <div style="font-size:17px;color:#0a1f3a;font-weight:800;margin:0 0 10px">Vous ne pouvez pas être derrière eux 24h/24.</div>
+          <p style="font-size:15.5px;color:#444;line-height:1.65;margin:0 0 16px">Despy, si. Un message douteux, un appel bizarre&nbsp;: ils nous l'envoient, un conseiller humain leur répond en quelques secondes. Dès <strong>9,99&nbsp;€/mois</strong>, ou <strong>14,99&nbsp;€ en Famille</strong> jusqu'à 4 proches — sans engagement.</p>
           <a href="https://despy.fr/tarifs" style="display:inline-block;background:#fff;color:#0a1f3a;border:1.5px solid #0a1f3a;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Découvrir Despy</a>
         </div>
 
