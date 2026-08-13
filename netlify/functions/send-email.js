@@ -146,6 +146,17 @@ const templates = {
           <div style="font-size:14px;color:#1a3fd9;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Tout est inclus</div>
           <div style="font-size:16px;color:#333;line-height:2">✅ Questions <strong>illimitées</strong> à votre Conseiller Despy<br>✅ SOS humain : un conseiller au bout du fil<br>✅ <strong>Surveillance dark web chaque semaine</strong> : fuites + appareils infectés, alerte immédiate<br>✅ Alertes dès qu'une nouvelle arnaque circule<br>✅ Effacement de vos traces sur internet<br>✅ Bilan de sécurité personnalisé chaque mois</div>
         </div>
+        <div style="border:1px solid #E2E9F6;border-radius:14px;padding:22px 24px;margin:22px 0">
+          <div style="font-size:12px;color:#2D5BFF;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:12px">Pour ouvrir l’application</div>
+          <div style="font-size:15.5px;color:#333;line-height:1.8">
+            <strong>Votre identifiant</strong> : cette adresse email.<br>
+            <strong>Votre mot de passe</strong> : celui que vous avez choisi juste après le paiement.
+          </div>
+          <div style="font-size:14.5px;color:#666;line-height:1.7;margin-top:12px">Vous ne l’avez pas encore choisi, ou vous l’avez oublié&nbsp;? Sur l’écran de connexion, touchez <strong>« Mot de passe oublié »</strong> : vous recevrez un lien pour en définir un.</div>
+          <div style="text-align:center;margin-top:18px">
+            <a href="https://despy.fr/app" style="display:inline-block;background:#2D5BFF;color:#fff;padding:14px 30px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15.5px">Ouvrir l’application</a>
+          </div>
+        </div>
         ${livretGift}
 
         <p style="font-size:14px;color:#666;line-height:1.7;margin:0 0 22px">Vous restez <strong>libre</strong> : résiliez à tout moment, en 1 clic, depuis votre espace (onglet « Mon compte »). Une question ? Répondez simplement à cet email, un humain vous répond.</p>

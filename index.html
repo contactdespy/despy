@@ -6716,7 +6716,16 @@ function despyCreerMotDePasse(sessionId) {
         showPage('login');
         return;
       }
-      if (!r.ok || !d || !d.ok) { echec((d && d.error) || 'Création impossible. Réessayez.'); return; }
+      if (!r.ok || !d || !d.ok) {
+        // Le message brut du serveur (« Session de paiement introuvable »)
+        // est affolant pour quelqu'un qui vient de payer : il comprend qu'il
+        // a perdu son argent, pas qu'une référence technique manque. On
+        // rassure, et on donne la sortie de secours plutôt qu'un mur.
+        echec('Votre paiement est bien enregistré — rien n’est perdu. Nous n’arrivons ' +
+              'pas à créer le mot de passe ici : ouvrez l’application et touchez ' +
+              '« Mot de passe oublié », vous recevrez un lien par email.');
+        return;
+      }
 
       // Il vient de payer : on le connecte directement, sans lui redemander.
       siteSession.set({
