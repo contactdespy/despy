@@ -18,7 +18,8 @@ function unsubToken(email) {
     .slice(0, 32);
 }
 
-const sendResend = async (to, subject, html) => {
+const sendResend = async (to, subject, html, extras) => {
+  const opt = extras || {};
   // En-tête List-Unsubscribe : améliore l'arrivée en boîte principale (Gmail
   // valorise les expéditeurs avec une désinscription en 1 clic) + conforme RGPD.
   const base = process.env.URL || "https://despy.fr";
@@ -33,7 +34,14 @@ const sendResend = async (to, subject, html) => {
       from: "Despy <contact@despy.fr>",
       to: [to],
       subject,
-      html,
+      // Le lien de désinscription visible n'est ajouté qu'aux emails
+      // marketing : il n'a rien à faire sur un échec de paiement.
+      html: html + (opt.unsub ? `
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:11.5px;color:#9aa3b2;text-align:center;line-height:1.7;margin:16px auto 0;max-width:600px">
+          Vous recevez cet email parce que vous avez laissé votre adresse à Despy.<br>
+          <a href="${unsubUrl}" style="color:#9aa3b2;text-decoration:underline">Se désinscrire en un clic</a>
+        </p>` : ''),
+      ...(opt.attachments ? { attachments: opt.attachments } : {}),
       headers: {
         "List-Unsubscribe": `<${unsubUrl}>, <mailto:contact@despy.fr?subject=unsubscribe>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
@@ -73,10 +81,17 @@ const referralBlock = (code) => code ? `
 const brandFooter = (showPhone) => `
   <div style="height:3px;background:linear-gradient(90deg,#2D5BFF,#5BE3F5,#2D5BFF);font-size:0;line-height:0">&nbsp;</div>
   <div style="padding:26px 32px;text-align:center;background:#010410">
-    <p style="font-size:14px;color:rgba(255,255,255,.75);margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
+    <p style="font-size:14px;color:#c5c8cc;margin:0 0 8px">Une question ? Écrivez-nous — un humain vous répond.</p>
     <p style="font-size:14px;color:#5BE3F5;margin:0;font-weight:600">contact@despy.fr${showPhone ? ' · 06 89 14 83 95' : ''}</p>
-    <p style="font-size:11px;color:rgba(255,255,255,.45);margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
+    <p style="font-size:11px;color:#7a7d81;margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
   </div>`;
+
+// Emails marketing : eux seuls portent un lien de désinscription visible.
+// Gmail l'attend des expéditeurs en volume, et on va faire de la publicité.
+const MARKETING = new Set([
+  "guide_delivery", "nurture_j2", "nurture_j4", "nurture_j6", "nurture_j8",
+  "relance_lead", "ia_scams_awareness", "cyber_alert_free"
+]);
 
 const templates = {
 
@@ -230,7 +245,7 @@ const templates = {
           <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:10px">Avec Despy, vous n'êtes plus seul face au doute</div>
           <div style="font-size:15px;color:#333;line-height:1.9">✅ Un message suspect&nbsp;? On vous dit en 10 sec si c'est une arnaque<br>✅ Un conseiller humain qui vous guide<br>✅ Des alertes sur les arnaques du moment<br>✅ Le nettoyage de vos données personnelles</div>
         </div>
-        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:22px;text-align:center">
+        <div style="background:#132a6b;background-image:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:14px;padding:22px;text-align:center">
           <div style="font-size:13px;color:#5BE3F5;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Offre de lancement</div>
           <div style="font-size:22px;color:#fff;font-weight:900;margin-bottom:4px">89€/an — 2 mois offerts</div>
           <div style="font-size:13px;color:rgba(255,255,255,.78);margin-bottom:16px">Soit 7,42€/mois · sans engagement · résiliable en 1 clic</div>
@@ -310,7 +325,7 @@ const templates = {
       <div style="background:#010410;padding:16px 32px;text-align:center">
         <img src="https://despy.fr/assets/logo-despy-email-dark.png" alt="Despy" width="92" style="color:#fff;font-size:22px;font-weight:900;width:92px;max-width:38%;height:auto;display:inline-block;border:0">
       </div>
-      <div style="background:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:26px 32px;text-align:center">
+      <div style="background:#ac2222;background-image:linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%);padding:26px 32px;text-align:center">
         <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#fecaca;font-weight:700">Alerte cybersécurité · ${alertSource || "ANSSI"}</div>
         <div style="font-size:22px;font-weight:900;color:#fff;margin-top:8px;line-height:1.3">${alertTitle || "Nouvelle menace détectée"}</div>
       </div>
@@ -399,36 +414,47 @@ const templates = {
   }),
 
   // Livraison de l'aimant à leads : le guide PDF "5 arnaques qui visent vos parents"
+  // Livraison de l'aimant à leads. Trois partis pris :
+  //   - le PDF est JOINT (voir handler) : le bouton n'est qu'un secours ;
+  //   - l'email donne déjà quelque chose d'utile (la règle d'or) ;
+  //   - un seul bouton dominant, l'offre commerciale reste en fin de course.
   guide_delivery: ({ prenom, guideUrl }) => ({
-    subject: "Votre guide Despy : les 5 arnaques qui visent vos parents",
+    subject: `${prenom ? prenom + ", v" : "V"}otre guide est prêt — les 5 arnaques du moment`,
     html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      <!-- apercu-boite : la ligne affichée à côté de l'objet dans la boîte
+           de réception. Sans elle, Gmail y mettait la baseline du logo. -->
+      <div style="display:none;font-size:1px;color:#f7f9fc;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden">Il est en pièce jointe. Les 5 arnaques du moment, et la phrase exacte à dire pour raccrocher.&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
       ${brandHeader("Votre guide est prêt")}
-      <div style="background:#fff;padding:36px 32px 30px">
-        <h1 style="margin:0 0 10px;font-size:24px;color:#0a1f3a;line-height:1.3">Voici votre guide${prenom ? ", " + prenom : ""} 🎁</h1>
-        <p style="font-size:16px;color:#444;line-height:1.65;margin:0 0 26px">Merci de votre confiance. Prenez 5 minutes pour le lire, puis parlez-en avec vos proches : c'est souvent ce simple échange qui suffit à éviter le piège.</p>
+      <div style="background:#fff;padding:34px 28px 30px">
+        <h1 style="margin:0 0 12px;font-size:24px;color:#0a1f3a;line-height:1.3">Voici votre guide${prenom ? ", " + prenom : ""}</h1>
+        <p style="font-size:16.5px;color:#444;line-height:1.65;margin:0 0 26px">Il est <strong>joint à cet email</strong> — vous n'avez rien à télécharger. Prenez cinq minutes : c'est court, et écrit sans jargon.</p>
 
-        <div style="background:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px;margin:0 0 28px;text-align:center">
-          <img src="https://despy.fr/assets/guide-cover.png" width="190" alt="Couverture — Les 5 arnaques qui visent vos parents" style="width:190px;max-width:58%;height:auto;border-radius:10px;display:block;margin:0 auto 22px;box-shadow:0 14px 36px rgba(0,0,0,.5)">
-          <div style="font-size:12px;color:#5BE3F5;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:7px">Guide PDF · 6 pages · gratuit</div>
-          <div style="font-size:19px;color:#fff;font-weight:800;line-height:1.35;margin-bottom:22px">Les 5 arnaques qui visent vos parents</div>
-          <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 36px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Télécharger le guide</a>
+        <div style="background:#0a1f3a;background-image:linear-gradient(135deg,#0a1f3a 0%,#122a4d 100%);border-radius:18px;padding:30px 24px 28px;margin:0 0 30px;text-align:center">
+          <img src="https://despy.fr/assets/guide-cover.png" width="200" alt="Votre guide Despy en PDF" style="width:200px;max-width:60%;height:auto;border-radius:10px;border:1px solid #2b4470;display:block;margin:0 auto 22px;box-shadow:0 14px 36px rgba(0,0,0,.5)">
+          <div style="font-size:12px;color:#5BE3F5;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:18px">PDF · 7 pages · gratuit</div>
+          <a href="${guideUrl}" style="display:inline-block;background:#2D5BFF;color:#fff;padding:17px 38px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16.5px">Ouvrir le guide</a>
+          <div style="font-size:13px;color:#93a6c2;margin-top:14px">Si la pièce jointe ne s'affiche pas</div>
         </div>
 
-        <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 0 14px">Au programme</div>
-        <div style="border:1px solid #edf0f5;border-radius:14px;overflow:hidden;margin:0 0 28px">
-          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">1</strong>&nbsp;&nbsp;Le faux SMS de colis</div>
-          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">2</strong>&nbsp;&nbsp;Le faux conseiller bancaire</div>
-          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">3</strong>&nbsp;&nbsp;Le faux support informatique</div>
-          <div style="padding:14px 18px;border-bottom:1px solid #f1f3f7;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">4</strong>&nbsp;&nbsp;L'arnaque au faux proche</div>
-          <div style="padding:14px 18px;font-size:15.5px;color:#0a1f3a"><strong style="color:#2D5BFF">5</strong>&nbsp;&nbsp;Le faux gain / faux cadeau&nbsp; <span style="color:#888;font-size:13.5px">+ la règle d'or</span></div>
+        <div style="font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin:0 0 14px">Ce que vous allez y trouver</div>
+        <div style="border:1px solid #edf0f5;border-radius:14px;overflow:hidden;margin:0 0 30px">
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">1</span>&nbsp;&nbsp;Le faux SMS de colis</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« Réglez 1,95 € de frais » — le piège le plus courant.</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">2</span>&nbsp;&nbsp;Le faux conseiller bancaire</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« Validez ce virement pour bloquer une fraude. »</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">3</span>&nbsp;&nbsp;Le faux support informatique</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">Le « technicien Microsoft » qui veut prendre la main.</div></div>
+          <div style="padding:15px 18px;border-bottom:1px solid #f1f3f7"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">4</span>&nbsp;&nbsp;L'arnaque au faux proche</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">« J'ai changé de numéro, peux-tu m'envoyer de l'argent ? »</div></div>
+          <div style="padding:15px 18px"><div style="font-size:15.5px;color:#0a1f3a;font-weight:700"><span style="color:#2D5BFF">5</span>&nbsp;&nbsp;Le faux gain, le faux cadeau</div><div style="font-size:14px;color:#6b7280;margin:3px 0 0 22px">Et la règle d'or, valable pour toutes les arnaques.</div></div>
+        </div>
+
+        <div style="border-left:4px solid #2D5BFF;background:#f7f9fc;border-radius:0 14px 14px 0;padding:20px 22px;margin:0 0 8px">
+          <div style="font-size:12px;color:#2D5BFF;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:8px">La règle d'or, tout de suite</div>
+          <p style="font-size:15.5px;color:#333;line-height:1.7;margin:0">Un escroc a toujours besoin de deux choses : <strong>l'urgence</strong>, pour vous empêcher de réfléchir, et <strong>la peur ou l'appât du gain</strong>. Dès que vous ressentez l'une des deux, arrêtez-vous. Ne cliquez pas, ne payez pas, ne donnez rien — et parlez-en à quelqu'un.</p>
         </div>
 
         ${founderNote()}
 
-        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:24px;margin:26px 0 0;text-align:center">
-          <div style="font-size:17px;color:#1a3fd9;font-weight:800;margin-bottom:8px">Vous ne pouvez pas être derrière eux 24h/24.</div>
-          <p style="font-size:15px;color:#444;line-height:1.6;margin:0 0 18px">Despy, si. Vos proches envoient un message douteux, on leur dit en quelques secondes si c'est une arnaque — avec un conseiller humain. Dès <strong>9,99€/mois</strong>, ou <strong>14,99€/mois en Famille</strong> (jusqu'à 4 proches).</p>
-          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#0a1f3a;color:#fff;padding:14px 30px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Protéger mes proches</a>
+        <div style="border-top:1px solid #edf0f5;margin:28px 0 0;padding:26px 0 0;text-align:center">
+          <p style="font-size:15.5px;color:#444;line-height:1.65;margin:0 0 16px">Un message douteux, un appel bizarre&nbsp;? Avec Despy, vous nous l'envoyez et un conseiller humain vous répond en quelques secondes. Dès <strong>9,99&nbsp;€/mois</strong>, sans engagement.</p>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#fff;color:#0a1f3a;border:1.5px solid #0a1f3a;padding:13px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">Découvrir Despy</a>
         </div>
 
         ${trustStrip()}
@@ -604,7 +630,7 @@ const templates = {
           <div style="font-size:15px;color:#1a3fd9;font-weight:800;margin-bottom:10px">Tout ce que Despy fait pour vous</div>
           <div style="font-size:15px;color:#333;line-height:2">✅ Un message suspect&nbsp;? Verdict en 10 secondes<br>✅ Un conseiller humain qui vous guide<br>✅ Surveillance de vos données chaque semaine<br>✅ SOS humain en cas de problème</div>
         </div>
-        <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:24px;text-align:center;color:#fff;margin:0 0 22px">
+        <div style="background:#132a6b;background-image:linear-gradient(135deg,#0a1f3a,#1a3fd9);border-radius:16px;padding:24px;text-align:center;color:#fff;margin:0 0 22px">
           <div style="font-size:22px;font-weight:900;margin-bottom:2px">Dès 9,99€/mois</div>
           <div style="font-size:14px;opacity:.85;margin-bottom:4px">ou <strong>14,99€/mois en Famille</strong> — jusqu'à 4 proches</div>
           <div style="font-size:12px;opacity:.75;margin-bottom:16px">Sans engagement · résiliable en 1 clic · satisfait ou remboursé 30 jours</div>
@@ -645,7 +671,39 @@ exports.handler = async (event) => {
     }
 
     const { subject, html } = templateFn(data);
-    await sendResend(data.email, subject, html);
+
+    // Le guide part EN PIÈCE JOINTE : un lien à cliquer, c'est un
+    // navigateur à ouvrir puis un PDF à retrouver — trois occasions
+    // d'abandonner pour quelqu'un de 75 ans. Si la récupération échoue,
+    // l'email part quand même : le bouton reste en secours.
+    const extras = {};
+    if (MARKETING.has(type)) extras.unsub = true;
+    if (type === "guide_delivery" && data.guideUrl) {
+      try {
+        const r = await fetch(data.guideUrl, { signal: AbortSignal.timeout(8000) });
+        if (r.ok) {
+          const buf = Buffer.from(await r.arrayBuffer());
+          if (buf.length > 0 && buf.length < 15 * 1024 * 1024) {
+            extras.attachments = [{
+              filename: "Despy - Les 5 arnaques du moment.pdf",
+              content: buf.toString("base64")
+            }];
+          }
+        } else {
+          console.warn("guide en pièce jointe : HTTP", r.status);
+        }
+      } catch (e) { console.warn("guide en pièce jointe:", e.message); }
+    }
+
+    try {
+      await sendResend(data.email, subject, html, extras);
+    } catch (e) {
+      // Une pièce jointe refusée ne doit jamais coûter l'email lui-même.
+      if (!extras.attachments) throw e;
+      console.warn("envoi avec pièce jointe refusé, second essai sans :", e.message);
+      delete extras.attachments;
+      await sendResend(data.email, subject, html, extras);
+    }
     console.log(`Email ${type} -> ${data.email}`);
     return { statusCode: 200, headers, body: JSON.stringify({ sent: true }) };
 
