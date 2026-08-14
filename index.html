@@ -363,6 +363,17 @@ footer{background:linear-gradient(180deg,#0b1226 0%,#0f172a 100%);border-top:1px
 .ck-btns{display:flex;gap:10px;flex-shrink:0}
 .ck-accept{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer}
 .ck-refuse{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+/* bandeau-une-ligne — mesuré en 375 px : à 140 px de haut, le bandeau
+   recouvrait encore le titre de la page (bas du H1 à 645, haut du bandeau à
+   614). Ce sont les boutons passés à la ligne qui coûtaient le plus. Sur une
+   seule ligne, il descend sous les 100 px et dégage le titre. */
+@media (max-width:620px){
+  #cookie-bar{padding:10px 14px;gap:10px;flex-wrap:nowrap}
+  #cookie-bar p{font-size:11.5px;line-height:1.45;min-width:0}
+  .ck-btns{gap:6px}
+  .ck-accept{padding:8px 12px;font-size:12px}
+  .ck-refuse{padding:8px 10px;font-size:12px}
+}
 
 /* MOBILE */
 /* Nav : 11 entrées ne tiennent pas sous ~1500px — on resserre, puis burger dès 1180px
