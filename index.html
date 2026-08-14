@@ -368,8 +368,8 @@ footer{background:linear-gradient(180deg,#0b1226 0%,#0f172a 100%);border-top:1px
    614). Ce sont les boutons passés à la ligne qui coûtaient le plus. Sur une
    seule ligne, il descend sous les 100 px et dégage le titre. */
 @media (max-width:620px){
-  #cookie-bar{padding:10px 14px;gap:10px;flex-wrap:nowrap}
-  #cookie-bar p{font-size:11.5px;line-height:1.45;min-width:0}
+  #cookie-bar{padding:8px 12px;gap:9px;flex-wrap:nowrap}
+  #cookie-bar p{font-size:11px;line-height:1.4;min-width:0}
   .ck-btns{gap:6px}
   .ck-accept{padding:8px 12px;font-size:12px}
   .ck-refuse{padding:8px 10px;font-size:12px}
@@ -1244,7 +1244,7 @@ body.despy-abonne #outils-upsell{display:none!important}
 
 <!-- ══ COOKIE ══ -->
 <div id="cookie-bar" style="display:none">
-  <p>Cookies nécessaires au site, plus un cookie de mesure publicitaire (Meta) qui ne se déclenche qu'avec votre accord. <a onclick="showLegal('confidentialite')" style="color:var(--blue);cursor:pointer;font-weight:600">En savoir plus</a></p>
+  <p>Cookies nécessaires au site, et un cookie de mesure publicitaire (Meta) si vous l'acceptez. <a onclick="showLegal('confidentialite')" style="color:var(--blue);cursor:pointer;font-weight:600">En savoir plus</a></p>
   <div class="ck-btns">
     <button class="ck-accept" onclick="hideCookie(true)">Accepter</button>
     <button class="ck-refuse" onclick="hideCookie(false)">Refuser</button>
