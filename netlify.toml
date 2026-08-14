@@ -14,6 +14,26 @@
 
 # SÉCURITÉ : le dossier publié étant la racine du dépôt, le code source des
 # fonctions serait servi en statique (/netlify/functions/*.js) sans ce blocage.
+# ══ Les PDF ne doivent pas atterrir dans Google ══
+# Le livret est VENDU 29,90 € et son adresse figure quatre fois dans le HTML
+# du site : sans consigne, il peut se retrouver dans les résultats de
+# recherche, donc gratuit pour tout le monde. Le guide, lui, est l'appât qui
+# sert à capter les adresses — servi directement par Google, il fait perdre
+# le prospect qu'on paie chez Meta.
+#
+# On utilise l'en-tête noindex et SURTOUT PAS un Disallow dans robots.txt :
+# bloquer l'exploration empêcherait Google de LIRE la consigne, et une
+# adresse déjà connue resterait listée sans qu'on puisse la retirer.
+[[headers]]
+  for = "/despy-livret-cybersecurite-2026-edition-1.pdf"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/despy-guide-5-arnaques-parents.pdf"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
 [[redirects]]
   from = "/netlify/*"
   to = "/index.html"
