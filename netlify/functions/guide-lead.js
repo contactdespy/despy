@@ -61,13 +61,18 @@ exports.handler = async (event) => {
     }
 
     const body = JSON.parse(event.body || '{}');
-    const { email, prenom, fbp, fbc, marketing_consent } = body;
+    const { email, prenom, fbp, fbc, source, marketing_consent } = body;
 
     if (!email || !email.includes('@') || email.length > 200) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Adresse email invalide.' }) };
     }
     const norm = email.toLowerCase().trim();
     const cleanPrenom = (prenom || '').toString().trim().slice(0, 60) || null;
+
+    // La provenance vient du navigateur : on ne lui fait pas confiance, on la
+    // borne. Étiquette de canal uniquement — jamais d'identifiant de clic.
+    const sourceNettoyee = String(source || '')
+      .toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 30) || 'guide_5_arnaques';
 
     // 1) Enregistrer le lead (best-effort : ne bloque jamais l'envoi du guide)
     try {
@@ -77,7 +82,7 @@ exports.handler = async (event) => {
         .upsert({
           email: norm,
           prenom: cleanPrenom,
-          source: 'guide_5_arnaques',
+          source: sourceNettoyee,
           updated_at: new Date().toISOString()
         }, { onConflict: 'email' });
     } catch (e) {

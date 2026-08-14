@@ -152,7 +152,13 @@ exports.handler = async (event) => {
       demandes_rgpd: await compter(supabase, 'privacy_requests'),
       signalements_arnaque: await compter(supabase, 'fraud_reports'),
       tests_entrainement: await compter(supabase, 'training_tests'),
-      leads_guide: await compter(supabase, 'guide_leads')
+      leads_guide: await compter(supabase, 'guide_leads'),
+      // Ce que la publicité rapporte, et si elle rapporte ENCORE : un total
+      // depuis toujours ne dit ni l'un ni l'autre.
+      leads_pub: await compter(supabase, 'guide_leads', q => q.eq('source', 'facebook_ads')),
+      leads_7j: await compter(supabase, 'guide_leads', q => q.gte('created_at', ilYA(7))),
+      leads_pub_7j: await compter(supabase, 'guide_leads',
+        q => q.eq('source', 'facebook_ads').gte('created_at', ilYA(7)))
     };
 
     // ── 3. LE BUSINESS ──────────────────────────────────────────────────

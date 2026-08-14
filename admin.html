@@ -208,7 +208,10 @@ function afficher(d){
     kpi(u.demandes_rgpd, 'demandes RGPD') +
     kpi(u.signalements_arnaque, 'arnaques signalées') +
     kpi(u.tests_entrainement, 'tests d’entraînement') +
-    kpi(u.leads_guide, 'leads du guide');
+    kpi(u.leads_guide, 'leads du guide (total)') +
+    kpi(u.leads_pub, 'dont venus de la publicité') +
+    kpi(u.leads_7j, 'leads ces 7 derniers jours') +
+    kpi(u.leads_pub_7j, 'dont publicité, 7 derniers jours');
 
   document.getElementById('derniers').innerHTML =
     '<tr><th>Prénom</th><th>Email</th><th>Formule</th><th>Inscrit</th></tr>' +

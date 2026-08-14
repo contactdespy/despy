@@ -258,6 +258,23 @@ input[type="text"], input[type="email"]{ font-size:17px !important; padding:15px
   var form = document.getElementById('lead-form');
   var btn = document.getElementById('submit-btn');
   var errBox = document.getElementById('err');
+  // ── D'où vient cette personne ? ──
+  // Meta ajoute `fbclid` à l'adresse dès qu'on clique une publicité. On en
+  // tire une ÉTIQUETTE de canal, et on ne transmet jamais le fbclid lui-même :
+  // c'est un identifiant de clic publicitaire, on n'en a pas besoin pour
+  // compter. Aucun cookie n'est lu ni posé ici — ceci ne dépend donc pas du
+  // consentement publicitaire.
+  function despyProvenance() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var utm = (p.get('utm_source') || '').toLowerCase();
+      if (p.get('fbclid') || /facebook|fb|instagram|ig|meta/.test(utm)) return 'facebook_ads';
+      if (utm) return utm.replace(/[^a-z0-9_-]/g, '').slice(0, 30) || null;
+      if (document.referrer && /facebook|instagram/.test(document.referrer)) return 'facebook_organique';
+      return null;
+    } catch (e) { return null; }
+  }
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
     errBox.style.display='none';
@@ -269,9 +286,10 @@ input[type="text"], input[type="email"]{ font-size:17px !important; padding:15px
     }
     btn.disabled = true; btn.textContent = 'Envoi en cours…';
     var fbck = fbCookies();
+    var provenance = despyProvenance();
     fetch('/.netlify/functions/guide-lead', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email:email, prenom:prenom, fbp:fbck.fbp, fbc:fbck.fbc, marketing_consent: adConsent() })
+      body: JSON.stringify({ email:email, prenom:prenom, fbp:fbck.fbp, fbc:fbck.fbc, source: provenance, marketing_consent: adConsent() })
     })
     .then(function(r){ return r.text().then(function(t){ var d={}; try{ d=JSON.parse(t); }catch(e){} return {ok:r.ok, d:d}; }); })
     .then(function(res){
