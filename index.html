@@ -363,6 +363,11 @@ footer{background:linear-gradient(180deg,#0b1226 0%,#0f172a 100%);border-top:1px
 .ck-btns{display:flex;gap:10px;flex-shrink:0}
 .ck-accept{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer}
 .ck-refuse{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:none;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer}
+/* Tant que le bandeau cookies est là, la bulle d'aide s'efface : mesuré,
+   elle recouvrait 65 % du bouton « Accepter » et captait le clic à sa place
+   (elementFromPoint renvoyait #fab-toggle au centre du bouton). */
+body.ck-visible #despy-fab{ display:none !important; }
+
 /* bandeau-une-ligne — mesuré en 375 px : à 140 px de haut, le bandeau
    recouvrait encore le titre de la page (bas du H1 à 645, haut du bandeau à
    614). Ce sont les boutons passés à la ligne qui coûtaient le plus. Sur une
@@ -5470,11 +5475,12 @@ function hideCookie(accept) {
   try { localStorage.setItem('despy_cookies', accept ? '1' : '0'); } catch(e){}
   // Consentement accordé → on charge le Pixel Meta (PageView). Refus → rien.
   if (accept && typeof window.loadMetaPixel === 'function') { try { window.loadMetaPixel(); } catch(e){} }
+  document.body.classList.remove('ck-visible');
   var bar = document.getElementById('cookie-bar');
   if (bar) { bar.style.opacity = '0'; bar.style.transition = 'opacity .3s'; setTimeout(function(){ bar.style.display = 'none'; }, 300); }
 }
 (function(){
-  try { if (!localStorage.getItem('despy_cookies')) { setTimeout(function(){ var b=document.getElementById('cookie-bar'); if(b) b.style.display='flex'; }, 2000); } } catch(e){}
+  try { if (!localStorage.getItem('despy_cookies')) { setTimeout(function(){ var b=document.getElementById('cookie-bar'); if(b) { document.body.classList.add('ck-visible'); } if(b) b.style.display='flex'; }, 2000); } } catch(e){}
 })();
 
 // ======================================
