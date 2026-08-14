@@ -121,7 +121,7 @@ const templates = {
         <div style="background:linear-gradient(135deg,#fff7ed,#fffbeb);border:1px solid #fed7aa;border-radius:14px;padding:22px;margin:22px 0;text-align:center">
           <div style="font-size:30px;line-height:1;margin-bottom:6px">🎁</div>
           <div style="font-size:18px;font-weight:800;color:#b45309;margin-bottom:6px">Votre cadeau : le Livret de formation</div>
-          <div style="font-size:14px;color:#7c5a1e;line-height:1.65;margin-bottom:18px">Offert avec votre abonnement annuel — <strong>valeur 29,90 €</strong>. 113 pages, 10 modules illustrés pour tout comprendre et garder sous la main.</div>
+          <div style="font-size:14px;color:#7c5a1e;line-height:1.65;margin-bottom:18px">Offert avec votre abonnement annuel — <strong>valeur 29,90 €</strong>. 135 pages, 10 modules illustrés pour tout comprendre et garder sous la main.</div>
           <a href="https://despy.fr/despy-livret-cybersecurite-2026-edition-1.pdf" style="display:inline-block;background:#d97706;color:#fff;padding:14px 28px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15px">📘 Télécharger mon livret offert</a>
         </div>` : '';
     return {
