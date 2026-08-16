@@ -110,9 +110,6 @@ exports.handler = async (event) => {
           famille_prenom: famC.couvert ? (famC.ownerPrenom || null) : null,
           created_at: client.created_at,
           questions_used: client.questions_used || 0,
-        // Prélèvement en échec : le site et l'appli s'en servent pour prévenir,
-        // sans couper l'accès. Absent si la migration n'est pas passée.
-        paiement_en_defaut: !!client.payment_issue_at,
           // Prélèvement en échec : le site et l'appli s'en servent pour prévenir,
           // sans couper l'accès. Absent si la migration n'est pas passée.
           paiement_en_defaut: !!client.payment_issue_at
@@ -138,7 +135,11 @@ exports.handler = async (event) => {
         // pour qu'il sache d'où vient sa protection (et à qui la redemander).
         famille_de: fam.couvert ? fam.owner : null,
         famille_prenom: fam.couvert ? (fam.ownerPrenom || null) : null,
-        questions_used: client.questions_used || 0
+        questions_used: client.questions_used || 0,
+        // C'est CETTE branche que l'application interroge à chaque
+        // revalidation de session : sans la clé ici, le bandeau ne s'affiche
+        // jamais, quoi qu'il y ait en base.
+        paiement_en_defaut: !!client.payment_issue_at
       })
     };
 
