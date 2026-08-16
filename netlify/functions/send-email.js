@@ -230,6 +230,43 @@ const templates = {
     </div>`
   }),
 
+  // Fin d'abonnement pour IMPAYÉ — à ne pas confondre avec une résiliation.
+  // Le client n'a rien demandé : lui écrire « votre résiliation est bien
+  // prise en compte » lui ferait croire qu'on l'a radié.
+  subscription_ended_unpaid: ({ name, prenom }) => ({
+    subject: `${prenom || name}, votre protection Despy est en pause`,
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${apercu("Un paiement n'est pas passé — votre compte et vos données sont intacts.")}
+      ${brandHeader("Un paiement n'est pas passé")}
+      <div style="background:#fff;padding:36px 32px">
+        <h1 style="margin:0 0 12px;font-size:23px;color:#0a1f3a">${bonjour(prenom, name)}</h1>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:0 0 18px">Nous avons essayé plusieurs fois de prélever votre abonnement, sans succès. Neuf fois sur dix, c'est une <strong>carte arrivée à expiration</strong> — rien de plus.</p>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:0 0 22px">Votre protection est donc <strong>en pause</strong> depuis aujourd'hui. Votre compte, lui, est intact : rien n'est supprimé, rien n'est perdu.</p>
+
+        <div style="border:1px solid #E2E9F6;background:#FBFCFE;border-radius:14px;padding:22px 24px;margin:0 0 24px">
+          <div style="font-size:12px;color:#2D5BFF;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:10px">Ce qui s'arrête en attendant</div>
+          <div style="font-size:15.5px;color:#444;line-height:1.9">
+            • Le Conseiller qui vérifie vos messages douteux<br>
+            • Les alertes sur les arnaques en circulation<br>
+            • Le SOS humain en cas de problème<br>
+            • La surveillance de vos données
+          </div>
+        </div>
+
+        <p style="font-size:16px;color:#444;line-height:1.7;margin:0 0 20px">Pour tout remettre en route, il suffit de reprendre votre abonnement avec une carte à jour. Vous retrouvez votre compte tel que vous l'avez laissé.</p>
+
+        <div style="text-align:center;margin:0 0 8px">
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#2D5BFF;color:#fff;padding:16px 34px;border-radius:12px;text-decoration:none;font-weight:700;font-size:16px">Reprendre ma protection</a>
+        </div>
+
+        <p style="font-size:15px;color:#666;line-height:1.7;margin:26px 0 0;text-align:center">Un doute, une question&nbsp;? <strong>Répondez simplement à cet email</strong> — un humain vous répond, sans jargon.</p>
+
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+  }),
+
   payment_failed: ({ name, prenom, attemptCount, invoiceUrl }) => ({
     subject: "Votre paiement Despy n'a pas abouti — réglons ça en 1 minute",
     html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">

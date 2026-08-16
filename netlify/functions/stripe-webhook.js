@@ -73,6 +73,31 @@ async function sendEmail(type, data) {
   }
 }
 
+// Note l'échec (ou sa disparition) sur la fiche client. La colonne peut ne
+// pas exister si la migration n'est pas passée : dans ce cas on ne casse
+// SURTOUT pas le webhook — un paiement doit toujours être traité.
+async function marquerPaiementEnDefaut(supabase, email, enDefaut) {
+  try {
+    const { error } = await supabase.from('clients').update({
+      payment_issue_at: enDefaut ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString()
+    }).eq('email', email);
+    if (error) console.warn('paiement en défaut (migration manquante ?) :', error.message);
+  } catch (e) {
+    console.warn('paiement en défaut :', e && e.message);
+  }
+}
+
+// Le client était-il déjà signalé en défaut ? Sert de filet quand Stripe ne
+// précise pas la raison de la suppression de l'abonnement.
+async function etaitEnDefaut(supabase, email) {
+  try {
+    const { data } = await supabase.from('clients')
+      .select('payment_issue_at').eq('email', email).maybeSingle();
+    return !!(data && data.payment_issue_at);
+  } catch (e) { return false; }
+}
+
 exports.handler = async (event) => {
   const sig = event.headers['stripe-signature'];
   let stripeEvent;
@@ -165,6 +190,8 @@ exports.handler = async (event) => {
         subscribed: true,
         updated_at: new Date().toISOString()
       }).eq('email', customer.email);
+      // Le paiement est passé : on retire le signalement s'il y en avait un.
+      await marquerPaiementEnDefaut(supabase, customer.email, false);
 
       console.log(`🔄 Renouvellement confirmé : ${customer.email}`);
     }
@@ -177,6 +204,10 @@ exports.handler = async (event) => {
 
     if (customer.email) {
       console.log(`💳 Paiement échoué : ${customer.email}`);
+      // On l'écrit AVANT l'email : c'est cette trace qui permettra au site
+      // et à l'application d'afficher le bandeau. L'email, lui, peut ne
+      // jamais être lu — le public a 75 ans en moyenne.
+      await marquerPaiementEnDefaut(supabase, customer.email, true);
       await sendEmail('payment_failed', {
         email:        customer.email,
         name:         customer.name || customer.email,
@@ -201,6 +232,15 @@ exports.handler = async (event) => {
       if (customer.email) {
         const email  = customer.email;
         const active = subscription.status === 'active' || subscription.status === 'trialing';
+
+        // Le statut, lui, change SANS que la formule bouge : c'est le cas
+        // d'un impayé (past_due, unpaid). L'ancien code ne regardait que la
+        // formule, donc n'en savait jamais rien.
+        if (subscription.status === 'past_due' || subscription.status === 'unpaid') {
+          await marquerPaiementEnDefaut(supabase, email, true);
+        } else if (active) {
+          await marquerPaiementEnDefaut(supabase, email, false);
+        }
 
         // Plan actuel en base → détecter un vrai changement de formule
         const { data: existing } = await supabase
@@ -240,18 +280,29 @@ exports.handler = async (event) => {
     const customer     = await stripe.customers.retrieve(subscription.customer);
 
     if (customer.email) {
+      // POURQUOI l'abonnement s'arrête : Stripe le dit lui-même. À défaut,
+      // la trace laissée par les échecs de paiement sert de filet.
+      const raison = (subscription.cancellation_details && subscription.cancellation_details.reason) || '';
+      const impaye = raison === 'payment_failed' || (!raison && await etaitEnDefaut(supabase, customer.email));
+
       await supabase.from('clients').update({
         subscribed: false,
         plan: 'free',
         updated_at: new Date().toISOString()
       }).eq('email', customer.email);
+      await marquerPaiementEnDefaut(supabase, customer.email, false);
 
       await supabase.from('subscriptions').update({
-        status: 'cancelled'
+        status: impaye ? 'unpaid' : 'cancelled'
       }).eq('email', customer.email);
 
-      console.log(`❌ Résiliation : ${customer.email}`);
-      await sendEmail('cancelled', { email: customer.email, name: customer.name || customer.email });
+      console.log(`❌ Fin d'abonnement (${impaye ? 'impayé' : 'résiliation'}) : ${customer.email}`);
+      // Envoyer « votre résiliation est bien prise en compte » à quelqu'un
+      // dont la carte a simplement expiré, c'est lui faire croire qu'on l'a
+      // radié — et lui promettre un accès jusqu'à la fin d'une période qui,
+      // justement, n'a pas été payée.
+      await sendEmail(impaye ? 'subscription_ended_unpaid' : 'cancelled',
+                      { email: customer.email, name: customer.name || customer.email });
     }
   }
 

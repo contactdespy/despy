@@ -1174,6 +1174,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
     <div class="pbody">
 
+      <div id="bandeau-impaye" style="display:none"></div>
+
       <button class="card hero-card" onclick="openTool('score')">
         <div class="ring" id="home-score-ring"></div>
         <div class="hero-txt">
@@ -1951,6 +1953,7 @@ function enterApp() {
   refreshProfile();
   refreshHomeScore();
   refreshHomeActivity();
+  try { majBandeauImpaye(); } catch (e) {}
   revalidateSession();
 }
 
@@ -2049,6 +2052,35 @@ function handlePaymentReturn() {
 
 // Revalide l'abonnement auprès du serveur (source de vérité).
 // Évite de se fier à un plan/subscribed périmé dans le localStorage.
+// ─── PRÉLÈVEMENT QUI N'EST PAS PASSÉ ───
+// bandeau-impaye — l'email seul ne suffit pas quand le lecteur a 75 ans :
+// il faut le dire dans l'application qu'il ouvre. On ne coupe aucun accès,
+// on donne le seul geste utile, et on ne reproche rien : une carte qui
+// expire n'est pas une faute.
+function majBandeauImpaye() {
+  var z = document.getElementById('bandeau-impaye');
+  if (!z) return;
+  var s = session.get() || {};
+  if (!s.paiement_en_defaut) { z.style.display = 'none'; z.innerHTML = ''; return; }
+  z.style.display = 'block';
+  z.innerHTML =
+    '<div style="background:#FFF7E8;border:1px solid #F3D18B;border-radius:16px;padding:15px 16px;margin:0 0 14px">' +
+      '<div style="display:flex;gap:12px;align-items:flex-start">' +
+        '<span style="font-size:20px;line-height:1.2;flex:none">💳</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:15px;font-weight:800;color:#8A5A10">Votre dernier paiement n’est pas passé</div>' +
+          '<div style="font-size:13.5px;color:#8A5A10;line-height:1.6;margin-top:4px">' +
+            'Neuf fois sur dix, c’est une carte arrivée à expiration. ' +
+            '<b>Votre protection reste active</b> — mettez votre carte à jour pour qu’elle le reste.</div>' +
+          '<button onclick="openBillingPortal()" style="margin-top:11px;background:#D97706;color:#fff;border:0;' +
+            'border-radius:10px;padding:11px 18px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer">' +
+            'Mettre ma carte à jour</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+
 async function revalidateSession() {
   var s = session.get();
   if (!s || !s.email) return;
@@ -2080,6 +2112,9 @@ async function revalidateSession() {
     // Met à jour les champs sensibles si le serveur diffère
     var changed = false;
     if (typeof data.subscribed === 'boolean' && data.subscribed !== s.subscribed) { s.subscribed = data.subscribed; changed = true; }
+    var defaut = !!data.paiement_en_defaut;
+    if (defaut !== !!s.paiement_en_defaut) { s.paiement_en_defaut = defaut; changed = true; }
+    try { majBandeauImpaye(); } catch (e) {}
     if (data.plan && data.plan !== s.plan) { s.plan = data.plan; changed = true; }
     var fdNouveau = data.famille_de || null;
     if (fdNouveau !== (s.famille_de || null)) { s.famille_de = fdNouveau; changed = true; }
@@ -6824,7 +6859,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-14-01';
+var APP_BUILD = '2026-08-14-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

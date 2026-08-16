@@ -20,6 +20,13 @@ function verifyPassword(password, stored) {
   return crypto.createHash('sha256').update(password).digest('hex') === stored;
 }
 
+// `payment_issue_at` peut ne pas exister si la migration n'est pas passée.
+// Un SELECT qui nomme une colonne absente ÉCHOUE — et ici, ce serait la
+// connexion elle-même qui casserait. On tente donc la liste complète, et on
+// retombe sur l'ancienne au moindre refus.
+const COLONNES_BASE = 'email, name, prenom, nom, telephone, plan, subscribed, password_hash, created_at, questions_used';
+let COLONNES = COLONNES_BASE + ', payment_issue_at';
+
 exports.handler = async (event) => {
   const headers = {
     'Content-Type': 'application/json',
@@ -43,11 +50,21 @@ exports.handler = async (event) => {
       process.env.SUPABASE_SERVICE_KEY
     );
 
-    const { data: client, error } = await supabase
+    const emailNorm = email.toLowerCase().trim();
+    let { data: client, error } = await supabase
       .from('clients')
-      .select('email, name, prenom, nom, telephone, plan, subscribed, password_hash, created_at, questions_used')
-      .eq('email', email.toLowerCase().trim())
+      .select(COLONNES)
+      .eq('email', emailNorm)
       .maybeSingle();
+
+    // Colonne absente (migration pas encore passée) → un SELECT qui la nomme
+    // échoue, et c'est la connexion qui casserait. On relit sans elle.
+    if (error && COLONNES !== COLONNES_BASE) {
+      COLONNES = COLONNES_BASE;
+      console.warn('check-subscription : payment_issue_at absente, lecture dégradée');
+      ({ data: client, error } = await supabase
+        .from('clients').select(COLONNES).eq('email', emailNorm).maybeSingle());
+    }
 
     if (error) {
       console.error('Supabase error:', error);
@@ -92,7 +109,13 @@ exports.handler = async (event) => {
           famille_de: famC.couvert ? famC.owner : null,
           famille_prenom: famC.couvert ? (famC.ownerPrenom || null) : null,
           created_at: client.created_at,
-          questions_used: client.questions_used || 0
+          questions_used: client.questions_used || 0,
+        // Prélèvement en échec : le site et l'appli s'en servent pour prévenir,
+        // sans couper l'accès. Absent si la migration n'est pas passée.
+        paiement_en_defaut: !!client.payment_issue_at,
+          // Prélèvement en échec : le site et l'appli s'en servent pour prévenir,
+          // sans couper l'accès. Absent si la migration n'est pas passée.
+          paiement_en_defaut: !!client.payment_issue_at
         })
       };
     }

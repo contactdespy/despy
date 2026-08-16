@@ -4493,6 +4493,8 @@ async function subscribeFraudAlerts() {
 <section style="background:var(--bg2);min-height:100vh;padding:calc(var(--nav-h) + 2rem) clamp(1rem,4vw,2rem) 5rem">
   <div style="max-width:820px;margin:0 auto">
 
+    <div id="bandeau-impaye-site" style="display:none"></div>
+
     <!-- En-tête premium — design sobre Apple avec liseré champagne discret pour abonnés -->
     <div id="client-header" class="premium-fade-in" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:1.75rem;padding:4px 2px">
       <div style="min-width:0;flex:1">
@@ -5949,12 +5951,37 @@ async function loadHomeAlerts() {
 }
 
 function showClientArea() {
+  try { majBandeauImpayeSite(); } catch (e) {}
   if (siteSession.get()) { showPage('client'); updateNavForSession(); var _s=siteSession.get(); if(_s&&_s.email&&typeof loadSecurityScore==='function') setTimeout(function(){loadSecurityScore(_s.email);},500); revalidateSiteSession(); }
   else { showPage('login'); }
 }
 
 // Revalide l'abonnement auprès du serveur (source de vérité) — évite
 // de se fier à un plan/subscribed périmé dans le localStorage.
+// Même bandeau que dans l'application : on prévient d'un prélèvement qui
+// n'est pas passé, sans rien couper. Voir despy_app_v23.html.
+function majBandeauImpayeSite() {
+  var z = document.getElementById('bandeau-impaye-site');
+  if (!z) return;
+  var s = siteSession.get() || {};
+  if (!s.paiement_en_defaut) { z.style.display = 'none'; z.innerHTML = ''; return; }
+  z.style.display = 'block';
+  z.innerHTML =
+    '<div style="background:#FFF7E8;border:1px solid #F3D18B;border-radius:16px;padding:16px 18px;margin:0 0 18px;display:flex;gap:13px;align-items:flex-start">' +
+      '<span style="font-size:21px;line-height:1.2;flex:none">💳</span>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:16px;font-weight:800;color:#8A5A10">Votre dernier paiement n’est pas passé</div>' +
+        '<div style="font-size:14px;color:#8A5A10;line-height:1.6;margin-top:4px">' +
+          'Neuf fois sur dix, c’est une carte arrivée à expiration. ' +
+          '<b>Votre protection reste active</b> — mettez votre carte à jour pour qu’elle le reste.</div>' +
+        '<button onclick="openBillingPortal()" style="margin-top:12px;background:#D97706;color:#fff;border:0;' +
+          'border-radius:10px;padding:12px 20px;font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer">' +
+          'Mettre ma carte à jour</button>' +
+      '</div>' +
+    '</div>';
+}
+
+
 async function revalidateSiteSession() {
   var s = siteSession.get();
   if (!s || !s.email) return;
@@ -5983,6 +6010,9 @@ async function revalidateSiteSession() {
     }
     var changed = false;
     if (typeof data.subscribed === 'boolean' && data.subscribed !== s.subscribed) { s.subscribed = data.subscribed; changed = true; }
+    var _def = !!data.paiement_en_defaut;
+    if (_def !== !!s.paiement_en_defaut) { s.paiement_en_defaut = _def; changed = true; }
+    try { majBandeauImpayeSite(); } catch (e) {}
     if (data.plan && data.plan !== s.plan) { s.plan = data.plan; changed = true; }
     if (changed) {
       siteSession.set(s);
