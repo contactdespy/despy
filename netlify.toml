@@ -213,6 +213,13 @@
 [functions.national-alerts]
   schedule = "0 9,18 * * *"        # 2×/jour (matin + soir) au lieu de 4×/jour
 
+[functions.sentinelle-alertes]
+  schedule = "0 6 * * 1"           # Lundi 8h — vérifie que la chaîne d'alertes
+                                   # fonctionne encore. N'envoie un email QUE s'il
+                                   # y a un problème : un rapport « tout va bien »
+                                   # hebdomadaire cesserait d'être lu au bout d'un
+                                   # mois, et c'est le silence qu'on veut fiable.
+
 [functions.hibp-check]
   schedule = "0 7 * * 1"           # Chaque lundi 7h — fuites de données (HIBP)
 

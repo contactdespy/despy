@@ -249,9 +249,40 @@ async function collecterAlertes(maxJours) {
   return retenues;
 }
 
+// ── Contrôle de santé ────────────────────────────────────────────────────
+// Pour la sentinelle hebdomadaire. Compter les alertes retenues ne suffit
+// pas : une source peut répondre 200 et ne plus rien contenir de lisible
+// (adresse conservée, format changé). Vu de loin, ça ressemble exactement à
+// une semaine calme — c'est cette confusion qui a duré des mois.
+//
+// On rapporte donc trois choses par source : le code HTTP, le nombre
+// d'entrées que le parseur arrive à lire, et le nombre qui passe le tri.
+async function diagnostiquer() {
+  return Promise.all(SOURCES.map(async (source) => {
+    const etat = { nom: source.nom, url: source.url, http: 0,
+                   entrees: 0, retenues: 0, erreur: null };
+    try {
+      const res = await fetch(source.url, {
+        headers: { 'User-Agent': 'Despy-Alertes/2.0 (+https://despy.fr)' },
+        signal: AbortSignal.timeout(9000)
+      });
+      etat.http = res.status;
+      if (!res.ok) return etat;
+      const xml = await res.text();
+      const bruts = source.format === 'atom' ? parserAtom(xml) : parserRss(xml);
+      etat.entrees = bruts.length;
+      etat.retenues = bruts.filter(b => pertinentPourSenior(b.titre, b.resume)).length;
+    } catch (e) {
+      etat.erreur = (e && e.message) || 'erreur inconnue';
+    }
+    return etat;
+  }));
+}
+
 module.exports = {
   SOURCES,
   collecterAlertes,
+  diagnostiquer,
   pertinentPourSenior,
   parserRss,
   parserAtom,
