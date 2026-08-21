@@ -2922,8 +2922,16 @@ function majAlerteNationale() {
       }
       if (!a) { el.style.display = 'none'; return; }
 
+      // Couper au dernier mot entier : « les vérifications sont e… » se lit
+      // mal, surtout en gros caractères. On ne recule pas au-delà de la
+      // moitié du bandeau, sinon un titre sans espaces le viderait.
       var titre = a.title || 'Alerte en cours';
-      if (titre.length > 72) titre = titre.slice(0, 71).replace(/[\s,;:.–—-]+$/, '') + '…';
+      if (titre.length > 72) {
+        var coupe = titre.slice(0, 71);
+        var espace = coupe.lastIndexOf(' ');
+        if (espace > 40) coupe = coupe.slice(0, espace);
+        titre = coupe.replace(/[\s,;:.–—-]+$/, '') + '…';
+      }
       var tEl = document.getElementById('alerte-nat-titre');
       var sEl = document.getElementById('alerte-nat-sub');
       if (tEl) tEl.textContent = titre;
@@ -6917,7 +6925,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-20-01';
+var APP_BUILD = '2026-08-21-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
