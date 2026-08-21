@@ -17,9 +17,26 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
-const { pertinentPourSenior } = require('./_alert-sources');
+const { pertinentPourSenior, collecterAlertes } = require('./_alert-sources');
 
 const AGE_MAX_JOURS = 120;
+
+// Filet de sécurité : si la table ne donne rien — cron pas encore passé,
+// table vide, base indisponible — on interroge les sources en direct plutôt
+// que d'afficher « Aucune alerte en cours ». C'est ce message rassurant et
+// faux qui a masqué la panne pendant des mois : mieux vaut une seconde de
+// latence qu'un mensonge tranquille. Ne coûte rien le reste du temps, puisque
+// dès que le cron alimente la table, ce chemin n'est plus emprunté.
+async function enDirect() {
+  const brutes = await collecterAlertes(AGE_MAX_JOURS);
+  return brutes.slice(0, 15).map(a => ({
+    title: a.title,
+    body: a.body,
+    source: a.source,
+    url: a.url,
+    created_at: a.published
+  }));
+}
 
 exports.handler = async (event) => {
   const headers = {
@@ -41,10 +58,17 @@ exports.handler = async (event) => {
 
     if (error) {
       console.error('[list-alerts] base indisponible:', error.message);
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ alerts: [], probleme: 'base' })
-      };
+      try {
+        return {
+          statusCode: 200, headers,
+          body: JSON.stringify({ alerts: await enDirect(), origine: 'direct', probleme: 'base' })
+        };
+      } catch (e2) {
+        return {
+          statusCode: 200, headers,
+          body: JSON.stringify({ alerts: [], probleme: 'base' })
+        };
+      }
     }
 
     const limite = Date.now() - AGE_MAX_JOURS * 24 * 3600 * 1000;
@@ -61,7 +85,15 @@ exports.handler = async (event) => {
       })
       .slice(0, 15);
 
-    return { statusCode: 200, headers, body: JSON.stringify({ alerts }) };
+    if (alerts.length) {
+      return { statusCode: 200, headers, body: JSON.stringify({ alerts, origine: 'base' }) };
+    }
+
+    // Table vide : on va voir à la source.
+    return {
+      statusCode: 200, headers,
+      body: JSON.stringify({ alerts: await enDirect(), origine: 'direct' })
+    };
 
   } catch (err) {
     console.error('[list-alerts] erreur:', err && err.message);

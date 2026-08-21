@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS national_alerts (
 -- L'URL identifie l'alerte : c'est sur elle que le robot vérifie s'il a déjà
 -- vu la nouvelle. Sans unicité, un doublon ferait échouer la lecture
 -- `.maybeSingle()` du robot, qui exige au plus une ligne.
+--
+-- On efface d'abord les doublons éventuels (on garde le plus récent), sinon
+-- la création de l'index unique échouerait et tout le script s'arrêterait là.
+DELETE FROM national_alerts a
+  USING national_alerts b
+  WHERE a.url IS NOT NULL
+    AND a.url = b.url
+    AND a.id < b.id;
+
 CREATE UNIQUE INDEX IF NOT EXISTS idx_national_alerts_url
   ON national_alerts (url)
   WHERE url IS NOT NULL;
@@ -46,6 +55,12 @@ CREATE TABLE IF NOT EXISTS sent_alerts (
   recipients   INTEGER DEFAULT 0,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+DELETE FROM sent_alerts a
+  USING sent_alerts b
+  WHERE a.alert_url IS NOT NULL
+    AND a.alert_url = b.alert_url
+    AND a.id < b.id;
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_sent_alerts_url
   ON sent_alerts (alert_url)
