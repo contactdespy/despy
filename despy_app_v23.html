@@ -1176,6 +1176,19 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
       <div id="bandeau-impaye" style="display:none"></div>
 
+      <!-- Alerte nationale en cours. Réutilise la bande « veille » existante
+           (variante ambre) plutôt que d'inventer un composant : même forme,
+           même place, information différente. Absente tant qu'il n'y a rien
+           de récent à dire — donc invisible la plupart du temps. -->
+      <button class="veille veille-alerte" id="home-alerte-nat" style="display:none;margin-bottom:16px" onclick="openAlertes()">
+        <span class="v-dot" aria-hidden="true"></span>
+        <span class="v-m">
+          <span class="v-a" id="alerte-nat-titre"></span>
+          <span class="v-b" id="alerte-nat-sub"></span>
+        </span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
       <button class="card hero-card" onclick="openTool('score')">
         <div class="ring" id="home-score-ring"></div>
         <div class="hero-txt">
@@ -2887,6 +2900,44 @@ function openAlertes() {
   loadAlertesFeed();
 }
 
+// Le bandeau d'alerte de l'accueil.
+//
+// Il n'affiche QUE la dernière alerte récente. Au-delà de trois semaines,
+// annoncer « en ce moment » serait faux, et un bandeau qui reste en place en
+// permanence finit par ne plus être lu — c'est le contraire du but.
+var ALERTE_HOME_JOURS = 21;
+
+function majAlerteNationale() {
+  var el = document.getElementById('home-alerte-nat');
+  if (!el) return;
+  fetch('/.netlify/functions/list-alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var liste = (d && Array.isArray(d.alerts)) ? d.alerts : [];
+      var limite = Date.now() - ALERTE_HOME_JOURS * 24 * 3600 * 1000;
+      var a = null;
+      for (var i = 0; i < liste.length; i++) {
+        var t = new Date(liste[i].created_at).getTime();
+        if (!isNaN(t) && t >= limite) { a = liste[i]; break; }
+      }
+      if (!a) { el.style.display = 'none'; return; }
+
+      var titre = a.title || 'Alerte en cours';
+      if (titre.length > 72) titre = titre.slice(0, 71).replace(/[\s,;:.–—-]+$/, '') + '…';
+      var tEl = document.getElementById('alerte-nat-titre');
+      var sEl = document.getElementById('alerte-nat-sub');
+      if (tEl) tEl.textContent = titre;
+      if (sEl) sEl.textContent = (a.source || 'Alerte') + ' · ' + timeAgoFr(a.created_at);
+      el.style.display = 'flex';
+    })
+    .catch(function (e) {
+      // Masqué plutôt qu'en erreur : sur l'accueil, un message d'échec
+      // inquiéterait sans rien apporter. La trace reste en console.
+      console.warn('alerte nationale indisponible', e);
+      el.style.display = 'none';
+    });
+}
+
 function loadAlertesFeed() {
   fetch('/.netlify/functions/list-alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
     .then(function(r){ return r.json(); })
@@ -2907,10 +2958,16 @@ function loadAlertesFeed() {
 }
 
 function alerteCard(a) {
-  var isAnssi = (a.source || '').toUpperCase().indexOf('ANSSI') !== -1;
-  var badgeBg = isAnssi ? '#e0e7ff' : '#fee2e2';
-  var badgeColor = isAnssi ? '#3730a3' : '#991b1b';
-  var badgeText = isAnssi ? 'ANSSI · officiel' : 'Vague détectée';
+  // Deux natures d'alertes, deux couleurs. Rouge = ce que NOS utilisateurs
+  // subissent en ce moment (détecté chez nous) ; bleu = une source publique
+  // officielle. Le badge reprend le nom réel de la source : depuis l'ajout de
+  // la CNIL et de Cybermalveillance, tester uniquement « ANSSI » étiquetait
+  // une alerte de la CNIL en « Vague détectée », ce qui était faux.
+  var source = a.source || '';
+  var interne = source.indexOf('Despy') !== -1;
+  var badgeBg = interne ? '#fee2e2' : '#e0e7ff';
+  var badgeColor = interne ? '#991b1b' : '#3730a3';
+  var badgeText = interne ? 'Vague détectée' : (source || 'Source officielle');
   var when = timeAgoFr(a.created_at);
   var html = '<div class="result-card" style="text-align:left;margin-bottom:10px">' +
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
@@ -4369,6 +4426,7 @@ function refreshHomeScore() {
   renderAccountState();
   refreshFormationCard();
   refreshPushCard();
+  majAlerteNationale();   // avant le garde-fou : une alerte nationale ne dépend pas du compte
   if (!s.email) return;
 
   fetch('/.netlify/functions/security-score', {
@@ -6859,7 +6917,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-14-02';
+var APP_BUILD = '2026-08-20-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

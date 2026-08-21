@@ -1,45 +1,35 @@
 // ════════════════════════════════════════════
 // DESPY — Push d'alertes nationales
 // Cron : 2 fois par jour → 0 9,18 * * * (voir netlify.toml)
-// 1. RSS ANSSI (CERT-FR)
+// 1. Sources publiques françaises (CNIL, Cybermalveillance, ANSSI)
+//    → voir _alert-sources.js, qui décide aussi de ce qui parle à un senior
 // 2. Vagues d'arnaques détectées via analyses_history (≥3 fois en 48h)
 // 3. Push à toutes les subscriptions actives (abonnés ou gratuits)
+//
+// Historique : ce robot n'a jamais rien envoyé. Il n'interrogeait que le
+// CERT-FR, qui ne publie que des avis de failles logicielles destinés aux
+// administrateurs système — aucun ne pouvait passer un filtre grand public.
+// Les sources vivent désormais dans _alert-sources.js, partagé avec
+// cyber-alerts.js et list-alerts.js pour qu'il n'existe qu'une définition.
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
+const { collecterAlertes } = require('./_alert-sources');
 
-async function fetchAnssiRss() {
-  try {
-    const res = await fetch('https://www.cert.ssi.gouv.fr/feed/', {
-      signal: AbortSignal.timeout(8000),
-      headers: { 'User-Agent': 'Despy/1.0' }
-    });
-    if (!res.ok) return [];
-    const xml = await res.text();
-    // Parse minimal du RSS (titre + lien des 5 derniers items)
-    const items = [];
-    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
-    let m;
-    while ((m = itemRegex.exec(xml)) && items.length < 5) {
-      const block = m[1];
-      const title = (block.match(/<title>(?:<!\[CDATA\[)?([^<\]]+?)(?:\]\]>)?<\/title>/i) || [])[1];
-      const link = (block.match(/<link>([^<]+)<\/link>/i) || [])[1];
-      const pubDate = (block.match(/<pubDate>([^<]+)<\/pubDate>/i) || [])[1];
-      if (title && link) {
-        items.push({
-          title: title.trim(),
-          url: link.trim(),
-          source: 'ANSSI',
-          published: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString()
-        });
-      }
-    }
-    return items;
-  } catch (e) {
-    console.error('ANSSI RSS error:', e.message);
-    return [];
-  }
+// On ne stocke que ce qui a moins de 120 jours : au-delà, ce n'est plus une
+// alerte, c'est de l'archive — et l'afficher comme « en ce moment » serait faux.
+const FENETRE_JOURS = 120;
+
+// Une notification push ne se justifie que pour un événement récent. Sans ce
+// garde-fou, la toute première exécution réveillerait tout le monde avec des
+// articles de plusieurs mois.
+const PUSH_JOURS = 12;
+
+function recente(alerte, jours) {
+  if (!alerte.published) return false;
+  const t = new Date(alerte.published).getTime();
+  return !isNaN(t) && t >= Date.now() - jours * 24 * 3600 * 1000;
 }
 
 async function detectInternalWaves(supabase) {
@@ -125,25 +115,6 @@ async function sendPushToAll(supabase, alert) {
   return { sent, failed, cleaned: expiredEndpoints.length };
 }
 
-// Ne garder que les alertes pertinentes pour le grand public senior.
-// Les vagues d'arnaques détectées en interne passent toujours.
-// Les avis ANSSI purement techniques (CVE, vulnérabilités produits) sont écartés.
-function isPublicRelevant(alert) {
-  const source = (alert.source || '').toUpperCase();
-  if (source.indexOf('ANSSI') === -1) return true; // vagues internes = pertinentes
-  // Pour l'ANSSI : uniquement le contenu qui parle réellement au grand public.
-  // Les bulletins/avis techniques (CVE, "Vulnérabilité dans X", etc.) sont écartés.
-  const text = ((alert.title || '') + ' ' + (alert.body || '')).toLowerCase();
-  const KEYWORDS = [
-    'phishing', 'hameçonnage', 'hameconnage', 'arnaque', 'fraude', 'escroquerie', 'escroc',
-    'smishing', 'vishing', 'faux sms', 'faux courriel', 'faux mail', 'usurpation',
-    'rançongiciel', 'rancongiciel', 'vol de données', 'vol de donnees',
-    'fuite de données', 'fuite de donnees', 'démarchage', 'demarchage',
-    'faux support', 'faux conseiller', 'carte bancaire', 'compte bancaire'
-  ];
-  return KEYWORDS.some(k => text.indexOf(k) !== -1);
-}
-
 exports.handler = async (event) => {
   const { isScheduled, notScheduled } = require('./_is-scheduled');
   if (!isScheduled(event)) return notScheduled();   // cron uniquement (pas d'appel HTTP)
@@ -151,46 +122,57 @@ exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    // 1. Récupérer alertes externes + internes
-    const [anssi, internal] = await Promise.all([
-      fetchAnssiRss(),
+    // 1. Récupérer alertes externes (déjà filtrées grand public) + internes
+    const [externes, internes] = await Promise.all([
+      collecterAlertes(FENETRE_JOURS),
       detectInternalWaves(supabase)
     ]);
-    // Filtre grand public : on écarte le jargon technique (CVE, etc.)
-    const allAlerts = [...internal, ...anssi].filter(isPublicRelevant);
+    const toutes = [...internes, ...externes];
+    console.log(`[alertes] ${externes.length} externes retenues, ${internes.length} vagues internes`);
 
-    // 2. Filtrer celles déjà envoyées (basé sur table national_alerts)
-    const newAlerts = [];
-    for (const alert of allAlerts) {
-      const { data: exists } = await supabase
+    // 2. Écarter celles déjà connues (table national_alerts)
+    const nouvelles = [];
+    for (const alerte of toutes) {
+      const { data: existe } = await supabase
         .from('national_alerts')
         .select('id')
-        .eq('url', alert.url)
+        .eq('url', alerte.url)
         .maybeSingle();
-      if (!exists) newAlerts.push(alert);
+      if (!existe) nouvelles.push(alerte);
     }
 
-    if (newAlerts.length === 0) {
-      console.log('Aucune nouvelle alerte');
+    if (nouvelles.length === 0) {
+      console.log('[alertes] aucune nouveauté');
       return { statusCode: 200, body: JSON.stringify({ new: 0 }) };
     }
 
-    // 3. Pour chaque nouvelle alerte : sauver + envoyer push
-    const results = [];
-    for (const alert of newAlerts.slice(0, 3)) { // Max 3 push par run
-      await supabase.from('national_alerts').insert({
-        title: alert.title,
-        body: alert.body || '',
-        source: alert.source,
-        url: alert.url,
-        created_at: new Date().toISOString()
+    // 3. Enregistrer TOUTES les nouvelles (l'appli les affichera), mais ne
+    //    notifier que les récentes : on enregistre l'historique sans réveiller
+    //    les gens pour un article de trois mois.
+    const resultats = [];
+    let notifiees = 0;
+    for (const alerte of nouvelles) {
+      const { error } = await supabase.from('national_alerts').insert({
+        title: alerte.title,
+        body: alerte.body || '',
+        source: alerte.source,
+        url: alerte.url,
+        created_at: alerte.published || new Date().toISOString()
       });
-      const r = await sendPushToAll(supabase, alert);
-      results.push({ title: alert.title, ...r });
+      // Bruyant : une insertion muette est ce qui a masqué le problème avant.
+      if (error) {
+        console.error('[alertes] insertion impossible:', error.message, '—', alerte.title);
+        continue;
+      }
+      if (notifiees < 2 && recente(alerte, PUSH_JOURS)) {
+        const r = await sendPushToAll(supabase, alerte);
+        resultats.push({ title: alerte.title, ...r });
+        notifiees++;
+      }
     }
 
-    console.log('Alertes envoyées:', results);
-    return { statusCode: 200, body: JSON.stringify({ new: newAlerts.length, results }) };
+    console.log('[alertes] enregistrées:', nouvelles.length, '| push:', resultats);
+    return { statusCode: 200, body: JSON.stringify({ new: nouvelles.length, pushed: resultats }) };
 
   } catch (err) {
     console.error('national-alerts error:', err);

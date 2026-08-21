@@ -1,216 +1,162 @@
 // ════════════════════════════════════════════
-// DESPY — Alertes Cybermenaces Automatisées
+// DESPY — Alertes cybermenaces par email
 // Cron : tous les 2 jours à 8h → 0 8 */2 * * (voir netlify.toml)
-// Sources : ANSSI (CERT-FR), Cybermalveillance.gouv.fr
-// Envoi : alerte complète aux abonnés payants + teaser aux comptes
-//         gratuits (plafonné à 1 par passage pour ne pas spammer).
+//
+// Envoi : alerte complète aux abonnés payants + teaser aux comptes gratuits
+//         (plafonné à 1 par passage pour ne pas spammer).
+//
+// Les sources et le tri « est-ce que ça parle à un senior ? » vivent dans
+// _alert-sources.js. Avant, ce fichier avait sa propre liste de flux — dont
+// un mort depuis des mois, avalé en silence — et sa propre liste de mots-clés
+// qui ne correspondait à rien de ce que publient réellement les sources.
+// Résultat : ce robot tournait tous les deux jours sans jamais rien envoyer.
+//
+// Mode à blanc : POST { next_run: "...", dry_run: true } → renvoie ce QUI
+// SERAIT envoyé, sans envoyer. Indispensable pour vérifier une modification
+// sans écrire à de vrais clients.
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { collecterAlertes } = require('./_alert-sources');
 
-// Sources RSS officielles françaises de cybermenaces
-const RSS_SOURCES = [
-  {
-    name: 'ANSSI',
-    url: 'https://www.cert.ssi.gouv.fr/feed/',
-    type: 'cert'
-  },
-  {
-    name: 'Cybermalveillance.gouv.fr',
-    url: 'https://www.cybermalveillance.gouv.fr/feed/',
-    type: 'awareness'
+// Un email d'alerte ne se justifie que si l'événement est récent. Sans ça, la
+// première exécution après cette correction écrirait à tout le monde à propos
+// d'articles vieux de plusieurs mois.
+const EMAIL_JOURS = 14;
+
+// Volontairement bas : une alerte par passage. Mieux vaut manquer une
+// deuxième nouvelle que d'être perçu comme un expéditeur de spam.
+const MAX_PAR_PASSAGE = 1;
+
+function recente(alerte) {
+  if (!alerte.published) return false;
+  const t = new Date(alerte.published).getTime();
+  return !isNaN(t) && t >= Date.now() - EMAIL_JOURS * 24 * 3600 * 1000;
+}
+
+async function envoyer(type, client, alerte) {
+  const prenom = client.prenom || (client.name || '').split(' ')[0] || 'cher membre';
+  const data = {
+    email: client.email,
+    prenom,
+    alertTitle: alerte.title,
+    alertSource: alerte.source
+  };
+  if (type === 'cyber_alert') {
+    data.alertDesc = alerte.body;
+    data.alertLink = alerte.url;
   }
-];
-
-// Mots-clés qui déclenchent une alerte urgente aux abonnés
-const URGENT_KEYWORDS = [
-  'arnaque', 'phishing', 'fraude', 'escroquerie', 'ransomware',
-  'particuliers', 'seniors', 'retraite', 'banque', 'impots',
-  'ameli', 'caf', 'la poste', 'chronopost', 'livraison',
-  'sms', 'whatsapp', 'facebook', 'credential'
-];
-
-async function fetchRSS(url) {
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Despy-Alerts/1.0 (contact.despy@gmail.com)' },
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!res.ok) return null;
-    const text = await res.text();
-    return parseRSSItems(text);
-  } catch (e) {
-    console.error(`RSS fetch error ${url}:`, e.message);
-    return null;
-  }
+  await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-internal-secret': process.env.INTERNAL_SECRET || ''
+    },
+    body: JSON.stringify({ type, data })
+  });
 }
 
-function parseRSSItems(xml) {
-  const items = [];
-  const itemMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g);
-  for (const match of itemMatches) {
-    const item = match[1];
-    const title = extractTag(item, 'title');
-    const desc = extractTag(item, 'description');
-    const link = extractTag(item, 'link');
-    const pubDate = extractTag(item, 'pubDate');
-    if (title) items.push({ title, desc, link, pubDate });
-  }
-  return items.slice(0, 5); // Max 5 items par source
-}
-
-function extractTag(xml, tag) {
-  const match = xml.match(new RegExp(`<${tag}[^>]*>(?:<\\!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`, 'i'));
-  return match ? match[1].replace(/<[^>]+>/g, '').trim() : '';
-}
-
-function isUrgentAlert(title, desc) {
-  const text = (title + ' ' + desc).toLowerCase();
-  return URGENT_KEYWORDS.some(kw => text.includes(kw));
-}
-
-async function sendAlertToSubscribers(supabase, alert) {
+// abonne = true  → alerte complète aux abonnés payants
+// abonne = false → teaser aux comptes gratuits
+async function diffuser(supabase, alerte, abonne) {
   const { data: clients } = await supabase
     .from('clients')
     .select('email, name, prenom')
-    .eq('subscribed', true);
+    .eq('subscribed', abonne);
 
   if (!clients || clients.length === 0) return 0;
 
-  let sent = 0;
+  const type = abonne ? 'cyber_alert' : 'cyber_alert_free';
+  let envoyes = 0;
   for (const client of clients) {
-    const prenom = client.prenom || client.name?.split(' ')[0] || 'cher membre';
     try {
-      await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.INTERNAL_SECRET || ''
-        },
-        body: JSON.stringify({
-          type: 'cyber_alert',
-          data: {
-            email: client.email,
-            prenom,
-            alertTitle: alert.title,
-            alertDesc: alert.desc,
-            alertLink: alert.link,
-            alertSource: alert.source
-          }
-        })
-      });
-      sent++;
-    } catch (e) { console.error('Alert email error:', e); }
+      await envoyer(type, client, alerte);
+      envoyes++;
+    } catch (e) {
+      console.error('[cyber-alerts] envoi impossible', client.email, e && e.message);
+    }
     await new Promise(r => setTimeout(r, 200));
   }
-  return sent;
-}
-
-// Teaser envoyé aux comptes gratuits (leads) pour les inciter à s'abonner.
-// Volontairement plafonné à 1 alerte par passage du robot (voir handler).
-async function sendTeaserToFree(supabase, alert) {
-  const { data: clients } = await supabase
-    .from('clients')
-    .select('email, name, prenom')
-    .eq('subscribed', false);
-
-  if (!clients || clients.length === 0) return 0;
-
-  let sent = 0;
-  for (const client of clients) {
-    const prenom = client.prenom || client.name?.split(' ')[0] || 'cher membre';
-    try {
-      await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.INTERNAL_SECRET || ''
-        },
-        body: JSON.stringify({
-          type: 'cyber_alert_free',
-          data: {
-            email: client.email,
-            prenom,
-            alertTitle: alert.title,
-            alertSource: alert.source
-          }
-        })
-      });
-      sent++;
-    } catch (e) { console.error('Teaser email error:', e); }
-    await new Promise(r => setTimeout(r, 200));
-  }
-  return sent;
+  return envoyes;
 }
 
 exports.handler = async (event) => {
   const { isScheduled, notScheduled } = require('./_is-scheduled');
-  if (!isScheduled(event)) return notScheduled();   // cron uniquement (pas d'appel HTTP)
+  if (!isScheduled(event)) return notScheduled();   // cron uniquement
+
+  let aBlanc = false;
+  try { aBlanc = !!JSON.parse(event.body || '{}').dry_run; } catch (e) {}
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    // Récupérer les alertes déjà envoyées (éviter les doublons)
-    const { data: sentAlerts } = await supabase
+    // Alertes déjà envoyées, pour ne pas répéter la même deux fois.
+    const { data: dejaEnvoyees, error: errLecture } = await supabase
       .from('sent_alerts')
       .select('alert_url')
       .order('created_at', { ascending: false })
-      .limit(50);
+      .limit(100);
 
-    const sentUrls = new Set((sentAlerts || []).map(a => a.alert_url));
-    let totalSent = 0;
-    let alertsTriggered = 0;
-    let teaserSent = false; // teaser aux gratuits : 1 max par passage
-
-    for (const source of RSS_SOURCES) {
-      const items = await fetchRSS(source.url);
-      if (!items) continue;
-
-      for (const item of items) {
-        // Vérifier si déjà envoyé
-        if (sentUrls.has(item.link)) continue;
-
-        // Vérifier si c'est une alerte urgente pour les particuliers
-        if (!isUrgentAlert(item.title, item.desc)) continue;
-
-        console.log(`Alerte détectée: ${item.title}`);
-
-        // Envoyer aux abonnés
-        const sent = await sendAlertToSubscribers(supabase, {
-          ...item, source: source.name
-        });
-
-        // Teaser aux comptes gratuits — uniquement sur la 1re alerte du passage
-        if (!teaserSent) {
-          try { await sendTeaserToFree(supabase, { ...item, source: source.name }); }
-          catch (e) { console.error('Teaser send error:', e); }
-          teaserSent = true;
-        }
-
-        // Enregistrer l'alerte comme envoyée
-        await supabase.from('sent_alerts').insert({
-          alert_url: item.link,
-          alert_title: item.title,
-          source: source.name,
-          recipients: sent,
-          created_at: new Date().toISOString()
-        });
-
-        sentUrls.add(item.link);
-        totalSent += sent;
-        alertsTriggered++;
-
-        // Max 2 alertes par jour pour ne pas surcharger
-        if (alertsTriggered >= 2) break;
-      }
-      if (alertsTriggered >= 2) break;
+    if (errLecture) {
+      console.error('[cyber-alerts] table sent_alerts illisible:', errLecture.message);
+      return { statusCode: 200, body: JSON.stringify({ erreur: 'sent_alerts', detail: errLecture.message }) };
     }
 
-    console.log(`Alertes: ${alertsTriggered} détectées, ${totalSent} emails envoyés`);
-    return { statusCode: 200, body: JSON.stringify({ alerts: alertsTriggered, emails: totalSent }) };
+    const connues = new Set((dejaEnvoyees || []).map(a => a.alert_url));
+
+    const candidates = (await collecterAlertes(EMAIL_JOURS))
+      .filter(a => a.url && !connues.has(a.url))
+      .filter(recente)
+      .slice(0, MAX_PAR_PASSAGE);
+
+    if (aBlanc) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          dry_run: true,
+          seraient_envoyees: candidates.map(a => ({
+            titre: a.title, source: a.source, date: a.published, url: a.url
+          })),
+          deja_connues: connues.size
+        })
+      };
+    }
+
+    if (candidates.length === 0) {
+      console.log('[cyber-alerts] rien de neuf à annoncer');
+      return { statusCode: 200, body: JSON.stringify({ alerts: 0, emails: 0 }) };
+    }
+
+    let total = 0;
+    let teaserFait = false;
+    for (const alerte of candidates) {
+      console.log('[cyber-alerts] diffusion :', alerte.title);
+      const envoyes = await diffuser(supabase, alerte, true);
+
+      // Teaser aux comptes gratuits : une seule fois par passage.
+      if (!teaserFait) {
+        try { await diffuser(supabase, alerte, false); }
+        catch (e) { console.error('[cyber-alerts] teaser:', e && e.message); }
+        teaserFait = true;
+      }
+
+      const { error } = await supabase.from('sent_alerts').insert({
+        alert_url: alerte.url,
+        alert_title: alerte.title,
+        source: alerte.source,
+        recipients: envoyes,
+        created_at: new Date().toISOString()
+      });
+      if (error) console.error('[cyber-alerts] insertion sent_alerts:', error.message);
+
+      total += envoyes;
+    }
+
+    console.log(`[cyber-alerts] ${candidates.length} alerte(s), ${total} email(s)`);
+    return { statusCode: 200, body: JSON.stringify({ alerts: candidates.length, emails: total }) };
 
   } catch (err) {
-    console.error('Cyber alerts error:', err);
+    console.error('[cyber-alerts] erreur:', err);
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
   }
 };
