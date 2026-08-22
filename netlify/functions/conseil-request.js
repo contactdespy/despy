@@ -19,7 +19,7 @@ const ADMIN_EMAIL = 'contact.despy@gmail.com';
 
 const PRESTATIONS = {
   distance: { nom: 'À distance',      prix: '49 €',  detail: 'Visio ou téléphone' },
-  domicile: { nom: 'À domicile',      prix: '89 €',  detail: 'Strasbourg ±15 km' },
+  domicile: { nom: 'À domicile',      prix: '89 €',  detail: 'Bas-Rhin (67)' },
   forfait:  { nom: 'Forfait complet', prix: '129 €', detail: 'Tous appareils' }
 };
 
