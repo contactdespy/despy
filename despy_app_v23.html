@@ -1413,7 +1413,10 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           <span class="m"><span class="a">Effacer mes données</span><span class="b">Désindexation web · Premium</span></span>
           <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="listrow" onclick="window.open('https://calendly.com/contact-despy/intervention-domicile','_blank')">
+        <!-- Adresse alignée sur celle du site. L'ancienne, « intervention-domicile »,
+             répondait 200 mais renvoyait une page Calendly vide : l'événement existe
+             encore mais il est désactivé. Le bouton ne menait donc nulle part. -->
+        <button class="listrow" onclick="window.open('https://calendly.com/contact-despy/intervention-a-domicile','_blank')">
           <span class="ic ic-cyan"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span>
           <span class="m"><span class="a">Intervention à domicile</span><span class="b">Strasbourg &amp; 15 km · 89&nbsp;€ à 129&nbsp;€</span></span>
           <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -6925,7 +6928,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-21-01';
+var APP_BUILD = '2026-08-22-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
