@@ -94,9 +94,16 @@ a { color: var(--blue); text-decoration: none; }
 .auth-google-wrap { display: flex; justify-content: center; min-height: 44px; margin-bottom: 14px; }
 .auth-divider { display: flex; align-items: center; gap: 10px; margin: 14px 0; color: var(--text3); font-size: 12px; font-weight: 600; }
 .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* font-family: sans elle, les champs gardent la police par défaut du moteur —
+   Arial pour un <input>, MONOSPACE pour un <textarea>. Tout le reste de l'appli
+   est en -apple-system : un formulaire en Courier au milieu, c'est le détail
+   qui fait « bricolé ». Le correctif existait déjà, mais seulement pour
+   #secteur (ligne ~1046) : le bug était traité là où on l'avait vu, pas à sa
+   source. Il touchait aussi la demande de rappel et la connexion. */
 .auth-input {
   width: 100%; padding: 15px 16px;
   border: 1.5px solid var(--border); border-radius: 14px;
+  font-family: inherit;
   font-size: 16px; margin-bottom: 10px;
   background: #fff; color: var(--text);
 }
@@ -389,7 +396,7 @@ body{ background:var(--p-paper); }
 *{ -webkit-tap-highlight-color:transparent; }
 
 /* ── fluidité : chaque surface tactile répond ── */
-.pheader,.hero-card,.sos-card,.qa-card,.tile,.listrow,.nav-btn,.nav-sos{
+.pheader,.hero-card,.sos-card,.qa-card,.tile,.listrow,.aide-row,.nav-btn,.nav-sos{
   transition:transform .16s cubic-bezier(.2,.7,.3,1), box-shadow .16s ease, background .16s ease;
 }
 .hero-card:active,.sos-card:active,.qa-card:active,.tile:active,.listrow:active{ transform:scale(.978); }
@@ -452,6 +459,37 @@ body{ background:var(--p-paper); }
 .sos-card .a{ font-size:15.5px; font-weight:800; }
 .sos-card .b{ font-size:12px; color:#FFDCD9; margin-top:2px; line-height:1.35; }
 .sos-btn{ background:#fff; color:#c0322f; font-weight:800; font-size:14px; border-radius:12px; padding:11px 15px; white-space:nowrap; margin-left:auto; flex:none; }
+
+/* ── Bloc « besoin d'aide » ──
+   Remplace deux bandes pleine largeur empilées sous le score : une rouge
+   (« Un doute, un problème ? ») et une bleue (« On m'appelle — j'ai un doute »).
+   Elles menaient à deux endroits différents mais portaient la même icône de
+   téléphone et le même mot « doute » : indiscernables d'un coup d'œil. Et la
+   rouge appelait EXACTEMENT la même fonction que le bouton SOS de la barre du
+   bas — le même écran proposé deux fois sur la même page.
+
+   Un seul bloc, deux lignes. La couleur passe de l'aplat à la pastille : sur
+   une page qui empilait déjà moutarde + rouge + bleu + bleu, c'est la
+   hiérarchie qui se perdait, pas la visibilité. Le rouge reste porté par le
+   SOS de la barre du bas, qui lui est présent sur TOUS les écrans. */
+.aide{ background:var(--p-card); border-radius:18px; overflow:hidden;
+  box-shadow:0 6px 20px rgba(12,25,55,.07); margin-bottom:16px; }
+.aide-row{ display:flex; align-items:center; gap:14px; width:100%;
+  padding:16px 17px; background:none; border:0; border-top:1px solid var(--p-line);
+  text-align:left; font-family:inherit; cursor:pointer; }
+.aide-row:first-child{ border-top:0; }
+.aide-row:active{ background:var(--p-soft); }
+.aide-ic{ width:46px; height:46px; border-radius:14px; flex:none; font-size:21px;
+  display:flex; align-items:center; justify-content:center; }
+.aide-ic-sos{ background:#FDECEC; color:var(--p-sos); }
+.aide-ic-tel{ background:#EAF0FF; color:var(--p-blue); }
+.aide-m{ flex:1; min-width:0; }
+/* 16 px : ces deux lignes se lisent en panique, et souvent sans lunettes. */
+.aide-a{ display:block; font-size:16px; font-weight:800; letter-spacing:-.01em;
+  color:var(--p-ink); line-height:1.25; }
+.aide-b{ display:block; font-size:12.5px; color:var(--p-muted); margin-top:3px;
+  line-height:1.4; }
+.aide-row .chev{ color:#C4CDDD; flex:none; }
 
 /* ── action rapide ── */
 .qa-card{ display:flex; align-items:center; gap:13px; padding:15px 16px; width:100%; text-align:left; font-family:inherit; cursor:pointer; }
@@ -812,6 +850,15 @@ body{ background:var(--p-paper); }
   box-shadow:0 8px 22px rgba(138,101,22,.25); }
 .veille.veille-alerte .v-dot{ background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.22); }
 .veille.veille-alerte .v-b{ color:#F5DFA6; }
+/* Une fuite qui concerne VOS données n'est pas une nouvelle du jour : c'est un
+   mot de passe à changer. Elle était rendue en moutarde, exactement comme le
+   bandeau d'alerte nationale — deux bandes identiques empilées sur la même
+   page, dont une seule appelait une action. Moutarde = à savoir, rouge = à
+   faire : la couleur redevient une information. */
+.veille.veille-fuite{ background:linear-gradient(120deg,#7a1114,#c0322f);
+  box-shadow:0 8px 22px rgba(197,50,47,.26); }
+.veille.veille-fuite .v-dot{ background:#FF8A85; box-shadow:0 0 0 4px rgba(255,138,133,.24); }
+.veille.veille-fuite .v-b{ color:#FFD7D4; }
 .veille:active{ transform:scale(.985); }
 .v-dot{ width:11px; height:11px; border-radius:50%; background:#4ade80; flex:none; box-shadow:0 0 0 4px rgba(74,222,128,.22); animation:vpulse 2.4s ease-in-out infinite; }
 @keyframes vpulse{ 0%,100%{ box-shadow:0 0 0 4px rgba(74,222,128,.22); } 50%{ box-shadow:0 0 0 8px rgba(74,222,128,.10); } }
@@ -1198,17 +1245,26 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         </div>
       </button>
 
-      <button class="sos-card" onclick="openTool('sos')">
-        <span class="sos-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
-        <span><span class="a">Un doute, un problème ?</span><span class="b">Un vrai conseiller vous répond</span></span>
-        <span class="sos-btn">Appeler</span>
-      </button>
-      <button class="appel-cta" onclick="openAppel()">
-        <span class="ac-ic">📞</span>
-        <span class="ac-m"><span class="ac-a">On m’appelle — j’ai un doute</span>
-        <span class="ac-b">Quoi dire, et quel numéro rappeler</span></span>
-        <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
+      <!-- Deux besoins réellement différents, donc deux lignes — mais un seul
+           bloc. « Appeler » a disparu du libellé : le bouton n'a jamais composé
+           de numéro, il ouvre un formulaire de rappel. Dire « on vous rappelle »
+           décrit ce qui se passe vraiment, et pose la bonne attente : la
+           personne sait qu'elle attend un appel au lieu de croire que rien ne
+           s'est produit. -->
+      <div class="aide">
+        <button class="aide-row" onclick="openTool('sos')">
+          <span class="aide-ic aide-ic-sos"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+          <span class="aide-m"><span class="aide-a">J’ai un problème, j’ai besoin d’aide</span>
+          <span class="aide-b">Argent, compte piraté, lien cliqué — on vous rappelle</span></span>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="aide-row" onclick="openAppel()">
+          <span class="aide-ic aide-ic-tel"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>
+          <span class="aide-m"><span class="aide-a">Quelqu’un m’appelle en ce moment</span>
+          <span class="aide-b">Quoi dire, et quel numéro rappeler</span></span>
+          <svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
 
       <div class="famband" id="home-fam" style="display:none"></div>
 
@@ -3169,8 +3225,14 @@ function vicDemanderRappel(type) {
       'placeholder="Ex. : j’ai donné mon code par téléphone ce matin"></textarea>' +
     '<div id="vic-err" style="display:none;margin-top:10px;font-size:13.5px;color:#b4892e;line-height:1.5"></div>' +
     '<button class="btn-primary" style="margin-top:16px" id="vic-go" onclick="vicEnvoyerRappel(\'' + type + '\')">Envoyer ma demande</button>' +
-    '<div class="fam-note" style="margin-top:14px">Vous préférez appeler tout de suite ? ' +
-      '<a href="tel:+33689148395"><b>06 89 14 83 95</b></a></div>');
+    // Le numéro était affiché ici en clair à TOUT LE MONDE, gratuits compris,
+    // alors que l'écran précédent annonce « l'appel direct est inclus dans
+    // Premium » : la promesse se contredisait à un écran d'intervalle. Tant
+    // qu'une seule personne décroche, tout passe par la demande de rappel —
+    // c'est elle qui garde une trace, pas un appel manqué.
+    '<div class="fam-note" style="margin-top:14px">Une seule équipe répond, et elle ' +
+      'rappelle dans l’ordre d’arrivée. Laissez votre numéro, vous n’avez rien ' +
+      'd’autre à faire.</div>');
 }
 
 function vicEnvoyerRappel(type) {
@@ -4490,7 +4552,9 @@ function renderVeille(stats) {
   if (t) t.textContent = fuites > 0
     ? (fuites + (fuites > 1 ? ' fuites vous concernent' : ' fuite vous concerne'))
     : 'Aucune fuite détectée';
-  el.classList.toggle('veille-alerte', fuites > 0);
+  // Rouge, pas moutarde : voir le commentaire de .veille-fuite dans le style.
+  el.classList.remove('veille-alerte');
+  el.classList.toggle('veille-fuite', fuites > 0);
   var bouts = [];
   if (st.last_hibp_check) { var q = timeAgoFr(st.last_hibp_check); if (q) bouts.push('vérifié ' + q); }
   bouts.push('prochain contrôle ' + prochainControleFr());
@@ -6928,7 +6992,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-22-01';
+var APP_BUILD = '2026-08-22-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
