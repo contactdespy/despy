@@ -445,7 +445,10 @@ body{ background:var(--p-paper); }
 .ring{ width:96px; height:96px; flex:none; position:relative; display:flex; align-items:center; justify-content:center; }
 .ring-arc{ transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.3,1); }
 .hero-txt{ min-width:0; }
-.hero-ey{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--p-safe); }
+/* Gris et non vert : c'est la couleur AVANT que le score soit connu. Un vert
+   posé par défaut rassure une seconde trop tôt, y compris chez un client qui
+   va s'afficher « Vulnérable ». La vraie couleur arrive avec la donnée. */
+.hero-ey{ font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--p-muted); }
 .hero-txt h2{ font-size:17.5px; margin:4px 0; letter-spacing:-.01em; color:var(--p-ink); font-weight:800; }
 .hero-txt p{ margin:0; font-size:12.5px; color:var(--p-muted); line-height:1.45; }
 
@@ -4496,10 +4499,23 @@ function renderAccountState() {
   show('home-locked', !sub);
   if (!sub) show('home-veille', false);   // la bande de veille est réservée aux abonnés
   // Le badge Premium ne s'affiche que pour un abonné (déjà géré par refreshPlanBadge).
-  // Cadre orange « protection incomplète » pour un compte gratuit.
-  var ey = document.getElementById('home-score-ey');
-  if (ey && !sub) { ey.textContent = '⚠ Protection incomplète'; ey.style.color = '#D97706'; }
-  else if (ey) { ey.style.color = ''; }
+
+  // Le chapeau du score ne dit plus « ⚠ Protection incomplète » aux comptes
+  // gratuits. Il se déclenchait sur `subscribed`, jamais sur le score : un
+  // client à 88/100 lisait « Excellent » avec « PROTECTION INCOMPLÈTE » juste
+  // au-dessus, en orange. La carte se contredisait en deux lignes voisines.
+  //
+  // Ce n'était pas théorique : runDarkWeb() lance la vérification HIBP sans
+  // condition d'abonnement, et c'est elle qui renseigne last_hibp_check. Un
+  // compte gratuit qui s'en sert une fois sort du plafond à 55 points imposé
+  // par security-score et peut donc monter au-dessus de 80.
+  //
+  // Le serveur sait déjà dire « Protection incomplète » quand c'est vrai
+  // (getScoreLabel, quand aucun contrôle n'a jamais tourné) et le met dans le
+  // TITRE. Le mot décrit désormais la protection, plus le portefeuille — et
+  // rien n'est perdu : la pastille « Compte gratuit », le conseil sous le
+  // score, l'encart d'abonnement et la liste « Avec l'abonnement » disent déjà
+  // à ce client ce qu'il gagnerait à s'abonner, quatre fois sur la même page.
 }
 
 function refreshHomeScore() {
@@ -4526,12 +4542,18 @@ function refreshHomeScore() {
     if (d && typeof d.score === 'number' && !d.error) {
       ringEl.innerHTML = heroScoreRing(d.score, d.color);
       if (titleEl) titleEl.textContent = d.label || 'Votre score de sécurité';
-      if (eyEl && d.emoji) eyEl.textContent = d.emoji + ' Votre protection';
+      // Le chapeau prend la couleur du score (verte à 80+, rouge sous 40) au
+      // lieu du vert fixe de la feuille de style : un client « Vulnérable »
+      // lisait son verdict sous un chapeau vert rassurant.
+      if (eyEl) {
+        eyEl.textContent = (d.emoji ? d.emoji + ' ' : '') + 'Votre protection';
+        eyEl.style.color = d.color || '';
+      }
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
       renderProtection(d.checklist, d.stats);
       renderHomeStats(d.stats);
       renderVeille(d.stats);          // surveillance rendue visible (abonnés)
-      renderAccountState();  // réapplique le cadre « gratuit » après la donnée
+      renderAccountState();  // rétablit l'état gratuit/abonné après la donnée
     } else {
       ringEl.innerHTML = heroPlaceholderRing();
       if (titleEl) titleEl.textContent = 'Construire mon score';
@@ -7008,7 +7030,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-22-03';
+var APP_BUILD = '2026-08-22-04';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
