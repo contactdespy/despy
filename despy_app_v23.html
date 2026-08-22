@@ -473,23 +473,34 @@ body{ background:var(--p-paper); }
    hiérarchie qui se perdait, pas la visibilité. Le rouge reste porté par le
    SOS de la barre du bas, qui lui est présent sur TOUS les écrans. */
 .aide{ background:var(--p-card); border-radius:18px; overflow:hidden;
-  box-shadow:0 6px 20px rgba(12,25,55,.07); margin-bottom:16px; }
-.aide-row{ display:flex; align-items:center; gap:14px; width:100%;
-  padding:16px 17px; background:none; border:0; border-top:1px solid var(--p-line);
+  border:1px solid var(--p-line);
+  box-shadow:0 10px 28px rgba(12,25,55,.10); margin-bottom:16px; }
+.aide-row{ position:relative; display:flex; align-items:center; gap:14px; width:100%;
+  padding:17px 16px; background:none; border:0;
   text-align:left; font-family:inherit; cursor:pointer; }
-.aide-row:first-child{ border-top:0; }
+/* Trait aligné sur le texte et non sur le bord de la carte : le regard descend
+   une seule colonne. C'est le détail qui sépare une liste d'un tableau. */
+.aide-row + .aide-row::before{ content:''; position:absolute; left:78px; right:0;
+  top:0; height:1px; background:var(--p-line); }
 .aide-row:active{ background:var(--p-soft); }
-.aide-ic{ width:46px; height:46px; border-radius:14px; flex:none; font-size:21px;
+/* Pastilles pleines, pas teintées. L'appli réserve les aplats pâles à ses
+   tuiles secondaires (.ic-blue, .ic-gold) ; ses moments forts — l'encart
+   d'abonnement, les bandes de veille — sont des dégradés portés par une ombre
+   colorée. Deux pastilles de 48 px dans cette langue-là donnent la présence
+   que deux bandes pleine largeur donnaient, sans reprendre toute la page. */
+.aide-ic{ width:48px; height:48px; border-radius:15px; flex:none; color:#fff;
   display:flex; align-items:center; justify-content:center; }
-.aide-ic-sos{ background:#FDECEC; color:var(--p-sos); }
-.aide-ic-tel{ background:#EAF0FF; color:var(--p-blue); }
+.aide-ic-sos{ background:linear-gradient(140deg,#EF5A5E,#C0322F);
+  box-shadow:0 6px 15px rgba(192,50,47,.34), inset 0 1px 0 rgba(255,255,255,.30); }
+.aide-ic-tel{ background:linear-gradient(140deg,#5B8CFF,#2D5BFF);
+  box-shadow:0 6px 15px rgba(45,91,255,.32), inset 0 1px 0 rgba(255,255,255,.30); }
 .aide-m{ flex:1; min-width:0; }
 /* 16 px : ces deux lignes se lisent en panique, et souvent sans lunettes. */
-.aide-a{ display:block; font-size:16px; font-weight:800; letter-spacing:-.01em;
+.aide-a{ display:block; font-size:16px; font-weight:800; letter-spacing:-.015em;
   color:var(--p-ink); line-height:1.25; }
-.aide-b{ display:block; font-size:12.5px; color:var(--p-muted); margin-top:3px;
+.aide-b{ display:block; font-size:13px; color:var(--p-muted); margin-top:3px;
   line-height:1.4; }
-.aide-row .chev{ color:#C4CDDD; flex:none; }
+.aide-row .chev{ color:#9FADC4; flex:none; }
 
 /* ── action rapide ── */
 .qa-card{ display:flex; align-items:center; gap:13px; padding:15px 16px; width:100%; text-align:left; font-family:inherit; cursor:pointer; }
@@ -846,10 +857,14 @@ body{ background:var(--p-paper); }
 .veille{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; font-family:inherit; cursor:pointer;
   background:linear-gradient(120deg,#0e3b2a,#12664a); color:#fff; border:0; border-radius:16px; padding:14px 16px;
   box-shadow:0 8px 22px rgba(16,102,74,.25); }
-.veille.veille-alerte{ background:linear-gradient(120deg,#5a4210,#8a6516);
-  box-shadow:0 8px 22px rgba(138,101,22,.25); }
-.veille.veille-alerte .v-dot{ background:#fbbf24; box-shadow:0 0 0 4px rgba(251,191,36,.22); }
-.veille.veille-alerte .v-b{ color:#F5DFA6; }
+/* L'ambre de la charte (--p-amber), pas le jaune terreux d'origine : sur fond
+   gris clair, un dégradé sombre et désaturé ne lit pas comme une alerte, il
+   lit comme une image mal chargée. C'est le seul aplat pleine largeur qui
+   reste au-dessus du score — autant qu'il ait l'air voulu. */
+.veille.veille-alerte{ background:linear-gradient(120deg,#B45309,#E08A0C);
+  box-shadow:0 10px 26px rgba(217,119,6,.30); }
+.veille.veille-alerte .v-dot{ background:#FFE29A; box-shadow:0 0 0 4px rgba(255,226,154,.28); }
+.veille.veille-alerte .v-b{ color:#FDE6C0; }
 /* Une fuite qui concerne VOS données n'est pas une nouvelle du jour : c'est un
    mot de passe à changer. Elle était rendue en moutarde, exactement comme le
    bandeau d'alerte nationale — deux bandes identiques empilées sur la même
@@ -1251,6 +1266,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
            décrit ce qui se passe vraiment, et pose la bonne attente : la
            personne sait qu'elle attend un appel au lieu de croire que rien ne
            s'est produit. -->
+      <div class="sec">Besoin d’aide ?</div>
       <div class="aide">
         <button class="aide-row" onclick="openTool('sos')">
           <span class="aide-ic aide-ic-sos"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
@@ -6992,7 +7008,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-22-02';
+var APP_BUILD = '2026-08-22-03';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
