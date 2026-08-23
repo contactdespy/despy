@@ -3,8 +3,9 @@
 // Cron : 2 fois par jour → 0 9,18 * * * (voir netlify.toml)
 // 1. Sources publiques françaises (CNIL, Cybermalveillance, ANSSI)
 //    → voir _alert-sources.js, qui décide aussi de ce qui parle à un senior
-// 2. Vagues d'arnaques détectées via analyses_history (≥3 fois en 48h)
-// 3. Push à toutes les subscriptions actives (abonnés ou gratuits)
+// 2. Vagues d'arnaques chez nos propres membres → voir _vagues.js
+// 3. Fiches d'arnaques de saison → voir _calendrier-arnaques.js
+// 4. Push à toutes les subscriptions actives (abonnés ou gratuits)
 //
 // Historique : ce robot n'a jamais rien envoyé. Il n'interrogeait que le
 // CERT-FR, qui ne publie que des avis de failles logicielles destinés aux
@@ -17,6 +18,7 @@ const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
 const { collecterAlertes } = require('./_alert-sources');
 const { fichesAPublier } = require('./_calendrier-arnaques');
+const { detecterVagues } = require('./_vagues');
 
 // On ne stocke que ce qui a moins de 120 jours : au-delà, ce n'est plus une
 // alerte, c'est de l'archive — et l'afficher comme « en ce moment » serait faux.
@@ -31,46 +33,6 @@ function recente(alerte, jours) {
   if (!alerte.published) return false;
   const t = new Date(alerte.published).getTime();
   return !isNaN(t) && t >= Date.now() - jours * 24 * 3600 * 1000;
-}
-
-async function detectInternalWaves(supabase) {
-  // Cherche les domaines/numéros récurrents dans analyses_history des dernières 48h
-  const since = new Date(Date.now() - 48 * 3600 * 1000).toISOString();
-  const { data: rows } = await supabase
-    .from('analyses_history')
-    .select('content, verdict, signals')
-    .eq('verdict', 'scam')
-    .gte('created_at', since)
-    .limit(500);
-  if (!rows || rows.length < 3) return [];
-
-  // Extraire les domaines mentionnés
-  const domainCount = {};
-  rows.forEach(r => {
-    const matches = (r.content || '').match(/[a-z0-9-]+\.[a-z]{2,}(?:\/[^\s)>"']*)?/gi) || [];
-    matches.forEach(m => {
-      const dom = m.split('/')[0].toLowerCase();
-      // Ignorer les TLD légitimes connus
-      if (/(laposte|chronopost|amazon|leboncoin|fnac|sncf|cdiscount|bnpparibas|creditmutuel|lcl|hsbc|despy)\.[a-z]{2,}/i.test(dom)) return;
-      domainCount[dom] = (domainCount[dom] || 0) + 1;
-    });
-  });
-
-  const waves = [];
-  Object.entries(domainCount)
-    .filter(([_, c]) => c >= 3)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 2)
-    .forEach(([dom, count]) => {
-      waves.push({
-        title: `Vague d'arnaque détectée : ${dom}`,
-        url: 'https://despy.fr/#analyseur',
-        source: 'Despy Community',
-        body: `${count} signalements en 48h pour ce domaine. Ne cliquez sur aucun lien le contenant.`,
-        published: new Date().toISOString()
-      });
-    });
-  return waves;
 }
 
 async function sendPushToAll(supabase, alert) {
@@ -125,13 +87,13 @@ exports.handler = async (event) => {
   try {
     // 1. Alertes externes (déjà filtrées grand public), vagues internes, et
     //    fiches de saison (voir _calendrier-arnaques.js).
-    const [externes, internes, saison] = await Promise.all([
+    const [externes, vagues, saison] = await Promise.all([
       collecterAlertes(FENETRE_JOURS),
-      detectInternalWaves(supabase),
+      detecterVagues(supabase),
       fichesAPublier(supabase)
     ]);
-    const toutes = [...internes, ...externes];
-    console.log(`[alertes] ${externes.length} externes retenues, ${internes.length} vagues internes,`
+    const toutes = externes;
+    console.log(`[alertes] ${externes.length} externes retenues, ${vagues.length} vagues internes,`
       + ` ${saison.length} fiche(s) de saison`);
 
     // 2. Écarter celles déjà connues (table national_alerts)
@@ -145,11 +107,15 @@ exports.handler = async (event) => {
       if (!existe) nouvelles.push(alerte);
     }
 
-    // Les fiches de saison ne passent pas par ce dédoublonnage-là : leur clé
-    // est le titre depuis l'ouverture de la fenêtre, pas l'URL, et le calcul
-    // est déjà fait. En tête, parce qu'une arnaque qu'on peut encore éviter
-    // prime sur un communiqué qui décrit ce qui est déjà arrivé.
-    nouvelles.unshift(...saison);
+    // Vagues et fiches de saison ne passent pas par ce dédoublonnage-là : elles
+    // partagent toutes la même URL, et dédoublonner par URL n'en aurait laissé
+    // passer qu'une seule dans toute la vie du service. Elles se dédoublonnent
+    // par TITRE, en amont, chacune dans son module.
+    //
+    // Ordre : une vague en cours d'abord — elle touche nos membres aujourd'hui —
+    // puis la fiche de saison, puis les communiqués qui décrivent ce qui est
+    // déjà arrivé.
+    nouvelles.unshift(...vagues, ...saison);
 
     if (nouvelles.length === 0) {
       console.log('[alertes] aucune nouveauté');
