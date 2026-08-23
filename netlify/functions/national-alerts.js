@@ -16,6 +16,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const webpush = require('web-push');
 const { collecterAlertes } = require('./_alert-sources');
+const { fichesAPublier } = require('./_calendrier-arnaques');
 
 // On ne stocke que ce qui a moins de 120 jours : au-delà, ce n'est plus une
 // alerte, c'est de l'archive — et l'afficher comme « en ce moment » serait faux.
@@ -122,13 +123,16 @@ exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    // 1. Récupérer alertes externes (déjà filtrées grand public) + internes
-    const [externes, internes] = await Promise.all([
+    // 1. Alertes externes (déjà filtrées grand public), vagues internes, et
+    //    fiches de saison (voir _calendrier-arnaques.js).
+    const [externes, internes, saison] = await Promise.all([
       collecterAlertes(FENETRE_JOURS),
-      detectInternalWaves(supabase)
+      detectInternalWaves(supabase),
+      fichesAPublier(supabase)
     ]);
     const toutes = [...internes, ...externes];
-    console.log(`[alertes] ${externes.length} externes retenues, ${internes.length} vagues internes`);
+    console.log(`[alertes] ${externes.length} externes retenues, ${internes.length} vagues internes,`
+      + ` ${saison.length} fiche(s) de saison`);
 
     // 2. Écarter celles déjà connues (table national_alerts)
     const nouvelles = [];
@@ -140,6 +144,12 @@ exports.handler = async (event) => {
         .maybeSingle();
       if (!existe) nouvelles.push(alerte);
     }
+
+    // Les fiches de saison ne passent pas par ce dédoublonnage-là : leur clé
+    // est le titre depuis l'ouverture de la fenêtre, pas l'URL, et le calcul
+    // est déjà fait. En tête, parce qu'une arnaque qu'on peut encore éviter
+    // prime sur un communiqué qui décrit ce qui est déjà arrivé.
+    nouvelles.unshift(...saison);
 
     if (nouvelles.length === 0) {
       console.log('[alertes] aucune nouveauté');

@@ -3049,11 +3049,18 @@ function alerteCard(a) {
   // officielle. Le badge reprend le nom réel de la source : depuis l'ajout de
   // la CNIL et de Cybermalveillance, tester uniquement « ANSSI » étiquetait
   // une alerte de la CNIL en « Vague détectée », ce qui était faux.
+  // Troisième nature depuis le calendrier des saisons : ambre = une arnaque
+  // qui revient à cette période de l'année, publiée AVANT le pic. Elle vient
+  // de nous, donc elle passait pour une « Vague détectée » rouge — ce qui
+  // affirmait que nos membres se faisaient avoir en ce moment. C'est faux, et
+  // c'est le contraire du message : ici, rien n'est encore arrivé.
   var source = a.source || '';
-  var interne = source.indexOf('Despy') !== -1;
-  var badgeBg = interne ? '#fee2e2' : '#e0e7ff';
-  var badgeColor = interne ? '#991b1b' : '#3730a3';
-  var badgeText = interne ? 'Vague détectée' : (source || 'Source officielle');
+  var saison = source.indexOf('Anticipation') !== -1;
+  var interne = !saison && source.indexOf('Despy') !== -1;
+  var badgeBg = saison ? '#FBF3E0' : (interne ? '#fee2e2' : '#e0e7ff');
+  var badgeColor = saison ? '#92400E' : (interne ? '#991b1b' : '#3730a3');
+  var badgeText = saison ? 'Arnaque de saison'
+    : (interne ? 'Vague détectée' : (source || 'Source officielle'));
   var when = timeAgoFr(a.created_at);
   var html = '<div class="result-card" style="text-align:left;margin-bottom:10px">' +
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
@@ -7030,7 +7037,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-22-05';
+var APP_BUILD = '2026-08-24-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
