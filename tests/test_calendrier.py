@@ -230,6 +230,37 @@ Promise.resolve()
         print('  %-5s %-24s → %s' % ('OK' if bon else 'ÉCHEC', b['source'], attendu))
 
     print()
+    print('═' * 74)
+    print('E. LA BASE ACCEPTE-T-ELLE NOS PUBLICATIONS ?')
+    print('═' * 74)
+    # Le calendrier ne peut pas exister sous une contrainte d'unicité sur
+    # l'URL : plusieurs fiches mènent au même site officiel, et surtout chacune
+    # se republie tous les ans vers cette même adresse. Un index unique aurait
+    # figé le calendrier à une seule parution par site, pour toujours — sans
+    # aucune erreur visible, puisque l'insertion échoue dans une boucle qui
+    # passe à la suivante.
+    partages = {}
+    for f in d['fiches']:
+        if f['lien']:
+            partages.setdefault(f['lien'], []).append(f['id'])
+    doubles = {u: ids for u, ids in partages.items() if len(ids) > 1}
+    for u, ids in sorted(doubles.items()):
+        print('        %d fiches partagent %s : %s' % (len(ids), u, ', '.join(ids)))
+    print('        une fiche se republie chaque année vers la même adresse')
+
+    sql = io.open(os.path.join(RACINE, 'sql_migration_alertes_nationales.sql'),
+                  encoding='utf-8').read()
+    i = sql.find('CREATE UNIQUE INDEX idx_national_alerts_url')
+    bloc = sql[i:sql.find(';', i)] if i != -1 else ''
+    protege = bool(bloc) and 'Despy' in bloc and 'NOT LIKE' in bloc
+    ok = ok and protege
+    print('  %-5s l\'index unique sur l\'URL épargne nos propres publications'
+          % ('OK' if protege else 'ÉCHEC'))
+    if not protege:
+        print('        sans cette exception, la base refuse la 2e fiche menant')
+        print('        au même site — et toute republication annuelle.')
+
+    print()
     print('RÉSULTAT : ' + ('tout est vert.' if ok else 'au moins un contrôle a échoué.'))
     return 0 if ok else 1
 

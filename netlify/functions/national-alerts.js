@@ -97,14 +97,20 @@ exports.handler = async (event) => {
       + ` ${saison.length} fiche(s) de saison`);
 
     // 2. Écarter celles déjà connues (table national_alerts)
+    //
+    // `limit(1)` et non `maybeSingle()` : cette dernière lève une erreur dès
+    // que DEUX lignes portent la même URL. Or nos propres publications en
+    // partagent forcément — les vagues pointent toutes vers la page d'alertes,
+    // et trois fiches de saison mènent à impots.gouv.fr. La lecture ne doit pas
+    // dépendre d'une unicité que nos données ne respectent pas.
     const nouvelles = [];
     for (const alerte of toutes) {
       const { data: existe } = await supabase
         .from('national_alerts')
         .select('id')
         .eq('url', alerte.url)
-        .maybeSingle();
-      if (!existe) nouvelles.push(alerte);
+        .limit(1);
+      if (!existe || !existe.length) nouvelles.push(alerte);
     }
 
     // Vagues et fiches de saison ne passent pas par ce dédoublonnage-là : elles

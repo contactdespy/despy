@@ -23,21 +23,42 @@ CREATE TABLE IF NOT EXISTS national_alerts (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- L'URL identifie l'alerte : c'est sur elle que le robot vérifie s'il a déjà
--- vu la nouvelle. Sans unicité, un doublon ferait échouer la lecture
--- `.maybeSingle()` du robot, qui exige au plus une ligne.
+-- L'URL identifie une alerte VENUE D'UNE SOURCE EXTERNE : c'est sur elle que
+-- le robot vérifie s'il a déjà vu le communiqué de la CNIL ou de l'ANSSI.
+--
+-- Mais elle n'identifie PAS nos propres publications, et l'index d'origine les
+-- aurait purement et simplement refusées :
+--
+--   • toutes les vagues détectées chez nos membres pointent vers la même page
+--     d'alertes — la première insérée aurait bloqué toutes les suivantes ;
+--   • trois fiches de saison mènent à impots.gouv.fr (avis d'impôt, taxe
+--     foncière, déclaration de revenus) : deux n'auraient jamais pu paraître ;
+--   • une fiche de saison se republie CHAQUE ANNÉE, vers le même site
+--     officiel. L'unicité l'aurait figée à une seule parution dans la vie du
+--     service, ce qui vide de son sens l'idée même d'un calendrier annuel.
+--
+-- Nos publications se dédoublonnent par TITRE, en amont, dans leur module. La
+-- contrainte ne porte donc que sur ce qu'elle sait identifier : les sources
+-- externes. Le partiel `source NOT LIKE 'Despy%'` fait exactement ça.
 --
 -- On efface d'abord les doublons éventuels (on garde le plus récent), sinon
 -- la création de l'index unique échouerait et tout le script s'arrêterait là.
 DELETE FROM national_alerts a
   USING national_alerts b
   WHERE a.url IS NOT NULL
+    AND COALESCE(a.source, '') NOT LIKE 'Despy%'
+    AND COALESCE(b.source, '') NOT LIKE 'Despy%'
     AND a.url = b.url
     AND a.id < b.id;
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_national_alerts_url
+-- L'ancien index couvrait TOUTES les lignes. `IF NOT EXISTS` ne l'aurait pas
+-- corrigé — il aurait vu un index du même nom et n'aurait rien fait. On le
+-- supprime donc explicitement avant de le recréer dans sa forme restreinte.
+DROP INDEX IF EXISTS idx_national_alerts_url;
+
+CREATE UNIQUE INDEX idx_national_alerts_url
   ON national_alerts (url)
-  WHERE url IS NOT NULL;
+  WHERE url IS NOT NULL AND COALESCE(source, '') NOT LIKE 'Despy%';
 
 -- L'appli demande toujours les plus récentes en premier.
 CREATE INDEX IF NOT EXISTS idx_national_alerts_date
