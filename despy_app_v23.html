@@ -2172,16 +2172,56 @@ function majBandeauImpaye() {
 }
 
 
+// Ramène proprement à l'écran de connexion, en disant pourquoi.
+function sessionExpiree(message) {
+  session.clear();
+  document.getElementById('app-view').classList.remove('active');
+  document.getElementById('auth-view').classList.add('active');
+  toggleAuthMode('login');
+  toast(message || 'Session expirée. Merci de vous reconnecter.');
+}
+
+// Le jeton de connexion vaut 30 jours. Passé ce délai, le serveur répond 401
+// avec le code AUTH_REQUIRED et la phrase exacte à montrer — mais aucun des
+// 18 appels authentifiés de l'appli ne lisait ce code, et aucun ne regardait
+// même le statut HTTP. Résultat : le membre restait « connecté » devant une
+// application vide. L'accueil affichait « Construire mon score » sous un
+// anneau gris, ce qui lui faisait croire que son score avait disparu, alors
+// qu'il lui suffisait de se reconnecter.
+//
+// revalidateSession() ne rattrapait pas le cas : elle vérifie que le jeton
+// EXISTE, pas qu'il soit encore valide, et interroge check-subscription sans
+// l'en-tête d'autorisation — donc sans jamais le faire vérifier.
+//
+// Un seul point de passage plutôt que dix-huit : il n'y a pas d'enveloppe
+// d'appel commune dans l'appli, mais tout passe par fetch.
+(function surveillerSessionExpiree() {
+  var fetchOrigine = window.fetch;
+  var deja = false;
+  window.fetch = function (entree, options) {
+    return fetchOrigine.apply(this, arguments).then(function (r) {
+      if (deja || r.status !== 401) return r;
+      var url = typeof entree === 'string' ? entree : ((entree && entree.url) || '');
+      if (url.indexOf('/.netlify/functions/') === -1) return r;
+      // On lit une COPIE : un corps de réponse ne se lit qu'une fois et
+      // l'appelant a encore besoin du sien.
+      return r.clone().json().catch(function () { return {}; }).then(function (d) {
+        if (d && d.code === 'AUTH_REQUIRED' && !deja) {
+          deja = true;
+          sessionExpiree(d.error);
+        }
+        return r;
+      });
+    });
+  };
+})();
+
 async function revalidateSession() {
   var s = session.get();
   if (!s || !s.email) return;
   // Ancienne session sans jeton de sécurité → reconnexion nécessaire (une seule fois)
   if (!s.token) {
-    session.clear();
-    document.getElementById('app-view').classList.remove('active');
-    document.getElementById('auth-view').classList.add('active');
-    toggleAuthMode('login');
-    toast('Pour votre sécurité, merci de vous reconnecter.');
+    sessionExpiree('Pour votre sécurité, merci de vous reconnecter.');
     return;
   }
   try {
@@ -4562,11 +4602,22 @@ function refreshHomeScore() {
       renderVeille(d.stats);          // surveillance rendue visible (abonnés)
       renderAccountState();  // rétablit l'état gratuit/abonné après la donnée
     } else {
+      // Tout compte connecté possède une ligne en base et reçoit donc un
+      // score, même très bas : cette branche n'est atteinte QUE sur panne.
+      // « Construire mon score » y faisait passer un échec pour une invitation
+      // — le membre attendait devant un anneau vide sans rien à construire.
+      // Le 401 est déjà traité en amont (voir surveillerSessionExpiree) ;
+      // ici, on dit ce qui se passe et quoi faire.
       ringEl.innerHTML = heroPlaceholderRing();
-      if (titleEl) titleEl.textContent = 'Construire mon score';
+      if (titleEl) titleEl.textContent = 'Score indisponible';
+      if (subEl) subEl.textContent = 'Nous n’arrivons pas à calculer votre score '
+        + 'pour le moment. Vos protections restent actives : réessayez dans un instant.';
     }
   }).catch(function () {
+    // Coupure réseau : ne pas accuser le service, l'appli est hors ligne.
     ringEl.innerHTML = heroPlaceholderRing();
+    if (titleEl) titleEl.textContent = 'Score indisponible hors connexion';
+    if (subEl) subEl.textContent = 'Reconnectez-vous à Internet pour revoir votre score.';
   });
 }
 
@@ -7037,7 +7088,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-24-01';
+var APP_BUILD = '2026-08-24-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
