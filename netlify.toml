@@ -40,6 +40,17 @@
   status = 404
   force = true
 
+# Même raison pour les bancs d'essai, qui étaient eux servis en clair : ils
+# décrivent noir sur blanc comment le détecteur de vagues décide (deux
+# personnes distinctes, un même lien répété ne comptant qu'une fois). C'est la
+# notice pour passer dessous — ou pour déclencher une fausse alerte chez tous
+# nos membres. Ils n'ont rien à faire sur le site.
+[[redirects]]
+  from = "/tests/*"
+  to = "/index.html"
+  status = 404
+  force = true
+
 # Fichier de prévisualisation des emails (outil de dev, jamais utile en prod)
 [[redirects]]
   from = "/_mail_preview.html"
