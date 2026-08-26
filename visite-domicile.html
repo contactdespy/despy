@@ -10,7 +10,10 @@
 <link rel="icon" href="assets/icon-192.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Un expert Despy se déplace chez vous — Bas-Rhin (67)">
-<meta property="og:description" content="Sécurisation à domicile, détection d'arnaques, formation. Sur rendez-vous, en toute confiance. Dès le 23 juillet.">
+<!-- Pas de date ici : Facebook et Google mettent cet aperçu en cache pendant
+     des semaines. Une date figée dans une balise meta reste affichée dans les
+     partages longtemps après avoir cessé d'être vraie. -->
+<meta property="og:description" content="Sécurisation à domicile, détection d'arnaques, formation. Sur rendez-vous, en toute confiance, dans tout le Bas-Rhin.">
 <meta property="og:url" content="https://despy.fr/visite-domicile">
 <meta property="og:image" content="https://despy.fr/assets/og.png">
 <meta property="og:locale" content="fr_FR">
@@ -127,7 +130,7 @@
   </div>
 </section>
 
-<div class="dispo">🗓️ Disponible à partir du <strong>jeudi 23 juillet</strong> — réservez votre créneau dès maintenant.</div>
+<div class="dispo">🗓️ Disponible <strong data-creneau>sous quelques jours</strong> — réservez votre créneau dès maintenant.</div>
 
 <main class="wrap">
 
@@ -176,7 +179,7 @@
   <div class="zone">
     📍 <b>J'interviens dans tout le Bas-Rhin (67)</b> — Strasbourg, Haguenau, Saverne, Sélestat, Obernai, Molsheim, et alentours.<br>
     Déplacement <b>inclus jusqu'à 30&nbsp;km</b> de Strasbourg · léger supplément au-delà (je vous le dis avant toute réservation).<br>
-    🗓️ Créneaux disponibles <b>à partir du jeudi 23 juillet</b>.
+    🗓️ Créneaux disponibles <b data-creneau>sous quelques jours</b>.
   </div>
 
   <h2>Pourquoi me faire confiance&nbsp;?</h2>
@@ -212,6 +215,39 @@
   <a class="c" href="tel:+33689148395">📞 Appeler</a>
   <a class="b" href="https://calendly.com/contact-despy/intervention-a-domicile?utm_source=meta&utm_medium=cpc&utm_campaign=visite-67&utm_content=stickybar" target="_blank" rel="noopener">📅 Réserver</a>
 </div>
+
+<script>
+/* ── La prochaine disponibilité, calculée à chaque visite ──────────────────
+   Cette page annonçait « jeudi 23 juillet » — écrit un jour où c'était vrai,
+   toujours là un mois après. Un prospect qui arrive par la pub lit une date
+   passée et en conclut que le service s'est arrêté. Rien ne pouvait le
+   signaler : la page se chargeait parfaitement.
+
+   Le texte inscrit dans le HTML (« sous quelques jours ») reste donc VRAI en
+   permanence, quoi qu'il arrive : c'est lui que voient les robots des moteurs
+   de recherche et les visiteurs sans JavaScript. Le script ne fait que le
+   préciser, jamais le contredire. */
+(function () {
+  var JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  var MOIS  = ['janvier','février','mars','avril','mai','juin','juillet','août',
+               'septembre','octobre','novembre','décembre'];
+  var d = new Date();
+  // Trois jours de battement : annoncer « demain » quand l'agenda peut être
+  // plein, c'est décevoir dès le premier clic sur Réserver.
+  d.setDate(d.getDate() + 3);
+  // Le dimanche est reporté au lundi. On ne verrouille RIEN d'autre : l'ancien
+  // texte disait « jeudi » parce que le service ouvrait un jeudi, pas parce
+  // que les visites n'ont lieu que ce jour-là. Fixer le jeudi aurait inventé
+  // une contrainte, et fait lire « pas avant huit jours » à quelqu'un qui
+  // aurait pu être reçu mardi.
+  if (d.getDay() === 0) d.setDate(d.getDate() + 1);
+  var n = d.getDate();
+  var texte = 'dès le ' + JOURS[d.getDay()] + ' ' + (n === 1 ? '1er' : n)
+            + ' ' + MOIS[d.getMonth()];
+  var cibles = document.querySelectorAll('[data-creneau]');
+  for (var i = 0; i < cibles.length; i++) cibles[i].textContent = texte;
+})();
+</script>
 
 </body>
 </html>
