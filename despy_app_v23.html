@@ -2961,6 +2961,13 @@ async function runDarkWeb() {
     var liste = Array.isArray(data.breaches) ? data.breaches : [];
     var n = typeof data.breachCount === 'number' ? data.breachCount : liste.length;
 
+    // La vérification vient d'écrire `last_hibp_check` sur la fiche : c'est ce
+    // champ qui coche « Vérifier vos fuites de données » dans Protection, et qui
+    // débloque le plafond de 55 points du score. Sans ce rappel, le membre fait
+    // le geste, voit son résultat, et retrouve l'étape encore à faire —
+    // exactement l'impression que rien n'a fonctionné.
+    if (typeof refreshHomeScore === 'function') { try { refreshHomeScore(); } catch (x) {} }
+
     // Aucune fuite : on rassure, et on rappelle que la surveillance continue.
     if (!n) {
       document.getElementById('hibp-result').innerHTML =
@@ -7112,7 +7119,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-26-01';
+var APP_BUILD = '2026-08-26-02';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une
