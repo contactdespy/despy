@@ -7487,12 +7487,15 @@ async function checkDarkWebNow() {
   if (result) result.innerHTML = '<div style="color:var(--text2)">🔍 Analyse en cours... (peut prendre quelques secondes)</div>';
 
   try {
-    var r = await fetch('/.netlify/functions/hibp-check', {
+    // hibp-manuel, et NON hibp-check : cette dernière porte un `schedule` dans
+    // netlify.toml, et Netlify refuse au bord tout appel HTTP vers une fonction
+    // planifiée (403 sans corps). L'outil était donc mort ici aussi.
+    var r = await fetch('/.netlify/functions/hibp-manuel', {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: session.email, manual: true })
     });
-    var data = await r.json();
+    var data = await r.json().catch(function () { return {}; });
 
     if (typeof data.breachCount !== 'number') {
       // Service HIBP momentanément indisponible (clé, rate limit, réseau…)

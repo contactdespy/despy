@@ -2884,10 +2884,21 @@ async function runConseiller() {
 
 function openDarkWeb() {
   var s = session.get();
+  var email = (s && s.email) || '';
+  // L'adresse est AFFICHÉE, plus saisie. Le champ libre d'avant laissait taper
+  // n'importe quelle adresse : le détail des fuites — donc une information
+  // sensible — serait parti par email à quelqu'un qui n'a rien demandé. Le
+  // serveur ne vérifie désormais que l'adresse du compte connecté ; la montrer
+  // évite au membre de taper pour rien, et de croire à une panne quand le
+  // serveur refuse. Pour tester une autre adresse : despy.fr/verifier-email-pirate.
   openSheet('Email piraté ?',
-    '<p class="sheet-help">Nous vérifions si votre email apparaît dans les fuites de données du dark web. Aucun mot de passe n\'est jamais envoyé.</p>' +
-    '<input id="hibp-input" class="auth-input" type="email" placeholder="votre@email.fr" value="' + ((s && s.email) || '') + '">' +
-    '<button class="btn-primary" onclick="runDarkWeb()" style="margin-top:6px">Vérifier mon email</button>' +
+    '<p class="sheet-help">Nous vérifions si votre adresse apparaît dans les fuites de données connues. Aucun mot de passe n\'est jamais envoyé.</p>' +
+    '<div style="display:flex;align-items:center;gap:10px;background:var(--bg2,#F5F6FA);border:1px solid var(--line,#E5E5EA);border-radius:14px;padding:13px 14px;margin-bottom:12px">' +
+      '<span style="font-size:18px">📧</span>' +
+      '<span style="min-width:0"><span style="display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3)">Adresse vérifiée</span>' +
+      '<span style="display:block;font-size:15px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis">' + escapeHtmlA(email) + '</span></span>' +
+    '</div>' +
+    '<button class="btn-primary" onclick="runDarkWeb()" style="margin-top:2px">Vérifier mon email</button>' +
     '<div id="hibp-result"></div>'
   );
 }
@@ -2916,26 +2927,39 @@ function dwGesteHtml(titre, detail) {
 }
 
 async function runDarkWeb() {
-  var email = document.getElementById('hibp-input').value.trim().toLowerCase();
-  if (email.indexOf('@') === -1) return toast('Email invalide');
+  var s = session.get();
+  var email = ((s && s.email) || '').trim().toLowerCase();
+  if (email.indexOf('@') === -1) return toast('Reconnectez-vous pour lancer la vérification');
   document.getElementById('hibp-result').innerHTML = '<div class="spinner"></div>';
   try {
-    var r = await fetch('/.netlify/functions/hibp-check', {
+    // hibp-manuel, et NON hibp-check : cette dernière est une fonction
+    // planifiée, que Netlify bloque au bord par un 403 sans corps. `r.json()`
+    // levait alors une exception et le membre lisait « Erreur réseau ».
+    var r = await fetch('/.netlify/functions/hibp-manuel', {
       method: 'POST',
       headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
       body: JSON.stringify({ email: email })
     });
-    var data = await r.json();
+    // Une réponse sans corps JSON ne doit pas passer pour une panne de réseau :
+    // on la traite comme un service indisponible, ce qu'elle est.
+    var data = await r.json().catch(function () { return { error: 'reponse_illisible' }; });
 
-    if (!r.ok || data.unavailable) {
+    // Le serveur répond 200 avec un champ `error` quand HIBP ne répond pas.
+    // L'ancien test portait sur `data.unavailable`, un champ qui n'a jamais
+    // existé : la branche était morte, et une panne s'affichait en « Aucune
+    // fuite connue » — le pire mensonge possible pour un service de sécurité.
+    if (!r.ok || data.error) {
       document.getElementById('hibp-result').innerHTML =
         '<div class="result-card" style="color:var(--text2)">Le service de vérification est momentanément indisponible. Votre surveillance hebdomadaire, elle, continue de tourner — vous serez prévenu si quelque chose apparaît.</div>';
       return;
     }
 
-    var breaches = data.breaches || data.count || 0;
-    var liste = Array.isArray(breaches) ? breaches : [];
-    var n = Array.isArray(breaches) ? breaches.length : breaches;
+    // Le serveur renvoie `breachCount` (un nombre) et `breaches` (la liste).
+    // L'appli lisait `data.breaches || data.count` : les deux valaient
+    // `undefined`, donc n = 0 — « aucune fuite » y compris pour un membre
+    // présent dans quarante.
+    var liste = Array.isArray(data.breaches) ? data.breaches : [];
+    var n = typeof data.breachCount === 'number' ? data.breachCount : liste.length;
 
     // Aucune fuite : on rassure, et on rappelle que la surveillance continue.
     if (!n) {
@@ -7088,7 +7112,7 @@ function showInstallInstructions() {
 
 // Identifiant de build. À incrémenter à chaque déploiement de l'appli :
 // c'est lui qui déclenche la mise à jour automatique côté téléphone.
-var APP_BUILD = '2026-08-24-02';
+var APP_BUILD = '2026-08-26-01';
 
 // Mise à jour auto : au lancement, on demande au serveur la toute dernière
 // version (sans passer par le cache). Si le build a changé, on recharge une

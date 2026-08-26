@@ -183,82 +183,15 @@ async function sendStealerPush(email, newCount) {
   } catch (e) { console.error('push infostealer:', e.message); }
 }
 
-// ── Vérification MANUELLE à la demande pour UN email (authentifiée) ──
-async function handleManualCheck(supabase, rawEmail) {
-  const json = (obj) => ({ statusCode: 200, body: JSON.stringify(obj) });
-  const email = (rawEmail || '').toLowerCase().trim();
-  if (!email || !email.includes('@')) return json({ error: 'invalid_email', infected: null });
-
-  try {
-    const { data: client } = await supabase
-      .from('clients')
-      .select('email, name, prenom, known_stealers, trusted_contact_name, trusted_contact_email')
-      .eq('email', email)
-      .maybeSingle();
-
-    const stealers = await checkEmailStealers(email);
-    if (stealers === null) return json({ error: 'unavailable', infected: null });
-
-    const count = stealers.length;
-    const currentKeys = stealers.map(stealerKey);
-    const prenom = (client && (client.prenom || (client.name || '').split(' ')[0])) || 'cher membre';
-
-    if (client) {
-      await supabase.from('clients').update({
-        last_stealer_check: new Date().toISOString(),
-        known_stealers: currentKeys,
-        stealer_count: count,
-        updated_at: new Date().toISOString()
-      }).eq('email', email);
-    }
-
-    let emailSent = false;
-    if (count > 0) {
-      try {
-        const html = buildStealerAlertHTML(prenom, email, stealers, currentKeys);
-        const r = await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
-          body: JSON.stringify({
-            type: 'custom',
-            data: {
-              email,
-              subject: `🦠 Despy — Un de vos appareils a été infecté (${count} détecté${count > 1 ? 's' : ''})`,
-              html
-            }
-          })
-        });
-        emailSent = r.ok;
-      } catch (e) { console.error('send-email manuel infostealer:', e.message); }
-
-      if (client) await alertTrustedContact(client, count);
-    }
-
-    return json({ infected: count > 0, count, emailSent });
-  } catch (e) {
-    console.error('Infostealer manuel error:', e.message);
-    return json({ error: 'server', infected: null });
-  }
-}
-
+// Cette fonction est PLANIFIÉE (schedule dans netlify.toml), donc injoignable
+// en HTTP : Netlify répond 403 au bord, sans exécuter une ligne de ce fichier.
+// Elle portait un bloc « appel manuel authentifié » qui n'a donc jamais pu
+// s'exécuter — et qu'aucune page n'appelait. Il a été retiré : la vérification
+// à la demande côté client passe par hudsonrock-public.js, non planifié.
+// Le jour où il faudra une version authentifiée, elle devra vivre dans sa
+// propre fonction SANS `schedule` (voir hibp-manuel.js, même situation).
 exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-
-  // Appel manuel authentifié (POST avec un email) → on ne vérifie QUE cet email.
-  if (event.httpMethod === 'POST') {
-    let body = {};
-    try { body = JSON.parse(event.body || '{}'); } catch (e) {}
-    if (body.email) {
-      const { requireAuth } = require('./_auth');
-      const auth = requireAuth(event, body, body.email, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      });
-      if (!auth.ok) return auth.response;
-      return await handleManualCheck(supabase, body.email);
-    }
-  }
 
   // Boucle cron (tous les abonnés) : uniquement sur déclenchement planifié Netlify.
   const { isScheduled, notScheduled } = require('./_is-scheduled');
