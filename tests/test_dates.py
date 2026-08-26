@@ -32,10 +32,22 @@ MOIS = {'janvier': 1, 'février': 2, 'fevrier': 2, 'mars': 3, 'avril': 4,
 MOTIF = re.compile(
     r'(\d{1,2})\s*(?:er)?\s+(%s)\s*(\d{4})?' % '|'.join(MOIS), re.I)
 
-# Les pages vues par un prospect. L'appli membre (despy_app_v23.html) affiche
-# des dates VENUES DE LA BASE — un historique daté d'hier y est normal.
-PAGES = ['visite-domicile.html', 'index.html', 'formation.html',
-         'verifier-email-pirate.html', 'guide.html']
+# Les pages sont DÉCOUVERTES, pas listées. Une liste écrite à la main se
+# périme exactement comme la date qu'elle surveille : la première version de
+# ce banc citait une page qui n'existe pas et en oubliait deux qui existent.
+# Une page d'atterrissage créée demain sera couverte sans que personne y pense.
+HORS_SUJET = {
+    'despy_app_v23.html',   # l'appli membre : ses dates viennent de la base
+    'admin.html',           # console interne, aucun prospect ne la voit
+    '_mail_preview.html',   # outil de développement
+}
+
+
+def pages_publiques(racine):
+    return sorted(f for f in os.listdir(racine)
+                  if f.endswith('.html')
+                  and f not in HORS_SUJET
+                  and not f.startswith('google'))  # vérification de propriété
 
 # Une date peut être passée à bon droit : « supprimé le 14 mars », « fondée en
 # 2019 », un article de loi. Ce qui n'a pas le droit de l'être, c'est une
@@ -68,10 +80,9 @@ def main():
 
     fautes = []
     examinees = 0
-    for page in PAGES:
+    pages = pages_publiques(RACINE)
+    for page in pages:
         chemin = os.path.join(RACINE, page)
-        if not os.path.exists(chemin):
-            continue
         lignes = sans_commentaires(
             io.open(chemin, encoding='utf-8').read()).splitlines()
         for i, ligne in enumerate(lignes):
@@ -95,9 +106,12 @@ def main():
                     continue
                 fautes.append((page, i + 1, d, contexte.strip()[:74]))
 
-    print('  %d date(s) en toutes lettres examinée(s) dans %d page(s)'
-          % (examinees, len([p for p in PAGES
-                             if os.path.exists(os.path.join(RACINE, p))])))
+    # Les pages sont nommées : c'est ce qui permet de voir d'un coup d'œil
+    # qu'une nouvelle page d'atterrissage est bien surveillée — ou qu'elle a
+    # atterri dans les exclusions par mégarde.
+    print('  %d date(s) en toutes lettres examinée(s) dans %d page(s) :'
+          % (examinees, len(pages)))
+    print('  %s' % ', '.join(p[:-5] for p in pages))
     print()
     if not fautes:
         print('  OK    aucune promesse ne porte une date déjà passée')
