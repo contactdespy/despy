@@ -19,9 +19,11 @@
 # Usage : python3 tests/test_dates.py
 # ════════════════════════════════════════════
 
-import datetime, io, os, re, sys
+import datetime, io, json, os, re, subprocess, sys, tempfile
 
 RACINE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+JSC = ('/System/Library/Frameworks/JavaScriptCore.framework/Versions/A'
+       '/Helpers/jsc')
 
 MOIS = {'janvier': 1, 'février': 2, 'fevrier': 2, 'mars': 3, 'avril': 4,
         'mai': 5, 'juin': 6, 'juillet': 7, 'août': 8, 'aout': 8,
@@ -69,6 +71,91 @@ def sans_commentaires(texte):
     texte = re.sub(r'<!--.*?-->', blanchir, texte, flags=re.S)
     texte = re.sub(r'/\*.*?\*/', blanchir, texte, flags=re.S)
     return texte
+
+
+SIMULATION = r"""
+var MOISN = {'janvier':1,'février':2,'mars':3,'avril':4,'mai':5,'juin':6,
+             'juillet':7,'août':8,'septembre':9,'octobre':10,'novembre':11,
+             'décembre':12};
+// Liste de référence recopiée À LA MAIN (service-public.fr, régime
+// Alsace-Moselle : Vendredi saint et 26 décembre en plus). La recalculer avec
+// la formule qu'on teste ne vérifierait rigoureusement rien.
+var FERIES = {
+ 2026: ['1-1','4-3','4-6','5-1','5-8','5-14','5-25','7-14','8-15','11-1','11-11','12-25','12-26'],
+ 2027: ['1-1','3-26','3-29','5-1','5-6','5-8','5-17','7-14','8-15','11-1','11-11','12-25','12-26'] };
+var pb = [], ecarts = {}, n = 0;
+for (var i = 0; i < 400; i++) {
+  // Des dates construites jour par jour, JAMAIS par ajout de millisecondes :
+  // au passage à l'heure d'hiver, 86 400 000 ms ne font plus une journée et
+  // la première version de ce banc a accusé la page à tort pendant 130 jours.
+  var jour = new Date(2026, 7, 27 + i);
+  JOUR = jour; POSE = []; run(); n++;
+  var t = POSE[0] || '';
+  var m = t.match(/^dès le \w+ (\d{1,2})(?:er)? (\S+)$/);
+  if (!m) { pb.push(jour.toDateString() + ' : texte illisible « ' + t + ' »'); continue; }
+  var J = parseInt(m[1], 10), M = MOISN[m[2]];
+  if (!M) { pb.push(jour.toDateString() + ' : mois inconnu « ' + t + ' »'); continue; }
+  var an = (M < jour.getMonth() + 1) ? jour.getFullYear() + 1 : jour.getFullYear();
+  if ((FERIES[an] || []).indexOf(M + '-' + J) !== -1)
+    pb.push('FÉRIÉ ANNONCÉ : ' + jour.toDateString() + ' → ' + t);
+  var ecart = Math.round((new Date(an, M - 1, J) - jour) / 86400000);
+  ecarts[ecart] = (ecarts[ecart] || 0) + 1;
+  if (ecart < 3 || ecart > 6)
+    pb.push('délai de ' + ecart + ' j : ' + jour.toDateString() + ' → ' + t);
+}
+print(JSON.stringify({ n: n, pb: pb.slice(0, 8), total: pb.length, ecarts: ecarts }));
+"""
+
+
+def simuler_creneau():
+    """Rejoue le script de la page sur 400 jours consécutifs.
+
+    Une date calculée ne peut pas être relue à l'œil : elle est juste
+    aujourd'hui et fausse dans trois mois, exactement comme la date figée
+    qu'elle remplace. La seule vérification qui vaille est de faire défiler le
+    calendrier."""
+    page = os.path.join(RACINE, 'visite-domicile.html')
+    src = io.open(page, encoding='utf-8').read()
+    m = re.search(r'<script>\n(/\* ── La prochaine.*?)</script>', src, re.S)
+    if not m:
+        print('  ÉCHEC le script de calcul du créneau est introuvable dans '
+              'visite-domicile.html')
+        return False
+    corps = (m.group(1)
+             .replace('(function () {', 'var JOUR; var POSE=[]; function run() {')
+             .replace('})();', '}')
+             .replace('var d = new Date();',
+                      'var d = new Date(JOUR.getFullYear(), JOUR.getMonth(), JOUR.getDate());'))
+    harnais = ('var document={querySelectorAll:function(){'
+               'return [{set textContent(v){POSE.push(v)}}];}};\n')
+
+    with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False,
+                                     encoding='utf-8') as f:
+        f.write(harnais + corps + SIMULATION)
+        chemin = f.name
+    try:
+        r = subprocess.run([JSC, chemin], capture_output=True, text=True, timeout=60)
+    finally:
+        os.unlink(chemin)
+
+    brut = (r.stdout or '').strip()
+    if r.returncode != 0 or not brut:
+        print('  ÉCHEC le script de la page n\'a pas pu être exécuté :')
+        print('        ' + ((r.stderr or '').strip()[:400] or brut[:400]))
+        return False
+    d = json.loads(brut.splitlines()[-1])
+
+    if d['total']:
+        print('  ÉCHEC %d jour(s) sur %d produisent une annonce fautive'
+              % (d['total'], d['n']))
+        for l in d['pb']:
+            print('        %s' % l)
+        return False
+    delais = '  ·  '.join('%s j ×%d' % (k, v)
+                          for k, v in sorted(d['ecarts'].items(), key=lambda x: int(x[0])))
+    print('  OK    %d jours simulés : jamais un férié, jamais un texte cassé' % d['n'])
+    print('        délais annoncés : %s' % delais)
+    return True
 
 
 def main():
@@ -119,10 +206,18 @@ def main():
         print('  ÉCHEC %s ligne %d — %s est passé' % (page, n, d.strftime('%d/%m/%Y')))
         print('        « %s »' % ctx)
 
+    ok = not fautes
+
     print()
-    print('RÉSULTAT : ' + ('rien de périmé à l\'affiche.' if not fautes
-                           else 'au moins une page annonce une date passée.'))
-    return 0 if not fautes else 1
+    print('═' * 74)
+    print('LA DATE QUE LA PAGE DE PUB CALCULE ELLE-MÊME')
+    print('═' * 74)
+    ok = simuler_creneau() and ok
+
+    print()
+    print('RÉSULTAT : ' + ('rien de périmé à l\'affiche.' if ok
+                           else 'au moins un contrôle a échoué.'))
+    return 0 if ok else 1
 
 
 if __name__ == '__main__':
