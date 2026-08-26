@@ -113,6 +113,34 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: `Webhook Error: ${err.message}` };
   }
 
+  // ── Les écritures que le client a payées ────────────────────────────────
+  // Elles étaient lancées sans jamais lire la réponse de la base. Une seule
+  // qui rate en silence et le client devient un abonné fantôme : débité chez
+  // Stripe, « compte gratuit » chez nous — et prévenu de rien, puisque l'email
+  // de bienvenue, lui, part quand même. Personne ne s'en apercevrait avant sa
+  // réclamation.
+  //
+  // Stripe REJOUE pendant 3 jours tout webhook qui ne répond pas 2xx. On s'en
+  // sert comme filet : tant que la base n'a pas enregistré ce qui a été payé,
+  // on refuse d'accuser réception, et Stripe revient frapper. Une panne
+  // devient un retard qui se répare tout seul, au lieu d'une perte définitive.
+  //
+  // Les emails partent APRÈS les écritures, pour qu'un rejeu ne les double pas.
+  const echecs = [];
+  const ecrire = async (quoi, requete) => {
+    const { error } = await requete;
+    if (error) {
+      console.error(`[stripe] ÉCHEC ${quoi} :`, error.message);
+      echecs.push(`${quoi} : ${error.message}`);
+      return false;
+    }
+    return true;
+  };
+  const redemander = () => {
+    console.error('[stripe] webhook non acquitté — Stripe rejouera :', echecs.join(' | '));
+    return { statusCode: 500, body: JSON.stringify({ error: 'base indisponible', echecs }) };
+  };
+
   // ── Paiement réussi : activation abonnement ──
   if (stripeEvent.type === 'checkout.session.completed') {
     const session = stripeEvent.data.object;
@@ -150,19 +178,25 @@ exports.handler = async (event) => {
       if (eFiche) {
         // Une colonne optionnelle absente ne doit pas faire échouer
         // l'activation de l'abonnement : on rejoue sans les champs annexes.
+        // Ce repli, lui, n'a plus le droit d'échouer en silence.
         delete fiche.telephone; delete fiche.date_naissance;
-        await supabase.from('clients').upsert(fiche, { onConflict: 'email' });
         console.warn('webhook clients upsert (repli sans tel/dob):', eFiche.message);
+        await ecrire('activation de la fiche client',
+          supabase.from('clients').upsert(fiche, { onConflict: 'email' }));
       }
 
-      await supabase.from('subscriptions').upsert({
-        email,
-        plan,
-        status: 'active',
-        start_date: new Date().toISOString(),
-        end_date: endDate,
-        stripe_subscription_id: session.subscription,
-      }, { onConflict: 'email' });
+      await ecrire('enregistrement de l\'abonnement',
+        supabase.from('subscriptions').upsert({
+          email,
+          plan,
+          status: 'active',
+          start_date: new Date().toISOString(),
+          end_date: endDate,
+          stripe_subscription_id: session.subscription,
+        }, { onConflict: 'email' }));
+
+      // Avant les emails : un rejeu ne doit pas envoyer deux fois la bienvenue.
+      if (echecs.length) return redemander();
 
       console.log(`✅ Abonnement activé : ${email} — ${plan}`);
       await sendEmail('welcome', { email, name, prenom, plan });
@@ -186,10 +220,12 @@ exports.handler = async (event) => {
 
     const customer = await stripe.customers.retrieve(invoice.customer);
     if (customer.email) {
-      await supabase.from('clients').update({
+      // Sans lecture de l'erreur, un renouvellement encaissé mais non écrit
+      // faisait retomber un abonné en « compte gratuit » du jour au lendemain.
+      if (!await ecrire('renouvellement', supabase.from('clients').update({
         subscribed: true,
         updated_at: new Date().toISOString()
-      }).eq('email', customer.email);
+      }).eq('email', customer.email))) return redemander();
       // Le paiement est passé : on retire le signalement s'il y en avait un.
       await marquerPaiementEnDefaut(supabase, customer.email, false);
 
@@ -248,16 +284,20 @@ exports.handler = async (event) => {
         const oldPlan = existing?.plan;
 
         if (oldPlan !== newPlan) {
-          await supabase.from('clients').update({
-            plan: newPlan,
-            subscribed: active,
-            updated_at: new Date().toISOString()
-          }).eq('email', email);
+          await ecrire('changement de formule (fiche client)',
+            supabase.from('clients').update({
+              plan: newPlan,
+              subscribed: active,
+              updated_at: new Date().toISOString()
+            }).eq('email', email));
 
-          await supabase.from('subscriptions').update({
-            plan: newPlan,
-            status: active ? 'active' : subscription.status
-          }).eq('email', email);
+          await ecrire('changement de formule (abonnement)',
+            supabase.from('subscriptions').update({
+              plan: newPlan,
+              status: active ? 'active' : subscription.status
+            }).eq('email', email));
+
+          if (echecs.length) return redemander();
 
           console.log(`♻️ Formule mise à jour : ${email} — ${oldPlan || '?'} → ${newPlan}`);
 
@@ -285,16 +325,23 @@ exports.handler = async (event) => {
       const raison = (subscription.cancellation_details && subscription.cancellation_details.reason) || '';
       const impaye = raison === 'payment_failed' || (!raison && await etaitEnDefaut(supabase, customer.email));
 
-      await supabase.from('clients').update({
-        subscribed: false,
-        plan: 'free',
-        updated_at: new Date().toISOString()
-      }).eq('email', customer.email);
+      await ecrire('fin d\'abonnement (fiche client)',
+        supabase.from('clients').update({
+          subscribed: false,
+          plan: 'free',
+          updated_at: new Date().toISOString()
+        }).eq('email', customer.email));
       await marquerPaiementEnDefaut(supabase, customer.email, false);
 
-      await supabase.from('subscriptions').update({
-        status: impaye ? 'unpaid' : 'cancelled'
-      }).eq('email', customer.email);
+      await ecrire('fin d\'abonnement (abonnement)',
+        supabase.from('subscriptions').update({
+          status: impaye ? 'unpaid' : 'cancelled'
+        }).eq('email', customer.email));
+
+      // Avant l'email : annoncer une résiliation qui n'a pas été enregistrée,
+      // c'est promettre une chose et en faire une autre. Et au rejeu, le
+      // membre recevrait deux fois le même adieu.
+      if (echecs.length) return redemander();
 
       console.log(`❌ Fin d'abonnement (${impaye ? 'impayé' : 'résiliation'}) : ${customer.email}`);
       // Envoyer « votre résiliation est bien prise en compte » à quelqu'un
