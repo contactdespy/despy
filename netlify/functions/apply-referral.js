@@ -65,17 +65,39 @@ exports.handler = async (event) => {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Code invalide ou expiré' }) };
     }
 
-    // Appliquer : +1 mois pour les deux
-    await supabase.from('clients').update({
+    // Appliquer : +1 mois pour les deux.
+    //
+    // Ces deux écritures étaient lancées sans jamais lire la réponse de la
+    // base, et le message « vous gagnez 1 mois offert (et votre parrain
+    // aussi) » partait dans tous les cas. Un mois offert promis mais jamais
+    // inscrit, c'est un mois facturé plus tard à quelqu'un à qui on avait dit
+    // le contraire — et personne pour s'en apercevoir, puisque l'écran, lui,
+    // disait que tout allait bien.
+    //
+    // L'ORDRE compte. C'est l'écriture du filleul qui pose `referred_by`, et
+    // `referred_by` interdit toute seconde tentative (refus plus haut). Si
+    // elle passait en premier et que celle du parrain ratait, le mois du
+    // parrain serait perdu DÉFINITIVEMENT : plus aucun rejeu possible. On
+    // crédite donc le parrain d'abord. Dans le pire des cas un rejeu lui offre
+    // un mois de trop — c'est un cadeau, pas une promesse trahie.
+    const rate = (quoi, e) => {
+      console.error(`[parrainage] ÉCHEC ${quoi} :`, e.message);
+      return { statusCode: 500, headers, body: JSON.stringify({
+        error: 'Le code n\'a pas pu être appliqué. Réessayez dans un instant.' }) };
+    };
+
+    const { error: eParrain } = await supabase.from('clients').update({
+      bonus_months: (referrer.bonus_months || 0) + 1,
+      updated_at: new Date().toISOString()
+    }).eq('email', referrer.email);
+    if (eParrain) return rate('crédit du parrain', eParrain);
+
+    const { error: eFilleul } = await supabase.from('clients').update({
       referred_by: cleanCode,
       bonus_months: (client.bonus_months || 0) + 1,
       updated_at: new Date().toISOString()
     }).eq('email', norm);
-
-    await supabase.from('clients').update({
-      bonus_months: (referrer.bonus_months || 0) + 1,
-      updated_at: new Date().toISOString()
-    }).eq('email', referrer.email);
+    if (eFilleul) return rate('crédit du filleul', eFilleul);
 
     return {
       statusCode: 200,

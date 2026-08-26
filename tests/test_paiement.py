@@ -230,23 +230,30 @@ def main():
     # Le banc ci-dessus ne voit que les chemins qu'il emprunte. Cette relecture,
     # elle, voit TOUT le fichier : une écriture ajoutée demain sans garde-fou
     # sera signalée ici même si aucun scénario ne passe dessus.
+    #
+    # Elle couvre les quatre fichiers où une écriture ratée coûte de l'argent à
+    # quelqu'un : l'abonnement lui-même, et les trois endroits qui promettent
+    # un mois offert (parrainage). Ailleurs dans le code, une écriture perdue
+    # se rattrape ; ici, non — le membre a payé, ou on lui a promis.
     aveugles = []
-    lignes = src.splitlines()
-    for i, l in enumerate(lignes):
-        if '.upsert(' not in l and '.update(' not in l and '.insert(' not in l:
-            continue
-        if 'supabase' not in l and 'supabase' not in (lignes[i - 1] if i else ''):
-            continue
-        # Surveillée si : passée à ecrire(), ou sa réponse est lue (const {error}).
-        contexte = '\n'.join(lignes[max(0, i - 3):i + 1])
-        if 'ecrire(' in contexte or 'error' in contexte:
-            continue
-        aveugles.append((i + 1, l.strip()[:60]))
+    for nom in ('stripe-webhook', 'apply-referral', 'auth-google', 'register-free'):
+        lignes = open(os.path.join(RACINE, 'netlify', 'functions', nom + '.js'),
+                      encoding='utf-8').read().splitlines()
+        for i, l in enumerate(lignes):
+            if '.upsert(' not in l and '.update(' not in l and '.insert(' not in l:
+                continue
+            if 'supabase' not in l and 'supabase' not in (lignes[i - 1] if i else ''):
+                continue
+            # Surveillée si : passée à ecrire(), ou sa réponse est lue.
+            contexte = '\n'.join(lignes[max(0, i - 3):i + 1])
+            if 'ecrire(' in contexte or 'error' in contexte:
+                continue
+            aveugles.append((nom, i + 1, l.strip()[:56]))
     ok = ok and not aveugles
-    print('  %-5s %d écriture(s) sans surveillance'
+    print('  %-5s %d écriture(s) sans surveillance sur les 4 fichiers de l\'argent'
           % ('OK' if not aveugles else 'ÉCHEC', len(aveugles)))
-    for n, l in aveugles:
-        print('        ligne %d : %s' % (n, l))
+    for f, n, l in aveugles:
+        print('        %s ligne %d : %s' % (f, n, l))
 
     print()
     print('RÉSULTAT : ' + ('un paiement perdu est impossible.' if ok

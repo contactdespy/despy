@@ -167,13 +167,19 @@ exports.handler = async (event) => {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Erreur création compte' }) };
     }
 
-    // Récompenser le parrain : +1 mois bonus
+    // Récompenser le parrain : +1 mois bonus.
+    // Le drapeau suivait l'INTENTION, pas le résultat : l'inscrit lisait
+    // « 1 mois offert appliqué » même quand la base avait refusé l'écriture,
+    // et son parrain ne recevait rien. Le compte étant créé, aucun rejeu
+    // n'était possible — la trace dans les logs est la seule façon de le
+    // rattraper à la main.
     if (referrer) {
-      await supabase.from('clients').update({
+      const { error: eBonus } = await supabase.from('clients').update({
         bonus_months: (referrer.bonus_months || 0) + 1,
         updated_at: new Date().toISOString()
       }).eq('email', referrer.email);
-      referralBonusApplied = true;
+      if (eBonus) console.error('[parrainage] ÉCHEC crédit du parrain :', eBonus.message);
+      referralBonusApplied = !eBonus;
     }
 
     // Email de bienvenue

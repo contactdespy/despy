@@ -88,12 +88,13 @@ exports.handler = async (event) => {
       // Compte existant : on connecte, on lie le google_id si pas encore lié
       const update = { updated_at: new Date().toISOString() };
       if (!existing.google_id) update.google_id = googleId;
-      try {
-        await supabase.from('clients').update(update).eq('email', email);
-      } catch (e) {
-        // Si la colonne google_id n'existe pas encore, on ignore — pas bloquant
-        console.warn('Update google_id failed (column may not exist):', e.message);
-      }
+      // Le try/catch qui entourait cet appel ne servait à rien : supabase-js
+      // ne LÈVE pas d'exception sur une erreur SQL, il la RENVOIE. Une colonne
+      // manquante passait donc à travers sans un mot, et le compte Google
+      // n'était jamais lié — la connexion suivante repassait par le même
+      // chemin. Non bloquant, mais il fallait au moins que ça se voie.
+      const { error: eLien } = await supabase.from('clients').update(update).eq('email', email);
+      if (eLien) console.warn('Liaison google_id impossible (colonne absente ?) :', eLien.message);
 
       return {
         statusCode: 200,
@@ -165,11 +166,16 @@ exports.handler = async (event) => {
     }
 
     if (referrer) {
-      await supabase.from('clients').update({
+      // `referralBonusApplied` était mis à vrai sans jamais regarder si la
+      // base avait accepté l'écriture. Le nouvel inscrit lisait donc « 1 mois
+      // offert appliqué » alors que le parrain, lui, n'avait rien reçu — et
+      // le compte étant créé, aucun rejeu n'était possible.
+      const { error: eBonus } = await supabase.from('clients').update({
         bonus_months: (referrer.bonus_months || 0) + 1,
         updated_at: new Date().toISOString()
       }).eq('email', referrer.email);
-      referralBonusApplied = true;
+      if (eBonus) console.error('[parrainage] ÉCHEC crédit du parrain :', eBonus.message);
+      referralBonusApplied = !eBonus;
     }
 
     // Email de bienvenue (best-effort)
