@@ -30,9 +30,19 @@ const FENETRE_JOURS = 120;
 // articles de plusieurs mois.
 const PUSH_JOURS = 12;
 
-// La presse est plus bavarde que les institutions : une vingtaine d'articles
-// retenus par jour, contre quatre par trimestre côté officiel.
-const PRESSE_JOURS = 10;
+// Chaque flux de presse borne DÉJÀ sa propre fenêtre, dans sa requête même :
+// `when:7d` pour le national, `when:30d` pour le local. Ce plafond-ci n'est
+// qu'un filet, et il doit donc épouser la plus large des deux.
+//
+// Il était à 10 jours dans la première version, ce qui aurait vidé le local
+// sans rien dire : ce flux ne rend que 17 articles en 30 jours, et « Foire aux
+// vins de Colmar : attention aux arnaques » a 26 jours. On aurait jeté la
+// partie la plus précieuse — celle qui n'a aucun équivalent officiel — pour
+// ne garder que le national, que tout le monde voit déjà passer.
+//
+// Un fait divers local de trois semaines reste utile : l'arnaque, elle,
+// circule encore.
+const PRESSE_JOURS = 30;
 
 // Plafond par passage. Sur les flux réels, le premier passage proposerait 24
 // articles d'un coup ; un email de 24 titres ne se lit pas, il se classe. On
