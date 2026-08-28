@@ -27,6 +27,10 @@ const AGE_MAX_JOURS = 120;
 // faux qui a masqué la panne pendant des mois : mieux vaut une seconde de
 // latence qu'un mensonge tranquille. Ne coûte rien le reste du temps, puisque
 // dès que le cron alimente la table, ce chemin n'est plus emprunté.
+//
+// `collecterAlertes` et NON `collecterPresse`, délibérément : ce chemin publie
+// sans relecture humaine. Il ne doit donc voir que les sources officielles. La
+// presse n'entre dans l'appli que par la file de validation.
 async function enDirect() {
   const brutes = await collecterAlertes(AGE_MAX_JOURS);
   return brutes.slice(0, 15).map(a => ({
@@ -50,9 +54,15 @@ exports.handler = async (event) => {
   try {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
+    // « status IS NULL OR status = 'publie' » et non « status = 'publie' » :
+    // toutes les alertes déjà en base sont antérieures à la colonne et n'ont
+    // donc pas de statut. Les exiger publiées explicitement aurait vidé
+    // l'écran d'un coup au déploiement — exactement le « Aucune alerte en
+    // cours » que ce module a mis des mois à cesser d'afficher à tort.
     const { data, error } = await supabase
       .from('national_alerts')
       .select('title, body, source, url, created_at')
+      .or('status.is.null,status.eq.publie')
       .order('created_at', { ascending: false })
       .limit(60);
 

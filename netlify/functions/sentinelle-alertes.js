@@ -136,9 +136,19 @@ exports.handler = async (event) => {
     const etats = await diagnostiquer();
 
     // 2. Quand la base a-t-elle reçu quelque chose pour la dernière fois ?
+    // Uniquement ce qui est PUBLIÉ, et c'est tout l'intérêt de la question.
+    //
+    // Depuis que la veille presse écrit aussi dans cette table, une simple
+    // « dernière ligne écrite » resterait fraîche en permanence : une dizaine
+    // d'articles en attente y sont ajoutés deux fois par jour. La sentinelle
+    // aurait donc trouvé la chaîne en pleine forme au moment précis où plus
+    // rien n'arrivait dans l'application — devenant aveugle à ce qu'elle
+    // surveille. La bonne question reste : « quand l'appli a-t-elle affiché
+    // quelque chose de nouveau pour la dernière fois ? »
     const { data: recentes, error: erreurBase } = await supabase
       .from('national_alerts')
       .select('created_at, title')
+      .or('status.is.null,status.eq.publie')
       .order('created_at', { ascending: false })
       .limit(1);
 
