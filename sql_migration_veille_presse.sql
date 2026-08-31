@@ -21,6 +21,31 @@
 -- Tout est en IF NOT EXISTS : réexécutable sans risque.
 -- ════════════════════════════════════════════
 
+-- ── Filet : la table existe-t-elle seulement ? ──────────────────────────
+-- La migration précédente est passée à la main dans Supabase, et rien dans
+-- le dépôt ne prouve qu'elle l'ait été. Si elle ne l'a pas été, tout ce qui
+-- suit échouerait sur « relation national_alerts does not exist » — et le
+-- script s'arrêterait à la première ligne, sans rien avoir fait.
+--
+-- Cette création est donc un doublon volontaire : sans effet si la table est
+-- déjà là, salvatrice sinon. Elle doit rester identique à celle de
+-- sql_migration_alertes_nationales.sql.
+CREATE TABLE IF NOT EXISTS national_alerts (
+  id          BIGSERIAL PRIMARY KEY,
+  title       TEXT NOT NULL,
+  body        TEXT,
+  source      TEXT,
+  url         TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Même raisonnement pour l'unicité des URL venues de sources externes : nos
+-- propres publications (vagues, fiches de saison) partagent leurs URL et
+-- doivent rester hors du périmètre, sinon la deuxième serait refusée.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_national_alerts_url
+  ON national_alerts (url)
+  WHERE url IS NOT NULL AND COALESCE(source, '') NOT LIKE 'Despy%';
+
 -- ── Les deux colonnes ───────────────────────────────────────────────────
 -- 'publie'    : visible dans l'appli et sur le site ;
 -- 'a_valider' : en attente d'un clic humain, invisible ;
