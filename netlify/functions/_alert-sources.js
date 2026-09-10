@@ -105,6 +105,12 @@ const SOURCES = [
     // On réimpose donc nous-mêmes le territoire. Les communes citées sont les
     // plus peuplées du Bas-Rhin, plus les deux voisines que la presse associe
     // toujours à la région.
+    //
+    // La comparaison se fait en SOUS-CHAÎNE, et il faut la laisser ainsi :
+    // « alsacien » doit attraper « ces AlsacienS » et « l'AlsacienNE ». Passer
+    // au mot entier — la correction qui vient naturellement à l'esprit — perd
+    // ces deux formes sans rien régler par ailleurs, puisque « L'Alsace »,
+    // le nom du journal, est déjà un mot entier.
     exige: ['bas-rhin', 'strasbourg', 'alsace', 'alsacien', 'haguenau',
             'selestat', 'saverne', 'schiltigheim', 'illkirch', 'bischheim',
             'obernai', 'molsheim', 'wissembourg', 'colmar', 'mulhouse']
@@ -411,9 +417,31 @@ async function lireSource(source) {
     }
     // Exigence propre à la source, quand on ne peut pas faire confiance au
     // moteur de recherche pour la respecter (voir `exige` plus haut).
+    //
+    // Dans le TITRE seul. Le « résumé » de Google Actualités n'est pas un
+    // résumé : c'est le titre répété, suivi du nom du journal — il n'y a pas
+    // une ligne d'article dedans. Chercher le territoire là-dedans revenait
+    // donc à ajouter « ou bien le journal s'appelle L'Alsace », qui couvre
+    // l'actualité nationale comme n'importe quel autre titre de presse.
+    //
+    // Relevé sur le flux réel du 10 septembre 2026 : 8 articles retenus, dont
+    // 2 ne tenaient qu'à cette manchette — « C'est quoi le SIM-swapping »
+    // (explication nationale) et « un faux théâtre antique : un Italien
+    // condamné ». Ce dernier est celui-là même qu'on avait fini par bloquer à
+    // la main dans HORS_SUJET_PRESSE ('theatre antique') : on soignait le
+    // symptôme, la porte d'entrée est ici.
+    //
+    // Le titre n'est pas seulement plus sévère, il est plus JUSTE : ce jour-là
+    // il laissait passer le Bas-Rhin de TF1 Info, de BFM et de 20 Minutes,
+    // c'est-à-dire les vraies histoires locales que racontent des journaux
+    // nationaux — celles qu'une lecture de la manchette manquerait toutes.
+    // (Ce qu'elles deviennent ensuite regarde le tri, pas ce filtre-ci.)
+    //
+    // Même règle que `pertinentPourSenior` plus haut : ce qui fait ENTRER un
+    // article se lit dans son titre, le résumé ne sert qu'à écarter.
     if (source.exige) {
       bruts = bruts.filter(b => {
-        const t = aplatir(b.titre + ' ' + (b.resume || ''));
+        const t = aplatir(b.titre);
         return source.exige.some(k => t.indexOf(k) !== -1);
       });
     }

@@ -19,7 +19,8 @@
 # Usage : python3 tests/test_alertes.py
 # ════════════════════════════════════════════
 
-import io, json, os, re, subprocess, sys, tempfile, unicodedata, urllib.request
+import email.utils, io, json, os, re, subprocess, sys, tempfile, time
+import unicodedata, urllib.request
 
 RACINE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 MODULE = os.path.join(RACINE, 'netlify', 'functions', '_alert-sources.js')
@@ -79,7 +80,8 @@ def sources_du_module(src):
     URL est construite autrement, le test suit sans qu'on y touche."""
     r = jsc(socle() + '\n' + src + '\n'
             + 'print(JSON.stringify(module.exports.SOURCES.map(function(s){'
-            + ' return { nom: s.nom, url: s.url, confiance: s.confiance }; })));')
+            + ' return { nom: s.nom, url: s.url, confiance: s.confiance,'
+            + ' exige: s.exige || null }; })));')
     brut = (r.stdout or '').strip()
     if r.returncode != 0 or not brut:
         sys.exit('ERREUR : le module ne se charge pas :\n'
@@ -95,6 +97,76 @@ def telecharger(url):
     except Exception as e:
         print('  !! %s : %s' % (url, e))
         return 0, ''
+
+
+# ── Le territoire, sur un flux fabriqué ──────────────────────────────────────
+# Le contrôle « presse locale » plus bas travaille sur l'actualité du jour :
+# il ne prouve la règle que si un article la viole aujourd'hui. Le 10 septembre
+# 2026 il en existait deux ; demain, zéro, et la régression passerait inaperçue
+# jusqu'au jour où elle sortirait dans un email.
+#
+# On rejoue donc la même règle sur un flux écrit à la main, calqué au caractère
+# près sur ce que Google Actualités renvoie vraiment — et notamment sur son
+# <description>, qui n'est PAS un résumé mais le titre suivi du nom du journal.
+# C'est cette confusion qui laissait entrer le national par la manchette de
+# « L'Alsace ».
+#
+# Les trois articles ci-dessous tiennent les deux bouts de la décision :
+# retirer le corps du texte (sinon le n°1 rentre), et garder la comparaison en
+# sous-chaîne (sinon le n°3 sort).
+ARTICLES_TERRITOIRE = [
+    # Le journal s'appelle « L'Alsace », le sujet est national. À ÉCARTER.
+    ("C'est quoi le SIM-swapping, cette arnaque qui peut vider vos comptes "
+     "en une minute ?", "L'Alsace", False),
+    # Le Bas-Rhin raconté par une chaîne nationale. À GARDER : c'est le titre
+    # qui dit le territoire, pas la manchette.
+    ('Dans le Bas-Rhin, une arnaque au faux conseiller bancaire vise '
+     'les retraités', 'BFM', True),
+    # « Alsaciens » au pluriel : à GARDER, et c'est ce que perdrait une
+    # comparaison en mot entier.
+    ('Ces Alsaciens visés par une arnaque au faux coursier bancaire',
+     '20 Minutes', True),
+]
+
+
+def flux_fabrique():
+    """Un RSS Google Actualités de synthèse, au format exact de l'original."""
+    items = []
+    for i, (titre, journal, _) in enumerate(ARTICLES_TERRITOIRE):
+        date = email.utils.formatdate(time.time() - (i + 1) * 3600, usegmt=True)
+        lien = 'https://news.google.com/rss/articles/FABRIQUE%d' % i
+        # Google échappe le HTML de sa description : &lt;a href=…&gt;
+        desc = ('&lt;a href="%s"&gt;%s&lt;/a&gt;&amp;nbsp;&amp;nbsp;'
+                '&lt;font color="#6f6f6f"&gt;%s&lt;/font&gt;'
+                % (lien, xml_echappe(titre), xml_echappe(journal)))
+        items.append(
+            '<item><title>%s - %s</title><link>%s</link>'
+            '<guid isPermaLink="false">%s</guid><pubDate>%s</pubDate>'
+            '<description>%s</description>'
+            '<source url="https://exemple.fr">%s</source></item>'
+            % (xml_echappe(titre), xml_echappe(journal), lien, lien, date,
+               desc, xml_echappe(journal)))
+    return ('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>'
+            '<title>Fabriqué</title>' + ''.join(items) + '</channel></rss>')
+
+
+def xml_echappe(t):
+    return t.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+
+def controle_territoire(src, sources):
+    """Renvoie les titres retenus quand on ne sert QUE le flux fabriqué."""
+    locale = next((s for s in sources if s.get('exige')), None)
+    if not locale:
+        return None
+    r = jsc(socle(json.dumps({locale['url']: flux_fabrique()})) + '\n' + src + '\n'
+            + 'module.exports.collecterPresse(400).then(function (l) {'
+            + ' print(JSON.stringify(l.map(function (a) { return a.title; })));'
+            + ' }).catch(function (e) { print(JSON.stringify([String(e)])); });')
+    brut = (r.stdout or '').strip()
+    if r.returncode != 0 or not brut:
+        return ['ERREUR : ' + ((r.stderr or '').strip()[:300] or '(rien)')]
+    return json.loads(brut.splitlines()[-1])
 
 
 def main():
@@ -226,6 +298,12 @@ Promise.all([M.collecterAlertes(400), M.collecterPresse(400)])
     controle('faits différents → non regroupés', d.get('histoire_non'), False)
     controle('même montant volé → regroupé', d.get('histoire_montant'), True)
     controle('même année ≠ même histoire', d.get('histoire_annee'), False)
+
+    # Sur flux fabriqué : la règle du territoire, indépendamment de l'actualité
+    # du jour (voir ARTICLES_TERRITOIRE).
+    controle('territoire exigé dans le TITRE, pas dans la manchette',
+             controle_territoire(src, sources),
+             [t for t, _, garde in ARTICLES_TERRITOIRE if garde])
 
     # Toutes les sources doivent répondre. Un 404 silencieux, c'est une source
     # qui meurt sans que personne ne l'apprenne — le défaut d'origine.
