@@ -35,7 +35,7 @@ JSC = ('/System/Library/Frameworks/JavaScriptCore.framework/Versions/A'
        '/Helpers/jsc')
 
 # Les modules réels chargés dans le bac à sable. Tout le reste est simulé.
-REELS = ['_privacy-sign', '_presse-recap', '_alert-sources',
+REELS = ['_privacy-sign', '_presse-recap', '_alert-sources', '_push',
          '_is-scheduled', 'national-alerts', 'alert-moderate', 'list-alerts']
 
 
@@ -52,13 +52,20 @@ var process = { env: {
   SUPABASE_SERVICE_KEY: 'cle-de-test',
   RESEND_API_KEY: 'cle-resend-de-test',
   INTERNAL_SECRET: 'secret-de-test',
-  URL: 'https://despy.fr'
+  URL: 'https://despy.fr',
+  // Présentes en production (c'est par elles que les notifications partent
+  // depuis des mois). _push.js s'abstient poliment quand elles manquent : sans
+  // elles ici, le bac à sable testerait le cas dégradé en croyant tester le
+  // cas normal, et n'attraperait plus une notification cassée.
+  VAPID_PUBLIC_KEY: 'cle-publique-de-test',
+  VAPID_PRIVATE_KEY: 'cle-privee-de-test'
 } };
 var Buffer = { from: function (s) { return { toString: function(){ return String(s); } }; } };
 
 // Journal de tout ce que le code tente de faire sortir : c'est lui qu'on
 // interroge à la fin.
-var JOURNAL = { insertions: [], majs: [], push: [], emails: [], requetes: [] };
+var JOURNAL = { insertions: [], majs: [], push: [], emails: [], requetes: [],
+                prevention: [] };
 
 // ── Faux crypto : déterministe, suffisant pour vérifier une concordance ───
 var __crypto__ = {
@@ -163,6 +170,16 @@ function fetch(url, opts) {
   if (String(url).indexOf('api.resend.com') !== -1) {
     JOURNAL.emails.push(JSON.parse(opts.body));
     return Promise.resolve({ ok: true, status: 200 });
+  }
+  // « Publier et prévenir » déclenche la fonction background. On note l'appel
+  // et on répond 202 comme le vrai Netlify : ce banc vérifie le DÉCLENCHEMENT,
+  // ce que la fonction envoie ensuite est le sujet de test_prevention.py.
+  if (String(url).indexOf('alerte-prevention-background') !== -1) {
+    JOURNAL.prevention.push({
+      corps: JSON.parse(opts.body),
+      secret: (opts.headers || {})['x-internal-secret']
+    });
+    return Promise.resolve({ ok: true, status: 202 });
   }
   var xml = __FLUX__[url];
   return Promise.resolve({
@@ -319,9 +336,26 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     });
     return o;
   }
+  sortie.nb_par_decision = {};
+  liens.forEach(function (u) {
+    var d = params(u).d;
+    sortie.nb_par_decision[d] = (sortie.nb_par_decision[d] || 0) + 1;
+  });
+
   var publier = liens.filter(function (u) { return params(u).d === 'publier'; })[0];
   var p = params(publier);
   sortie.cible = Number(p.a);
+
+  // Le troisième bouton, sur un AUTRE article que celui qu'on publie en
+  // silence : les deux chemins doivent coexister dans le même email.
+  var prevenirs = liens.filter(function (u) {
+    var q = params(u); return q.d === 'publier_prevenir' && q.a !== p.a;
+  });
+  var pp = params(prevenirs[0]);
+  sortie.prevenir_cible = Number(pp.a);
+  // Une signature par décision : celle du « publier » ne doit pas ouvrir le
+  // bouton qui écrit à tout le fichier.
+  sortie.signature_distincte = pp.k !== p.k;
 
   // 1er clic : publie.
   return moder.handler({ queryStringParameters: { a: p.a, d: p.d, k: p.k } })
@@ -348,6 +382,38 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
   })
   .then(function (r4) {
     sortie.decision_permutee_code = r4.statusCode;
+
+    // La signature d'un « publier » ne doit pas ouvrir « publier et prévenir » :
+    // ce serait un email à tout le fichier obtenu en changeant un mot dans l'URL.
+    return moder.handler({ queryStringParameters: { a: pp.a, d: 'publier_prevenir', k: p.k } });
+  })
+  .then(function (r5) {
+    sortie.prevenir_signature_volee = r5.statusCode;
+
+    // ── Le vrai clic sur « Publier et prévenir » ──────────────────────────
+    JOURNAL.prevention = [];
+    return moder.handler({ queryStringParameters: { a: pp.a, d: pp.d, k: pp.k } });
+  })
+  .then(function (r6) {
+    sortie.prevenir_code = r6.statusCode;
+    sortie.prevenir_page = r6.body.indexOf('prévention en cours') !== -1;
+    sortie.prevenir_statut = TABLE.filter(function (x) {
+      return x.id === Number(pp.a);
+    })[0].status;
+    sortie.prevenir_appels = JOURNAL.prevention.length;
+    sortie.prevenir_id = JOURNAL.prevention.length
+      ? JOURNAL.prevention[0].corps.alert_id : null;
+    sortie.prevenir_secret = JOURNAL.prevention.length
+      ? JOURNAL.prevention[0].secret : null;
+
+    // Deuxième clic : l'article n'est plus « a_valider », donc aucun second
+    // envoi ne doit être déclenché.
+    JOURNAL.prevention = [];
+    return moder.handler({ queryStringParameters: { a: pp.a, d: pp.d, k: pp.k } });
+  })
+  .then(function (r7) {
+    sortie.prevenir_2e_clic_deja = r7.body.indexOf('Déjà traité') !== -1;
+    sortie.prevenir_2e_appels = JOURNAL.prevention.length;
 
     JOURNAL.requetes = [];
     return lister.handler({ httpMethod: 'GET' });
@@ -430,7 +496,15 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
              'Bas-Rhin' in d['objet'], True)
     controle('envoyé à la boîte de modération',
              d['destinataire'], 'contact.despy@gmail.com')
-    controle('deux boutons par article', d['nb_liens'], 20)
+    controle('trois boutons par article', d['nb_liens'], 30)
+    controle('un « publier » par article',
+             d['nb_par_decision'].get('publier'), 10)
+    controle('un « rejeter » par article',
+             d['nb_par_decision'].get('rejeter'), 10)
+    controle('un « publier et prévenir » par article',
+             d['nb_par_decision'].get('publier_prevenir'), 10)
+    controle('chaque décision a sa propre signature',
+             d['signature_distincte'], True)
 
     print()
     print('═' * 74)
@@ -441,6 +515,17 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     controle('statut passé à publié', d['statut_apres'], 'publie')
     controle('deuxième clic sans effet', d['clic2_deja'], True)
     controle('signature bricolée refusée', d['faux_code'], 403)
+    controle('un « publier » ne devient pas « prévenir » '
+             '(sinon : email à tout le fichier)',
+             d['prevenir_signature_volee'], 403)
+    controle('« publier et prévenir » publie', d['prevenir_statut'], 'publie')
+    controle('page « prévention en cours »', d['prevenir_page'], True)
+    controle('la fonction de prévention est déclenchée une fois',
+             d['prevenir_appels'], 1)
+    controle('avec l\'id du bon article', d['prevenir_id'], d['prevenir_cible'])
+    controle('et le secret interne', d['prevenir_secret'], 'secret-de-test')
+    controle('2e clic : déjà traité', d['prevenir_2e_clic_deja'], True)
+    controle('2e clic : aucun second envoi', d['prevenir_2e_appels'], 0)
     controle('« publier » ne vaut pas « rejeter »',
              d['decision_permutee_code'], 403)
 

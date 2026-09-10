@@ -28,10 +28,16 @@ function lien(base, id, action) {
 }
 
 // Un article = un bloc lisible en diagonale : le titre, le journal, la date,
-// et les deux boutons. Le résumé n'est PAS repris : celui de Google Actualités
+// et les trois boutons. Le résumé n'est PAS repris : celui de Google Actualités
 // ne contient que le titre du lien et le nom du journal, déjà affichés.
+//
+// « Publier et prévenir » est le seul bouton qui écrit à de vrais clients.
+// Il est donc posé sur sa propre ligne, séparé des deux autres et légendé :
+// deux boutons côte à côte que rien ne distingue, c'est un jour où l'on
+// prévient tout le fichier pour un fait divers, par simple glissement du doigt.
 function bloc(base, a) {
   const publier = lien(base, a.id, 'publier');
+  const prevenir = lien(base, a.id, 'publier_prevenir');
   const rejeter = lien(base, a.id, 'rejeter');
   const local = (a.source || '').indexOf('locale') !== -1;
   const jour = (a.published || '').slice(0, 10);
@@ -47,6 +53,15 @@ function bloc(base, a) {
          padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px;margin-right:6px">✅ Publier</a>
       <a href="${rejeter}" style="display:inline-block;background:#eef1f5;color:#555;text-decoration:none;
          padding:9px 18px;border-radius:8px;font-weight:700;font-size:13px">🚫 Rejeter</a>
+      <div style="border-top:1px dashed #e6ebf2;margin:14px 0 0;padding-top:12px">
+        <a href="${prevenir}" style="display:inline-block;background:#2D5BFF;color:#fff;text-decoration:none;
+           padding:10px 18px;border-radius:8px;font-weight:700;font-size:13px">📣 Publier et prévenir les clients</a>
+        <div style="font-size:11.5px;color:#8a93a0;line-height:1.55;margin-top:8px">
+          Rédige un email de <strong>prévention</strong> (le mécanisme, les signes, les réflexes)
+          et l'envoie à <strong>tous les clients</strong>, avec une notification.
+          À réserver aux arnaques qu'ils peuvent croiser eux-mêmes.
+        </div>
+      </div>
     </div>`;
 }
 
@@ -88,6 +103,12 @@ async function envoyerRecapPresse(articles) {
           Ces articles ont été trouvés dans la presse et <strong>ne sont pas visibles</strong>
           dans l'application. Ils n'y paraîtront que si vous cliquez sur « Publier ».
           Sans clic, ils restent en attente et ne sont plus reproposés.
+        </p>
+        <p style="font-size:13px;color:#555;line-height:1.65;background:#eff6ff;border:1px solid #bfdbfe;
+                  border-radius:10px;padding:12px 16px">
+          <strong>« Publier »</strong> rend l'article visible, sans prévenir personne.<br>
+          <strong>« Publier et prévenir »</strong> fait la même chose <em>et</em> envoie un email de
+          prévention à tous les clients. C'est le seul bouton qui écrit à quelqu'un.
         </p>
         ${articles.map(a => bloc(base, a)).join('')}
         <p style="font-size:11.5px;color:#aaa;line-height:1.6;border-top:1px solid #eee;padding-top:12px">

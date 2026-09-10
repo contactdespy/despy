@@ -98,11 +98,57 @@ const brandFooter = (showPhone) => `
     <p style="font-size:11px;color:#8494ae;margin:14px 0 0;line-height:1.6">Despy · cybersécurité pour tous · SIRET 103 694 212 00012<br><a href="https://despy.fr" style="color:#5BE3F5;text-decoration:none">despy.fr</a></p>
   </div>`;
 
+// ── Briques des alertes de prévention ──
+// Le contenu de ces emails est rédigé par un modèle (_alerte-prevention.js) à
+// partir d'un article de presse. Ce n'est pas une saisie utilisateur, mais ça
+// n'est pas non plus écrit à la main dans ce fichier : ça s'échappe.
+const esc = (txt) => String(txt == null ? "" : txt)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+const sectionTitre = (txt) => `
+  <div style="font-size:12px;font-weight:800;color:#2D5BFF;letter-spacing:.13em;text-transform:uppercase;margin:0 0 12px">${esc(txt)}</div>`;
+
+// Les listes sont montées en <table> : Outlook et Gmail malmènent les puces
+// des <ul>, et une consigne de sécurité à moitié affichée ne vaut rien.
+const rangee = (gauche, droite) => `
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 10px">
+    <tr>
+      <td valign="top" width="34" style="padding-top:1px">${gauche}</td>
+      <td valign="top" style="font-size:15.5px;color:#3c4757;line-height:1.65">${droite}</td>
+    </tr>
+  </table>`;
+
+const listeNumerotee = (items) => (items || []).map((t, i) => rangee(
+  `<div style="width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:12.5px;font-weight:800">${i + 1}</div>`,
+  esc(t)
+)).join("");
+
+const listeCochee = (items) => (items || []).map(t => rangee(
+  `<div style="width:24px;height:24px;line-height:23px;text-align:center;border-radius:50%;background:#2D5BFF;color:#fff;font-size:13px;font-weight:800">&#10003;</div>`,
+  `<strong style="color:#1a3fd9">${esc(t)}</strong>`
+)).join("");
+
+const listeInterdits = (items) => (items || []).map(t => rangee(
+  `<div style="width:24px;height:24px;line-height:23px;text-align:center;border-radius:50%;background:#dc2626;color:#fff;font-size:15px;font-weight:800">&times;</div>`,
+  `<span style="color:#7f1d1d;font-weight:600">${esc(t)}</span>`
+)).join("");
+
+// La source est citée mais discrète, et l'article n'est PAS le bouton
+// principal : on veut que la personne retienne les réflexes ci-dessus, pas
+// qu'elle parte lire un fait divers qui l'inquiétera sans la protéger.
+const sourceLigne = (source, lien) => `
+  <p style="font-size:12px;color:#9aa3b2;line-height:1.6;text-align:center;margin:24px 0 0">
+    Alerte préparée par l'équipe Despy${source ? ` d'après ${esc(source)}` : ""}.${lien ? `
+    <a href="${esc(lien)}" style="color:#9aa3b2;text-decoration:underline">Lire l'article d'origine</a>` : ""}
+  </p>`;
+
 // Emails marketing : eux seuls portent un lien de désinscription visible.
 // Gmail l'attend des expéditeurs en volume, et on va faire de la publicité.
 const MARKETING = new Set([
   "guide_delivery", "nurture_j2", "nurture_j4", "nurture_j6", "nurture_j8",
-  "relance_lead", "ia_scams_awareness", "cyber_alert_free"
+  "relance_lead", "ia_scams_awareness", "cyber_alert_free",
+  "alerte_prevention_free"
 ]);
 
 const templates = {
@@ -425,6 +471,131 @@ const templates = {
       ${brandFooter()}
     </div>`
   }),
+
+  // ── Alerte de PRÉVENTION ─────────────────────────────────────────────────
+  // Déclenchée à la main depuis « Publier et prévenir » (alert-moderate.js),
+  // jamais par un robot : personne ne reçoit ça sans qu'un humain l'ait décidé.
+  //
+  // Le contenu (mécanisme, signes, réflexes, lignes rouges) est préparé par
+  // _alerte-prevention.js. La différence avec `cyber_alert`, qui recopiait 400
+  // caractères de dépêche : ici on n'apprend pas ce qui est arrivé à quelqu'un
+  // d'autre, on repart en sachant reconnaître le piège.
+  //
+  // Registre visuel volontairement sobre — bleu nuit de la marque, un liseré
+  // ambre. Le dégradé rouge sang de `cyber_alert` fait paniquer avant d'avoir
+  // lu ; or c'est calmement qu'on retient une consigne.
+  alerte_prevention: ({ prenom, contenu, alertSource, alertLink }) => {
+    const c = contenu || {};
+    return {
+    subject: `Alerte prévention — ${esc(c.titre || 'une arnaque circule en ce moment').slice(0, 90)}`,
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${apercu(`Comment reconnaître ce piège et quoi faire — ${esc(c.concerne || '')}`)}
+      ${brandHeader("Alerte prévention")}
+      <div style="background:#fff;padding:34px 32px 8px">
+        <div style="display:inline-block;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:20px">À lire avant d'y être confronté</div>
+        <h1 style="margin:16px 0 0;font-size:24px;color:#0a1f3a;line-height:1.3;font-weight:800">${esc(c.titre)}</h1>
+        <div style="height:3px;width:52px;background:#2D5BFF;border-radius:2px;margin:18px 0 22px"></div>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:0 0 4px">${bonjour(prenom)}</p>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:14px 0 0">${esc(c.accroche)}</p>
+        ${c.concerne ? `<p style="font-size:14.5px;color:#666;line-height:1.65;margin:14px 0 0;padding-left:14px;border-left:3px solid #e6ebf2"><strong style="color:#0a1f3a">Qui est visé :</strong> ${esc(c.concerne)}</p>` : ''}
+      </div>
+
+      <div style="background:#fff;padding:26px 32px 0">
+        ${sectionTitre('Comment le piège fonctionne')}
+        <div style="background:#f7f9fc;border:1px solid #e6ebf2;border-radius:14px;padding:20px 22px;font-size:15.5px;color:#3c4757;line-height:1.75">${esc(c.mecanisme)}</div>
+      </div>
+
+      <div style="background:#fff;padding:28px 32px 0">
+        ${sectionTitre('Ce qui doit vous alerter')}
+        ${listeNumerotee(c.signes)}
+      </div>
+
+      <div style="background:#fff;padding:28px 32px 0">
+        ${sectionTitre('Les bons réflexes')}
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:8px 20px 14px">
+          ${listeCochee(c.reflexes)}
+        </div>
+      </div>
+
+      <div style="background:#fff;padding:28px 32px 0">
+        ${sectionTitre('À ne jamais faire')}
+        <div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 12px 12px 0;padding:16px 20px">
+          ${listeInterdits(c.jamais)}
+        </div>
+      </div>
+
+      <div style="background:#fff;padding:30px 32px 34px">
+        <div style="background:linear-gradient(135deg,#0B1838 0%,#16307A 100%);border-radius:16px;padding:26px 24px;text-align:center">
+          <div style="font-size:17px;color:#fff;font-weight:800;margin-bottom:8px">Un doute sur un message que vous avez reçu ?</div>
+          <p style="font-size:14.5px;color:#ccd4e4;line-height:1.65;margin:0 0 18px">Copiez-le et montrez-le à votre Conseiller Despy. Il vous dira clairement, en quelques secondes, si vous devez vous en méfier. C'est inclus dans votre abonnement, autant de fois que vous voulez.</p>
+          <a href="https://despy.fr" style="display:inline-block;background:#2D5BFF;color:#fff;padding:14px 30px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15.5px">Vérifier un message</a>
+        </div>
+        <p style="font-size:14.5px;color:#555;line-height:1.7;margin:22px 0 0;text-align:center">Et si vous préférez en parler de vive voix, appelez-nous. Un humain décroche.</p>
+        ${sourceLigne(alertSource, alertLink)}
+        ${trustStrip()}
+      </div>
+      ${brandFooter(true)}
+    </div>`
+    };
+  },
+
+  // Version compte gratuit.
+  //
+  // Elle donne les MÊMES signes et les MÊMES réflexes que la version abonné.
+  // Retenir une consigne de sécurité en otage pour vendre un abonnement, à des
+  // gens dont on dit vouloir la protection, ne se défend pas — et un lecteur
+  // qui se fait piéger après avoir reçu un email tronqué ne s'abonnera jamais.
+  // Ce qui reste réservé à l'abonnement, c'est ce que l'abonnement fait
+  // vraiment : analyser SON message à elle, et un humain au téléphone.
+  alerte_prevention_free: ({ prenom, contenu, alertSource, alertLink }) => {
+    const c = contenu || {};
+    return {
+    subject: `Alerte prévention — ${esc(c.titre || 'une arnaque circule en ce moment').slice(0, 90)}`,
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
+      ${apercu(`Comment reconnaître ce piège et quoi faire — ${esc(c.concerne || '')}`)}
+      ${brandHeader("Alerte prévention")}
+      <div style="background:#fff;padding:34px 32px 8px">
+        <div style="display:inline-block;background:#fffbeb;border:1px solid #fde68a;color:#92400e;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:20px">À lire avant d'y être confronté</div>
+        <h1 style="margin:16px 0 0;font-size:24px;color:#0a1f3a;line-height:1.3;font-weight:800">${esc(c.titre)}</h1>
+        <div style="height:3px;width:52px;background:#2D5BFF;border-radius:2px;margin:18px 0 22px"></div>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:0 0 4px">${bonjour(prenom)}</p>
+        <p style="font-size:16.5px;color:#444;line-height:1.7;margin:14px 0 0">${esc(c.accroche)}</p>
+        ${c.concerne ? `<p style="font-size:14.5px;color:#666;line-height:1.65;margin:14px 0 0;padding-left:14px;border-left:3px solid #e6ebf2"><strong style="color:#0a1f3a">Qui est visé :</strong> ${esc(c.concerne)}</p>` : ''}
+      </div>
+
+      <div style="background:#fff;padding:26px 32px 0">
+        ${sectionTitre('Ce qui doit vous alerter')}
+        ${listeNumerotee(c.signes)}
+      </div>
+
+      <div style="background:#fff;padding:28px 32px 0">
+        ${sectionTitre('Les bons réflexes')}
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:14px;padding:8px 20px 14px">
+          ${listeCochee(c.reflexes)}
+        </div>
+      </div>
+
+      <div style="background:#fff;padding:28px 32px 0">
+        ${sectionTitre('À ne jamais faire')}
+        <div style="background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 12px 12px 0;padding:16px 20px">
+          ${listeInterdits(c.jamais)}
+        </div>
+      </div>
+
+      <div style="background:#fff;padding:30px 32px 34px">
+        <div style="background:#f7f9fc;border:1px solid #e6ebf2;border-radius:16px;padding:24px;text-align:center">
+          <div style="font-size:16.5px;color:#0a1f3a;font-weight:800;margin-bottom:8px">Vous venez de recevoir un message douteux ?</div>
+          <p style="font-size:14.5px;color:#555;line-height:1.7;margin:0 0 16px">Cette alerte, vous l'avez reçue gratuitement — et elle est complète, sans rien de caché. Ce que l'abonnement ajoute : vous copiez <em>votre</em> message, le Conseiller Despy vous répond s'il est dangereux, et un humain vous rappelle quand vous êtes bloqué.</p>
+          <div style="font-size:13.5px;color:#666;margin-bottom:16px">9,99 € par mois · sans engagement</div>
+          <a href="https://despy.fr/tarifs" style="display:inline-block;background:#2D5BFF;color:#fff;padding:14px 30px;border-radius:11px;text-decoration:none;font-weight:700;font-size:15.5px">Découvrir l'abonnement</a>
+        </div>
+        ${sourceLigne(alertSource, alertLink)}
+        ${trustStrip()}
+      </div>
+      ${brandFooter()}
+    </div>`
+    };
+  },
 
   // Sensibilisation : arnaques générées par IA (peut être envoyé aux gratuits comme aux abonnés)
   ia_scams_awareness: ({ name, prenom, referralCode }) => ({

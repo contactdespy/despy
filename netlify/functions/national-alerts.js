@@ -15,7 +15,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
-const webpush = require('web-push');
+const { envoyerPush, tagDepuis } = require('./_push');
 const { collecterAlertes, collecterPresse } = require('./_alert-sources');
 const { fichesAPublier } = require('./_calendrier-arnaques');
 const { detecterVagues } = require('./_vagues');
@@ -56,47 +56,15 @@ function recente(alerte, jours) {
   return !isNaN(t) && t >= Date.now() - jours * 24 * 3600 * 1000;
 }
 
-async function sendPushToAll(supabase, alert) {
-  const { data: subs, error } = await supabase
-    .from('push_subscriptions')
-    .select('endpoint, p256dh, auth');
-  if (error || !subs || subs.length === 0) return { sent: 0, failed: 0 };
-
-  webpush.setVapidDetails(
-    process.env.VAPID_SUBJECT || 'mailto:contact@despy.fr',
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-  );
-
-  const payload = JSON.stringify({
+// La plomberie web-push vit dans _push.js, partagée avec « Publier et
+// prévenir ». Ici on ne décide plus que du texte affiché sur l'écran.
+function sendPushToAll(supabase, alert) {
+  return envoyerPush(supabase, {
     title: alert.title.length > 80 ? alert.title.slice(0, 77) + '…' : alert.title,
     body: alert.body || ('Source : ' + (alert.source || 'Despy')),
     url: alert.url || 'https://despy.fr',
-    tag: 'despy-' + Buffer.from(alert.url || alert.title).toString('base64').slice(0, 24)
+    tag: tagDepuis(alert.url || alert.title)
   });
-
-  let sent = 0, failed = 0;
-  const expiredEndpoints = [];
-  for (const sub of subs) {
-    try {
-      await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        payload,
-        { TTL: 24 * 3600 }
-      );
-      sent++;
-    } catch (e) {
-      failed++;
-      if (e.statusCode === 404 || e.statusCode === 410) expiredEndpoints.push(sub.endpoint);
-    }
-  }
-
-  // Nettoyer les subscriptions expirées
-  if (expiredEndpoints.length > 0) {
-    await supabase.from('push_subscriptions').delete().in('endpoint', expiredEndpoints);
-  }
-
-  return { sent, failed, cleaned: expiredEndpoints.length };
 }
 
 exports.handler = async (event) => {
