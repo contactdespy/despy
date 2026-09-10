@@ -166,6 +166,38 @@ exports.handler = async (event) => {
     const parPlan = {};
     abonnes.forEach(c => { parPlan[c.plan || '?'] = (parPlan[c.plan || '?'] || 0) + 1; });
 
+    // D'où viennent les inscrits, et surtout d'où viennent les PAYANTS.
+    //
+    // Requête à part, et c'est délibéré : `provenance` est une colonne ajoutée
+    // par un script SQL passé à la main. L'ajouter à la sélection principale
+    // ferait échouer TOUT le tableau de bord tant que le script n'est pas
+    // passé — un écran blanc en échange d'une statistique. Ici, si la colonne
+    // manque, on renvoie null et l'écran affiche « — ».
+    //
+    // Le compteur `leads_pub` plus haut ne compte que les téléchargements du
+    // guide. Il valait zéro en permanence dès que la publicité pointait
+    // ailleurs que sur /guide, et laissait croire qu'elle n'amenait personne.
+    // Celui-ci regarde les comptes réellement créés, quelle que soit la porte.
+    let parProvenance = null;
+    try {
+      const { data: prov, error: eProv } = await supabase
+        .from('clients').select('provenance, subscribed, created_at');
+      if (!eProv && prov) {
+        parProvenance = {};
+        prov.forEach(c => {
+          const canal = c.provenance || 'direct';
+          if (!parProvenance[canal]) parProvenance[canal] = { inscrits: 0, abonnes: 0, inscrits_30j: 0 };
+          parProvenance[canal].inscrits++;
+          if (c.subscribed) parProvenance[canal].abonnes++;
+          if (c.created_at && c.created_at >= ilYA(30)) parProvenance[canal].inscrits_30j++;
+        });
+      } else if (eProv) {
+        console.warn('admin-stats : colonne `provenance` absente —', eProv.message);
+      }
+    } catch (e) {
+      console.warn('admin-stats provenance:', e && e.message);
+    }
+
     const business = {
       total_comptes: tous.length,
       abonnes: abonnes.length,
@@ -175,7 +207,8 @@ exports.handler = async (event) => {
       inscrits_7j: tous.filter(c => depuis(c, 7)).length,
       inscrits_30j: tous.filter(c => depuis(c, 30)).length,
       abonnes_30j: abonnes.filter(c => depuis(c, 30)).length,
-      parrainages_aboutis: tous.filter(c => c.referred_by).length
+      parrainages_aboutis: tous.filter(c => c.referred_by).length,
+      par_provenance: parProvenance
     };
 
     // Les dix derniers inscrits — pour voir qui arrive, et d'où.

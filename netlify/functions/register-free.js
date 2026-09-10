@@ -90,7 +90,12 @@ exports.handler = async (event) => {
     }
 
     const body = JSON.parse(event.body || '{}');
-    const { email, password, prenom, nom, telephone, dob, referralCode, fbp, fbc, marketing_consent } = body;
+    const { email, password, prenom, nom, telephone, dob, referralCode, fbp, fbc, marketing_consent, provenance } = body;
+
+    // Étiquette de canal (« facebook_ads », « google »…), bornée comme dans
+    // guide-lead : jamais l'identifiant de clic, juste de quoi savoir compter.
+    const canal = String(provenance || '')
+      .toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 30) || null;
 
     if (!email || !email.includes('@')) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email invalide' }) };
@@ -142,25 +147,36 @@ exports.handler = async (event) => {
 
     const password_hash = hashPassword(password);
 
-    const { data: newClient, error } = await supabase
-      .from('clients')
-      .insert([{
-        email: email.toLowerCase().trim(),
-        password_hash,
-        prenom,
-        nom: nom || null,
-        name: fullName,
-        telephone: telephone || null,
-        date_naissance: dob || null,
-        plan: 'free',
-        subscribed: false,
-        lead: true,
-        referral_code: newReferralCode,
-        referred_by: referrer ? referrer.referral_code : null,
-        bonus_months: referrer ? 1 : 0
-      }])
-      .select()
-      .single();
+    const fiche = {
+      email: email.toLowerCase().trim(),
+      password_hash,
+      prenom,
+      nom: nom || null,
+      name: fullName,
+      telephone: telephone || null,
+      date_naissance: dob || null,
+      plan: 'free',
+      subscribed: false,
+      lead: true,
+      referral_code: newReferralCode,
+      referred_by: referrer ? referrer.referral_code : null,
+      bonus_months: referrer ? 1 : 0
+    };
+    if (canal) fiche.provenance = canal;
+
+    let { data: newClient, error } = await supabase
+      .from('clients').insert([fiche]).select().single();
+
+    // La colonne `provenance` est ajoutée par un script SQL passé à la main.
+    // Tant qu'il ne l'a pas été, l'insertion entière échouerait — et plus
+    // personne ne pourrait créer de compte. Savoir d'où vient quelqu'un ne
+    // vaut pas de l'empêcher d'entrer : on réessaie sans, et on le dit fort.
+    if (error && canal) {
+      console.warn('register-free : colonne `provenance` absente, repli sans elle —', error.message);
+      delete fiche.provenance;
+      ({ data: newClient, error } = await supabase
+        .from('clients').insert([fiche]).select().single());
+    }
 
     if (error) {
       console.error('Insert error:', error);

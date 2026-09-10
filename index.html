@@ -1239,6 +1239,37 @@ body.despy-abonne #outils-upsell{display:none!important}
 
   // Visiteur déjà consentant lors d'une visite précédente → charger immédiatement.
   if (window.despyAdConsent()) window.loadMetaPixel();
+
+  // ── D'où vient cette personne ? ────────────────────────────────────────
+  // La même fonction que sur guide.html, portée ici parce qu'il y manquait
+  // l'essentiel : c'est CETTE page qui encaisse. Jusqu'ici, un visiteur venu
+  // d'une publicité Meta et devenu abonné était rigoureusement indiscernable
+  // d'un visiteur venu du bouche-à-oreille — on payait la publicité sans
+  // pouvoir dire si elle avait jamais rapporté un seul client.
+  //
+  // Meta ajoute `fbclid` à l'adresse dès qu'on clique une publicité. On n'en
+  // garde qu'une ÉTIQUETTE de canal ; le fbclid lui-même n'est jamais transmis
+  // ni stocké. Aucun cookie n'est lu ni posé : cette mesure ne dépend donc PAS
+  // du consentement publicitaire, et compte tout le monde — c'est justement ce
+  // qui manquait, le Pixel ne comptant que ceux qui cliquent « Accepter ».
+  window.despyProvenance = function () {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var utm = (p.get('utm_source') || '').toLowerCase();
+      var canal = null;
+      if (p.get('fbclid') || /facebook|fb|instagram|ig|meta/.test(utm)) canal = 'facebook_ads';
+      else if (utm) canal = utm.replace(/[^a-z0-9_-]/g, '').slice(0, 30) || null;
+      else if (document.referrer && /facebook|instagram/.test(document.referrer)) canal = 'facebook_organique';
+
+      // On mémorise : entre l'arrivée par la publicité et le clic « S'abonner »,
+      // il y a des pages lues, un guide téléchargé, parfois un retour le
+      // lendemain. Sans mémoire, l'origine serait perdue à la seconde page et
+      // toutes les conversions seraient attribuées au « direct ».
+      if (canal) { try { localStorage.setItem('despy_provenance', canal); } catch (e) {} return canal; }
+      try { return localStorage.getItem('despy_provenance') || null; } catch (e) { return null; }
+    } catch (e) { return null; }
+  };
+  try { window.despyProvenance(); } catch (e) {}
 </script>
 <!-- Pas de <noscript> fallback : il enverrait un PageView à Meta sans consentement. -->
 </head>
@@ -6460,7 +6491,8 @@ function showSubscribeModal(plan) {
   var prenomVal = session ? (session.prenom || (session.name ? session.name.split(' ')[0] : '')) : '';
   var nomVal    = session ? (session.nom    || (session.name ? session.name.split(' ').slice(1).join(' ') : '')) : '';
   var emailVal  = session ? session.email : '';
-  var telVal    = session ? (session.tel || '') : '';
+  // (le téléphone de la session est relu directement dans confirmSub :
+  //  il n'y a plus de champ à pré-remplir ici)
 
   var grid = document.createElement('div');
   grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:12px';
@@ -6468,16 +6500,24 @@ function showSubscribeModal(plan) {
   grid.appendChild(makeField('Nom', 'sub-nom', 'text', 'Dupont', 'family-name', nomVal));
 
   var emailF = makeField('Email', 'sub-email', 'email', 'votre@email.fr', 'email', emailVal);
-  var telF   = makeField('T\u00e9l\u00e9phone', 'sub-tel', 'tel', '06 12 34 56 78', 'tel', telVal);
 
-  var dobW = document.createElement('div'); dobW.className = 'field';
-  var dobL = document.createElement('label'); dobL.textContent = 'Date de naissance *';
-  var dobI = document.createElement('input');
-  dobI.type = 'date'; dobI.id = 'sub-dob';
-  dobI.max = new Date().toISOString().split('T')[0];
-  if (session && session.dob) dobI.value = session.dob;
-  dobI.style.cssText = 'width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;color:var(--text);outline:none;font-family:inherit';
-  dobW.appendChild(dobL); dobW.appendChild(dobI);
+  // \u2500\u2500 Deux champs retir\u00e9s d'ici, et pour deux raisons diff\u00e9rentes \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  //
+  // T\u00c9L\u00c9PHONE : il n'a pas disparu, il a chang\u00e9 de page. C'est Stripe qui le
+  // demande maintenant, dans son propre formulaire de paiement
+  // (`phone_number_collection`), et le webhook le r\u00e9cup\u00e8re dans
+  // `customer_details.phone`. La promesse \u00ab un humain vous rappelle \u00bb tient
+  // donc toujours \u2014 mais on ne r\u00e9clame plus un num\u00e9ro de t\u00e9l\u00e9phone AVANT
+  // d'avoir montr\u00e9 la moindre page de paiement, \u00e0 un public \u00e0 qui l'on
+  // explique par ailleurs de se m\u00e9fier de qui demande ses coordonn\u00e9es.
+  //
+  // DATE DE NAISSANCE : supprim\u00e9e. Elle \u00e9tait obligatoire, elle bloquait
+  // l'abonnement, et j'ai cherch\u00e9 qui la lisait : personne. \u00c9crite dans
+  // `clients.date_naissance` par le webhook, relue par aucune fonction, aucun
+  // email, aucun \u00e9cran de l'application. Un s\u00e9lecteur de date sur un t\u00e9l\u00e9phone,
+  // pour trouver l'ann\u00e9e 1948, est l'un des gestes les plus p\u00e9nibles qui
+  // soient \u2014 et il ne servait \u00e0 rien. La colonne reste en base, la plomberie
+  // reste en place : si un jour on en a l'usage, il n'y aura qu'\u00e0 redemander.
 
   var errDiv = document.createElement('div');
   errDiv.id = 'sub-err'; errDiv.className = 'sub-error';
@@ -6537,7 +6577,7 @@ function showSubscribeModal(plan) {
     box.appendChild(buildGoogleSection('subscribe', plan));
   }
   box.appendChild(grid);
-  box.appendChild(emailF); box.appendChild(telF); box.appendChild(dobW);
+  box.appendChild(emailF);
   box.appendChild(errDiv);
   box.appendChild(cguW); box.appendChild(retW);
   box.appendChild(goBtn); box.appendChild(cancelBtn); box.appendChild(trust);
@@ -6555,8 +6595,12 @@ async function confirmSub(plan) {
   var prenom = (document.getElementById('sub-prenom')||{}).value||'';
   var nom    = (document.getElementById('sub-nom')||{}).value||'';
   var email  = (document.getElementById('sub-email')||{}).value||'';
-  var tel    = (document.getElementById('sub-tel')||{}).value||'';
-  var dob    = (document.getElementById('sub-dob')||{}).value||'';
+  // Le champ n'existe plus dans ce formulaire : on récupère ce que la session
+  // connaît déjà (cas d'un compte gratuit qui passe à l'abonnement). Sinon
+  // c'est Stripe qui demandera le numéro sur sa page de paiement.
+  var _sess  = (typeof siteSession !== 'undefined' && siteSession.get()) || {};
+  var tel    = (document.getElementById('sub-tel')||{}).value || _sess.tel || '';
+  var dob    = (document.getElementById('sub-dob')||{}).value || '';
   var cgu    = document.getElementById('sub-cgu');
   var errEl  = document.getElementById('sub-err');
   var btn    = document.getElementById('sub-go-btn');
@@ -6570,12 +6614,11 @@ async function confirmSub(plan) {
   if (!email || !email.includes('@')) {
     if(errEl){errEl.textContent='Email invalide.';errEl.style.display='block';} return;
   }
-  if (!tel || tel.replace(/\s/g,'').length < 10) {
-    if(errEl){errEl.textContent='Num\u00e9ro de t\u00e9l\u00e9phone invalide.';errEl.style.display='block';} return;
-  }
-  if (!dob) {
-    if(errEl){errEl.textContent='Veuillez entrer votre date de naissance.';errEl.style.display='block';} return;
-  }
+  // Plus de contr\u00f4le sur le t\u00e9l\u00e9phone ni sur la date de naissance : les champs
+  // n'existent plus dans ce formulaire (voir le commentaire \u00e0 leur suppression).
+  // Les deux variables restent lues plus haut avec un repli sur la cha\u00eene vide,
+  // et continuent d'\u00eatre transmises \u2014 un abonn\u00e9 venu de l'application, lui, a
+  // toujours son num\u00e9ro en session, et il n'y a aucune raison de le perdre.
   if (!cgu || !cgu.checked) {
     if(errEl){errEl.textContent='Veuillez accepter les CGV.';errEl.style.display='block';} return;
   }
@@ -6627,7 +6670,7 @@ async function launchCheckout(email, name, plan, telephone, dob) {
     var r = await fetch('/.netlify/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site', telephone: telephone || '', dob: dob || '', marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
+      body: JSON.stringify({ email: email, name: name, plan: plan, source: 'site', telephone: telephone || '', dob: dob || '', marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()), provenance: (typeof window.despyProvenance === 'function' ? window.despyProvenance() : null) })
     });
     if (!r.ok) {
       var err = await r.json();
@@ -9775,7 +9818,8 @@ async function createFreeAccount() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, password: pwd, nom: nom, prenom: prenom, telephone: tel, dob: dob, referralCode: referralCode || undefined,
         fbp: _fbck.fbp, fbc: _fbck.fbc,
-        marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()) })
+        marketing_consent: (typeof window.despyAdConsent === 'function' && window.despyAdConsent()),
+        provenance: (typeof window.despyProvenance === 'function' ? window.despyProvenance() : null) })
     });
     var data = await r.json();
     if (!r.ok || data.error) {

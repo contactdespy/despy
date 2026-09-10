@@ -170,17 +170,28 @@ exports.handler = async (event) => {
         stripe_subscription_id: session.subscription,
         updated_at: new Date().toISOString(),
       };
-      // Téléphone et date de naissance saisis au formulaire d'abonnement.
-      if (session.metadata?.despy_tel) fiche.telephone = session.metadata.despy_tel;
+      // Téléphone : Stripe le demande maintenant dans sa propre page de paiement
+      // (`phone_number_collection`), et c'est cette réponse-là qui fait foi —
+      // elle est plus récente et plus fiable que celle de notre formulaire, qui
+      // ne le demande plus. On garde la métadonnée en second rideau pour les
+      // sessions créées avant ce changement, et pour l'appli.
+      const telStripe = session.customer_details?.phone || '';
+      const tel = telStripe || session.metadata?.despy_tel || '';
+      if (tel) fiche.telephone = String(tel).slice(0, 40);
       if (session.metadata?.despy_dob) fiche.date_naissance = session.metadata.despy_dob;
+
+      // D'où vient cet abonné : « facebook_ads », « google »… Écrit ici et
+      // nulle part ailleurs, c'est la seule trace qui relie un euro encaissé à
+      // l'euro dépensé en publicité.
+      if (session.metadata?.despy_provenance) fiche.provenance = session.metadata.despy_provenance;
 
       const { error: eFiche } = await supabase.from('clients').upsert(fiche, { onConflict: 'email' });
       if (eFiche) {
         // Une colonne optionnelle absente ne doit pas faire échouer
         // l'activation de l'abonnement : on rejoue sans les champs annexes.
         // Ce repli, lui, n'a plus le droit d'échouer en silence.
-        delete fiche.telephone; delete fiche.date_naissance;
-        console.warn('webhook clients upsert (repli sans tel/dob):', eFiche.message);
+        delete fiche.telephone; delete fiche.date_naissance; delete fiche.provenance;
+        console.warn('webhook clients upsert (repli sans tel/dob/provenance):', eFiche.message);
         await ecrire('activation de la fiche client',
           supabase.from('clients').upsert(fiche, { onConflict: 'email' }));
       }

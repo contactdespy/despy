@@ -38,7 +38,22 @@ exports.handler = async (event, context) => {
     // métadonnée Stripe car le compte n'est créé qu'au retour du webhook — sans
     // ça, le numéro du client était perdu, alors que c'est lui qui sert à
     // « un vrai humain vous rappelle ».
-    const { email, name, plan, source, marketing_consent, telephone, dob } = JSON.parse(event.body || '{}');
+    //
+    // Ils restent acceptés ici, mais le formulaire du site ne les demande plus :
+    // le téléphone est désormais collecté par Stripe lui-même (voir
+    // `phone_number_collection` plus bas), et la date de naissance a été retirée
+    // — elle était écrite en base et relue par personne, nulle part.
+    //
+    // provenance : « facebook_ads », « google », etc. Étiquette de canal, jamais
+    // l'identifiant de clic lui-même. Sans elle, un abonné venu d'une publicité
+    // était indiscernable d'un abonné venu du bouche-à-oreille : on payait pour
+    // de la publicité sans jamais pouvoir dire si elle rapportait un seul client.
+    const { email, name, plan, source, marketing_consent, telephone, dob, provenance } =
+      JSON.parse(event.body || '{}');
+
+    // Bornée comme dans guide-lead : une étiquette, pas une donnée libre.
+    const canal = String(provenance || '')
+      .toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 30);
 
     // Validation
     if (!email || !email.includes('@')) {
@@ -125,6 +140,12 @@ exports.handler = async (event, context) => {
       cancel_url: cancelUrl,
       locale: 'fr',
       allow_promotion_codes: true,
+      // Le téléphone est demandé PAR Stripe, plus par notre formulaire. Deux
+      // raisons : un champ de moins avant de voir le prix, et surtout un champ
+      // demandé dans une page que la personne reconnaît comme celle du paiement.
+      // On récupère le numéro dans `customer_details.phone` côté webhook — la
+      // promesse « un humain vous rappelle » tient donc toujours.
+      phone_number_collection: { enabled: true },
       subscription_data: Object.assign(
         {
           metadata: {
@@ -145,7 +166,8 @@ exports.handler = async (event, context) => {
         despy_bonus_months_used: String(bonusMonths),
         despy_consent: marketing_consent ? '1' : '0',
         despy_tel: (telephone || '').toString().slice(0, 40),
-        despy_dob: (dob || '').toString().slice(0, 20)
+        despy_dob: (dob || '').toString().slice(0, 20),
+        despy_provenance: canal
       }
     });
 

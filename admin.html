@@ -187,6 +187,51 @@ function afficher(d){
   var plans = Object.keys(b.par_plan).map(function(p){
     return ech(nomPlan(p)) + ' : ' + b.par_plan[p];
   }).join(' · ') || '—';
+
+  // ── D'où viennent les gens, et lesquels paient ──────────────────────────
+  // Le tableau qui manquait. Tant qu'il n'existait pas, « la publicité ne
+  // marche pas » et « la publicité amène du monde qui repart » se ressemblaient
+  // exactement : dans les deux cas, zéro abonné et aucun moyen de trancher.
+  // La colonne qui compte est la dernière : un canal qui amène cent visiteurs
+  // et zéro payant ne coûte pas moins cher qu'un canal qui n'amène personne.
+  function provenanceHtml(pp) {
+    if (!pp) {
+      return '<div class="carte kpi" style="grid-column:1/-1"><div class="k">Provenance</div>' +
+        '<div style="font-size:13px;color:#666;margin-top:6px">Colonne <code>provenance</code> absente — ' +
+        'le script <code>sql_migration_provenance.sql</code> n’a pas encore été passé dans Supabase.</div></div>';
+    }
+    var canaux = Object.keys(pp).sort(function(x, y){ return pp[y].inscrits - pp[x].inscrits; });
+    if (!canaux.length) {
+      return '<div class="carte kpi" style="grid-column:1/-1"><div class="k">Provenance</div>' +
+        '<div style="font-size:13px;color:#666;margin-top:6px">Aucun compte enregistré.</div></div>';
+    }
+    var NOMS = {
+      direct: 'Direct / inconnu',
+      facebook_ads: 'Publicité Meta',
+      facebook_organique: 'Facebook (non payant)',
+      google: 'Google'
+    };
+    var lignes = canaux.map(function(c){
+      var v = pp[c];
+      var taux = v.inscrits ? Math.round(v.abonnes / v.inscrits * 100) : 0;
+      var pub  = (c === 'facebook_ads');
+      return '<tr' + (pub ? ' style="background:#fff7ed"' : '') + '>' +
+        '<td><b>' + ech(NOMS[c] || c) + '</b></td>' +
+        '<td style="text-align:right">' + v.inscrits + '</td>' +
+        '<td style="text-align:right">' + v.inscrits_30j + '</td>' +
+        '<td style="text-align:right;font-weight:800' + (v.abonnes ? ';color:#166534' : ';color:#b91c1c') + '">' +
+          v.abonnes + (v.inscrits ? ' <span style="font-weight:600;color:#666">(' + taux + '%)</span>' : '') +
+        '</td></tr>';
+    }).join('');
+    return '<div class="carte kpi" style="grid-column:1/-1"><div class="k">Provenance des comptes</div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:14px">' +
+      '<tr style="font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#666;text-align:left">' +
+      '<th>Canal</th><th style="text-align:right">Comptes</th>' +
+      '<th style="text-align:right">30 j</th><th style="text-align:right">Abonnés</th></tr>' +
+      lignes + '</table>' +
+      '<div style="font-size:11px;color:#666;margin-top:8px">Les comptes créés avant la mise en place ' +
+      'de la mesure sont comptés en « Direct / inconnu ».</div></div>';
+  }
   document.getElementById('business').innerHTML =
     kpi(b.abonnes, 'abonnés') +
     kpi(euros(b.revenu_mensuel_estime), 'par mois (estimé)') +
@@ -195,7 +240,8 @@ function afficher(d){
     kpi(b.abonnes_30j, 'nouveaux abonnés sur 30 j') +
     kpi(b.parrainages_aboutis, 'parrainages aboutis') +
     '<div class="carte kpi" style="grid-column:1/-1"><div class="k">Répartition des formules</div>' +
-    '<div style="font-size:15px;font-weight:700;margin-top:6px">' + plans + '</div></div>';
+    '<div style="font-size:15px;font-weight:700;margin-top:6px">' + plans + '</div></div>' +
+    provenanceHtml(b.par_provenance);
 
   var u = d.usage;
   document.getElementById('usage').innerHTML =
