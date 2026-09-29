@@ -105,8 +105,7 @@ function buildClientRecapHTML(c, sentBrokers) {
         <div style="font-size:13.5px;color:#444;line-height:1.7">
           Notre équipe traite aussi les annuaires qui exigent un formulaire
           (118712, Infobel…) et surveille les réponses. Vous suivez l'avancement
-          dans votre espace Despy, et nous revérifions chaque mois que vos données
-          ne réapparaissent pas.
+          dans votre espace Despy.
         </div>
       </div>
       <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px 18px;margin:0 0 24px">

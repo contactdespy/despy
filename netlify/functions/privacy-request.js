@@ -196,7 +196,6 @@ exports.handler = async (event) => {
         <li><strong>Sous 7 jours</strong> : scan complet des principaux annuaires et courtiers de données</li>
         <li><strong>Sous 14 jours</strong> : premières demandes RGPD article 17 envoyées</li>
         <li><strong>Sous 30 jours</strong> : la majorité des sites doivent supprimer vos données (délai légal UE)</li>
-        <li><strong>Chaque mois</strong> : re-scan pour s'assurer qu'elles ne réapparaissent pas</li>
       </ol>
     </div>
 
