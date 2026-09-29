@@ -185,7 +185,7 @@ exports.handler = async (event) => {
     // Conseils personnalisés selon le profil
     const tips = [];
     if ((client.breach_count || 0) > 0) tips.push({ priority: 'high', text: 'Changez vos mots de passe — votre email est dans des fuites de données' });
-    if (!couvert) tips.push({ priority: 'medium', text: 'Activez la surveillance dark web mensuelle avec l\'abonnement' });
+    if (!couvert) tips.push({ priority: 'medium', text: 'Activez la surveillance dark web hebdomadaire avec l\'abonnement' });
     if ((client.questions_used || 0) === 0) tips.push({ priority: 'low', text: 'Posez votre première question au Conseiller Despy' });
     if (!client.telephone) tips.push({ priority: 'low', text: 'Ajoutez votre numéro pour recevoir des alertes SMS urgentes' });
 
