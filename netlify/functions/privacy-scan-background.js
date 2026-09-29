@@ -22,6 +22,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { signFinding } = require('./_privacy-sign');
+const { ecrire, lire } = require('./_db');
 
 // ── Étage 1 : recherches ──
 function buildQueries(c) {
@@ -259,29 +260,55 @@ exports.handler = async (event) => {
     // doublons quand un re-scan retombe sur les mêmes résultats.
     const emailKey = c.user_email.toLowerCase().trim();
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-    let knownUrls = new Set();
-    try {
-      const { data: existing } = await supabase.from('privacy_findings').select('url').eq('user_email', emailKey);
-      knownUrls = new Set((existing || []).map(r => r.url));
-    } catch (e) { console.warn('lecture findings existants:', e.message); }
+    // Cette lecture ne peut PAS échouer en silence. Une erreur avalée donnait
+    // un Set vide, donc « aucune fiche connue » : le re-scan mensuel ré-insérait
+    // alors tout, perdant les décisions déjà prises (validé / ignoré) et
+    // remettant chaque mois les mêmes résultats dans l'email de validation.
+    // En cas d'échec on n'insère rien du tout — mieux vaut un scan sans effet
+    // qu'un scan qui pollue la base.
+    //
+    // L'anti-doublon d'alerte de _db.js ne protège que DANS une exécution, et
+    // le cron mensuel invoque cette fonction une fois par client — chacune dans
+    // son propre processus. On ne fait donc cette lecture que s'il y a vraiment
+    // quelque chose à écrire : sinon, une table cassée enverrait un email par
+    // client, et un mois de scans à vide en enverrait autant pour rien.
+    const lu = findings.length === 0
+      ? { ok: true, data: [] }
+      : await lire(
+          supabase.from('privacy_findings').select('url').eq('user_email', emailKey),
+          `privacy_findings (dédoublonnage) — ${emailKey}`,
+          { alerte: true, details: {
+              'Client': emailKey,
+              'Conséquence': 'Scan interrompu avant insertion pour ne pas créer de doublons'
+            } }
+        );
 
-    for (const f of findings) {
-      if (knownUrls.has(f.url)) { f.duplicate = true; continue; } // déjà traité
-      try {
-        const { data: inserted } = await supabase.from('privacy_findings').insert({
-          user_email: emailKey,
-          url: f.url, title: (f.title || '').slice(0, 200),
-          category: f.category, action: f.action,
-          confidence: f.confidence, reason: (f.reason || '').slice(0, 300),
-          status: 'found'
-        }).select('id').single();
-        if (inserted) f.id = inserted.id;
-      } catch (e) { console.warn('finding insert:', e.message); }
+    if (lu.ok) {
+      const knownUrls = new Set((lu.data || []).map(r => r.url));
+      for (const f of findings) {
+        if (knownUrls.has(f.url)) { f.duplicate = true; continue; } // déjà traité
+        const ins = await ecrire(
+          supabase.from('privacy_findings').insert({
+            user_email: emailKey,
+            url: f.url, title: (f.title || '').slice(0, 200),
+            category: f.category, action: f.action,
+            confidence: f.confidence, reason: (f.reason || '').slice(0, 300),
+            status: 'found'
+          }).select('id').single(),
+          `privacy_findings — ${emailKey}`
+        );
+        // Sans id, le rapport affiche déjà « non enregistré » à la place des
+        // boutons : la trouvaille reste visible, elle n'est juste pas validable.
+        if (ins.ok && ins.data) f.id = ins.data.id;
+      }
     }
 
     // 4. Rapport à l'équipe
+    // Sans cet email, les trouvailles restent en 'found' pour toujours : rien
+    // n'est validé, donc rien n'apparaît jamais chez le client. C'est le maillon
+    // dont l'échec est le plus invisible de toute la chaîne.
     try {
-      await fetch('https://api.resend.com/emails', {
+      const rep = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -291,6 +318,9 @@ exports.handler = async (event) => {
           html: buildReportHTML(c, findings, queries)
         })
       });
+      // fetch ne lève pas sur un 4xx : sans ce test, une clé Resend expirée ou
+      // un quota dépassé passait totalement inaperçu.
+      if (!rep.ok) console.error(`rapport scan ${c.user_email}: Resend HTTP ${rep.status} — ${await rep.text()}`);
     } catch (e) { console.error('rapport scan:', e.message); }
 
     // 5. Cas ambigus → on demande directement au CLIENT (« est-ce vous ? »).
@@ -298,7 +328,7 @@ exports.handler = async (event) => {
     const ambiguous = findings.filter(f => f.action === 'demander_client' && f.id);
     if (ambiguous.length > 0) {
       try {
-        await fetch('https://api.resend.com/emails', {
+        const cons = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -308,7 +338,8 @@ exports.handler = async (event) => {
             html: buildClientConsultHTML(c, ambiguous)
           })
         });
-        console.log(`Consultation client envoyée: ${c.user_email} (${ambiguous.length} cas)`);
+        if (cons.ok) console.log(`Consultation client envoyée: ${c.user_email} (${ambiguous.length} cas)`);
+        else console.error(`consult client ${c.user_email}: Resend HTTP ${cons.status} — ${await cons.text()}`);
       } catch (e) { console.error('consult client:', e.message); }
     }
 

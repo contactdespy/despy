@@ -5,6 +5,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('./_auth');
+const { ecrire } = require('./_db');
 
 // Helper : envoi email via Resend
 async function sendResend(to, subject, html) {
@@ -63,7 +64,6 @@ exports.handler = async (event) => {
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-    // Insert dans la table privacy_requests (créée si pas encore en BDD = error mais on continue)
     const insertPayload = {
       user_email: user_email.toLowerCase().trim(),
       prenom: prenom.trim(),
@@ -75,11 +75,35 @@ exports.handler = async (event) => {
       activated_at: activated_at || new Date().toISOString()
     };
 
-    try {
-      await supabase.from('privacy_requests').insert(insertPayload);
-    } catch (e) {
-      // Si la table n'existe pas encore, on continue quand même pour envoyer l'email
-      console.warn('Supabase insert failed (table may not exist yet):', e.message);
+    // Cette ligne EST le service. L'espace client la lit pour afficher
+    // l'avancement, et le cron mensuel la lit pour relancer les vérifications :
+    // sans elle, le client a payé pour un service qui n'existe nulle part.
+    //
+    // Avant, l'échec était avalé (« la table n'existe peut-être pas encore, on
+    // continue ») : le client recevait « Privacy Cleanup activé », puis son
+    // espace affichait 0 pour toujours. On préfère lui dire non tout de suite —
+    // rien n'est encore parti à ce stade, il peut réessayer — et prévenir
+    // l'admin avec toutes ses informations pour que rien ne soit perdu.
+    const ins = await ecrire(
+      supabase.from('privacy_requests').insert(insertPayload),
+      `privacy_requests — activation de ${insertPayload.user_email}`,
+      { alerte: true, details: {
+          'Compte Despy': insertPayload.user_email,
+          'Prénom Nom': `${insertPayload.prenom} ${insertPayload.nom}`,
+          'Email à protéger': insertPayload.target_email,
+          'Téléphone': insertPayload.phone,
+          'Ville': insertPayload.ville
+        } }
+    );
+    if (!ins.ok) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: "Votre demande n'a pas pu être enregistrée. Rien n'a été envoyé. "
+               + "Réessayez dans quelques minutes — notre équipe est prévenue."
+        })
+      };
     }
 
     // ── Envoi AUTOMATIQUE des demandes RGPD (privacy-dispatch.js) ──
@@ -196,6 +220,7 @@ exports.handler = async (event) => {
         <li><strong>Sous 7 jours</strong> : scan complet des principaux annuaires et courtiers de données</li>
         <li><strong>Sous 14 jours</strong> : premières demandes RGPD article 17 envoyées</li>
         <li><strong>Sous 30 jours</strong> : la majorité des sites doivent supprimer vos données (délai légal UE)</li>
+        <li><strong>Chaque mois</strong> : re-scan pour s'assurer qu'elles ne réapparaissent pas</li>
       </ol>
     </div>
 

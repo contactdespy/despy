@@ -5,6 +5,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('./_auth');
+const { lire } = require('./_db');
 
 exports.handler = async (event) => {
   const headers = {
@@ -42,9 +43,13 @@ exports.handler = async (event) => {
       .limit(1);
 
     if (error) {
-      // Table absente ou inaccessible — on renvoie active:false sans crasher
-      console.warn('privacy-status read warn:', error.message);
-      return { statusCode: 200, headers, body: JSON.stringify({ active: false }) };
+      // Table inaccessible. On renvoyait `active:false`, ce qui revient à dire
+      // au client « vous n'avez jamais activé le service » — et lui réaffiche
+      // le formulaire d'activation, qu'il risque de resoumettre en doublon.
+      // `indisponible` permet à l'espace client de dire la vérité : on ne sait
+      // pas, réessayez.
+      console.error(`BDD ÉCHEC — lecture privacy_requests ${email}: ${error.message}`);
+      return { statusCode: 200, headers, body: JSON.stringify({ active: false, indisponible: true }) };
     }
 
     if (!data || data.length === 0) {
@@ -53,8 +58,17 @@ exports.handler = async (event) => {
 
     const req = data[0];
 
-    const activatedAt = new Date(req.activated_at);
-    const nextScan = new Date(activatedAt.getTime() + 30 * 86400000).toISOString();
+    // Prochaine vérification = le prochain passage RÉEL du cron, pas une date
+    // théorique. C'était « activation + 30 jours » : pour un client activé en mai,
+    // la date était dépassée depuis des mois et l'espace client affichait
+    // « Nouvelle vérification dans 0 jour » à vie. La cadence vraie est celle de
+    // privacy-recheck dans netlify.toml : le 1er du mois à 5h UTC.
+    const maintenant = new Date();
+    let prochain = new Date(Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth(), 1, 5, 0, 0));
+    if (prochain <= maintenant) {
+      prochain = new Date(Date.UTC(maintenant.getUTCFullYear(), maintenant.getUTCMonth() + 1, 1, 5, 0, 0));
+    }
+    const nextScan = prochain.toISOString();
 
     // ── Construction des ÉLÉMENTS RÉELS visibles par le client ──
     // Deux sources, toutes deux factuelles / validées :
@@ -65,28 +79,38 @@ exports.handler = async (event) => {
     const CAT_LABEL = { annuaire: 'Annuaire', reseau_social: 'Réseau social', presse_blog: 'Article / blog', donnees_legales: 'Registre légal', autre: 'Site web' };
     const items = [];
 
+    // Une lecture qui échoue renvoyait `undefined`, devenu `[]`, devenu « 0 »
+    // à l'écran : une table inaccessible était donc affichée au client comme
+    // « aucune donnée supprimée ». Indiscernable de la vérité. On suit
+    // maintenant l'échec, et on le dit au lieu d'afficher un zéro inventé.
+    let degrade = false;
+
     // 1. Demandes RGPD envoyées
-    try {
-      const { data: logs } = await supabase
-        .from('privacy_dispatch_log')
+    const lgs = await lire(
+      supabase.from('privacy_dispatch_log')
         .select('broker_name, status, sent_at')
-        .eq('user_email', email);
-      (logs || []).forEach(l => items.push({
-        name: l.broker_name || 'Annuaire',
-        kind: 'Demande de suppression envoyée',
-        status: l.status === 'confirmed' ? 'supprime' : 'encours',
-        date: l.sent_at
-      }));
-    } catch (e) { console.warn('dispatch log read:', e.message); }
+        .eq('user_email', email),
+      `privacy_dispatch_log — ${email}`
+    );
+    if (!lgs.ok) degrade = true;
+    (lgs.data || []).forEach(l => items.push({
+      name: l.broker_name || 'Annuaire',
+      kind: 'Demande de suppression envoyée',
+      status: l.status === 'confirmed' ? 'supprime' : 'encours',
+      date: l.sent_at
+    }));
 
     // 2. Trouvailles validées
-    try {
-      const { data: finds } = await supabase
-        .from('privacy_findings')
-        .select('url, category, action, status, reason, found_at')
-        .eq('user_email', email)
-        .eq('status', 'validated');
-      (finds || []).forEach(f => {
+    {
+      const fnd = await lire(
+        supabase.from('privacy_findings')
+          .select('url, category, action, status, reason, found_at')
+          .eq('user_email', email)
+          .eq('status', 'validated'),
+        `privacy_findings — ${email}`
+      );
+      if (!fnd.ok) degrade = true;
+      (fnd.data || []).forEach(f => {
         const dom = domainOf(f.url);
         const label = CAT_LABEL[f.category] || 'Site web';
         // guide_client = une action côté client (ex. profil LinkedIn) ; sinon suppression en cours
@@ -100,7 +124,7 @@ exports.handler = async (event) => {
           date: f.found_at
         });
       });
-    } catch (e) { console.warn('findings read:', e.message); }
+    }
 
     const stats = {
       supprime: items.filter(i => i.status === 'supprime').length,
@@ -123,6 +147,11 @@ exports.handler = async (event) => {
         status: req.status || 'pending',
         items,
         stats,
+        // true = au moins une lecture a échoué, donc les compteurs sont faux
+        // et probablement sous-évalués. L'espace client affiche un message
+        // plutôt que des chiffres qu'il ne peut pas garantir.
+        degrade,
+        last_scan_at: req.last_scan_at || null,
         next_scan: nextScan
       })
     };

@@ -25,6 +25,11 @@ CREATE INDEX IF NOT EXISTS idx_privacy_requests_email ON privacy_requests (user_
 ALTER TABLE privacy_requests ADD COLUMN IF NOT EXISTS notes TEXT;
 ALTER TABLE privacy_requests ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending';
 
+-- Date du dernier passage mensuel (privacy-recheck.js, cron du 1er du mois).
+-- Sert à l'espace client : « dernière vérification le … ». Volontairement NULL
+-- au départ — une demande jamais repassée ne doit pas prétendre l'avoir été.
+ALTER TABLE privacy_requests ADD COLUMN IF NOT EXISTS last_scan_at TIMESTAMPTZ;
+
 -- Journal des demandes RGPD envoyées automatiquement (privacy-dispatch.js)
 -- Une ligne par broker contacté → le suivi de l'espace client devient réel.
 CREATE TABLE IF NOT EXISTS privacy_dispatch_log (

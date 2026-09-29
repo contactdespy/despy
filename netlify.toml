@@ -234,6 +234,14 @@
 [functions.hibp-check]
   schedule = "0 7 * * 1"           # Chaque lundi 7h — fuites de données (HIBP)
 
+[functions.privacy-recheck]
+  schedule = "0 5 1 * *"           # 1er du mois 5h — Privacy Cleanup. L'espace client
+                                   # promet « une nouvelle vérification chaque mois » :
+                                   # sans ce passage, la promesse n'était tenue par
+                                   # personne (l'envoi RGPD et le scan ne partaient
+                                   # QUE depuis le formulaire d'activation). Rattrape
+                                   # aussi les demandes jamais dispatchées.
+
 [functions.hudsonrock-check]
   schedule = "0 7 * * 4"           # Chaque jeudi 7h — appareils infectés (infostealer)
                                    # Surveillance hebdomadaire + alerte push instantanée

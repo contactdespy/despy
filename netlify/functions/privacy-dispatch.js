@@ -17,6 +17,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { EMAIL_BROKERS, FORM_BROKERS } = require('./_privacy-brokers');
+const { ecrire } = require('./_db');
 
 // Envoi direct Resend — lettre légale : pas d'en-tête de désinscription.
 async function sendRaw(to, subject, html, replyTo) {
@@ -105,7 +106,8 @@ function buildClientRecapHTML(c, sentBrokers) {
         <div style="font-size:13.5px;color:#444;line-height:1.7">
           Notre équipe traite aussi les annuaires qui exigent un formulaire
           (118712, Infobel…) et surveille les réponses. Vous suivez l'avancement
-          dans votre espace Despy.
+          dans votre espace Despy, et nous revérifions chaque mois que vos données
+          ne réapparaissent pas.
         </div>
       </div>
       <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px 18px;margin:0 0 24px">
@@ -175,15 +177,26 @@ exports.handler = async (event) => {
         buildArt17HTML(c, broker)
       );
       sent.push(broker);
-      // journal best-effort (la table peut ne pas exister encore)
-      try {
-        await supabase.from('privacy_dispatch_log').insert({
+
+      // Ce journal N'EST PAS accessoire : c'est la seule trace qu'une demande
+      // est partie. L'espace client en tire ses compteurs, et le cron mensuel
+      // s'en sert pour savoir qui n'a jamais été traité. S'il n'est pas écrit,
+      // le courrier est bien parti mais Despy l'a oublié — et rejouera un
+      // rattrapage au prochain passage, cette fois en doublon chez le broker.
+      await ecrire(
+        supabase.from('privacy_dispatch_log').insert({
           user_email: c.user_email.toLowerCase().trim(),
           broker_id: broker.id,
           broker_name: broker.name,
           status: 'sent'
-        });
-      } catch (e) { console.warn('log insert:', e.message); }
+        }),
+        `privacy_dispatch_log — ${broker.id} pour ${c.user_email}`,
+        { alerte: true, details: {
+            'Client': c.user_email,
+            'Broker': `${broker.name} (${broker.id})`,
+            'Conséquence': 'Demande art. 17 envoyée mais non journalisée — à saisir à la main'
+          } }
+      );
       await new Promise(r => setTimeout(r, 700));
     } catch (e) {
       console.error(`Envoi ${broker.id} échoué:`, e.message);
@@ -191,15 +204,19 @@ exports.handler = async (event) => {
     }
   }
 
-  // 2. Statut de la demande → in_progress (best-effort)
-  try {
-    await supabase.from('privacy_requests')
+  // 2. Statut de la demande → in_progress
+  // Pas d'alerte email ici : le journal ci-dessus porte déjà l'information qui
+  // compte, et ce statut se rattrape tout seul au passage suivant. Une alerte
+  // de plus pour la même panne ferait du bruit, pas du signal.
+  await ecrire(
+    supabase.from('privacy_requests')
       .update({
         status: 'in_progress',
         notes: `Dispatch auto le ${new Date().toISOString().slice(0, 10)} — envoyé : ${sent.map(b => b.id).join(', ') || 'aucun'}${failed.length ? ' · échecs : ' + failed.map(b => b.id).join(', ') : ''}`
       })
-      .eq('user_email', c.user_email.toLowerCase().trim());
-  } catch (e) { console.warn('update status:', e.message); }
+      .eq('user_email', c.user_email.toLowerCase().trim()),
+    `privacy_requests.status — ${c.user_email}`
+  );
 
   // 3. Récap au client (uniquement si au moins un envoi a réussi)
   if (sent.length > 0) {

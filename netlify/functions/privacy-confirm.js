@@ -72,8 +72,12 @@ exports.handler = async (event) => {
       // Prévenir l'équipe pour lancer la demande de suppression de ce site précis.
       let host = '';
       try { host = new URL(data.url).hostname.replace(/^www\./, ''); } catch (e) {}
+      // Si cette notification n'arrive pas, le client a lu « nous allons
+      // demander la suppression » et personne, côté Despy, ne sait qu'il faut
+      // le faire : la fiche reste « en cours » dans son espace indéfiniment.
+      // fetch ne lève pas sur un 4xx, donc le catch seul ne suffisait pas.
       try {
-        await fetch('https://api.resend.com/emails', {
+        const notif = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -87,7 +91,16 @@ exports.handler = async (event) => {
             </div>`
           })
         });
-      } catch (e) { console.error('notif équipe confirm:', e.message); }
+        // Le log porte toutes les informations nécessaires : c'est le dernier
+        // filet quand le canal email lui-même est en panne.
+        if (!notif.ok) {
+          console.error(`ACTION MANUELLE REQUISE — notif équipe non envoyée (Resend HTTP ${notif.status}). `
+            + `Client ${email} a confirmé la fiche ${id} (${host || data.url}) : envoyer la demande art. 17.`);
+        }
+      } catch (e) {
+        console.error(`ACTION MANUELLE REQUISE — notif équipe impossible (${e.message}). `
+          + `Client ${email} a confirmé la fiche ${id} (${host || data.url}) : envoyer la demande art. 17.`);
+      }
 
       return html(200, page('✅', 'Merci, c\'est noté&nbsp;!', 'Nous allons demander la suppression de vos informations sur ce site. Vous pouvez suivre l\'avancement dans votre espace Despy — nous nous occupons de tout.'));
     }
