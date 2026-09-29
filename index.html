@@ -3675,10 +3675,10 @@ function triggerPWAInstall() {
           <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">01</div>
           <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Découverte</div>
           <div style="font-size:14px;color:var(--text2);line-height:1.6">
-            Vous renseignez vos infos (nom, email, téléphone, ville). Despy scanne automatiquement <strong>30 sites prioritaires</strong> en France et à l'international pour identifier où vos données apparaissent.
+            Vous renseignez vos infos (nom, email, téléphone, ville). Despy fait une <strong>série de recherches sur le web</strong> et repère où vos données apparaissent : annuaires, réseaux sociaux, presse. Chaque résultat est vérifié par une personne avant de vous être montré — un homonyme, ce n'est pas vous.
           </div>
           <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
-            Scan : les principaux annuaires et courtiers de données · Durée : ~10 min
+            Recherche web · vérifiée à la main · ~10 min
           </div>
         </div>
 
@@ -3687,7 +3687,7 @@ function triggerPWAInstall() {
           <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">02</div>
           <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Demandes RGPD</div>
           <div style="font-size:14px;color:var(--text2);line-height:1.6">
-            Pour chaque site identifié, Despy envoie une <strong>demande légale d'effacement</strong> (article 17 RGPD). Le site a <strong>1 mois maximum</strong> pour s'exécuter — c'est obligatoire en Europe.
+            Despy envoie une <strong>demande légale d'effacement</strong> (article 17 RGPD) aux annuaires qui publient les coordonnées des particuliers — PagesJaunes, 118 218, 118 000, 118 712, Infobel, annuaire.com — et à Google pour ses résultats vous concernant. Chacun a <strong>1 mois maximum</strong> pour s'exécuter : c'est obligatoire en Europe. Pour les autres sites trouvés, on voit avec vous au cas par cas.
           </div>
           <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
             Article 17 RGPD · Droit à l'oubli
@@ -3699,10 +3699,10 @@ function triggerPWAInstall() {
           <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">03</div>
           <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Suivi & escalade</div>
           <div style="font-size:14px;color:var(--text2);line-height:1.6">
-            Despy relance les sites qui ne répondent pas. En cas de refus injustifié, on <strong>saisit la CNIL</strong> automatiquement. Vous voyez l'avancement de chaque demande en temps réel.
+            Sans réponse au bout de 30 jours, on relance. Si un site refuse sans motif valable, on vous aide à <strong>saisir la CNIL</strong> : la plainte est à votre nom, c'est votre droit, et on prépare le dossier avec vous. Vous suivez l'avancement dans votre espace.
           </div>
           <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
-            Recours CNIL · Gratuit · Inclus
+            Relance à 30 jours · Recours CNIL · Inclus
           </div>
         </div>
 
@@ -3711,10 +3711,10 @@ function triggerPWAInstall() {
           <div style="position:absolute;top:-14px;left:24px;background:var(--blue);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px">04</div>
           <div style="margin-top:12px;font-weight:800;font-size:17px;color:var(--text);margin-bottom:10px">Monitoring permanent</div>
           <div style="font-size:14px;color:var(--text2);line-height:1.6">
-            Les data brokers réimportent régulièrement les bases. Despy <strong>re-scanne chaque mois</strong> et renvoie une demande si vos données réapparaissent. Vous êtes protégé en continu.
+            Les annuaires réimportent régulièrement leurs bases. Chaque mois, Despy <strong>refait la recherche</strong> ; si vos données réapparaissent quelque part, on le vérifie et on renvoie une demande.
           </div>
           <div style="margin-top:14px;font-size:12px;color:var(--text3);font-family:'SF Mono',Menlo,monospace;background:var(--bg2);padding:10px;border-radius:8px;border-left:3px solid var(--blue)">
-            Re-scan : 1× par mois · Automatique
+            Nouvelle recherche : 1× par mois
           </div>
         </div>
       </div>
@@ -6947,7 +6947,7 @@ var LEGAL = {
   },
   cgv: {
     title: 'Conditions Générales de Vente',
-    html: '<p><em>En vigueur au 14/04/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Intervention à distance : 49€ (téléphone ou visio)<br>• Intervention à domicile : 89€ (Bas-Rhin (67) — déplacement inclus jusqu&#39;à 30 km de Strasbourg, léger supplément au-delà, annoncé avant toute réservation)<br>• Forfait complet : 129€ (tous appareils + rapport)</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Service SOS Humain &mdash; Nature et limites</h4><p>Le service SOS Humain consiste en un accompagnement par téléphone et par écrit, à des fins de conseil, de coordination et de rédaction de courriers. Despy n&#39;est ni une banque, ni un avocat, ni une autorité judiciaire ou de police. Despy ne se substitue à aucun de ces acteurs et ne garantit pas la récupération de sommes débitées ou la résolution juridique d&#39;un litige. L&#39;utilisateur reste seul responsable de ses comptes, mots de passe et démarches officielles. Despy peut rédiger des courriers à des fins d&#39;accompagnement, mais l&#39;utilisateur en reste signataire et responsable. <strong>Délais de rappel garantis :</strong> 15 minutes pour les cas critiques, 30 minutes en soirée et week-end, 4 heures en journée semaine, lendemain matin pour les demandes de nuit. <strong>Inclusion abonnement 9,99€/mois :</strong> conseil humain illimité (téléphone, rédaction de courriers, accompagnement banque/police). <strong>Non-inclus :</strong> les interventions techniques sur appareil (désinstallation, sécurisation, reset) qui restent facturées à l&#39;acte au tarif public (49€ distance, 89€ domicile, 129€ forfait complet), pour abonnés comme non-abonnés.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
+    html: '<p><em>En vigueur au 29/09/2026</em></p><h4>Parties</h4><p>Despy (Bourefis Yacine, EI, SIRET 103 694 212 00012) et tout client particulier.</p><h4>Services et tarifs</h4><p>• Abonnement mensuel : 9,99€/mois<br>• Abonnement annuel : 89€/an (7,42€/mois · 2 mois offerts)<br>• Abonnement Famille mensuel : 14,99€/mois<br>• Abonnement Famille annuel : 139€/an<br>• Intervention à distance : 49€ (téléphone ou visio)<br>• Intervention à domicile : 89€ (Bas-Rhin (67) — déplacement inclus jusqu&#39;à 30 km de Strasbourg, léger supplément au-delà, annoncé avant toute réservation)<br>• Forfait complet : 129€ (tous appareils + rapport)</p><h4>Formule Famille</h4><p>Un abonnement Famille couvre 3 personnes : le titulaire, qui paie, et 2 proches qu&#39;il invite depuis son espace. Chacun a son propre compte. Chaque proche bénéficie des mêmes services que le titulaire ; les interventions techniques restent facturées à l&#39;acte, comme pour tout abonné. Le titulaire peut retirer un proche et en inviter un autre à tout moment, dans la limite de 2. La couverture des proches dépend de l&#39;abonnement du titulaire : s&#39;il le résilie, elle prend fin en même temps que le sien.</p><h4>Paiement</h4><p>Sécurisé via Stripe (PCI-DSS). Prélèvement mensuel ou annuel.</p><h4>Résiliation</h4><p>Sans engagement. Gratuite, immédiate, sans justification. Effet en fin de période en cours.</p><h4>Rétractation</h4><p>14 jours conformément à l&#39;article L221-18 du Code de la consommation.</p><h4>Conseiller Despy &mdash; Nature IA (EU AI Act)</h4><p>Le Conseiller Despy est basé sur l&#39;intelligence artificielle (Claude, Anthropic Inc., USA). Ses réponses sont informatives et ne constituent pas un conseil professionnel certifié. Transferts encadrés par CCT UE.</p><h4>Service SOS Humain &mdash; Nature et limites</h4><p>Le service SOS Humain consiste en un accompagnement par téléphone et par écrit, à des fins de conseil, de coordination et de rédaction de courriers. Despy n&#39;est ni une banque, ni un avocat, ni une autorité judiciaire ou de police. Despy ne se substitue à aucun de ces acteurs et ne garantit pas la récupération de sommes débitées ou la résolution juridique d&#39;un litige. L&#39;utilisateur reste seul responsable de ses comptes, mots de passe et démarches officielles. Despy peut rédiger des courriers à des fins d&#39;accompagnement, mais l&#39;utilisateur en reste signataire et responsable. <strong>Délais de rappel garantis :</strong> 15 minutes pour les cas critiques, 30 minutes en soirée et week-end, 4 heures en journée semaine, lendemain matin pour les demandes de nuit. <strong>Inclusion abonnement 9,99€/mois :</strong> conseil humain illimité (téléphone, rédaction de courriers, accompagnement banque/police). <strong>Non-inclus :</strong> les interventions techniques sur appareil (désinstallation, sécurisation, reset) qui restent facturées à l&#39;acte au tarif public (49€ distance, 89€ domicile, 129€ forfait complet), pour abonnés comme non-abonnés.</p><h4>Démarrage immédiat (L221-28)</h4><p>En cochant la case lors de la souscription, le consommateur reconnaît que le service commence immédiatement après paiement et renonce à son droit de rétractation de 14 jours.</p><h4>Médiation de la consommation (L.616-1)</h4><p>Litige non résolu : <strong>CNPM &mdash; Médiation de la Consommation</strong><br>contact@cnpm-mediation-consommation.eu &middot; cnpm-mediation-consommation.eu</p><h4>Litiges</h4><p>Médiation à l&#39;amiable privilégiée. Juridiction compétente : Tribunal de Strasbourg.</p>'
   },
   confidentialite: {
     title: "Politique de confidentialité",
@@ -8430,40 +8430,6 @@ function doLogout() {
 // ═══════════════════════════════════════════════
 // PRIVACY CLEANUP — Module d'effacement de données
 // ═══════════════════════════════════════════════
-
-// Liste des 30 sites cibles (data brokers)
-var PRIVACY_TARGETS = [
-  { name: '118-712.fr',                    category: 'Annuaire inversé FR',        priority: 1 },
-  { name: '118-218.fr',                    category: 'Annuaire inversé FR',        priority: 1 },
-  { name: 'pagesjaunes.fr',                category: 'Annuaire inversé FR',        priority: 1 },
-  { name: 'annuaire-inverse-france.com',   category: 'Annuaire inversé FR',        priority: 1 },
-  { name: 'annuaire-inverse.net',          category: 'Annuaire inversé FR',        priority: 2 },
-  { name: 'pages-blanches.fr',             category: 'Annuaire inversé FR',        priority: 2 },
-  { name: 'annu-inverse.com',              category: 'Annuaire inversé FR',        priority: 2 },
-  { name: 'Spokeo',                        category: 'Broker international',       priority: 1 },
-  { name: 'Whitepages',                    category: 'Broker international',       priority: 1 },
-  { name: 'Pipl',                          category: 'Broker international',       priority: 1 },
-  { name: 'BeenVerified',                  category: 'Broker international',       priority: 2 },
-  { name: 'Intelius',                      category: 'Broker international',       priority: 2 },
-  { name: 'PeopleFinder',                  category: 'Broker international',       priority: 2 },
-  { name: 'Pappers.fr',                    category: 'Aggregator pro',             priority: 2 },
-  { name: 'Societe.com',                   category: 'Aggregator pro',             priority: 2 },
-  { name: 'Infogreffe',                    category: 'Aggregator pro',             priority: 3 },
-  { name: 'Verif.com',                     category: 'Aggregator pro',             priority: 3 },
-  { name: 'Manageo',                       category: 'Aggregator pro',             priority: 3 },
-  { name: 'Google Cache',                  category: 'Archives & moteurs',         priority: 1 },
-  { name: 'Internet Archive',              category: 'Archives & moteurs',         priority: 2 },
-  { name: 'Bing Cache',                    category: 'Archives & moteurs',         priority: 3 },
-  { name: 'Datafrance',                    category: 'Base marketing',             priority: 3 },
-  { name: 'Geoscope',                      category: 'Base marketing',             priority: 3 },
-  { name: 'Annuaire 118.fr',               category: 'Annuaire inversé FR',        priority: 2 },
-  { name: 'fichier-prospect.com',          category: 'Base marketing',             priority: 3 },
-  { name: 'qui-est-ce.com',                category: 'Annuaire inversé FR',        priority: 3 },
-  { name: 'AnnuaireFrancais',              category: 'Annuaire inversé FR',        priority: 3 },
-  { name: 'Yandex People Search',          category: 'Broker international',       priority: 3 },
-  { name: 'TruePeopleSearch',              category: 'Broker international',       priority: 3 },
-  { name: 'FastPeopleSearch',              category: 'Broker international',       priority: 3 },
-];
 
 // Statuts possibles : 'pending' (en attente scan), 'sent' (demande envoyée), 'cleaned' (supprimé), 'cnil' (escalade CNIL), 'not_found' (pas trouvé)
 
