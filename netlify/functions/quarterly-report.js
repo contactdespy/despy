@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { avecProches } = require('./_famille');
 
 // Checklist personnalisée selon le profil
 const SECURITY_CHECKLIST = [
@@ -140,10 +141,11 @@ exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    const { data: clients } = await supabase
+    const { data: payeurs } = await supabase
       .from('clients')
       .select('email, name, prenom')
       .eq('subscribed', true);
+    const clients = await avecProches(supabase, payeurs, 'email, name, prenom');
 
     if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ sent: 0 }) };

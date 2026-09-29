@@ -7,6 +7,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { prochesCouverts } = require('./_famille');
 
 async function sendEmail(type, data) {
   await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
@@ -24,6 +25,12 @@ exports.handler = async (event) => {
   if (!isScheduled(event)) return notScheduled();   // cron uniquement (pas d'appel HTTP)
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+  // Cette séquence vend l'abonnement aux comptes gratuits. Un proche Famille
+  // est gratuit en base mais déjà protégé : lui écrire « Dernière chance :
+  // 2 mois offerts », c'est lui vendre ce que sa famille lui paie déjà.
+  const couverts = await prochesCouverts(supabase);
+  const pasCouvert = (l) => !couverts.has((l.email || '').toLowerCase());
 
   const now = new Date();
 
@@ -49,7 +56,7 @@ exports.handler = async (event) => {
       .gte('created_at', r1.start)
       .lte('created_at', r1.end);
 
-    for (const l of leads_j1 || []) {
+    for (const l of (leads_j1 || []).filter(pasCouvert)) {
       const prenom = l.prenom || l.name?.split(' ')[0] || 'cher membre';
       try {
         await sendEmail('custom', {
@@ -89,7 +96,7 @@ exports.handler = async (event) => {
       .gte('created_at', r7.start)
       .lte('created_at', r7.end);
 
-    for (const l of leads_j7 || []) {
+    for (const l of (leads_j7 || []).filter(pasCouvert)) {
       const prenom = l.prenom || l.name?.split(' ')[0] || 'cher membre';
       const restantes = 3 - (l.questions_used || 0);
       try {
@@ -126,7 +133,7 @@ exports.handler = async (event) => {
       .gte('created_at', r14.start)
       .lte('created_at', r14.end);
 
-    for (const l of leads_j14 || []) {
+    for (const l of (leads_j14 || []).filter(pasCouvert)) {
       const prenom = l.prenom || l.name?.split(' ')[0] || 'cher membre';
       try {
         await sendEmail('custom', {

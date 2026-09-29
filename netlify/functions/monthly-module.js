@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { estCouvert } = require('./_famille');
 const { requireAuth } = require('./_auth');
 
 exports.handler = async (event) => {
@@ -48,7 +49,7 @@ exports.handler = async (event) => {
     const { data: client } = await supabase
       .from('clients').select('subscribed').eq('email', email).maybeSingle();
 
-    if (!(client && client.subscribed)) {
+    if (!(client && await estCouvert(supabase, client, email))) {
       return {
         statusCode: 200, headers,
         body: JSON.stringify({ module: { period: mod.period, title: mod.title, locked: true } })

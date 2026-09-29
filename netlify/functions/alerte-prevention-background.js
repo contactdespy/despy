@@ -26,6 +26,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { preparerPrevention } = require('./_alerte-prevention');
 const { envoyerPush, tagDepuis } = require('./_push');
+const { prochesCouverts } = require('./_famille');
 
 const ADMIN = process.env.ALERTES_MODERATION_EMAIL || 'contact.despy@gmail.com';
 
@@ -94,11 +95,14 @@ async function destinataires(supabase) {
     .select('email, name, prenom, subscribed');
   if (error) throw new Error('clients illisible : ' + error.message);
 
+  // Un proche Famille n'a pas `subscribed` à son nom : sans ce tri, il
+  // recevait la version gratuite de l'alerte.
+  const couverts = await prochesCouverts(supabase);
   const abonnes = [], gratuits = [];
   for (const c of (clients || [])) {
     const mail = (c.email || '').toLowerCase().trim();
     if (!mail || !mail.includes('@') || optout.has(mail)) continue;
-    (c.subscribed ? abonnes : gratuits).push({
+    (c.subscribed || couverts.has(mail) ? abonnes : gratuits).push({
       email: mail,
       prenom: c.prenom || (c.name || '').split(' ')[0] || ''
     });

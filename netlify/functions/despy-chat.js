@@ -9,6 +9,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth, rateLimit } = require('./_auth');
 const { matchPlaybook, buildPlaybookReply } = require('./_chat-playbooks');
+const { estCouvert } = require('./_famille');
 
 // Quota découverte des comptes gratuits (aligné sur le quiz : 5/mois).
 const FREE_CHAT_PAR_MOIS = 5;
@@ -97,7 +98,9 @@ exports.handler = async (event) => {
         // lui, vaut pour tout le monde. Auparavant l'incrémentation était
         // enfermée dans ce test : un abonné Premium voyait donc « 0 question
         // posée » à vie sur son accueil, alors qu'il en posait tous les jours.
-        if (!client.subscribed && used >= FREE_CHAT_PAR_MOIS) {
+        // Un proche Famille n'a pas `subscribed` à son nom : on ne le vérifie
+        // qu'au moment de bloquer, pour ne rien coûter aux autres messages.
+        if (!client.subscribed && used >= FREE_CHAT_PAR_MOIS && !(await estCouvert(supabase, client, em))) {
           return {
             statusCode: 200,
             headers,

@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { prochesCouverts } = require('./_famille');
 
 exports.handler = async (event) => {
   const { isScheduled, notScheduled } = require('./_is-scheduled');
@@ -21,13 +22,18 @@ exports.handler = async (event) => {
     const end = new Date(threeDaysAgo);
     end.setHours(23, 59, 59, 999);
 
-    const { data: leads } = await supabase
+    const { data: lus } = await supabase
       .from('clients')
       .select('email, name, prenom')
       .eq('subscribed', false)
       .eq('lead', true)
       .gte('created_at', start.toISOString())
       .lte('created_at', end.toISOString());
+
+    // Un proche Famille est un compte gratuit en base, mais déjà protégé :
+    // pas de relance commerciale.
+    const couverts = await prochesCouverts(supabase);
+    const leads = (lus || []).filter((l) => !couverts.has((l.email || '').toLowerCase()));
 
     if (!leads || leads.length === 0) {
       console.log('Aucun lead à relancer aujourd\'hui');

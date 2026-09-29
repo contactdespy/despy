@@ -18,6 +18,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { isScheduled, notScheduled } = require('./_is-scheduled');
 const { TEMPLATES } = require('./training-templates');
+const { prochesCouverts } = require('./_famille');
 
 const JOURS = { mensuel: 30, bimestriel: 60, trimestriel: 90 };
 const CHANCE_PAR_JOUR = 0.25;   // ≈ 4 jours d'attente en moyenne après l'échéance
@@ -51,6 +52,10 @@ exports.handler = async (event) => {
       (outs || []).forEach(o => { if (o.email) stop.add(o.email.toLowerCase()); });
     } catch (e) { console.warn('optouts:', e.message); }
 
+    // L'entraînement fait partie de l'abonnement — celui du payeur couvre ses
+    // proches, qui n'ont pas `subscribed` à leur nom.
+    const couverts = await prochesCouverts(supabase);
+
     const maintenant = Date.now();
     let envoyes = 0, ignores = 0, echecs = 0;
 
@@ -58,7 +63,7 @@ exports.handler = async (event) => {
       const email = (m.email || '').toLowerCase().trim();
       if (!email || !email.includes('@')) { ignores++; continue; }
       if (stop.has(email)) { ignores++; continue; }
-      if (!m.subscribed) { ignores++; continue; }   // l'entraînement fait partie de l'abonnement
+      if (!m.subscribed && !couverts.has(email)) { ignores++; continue; }   // l'entraînement fait partie de l'abonnement
 
       const intervalle = JOURS[m.training_rythme] || 30;
       const depuis = m.training_last_at

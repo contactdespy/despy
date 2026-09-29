@@ -12,6 +12,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { avecProches } = require('./_famille');
 const {
   checkEmailBreaches, buildBreachAlertHTML, alertTrustedContact, sendBreachPush
 } = require('./_hibp');
@@ -25,10 +26,13 @@ exports.handler = async (event) => {
 
   try {
     // Récupérer les abonnés actifs
-    const { data: clients } = await supabase
+    const { data: payeurs } = await supabase
       .from('clients')
       .select('email, name, prenom, last_hibp_check, known_breaches, trusted_contact_name, trusted_contact_email')
       .eq('subscribed', true);
+    // Les proches Famille aussi : la surveillance des fuites est le cœur de
+    // ce que la famille paie pour eux.
+    const clients = await avecProches(supabase, payeurs, 'email, name, prenom, last_hibp_check, known_breaches, trusted_contact_name, trusted_contact_email');
 
     if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ checked: 0, alerts: 0 }) };

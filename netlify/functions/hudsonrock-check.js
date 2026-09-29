@@ -13,6 +13,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { avecProches } = require('./_famille');
 
 const HR_BASE = 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email';
 
@@ -199,7 +200,7 @@ exports.handler = async (event) => {
 
   // ── Cron mensuel : tous les abonnés ──
   try {
-    const { data: clients, error } = await supabase
+    const { data: payeurs, error } = await supabase
       .from('clients')
       .select('email, name, prenom, last_stealer_check, known_stealers, trusted_contact_name, trusted_contact_email')
       .eq('subscribed', true);
@@ -209,6 +210,8 @@ exports.handler = async (event) => {
       console.error('Infostealer cron — select error (migration SQL manquante ?):', error.message);
       return { statusCode: 200, body: JSON.stringify({ checked: 0, alerts: 0, error: 'select' }) };
     }
+    // Les proches Famille aussi : c'est pour eux que la famille paie.
+    const clients = await avecProches(supabase, payeurs, 'email, name, prenom, last_stealer_check, known_stealers, trusted_contact_name, trusted_contact_email');
     if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ checked: 0, alerts: 0 }) };
     }

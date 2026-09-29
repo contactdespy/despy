@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { avecProches } = require('./_famille');
 
 exports.handler = async (event) => {
   const { isScheduled, notScheduled } = require('./_is-scheduled');
@@ -13,10 +14,11 @@ exports.handler = async (event) => {
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   try {
-    const { data: clients } = await supabase
+    const { data: payeurs } = await supabase
       .from('clients')
       .select('email, name, prenom, plan, subscribed, breach_count, quizzes_completed, analyses_count, questions_used, referral_code, bonus_months')
       .eq('subscribed', true);
+    const clients = await avecProches(supabase, payeurs, 'email, name, prenom, plan, subscribed, breach_count, quizzes_completed, analyses_count, questions_used, referral_code, bonus_months');
 
     if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ sent: 0 }) };

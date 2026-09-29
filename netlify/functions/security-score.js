@@ -5,6 +5,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { estCouvert } = require('./_famille');
 const { requireAuth } = require('./_auth');
 
 // ════════════════════════════════════════════
@@ -147,6 +148,10 @@ exports.handler = async (event) => {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Compte introuvable' }) };
     }
 
+    // Un proche Famille n'a pas l'abonnement à son nom : sans ça, l'accueil
+    // lui conseillait de s'abonner et affichait « formule gratuite ».
+    const couvert = await estCouvert(supabase, client, cleanEmail);
+
     // ── Checklist « Votre protection » (dashboard) ──
     // privacy_requests et training_tests : simple présence d'une ligne.
     // Best-effort : si une table manque, l'étape reste à faire (pas d'erreur).
@@ -180,7 +185,7 @@ exports.handler = async (event) => {
     // Conseils personnalisés selon le profil
     const tips = [];
     if ((client.breach_count || 0) > 0) tips.push({ priority: 'high', text: 'Changez vos mots de passe — votre email est dans des fuites de données' });
-    if (!client.subscribed) tips.push({ priority: 'medium', text: 'Activez la surveillance dark web mensuelle avec l\'abonnement' });
+    if (!couvert) tips.push({ priority: 'medium', text: 'Activez la surveillance dark web mensuelle avec l\'abonnement' });
     if ((client.questions_used || 0) === 0) tips.push({ priority: 'low', text: 'Posez votre première question au Conseiller Despy' });
     if (!client.telephone) tips.push({ priority: 'low', text: 'Ajoutez votre numéro pour recevoir des alertes SMS urgentes' });
 
@@ -216,7 +221,7 @@ exports.handler = async (event) => {
           // fois les six gestes faits, pour que « protégé » ait un visage.
           trusted_name:      client.trusted_contact_name || null,
           trusted_email:     client.trusted_contact_email || null,
-          plan:              client.subscribed ? client.plan : 'free',
+          plan:              client.subscribed ? client.plan : (couvert ? 'family_member' : 'free'),
         }
       })
     };

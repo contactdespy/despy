@@ -10,6 +10,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { CATEGORIES } = require('./_fraud-alerts');
+const { prochesCouverts } = require('./_famille');
 
 function digestHTML(prenom, ville, items) {
   const rows = items.map(r => `
@@ -77,12 +78,16 @@ exports.handler = async (event) => {
       (outs || []).forEach(o => optedOut.add((o.email || '').toLowerCase()));
     } catch (e) {}
 
+    // Un proche Famille est servi en temps réel comme un abonné (voir
+    // _fraud-alerts) : il ne doit pas recevoir le récap gratuit en plus.
+    const couverts = await prochesCouverts(supabase);
+
     let sent = 0;
     for (const sub of subs) {
       const email = (sub.email || '').toLowerCase();
       if (optedOut.has(email)) continue;
       const cli = byEmail.get(email);
-      if (cli && cli.subscribed) continue; // premium : déjà servi en temps réel
+      if ((cli && cli.subscribed) || couverts.has(email)) continue; // premium : déjà servi en temps réel
 
       const items = reports.filter(r => r.code_postal === sub.code_postal);
       if (items.length === 0) continue;

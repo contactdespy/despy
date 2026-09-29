@@ -23,6 +23,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { prochesCouverts } = require('./_famille');
 
 // Messages « valeur » en rotation. On tourne via clients.nudge_step, donc
 // chaque membre voit un thème différent chaque semaine (cycle ~6 semaines).
@@ -94,7 +95,11 @@ exports.handler = async (event) => {
         .select('email, prenom, name, created_at')
         .eq('subscribed', false);
     }
-    clients = res.data;
+    // Même règle absolue pour un proche Famille : il est protégé par
+    // l'abonnement d'un autre, donc « Premium actif » — même si sa ligne
+    // dit subscribed = false.
+    const couverts = await prochesCouverts(supabase);
+    clients = (res.data || []).filter((c) => !couverts.has((c.email || '').toLowerCase()));
 
     if (res.error || !clients || clients.length === 0) {
       if (res.error) console.error('nudge: select clients:', res.error.message);

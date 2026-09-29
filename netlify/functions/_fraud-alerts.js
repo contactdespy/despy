@@ -10,6 +10,8 @@
 // (fraud-digest.js) — c'est la frontière gratuit/payant.
 // ════════════════════════════════════════════
 
+const { avecProches } = require('./_famille');
+
 const CATEGORIES = {
   faux_artisan: 'Faux artisan / dépanneur',
   faux_agent: 'Faux agent (EDF, eau, police…)',
@@ -62,11 +64,13 @@ async function dispatchFraudAlert(supabase, report) {
 
   // Parmi eux, les clients premium (temps réel = payant)
   const emails = subs.map(s => s.email);
-  const { data: premiums } = await supabase
+  const { data: payeurs } = await supabase
     .from('clients')
     .select('email, prenom, name')
     .in('email', emails)
     .eq('subscribed', true);
+  // Un proche Famille a droit au temps réel comme celui qui paie pour lui.
+  const premiums = await avecProches(supabase, payeurs, 'email, prenom, name', { parmi: emails });
   if (!premiums || premiums.length === 0) return { alerted: 0 };
 
   const label = CATEGORIES[report.category] || 'Arnaque locale';

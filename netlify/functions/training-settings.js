@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { estCouvert } = require('./_famille');
 const { requireAuth } = require('./_auth');
 
 const RYTHMES = { mensuel: 30, bimestriel: 60, trimestriel: 90 };
@@ -60,9 +61,9 @@ exports.handler = async (event) => {
     if (res.error) {
       dispo = false;                                   // colonnes absentes
       const base = await supabase.from('clients').select('subscribed').eq('email', email).maybeSingle();
-      abonne = !!(base.data && base.data.subscribed);
+      abonne = !!base.data && await estCouvert(supabase, base.data, email);
     } else if (res.data) {
-      abonne = !!res.data.subscribed;
+      abonne = await estCouvert(supabase, res.data, email);
       actif = !!res.data.training_active;
       rythme = res.data.training_rythme || 'mensuel';
       dernier = res.data.training_last_at || null;

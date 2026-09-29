@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { avecProches } = require('./_famille');
 const crypto = require('crypto');
 const { WEEKLY_TIPS, TIPS_BY_ID, getIsoWeek } = require('./_weekly-tips');
 
@@ -29,10 +30,11 @@ exports.handler = async (event) => {
   const N = WEEKLY_TIPS.length;
 
   try {
-    const { data: clients } = await supabase
+    const { data: payeurs } = await supabase
       .from('clients')
       .select('email, name, prenom')
       .eq('subscribed', true);
+    const clients = await avecProches(supabase, payeurs, 'email, name, prenom');
 
     if (!clients || clients.length === 0) {
       return { statusCode: 200, body: JSON.stringify({ sent: 0 }) };

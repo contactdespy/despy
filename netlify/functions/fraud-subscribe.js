@@ -9,6 +9,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { estCouvert } = require('./_famille');
 const { requireAuth, rateLimit } = require('./_auth');
 
 async function geocodeCheck(codePostal, ville) {
@@ -74,7 +75,7 @@ exports.handler = async (event) => {
     let premium = false;
     try {
       const { data: cli } = await supabase.from('clients').select('subscribed').eq('email', auth.email).maybeSingle();
-      premium = !!(cli && cli.subscribed);
+      premium = !!cli && await estCouvert(supabase, cli, auth.email);
     } catch (e) {}
 
     return {

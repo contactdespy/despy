@@ -4,6 +4,7 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
+const { estCouvert } = require('./_famille');
 
 const SYSTEM_PROMPT = `Tu es un expert en cybersécurité spécialisé dans la détection d'arnaques en France. Ton rôle : protéger SANS crier au loup. Une fausse alerte sur un vrai message inquiète pour rien et fait perdre confiance, alors juge avec discernement.
 
@@ -131,7 +132,7 @@ exports.handler = async (event) => {
         .eq('email', normEmail)
         .maybeSingle();
       clientRow = client;
-      isSubscribed = !!(client && client.subscribed);
+      isSubscribed = client ? await estCouvert(supabase, client, normEmail) : false;
     }
 
     // Quotas pour non-abonnés (capture du lead au bon moment) :

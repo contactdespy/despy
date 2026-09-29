@@ -18,6 +18,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { collecterAlertes } = require('./_alert-sources');
+const { avecProches, prochesCouverts } = require('./_famille');
 
 // Un email d'alerte ne se justifie que si l'événement est récent. Sans ça, la
 // première exécution après cette correction écrirait à tout le monde à propos
@@ -59,10 +60,20 @@ async function envoyer(type, client, alerte) {
 // abonne = true  → alerte complète aux abonnés payants
 // abonne = false → teaser aux comptes gratuits
 async function diffuser(supabase, alerte, abonne) {
-  const { data: clients } = await supabase
+  const { data: lus } = await supabase
     .from('clients')
     .select('email, name, prenom')
     .eq('subscribed', abonne);
+
+  // Un proche Famille est `subscribed = false` en base : il tombait dans
+  // les comptes gratuits et recevait le teaser. On le fait passer du bon côté.
+  let clients;
+  if (abonne) {
+    clients = await avecProches(supabase, lus, 'email, name, prenom');
+  } else {
+    const couverts = await prochesCouverts(supabase);
+    clients = (lus || []).filter((c) => !couverts.has((c.email || '').toLowerCase()));
+  }
 
   if (!clients || clients.length === 0) return 0;
 

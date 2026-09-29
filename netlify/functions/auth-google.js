@@ -9,6 +9,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { OAuth2Client } = require('google-auth-library');
 const { issueToken } = require('./_auth');
+const { couvertureFamille } = require('./_famille');
 
 const GOOGLE_CLIENT_ID = '748335639234-oj6eijplnemcr23b6us3bohv2cannql4.apps.googleusercontent.com';
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
@@ -96,6 +97,12 @@ exports.handler = async (event) => {
       const { error: eLien } = await supabase.from('clients').update(update).eq('email', email);
       if (eLien) console.warn('Liaison google_id impossible (colonne absente ?) :', eLien.message);
 
+      // Même réponse que la connexion par mot de passe (check-subscription) :
+      // un proche Famille qui passe par Google était vu « gratuit » jusqu'à
+      // la revalidation suivante de la session.
+      const fam = existing.subscribed ? { couvert: false }
+                                      : await couvertureFamille(supabase, email);
+
       return {
         statusCode: 200,
         headers,
@@ -108,8 +115,10 @@ exports.handler = async (event) => {
           prenom: existing.prenom || givenName,
           nom: existing.nom || familyName,
           telephone: existing.telephone || '',
-          subscribed: !!existing.subscribed,
-          plan: existing.plan || 'free',
+          subscribed: !!existing.subscribed || fam.couvert,
+          plan: fam.couvert ? 'family_member' : (existing.plan || 'free'),
+          famille_de: fam.couvert ? fam.owner : null,
+          famille_prenom: fam.couvert ? (fam.ownerPrenom || null) : null,
           created_at: existing.created_at,
           referralCode: existing.referral_code || null
         })
