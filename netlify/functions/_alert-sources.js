@@ -396,6 +396,44 @@ function pertinentPourSenior(titre, resume) {
   return PERTINENT.some(k => t.indexOf(k) !== -1);
 }
 
+// ── L'exigence propre à la source ────────────────────────────────────────
+// Ce qu'on réimpose soi-même quand on ne peut pas faire confiance au moteur
+// de recherche pour respecter la contrainte qu'on lui a donnée (voir `exige`
+// plus haut).
+//
+// Dans le TITRE seul. Le « résumé » de Google Actualités n'est pas un
+// résumé : c'est le titre répété, suivi du nom du journal — il n'y a pas
+// une ligne d'article dedans. Chercher le territoire là-dedans revenait
+// donc à ajouter « ou bien le journal s'appelle L'Alsace », qui couvre
+// l'actualité nationale comme n'importe quel autre titre de presse.
+//
+// Relevé sur le flux réel du 10 septembre 2026 : 8 articles retenus, dont
+// 2 ne tenaient qu'à cette manchette — « C'est quoi le SIM-swapping »
+// (explication nationale) et « un faux théâtre antique : un Italien
+// condamné ». Ce dernier est celui-là même qu'on avait fini par bloquer à
+// la main dans HORS_SUJET_PRESSE ('theatre antique') : on soignait le
+// symptôme, la porte d'entrée est ici.
+//
+// Le titre n'est pas seulement plus sévère, il est plus JUSTE : ce jour-là
+// il laissait passer le Bas-Rhin de TF1 Info, de BFM et de 20 Minutes,
+// c'est-à-dire les vraies histoires locales que racontent des journaux
+// nationaux — celles qu'une lecture de la manchette manquerait toutes.
+// (Ce qu'elles deviennent ensuite regarde le tri, pas ce filtre-ci.)
+//
+// Même règle que `pertinentPourSenior` plus haut : ce qui fait ENTRER un
+// article se lit dans son titre, le résumé ne sert qu'à écarter.
+//
+// UNE seule copie, et c'est le fond du problème : tant que ce filtre n'était
+// écrit que dans `lireSource`, la sentinelle comptait sans lui et annonçait
+// 16 articles retenus là où la chaîne n'en gardait que 2. Un flux local tombé
+// à zéro serait donc resté affiché en bonne santé — précisément la panne
+// qu'elle est chargée de voir.
+function respecteExigence(source, titre) {
+  if (!source.exige) return true;
+  const t = aplatir(titre);
+  return source.exige.some(k => t.indexOf(k) !== -1);
+}
+
 // ── Récupération ─────────────────────────────────────────────────────────
 async function lireSource(source) {
   try {
@@ -415,36 +453,7 @@ async function lireSource(source) {
       console.error(`[alertes] source VIDE ou format inattendu : ${source.nom} ${source.url}`);
       return [];
     }
-    // Exigence propre à la source, quand on ne peut pas faire confiance au
-    // moteur de recherche pour la respecter (voir `exige` plus haut).
-    //
-    // Dans le TITRE seul. Le « résumé » de Google Actualités n'est pas un
-    // résumé : c'est le titre répété, suivi du nom du journal — il n'y a pas
-    // une ligne d'article dedans. Chercher le territoire là-dedans revenait
-    // donc à ajouter « ou bien le journal s'appelle L'Alsace », qui couvre
-    // l'actualité nationale comme n'importe quel autre titre de presse.
-    //
-    // Relevé sur le flux réel du 10 septembre 2026 : 8 articles retenus, dont
-    // 2 ne tenaient qu'à cette manchette — « C'est quoi le SIM-swapping »
-    // (explication nationale) et « un faux théâtre antique : un Italien
-    // condamné ». Ce dernier est celui-là même qu'on avait fini par bloquer à
-    // la main dans HORS_SUJET_PRESSE ('theatre antique') : on soignait le
-    // symptôme, la porte d'entrée est ici.
-    //
-    // Le titre n'est pas seulement plus sévère, il est plus JUSTE : ce jour-là
-    // il laissait passer le Bas-Rhin de TF1 Info, de BFM et de 20 Minutes,
-    // c'est-à-dire les vraies histoires locales que racontent des journaux
-    // nationaux — celles qu'une lecture de la manchette manquerait toutes.
-    // (Ce qu'elles deviennent ensuite regarde le tri, pas ce filtre-ci.)
-    //
-    // Même règle que `pertinentPourSenior` plus haut : ce qui fait ENTRER un
-    // article se lit dans son titre, le résumé ne sert qu'à écarter.
-    if (source.exige) {
-      bruts = bruts.filter(b => {
-        const t = aplatir(b.titre);
-        return source.exige.some(k => t.indexOf(k) !== -1);
-      });
-    }
+    bruts = bruts.filter(b => respecteExigence(source, b.titre));
     return bruts.map(b => ({
       title: b.titre,
       body: b.resume ? b.resume.slice(0, 400) : '',
@@ -535,7 +544,11 @@ async function collecterPresse(maxJours) {
 // une semaine calme — c'est cette confusion qui a duré des mois.
 //
 // On rapporte donc trois choses par source : le code HTTP, le nombre
-// d'entrées que le parseur arrive à lire, et le nombre qui passe le tri.
+// d'entrées que le parseur arrive à lire, et le nombre que la chaîne garde
+// vraiment — tri ET exigence de territoire, comme `lireSource`. Compter sans
+// l'exigence rendait la sentinelle aveugle là où elle est la plus utile : la
+// presse locale pouvait ne plus rien ramener du Bas-Rhin et continuer
+// d'afficher un chiffre à deux chiffres, en pleine forme.
 async function diagnostiquer() {
   return Promise.all(SOURCES.map(async (source) => {
     const confiance = source.confiance || 'officiel';
@@ -552,7 +565,8 @@ async function diagnostiquer() {
       const xml = await res.text();
       const bruts = source.format === 'atom' ? parserAtom(xml) : parserRss(xml);
       etat.entrees = bruts.length;
-      etat.retenues = bruts.filter(b => tri(b.titre, b.resume)).length;
+      etat.retenues = bruts.filter(
+        b => respecteExigence(source, b.titre) && tri(b.titre, b.resume)).length;
     } catch (e) {
       etat.erreur = (e && e.message) || 'erreur inconnue';
     }
