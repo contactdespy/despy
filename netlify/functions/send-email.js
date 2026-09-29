@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════
 
 const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
 // Jeton de désinscription (identique à unsubscribe.js) pour le lien 1-clic.
 function unsubToken(email) {
@@ -150,6 +151,54 @@ const MARKETING = new Set([
   "relance_lead", "ia_scams_awareness", "cyber_alert_free",
   "alerte_prevention_free"
 ]);
+
+// Ce qui ne part plus à qui a cliqué « se désinscrire ».
+//
+// Le lien 1-clic est sur TOUS les emails, et le clic est bien enregistré
+// dans `email_optouts` — mais rien ne relisait cette table ici. Seuls les
+// envois qui la vérifiaient eux-mêmes s'arrêtaient ; la relance J+3, la
+// séquence d'accueil et les bilans continuaient d'écrire à des gens qui
+// avaient dit non. C'est interdit en prospection, et Gmail range en spam
+// l'expéditeur qui ignore ce bouton — alertes de sécurité comprises.
+//
+// guide_delivery n'y est pas : c'est la réponse à une demande qu'on vient
+// de faire. La refuser à quelqu'un qui s'était désinscrit il y a un an
+// serait absurde.
+//
+// Un envoi `custom` n'a pas de type parlant : l'appelant écrit
+// `data.marketing = true` quand c'est de la prospection ou un bilan que
+// personne n'a demandé. Sans cette marque, un custom reste un email de
+// service — mot de passe, proche de confiance, analyse demandée, alerte de
+// fuite à un abonné — et part toujours.
+const RETENU_SI_DESINSCRIT = new Set([
+  "nurture_j2", "nurture_j4", "nurture_j6", "nurture_j8",
+  "relance_lead", "ia_scams_awareness", "cyber_alert_free",
+  "alerte_prevention_free", "monthly_report"
+]);
+
+// Table absente = migration jamais passée = personne n'a pu se désinscrire :
+// on envoie. Toute autre panne, on retient : un email de prospection qui ne
+// part pas ne coûte rien, un email envoyé à quelqu'un qui a dit non, si.
+async function desinscrit(email) {
+  try {
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { data, error } = await supabase
+      .from("email_optouts")
+      .select("email")
+      .eq("email", String(email).toLowerCase().trim())
+      .limit(1);
+    if (error) {
+      const absente = error.code === "42P01" || error.code === "PGRST205" ||
+        /does not exist|could not find the table/i.test(error.message || "");
+      if (absente) return false;
+      throw new Error(error.message || "lecture impossible");
+    }
+    return Array.isArray(data) && data.length > 0;
+  } catch (e) {
+    console.warn("email_optouts illisible, envoi retenu :", e.message);
+    return true;
+  }
+}
 
 const templates = {
 
@@ -906,14 +955,24 @@ exports.handler = async (event) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: `Template inconnu: ${type}` }) };
     }
 
+    // 200 et pas une erreur : pour l'appelant, ne pas écrire à quelqu'un
+    // qui a dit non est le fonctionnement normal, pas une panne.
+    const retenu = RETENU_SI_DESINSCRIT.has(type) || data.marketing === true;
+    if (retenu && await desinscrit(data.email)) {
+      console.log(`Email ${type} retenu : ${data.email} s'est désinscrit`);
+      return { statusCode: 200, headers, body: JSON.stringify({ sent: false, reason: "desinscrit" }) };
+    }
+
     const { subject, html } = templateFn(data);
 
     // Le guide part EN PIÈCE JOINTE : un lien à cliquer, c'est un
     // navigateur à ouvrir puis un PDF à retrouver — trois occasions
     // d'abandonner pour quelqu'un de 75 ans. Si la récupération échoue,
     // l'email part quand même : le bouton reste en secours.
+    // Tout ce qui s'arrête sur un « non » doit montrer comment le dire : le
+    // lien visible accompagne donc aussi les bilans et les `custom` marqués.
     const extras = {};
-    if (MARKETING.has(type)) extras.unsub = true;
+    if (MARKETING.has(type) || retenu) extras.unsub = true;
     if (type === "guide_delivery" && data.guideUrl) {
       try {
         const r = await fetch(data.guideUrl, { signal: AbortSignal.timeout(8000) });

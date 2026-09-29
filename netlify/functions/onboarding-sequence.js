@@ -54,6 +54,7 @@ exports.handler = async (event) => {
       try {
         await sendEmail('custom', {
           email: l.email,
+          marketing: true,
           subject: 'Despy — Avez-vous posé votre première question ?',
           html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px">
             <h2 style="color:#2D5BFF">Bonjour ${prenom} 👋</h2>
@@ -94,6 +95,7 @@ exports.handler = async (event) => {
       try {
         await sendEmail('custom', {
           email: l.email,
+          marketing: true,
           subject: `Despy — Il vous reste ${restantes} question${restantes > 1 ? 's' : ''} gratuite${restantes > 1 ? 's' : ''}`,
           html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px">
             <h2 style="color:#2D5BFF">Bonjour ${prenom},</h2>
@@ -129,6 +131,7 @@ exports.handler = async (event) => {
       try {
         await sendEmail('custom', {
           email: l.email,
+          marketing: true,
           subject: 'Despy — Dernière chance : 2 mois offerts',
           html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px">
             <h2 style="color:#2D5BFF">Bonjour ${prenom},</h2>

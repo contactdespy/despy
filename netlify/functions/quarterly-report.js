@@ -169,6 +169,7 @@ exports.handler = async (event) => {
             type: 'custom',
             data: {
               email: client.email,
+              marketing: true,
               subject: `🛡️ Votre bilan Despy — ${quarter === 1 ? '1er' : quarter + 'ème'} trimestre ${year}`,
               html
             }

@@ -70,34 +70,41 @@ exports.handler = async (event) => {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
     if (action === 'resub') {
-      await supabase.from('email_optouts').delete().eq('email', cleanEmail);
+      const { error: e1 } = await supabase.from('email_optouts').delete().eq('email', cleanEmail);
+      if (e1) throw new Error(e1.message);
       return html(200, page(
         '🎉', 'Vous êtes réabonné !',
-        "Parfait, vous recevrez à nouveau votre conseil sécurité chaque semaine. Content de vous retrouver 🛡️",
+        "Parfait, vous recevrez à nouveau nos conseils et nos bilans par email. Content de vous retrouver 🛡️",
         '#16a34a',
         `<a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:13px 26px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">Retour sur Despy</a>`
       ));
     }
 
-    // Désinscription
-    await supabase.from('email_optouts').upsert(
+    // Désinscription. supabase ne lève pas d'exception quand la base refuse :
+    // il renvoie l'erreur dans la réponse. Sans la relire, une écriture
+    // ratée affichait « C'est fait » — et la personne continuait de recevoir
+    // des emails après avoir été assurée du contraire.
+    const { error: e2 } = await supabase.from('email_optouts').upsert(
       { email: cleanEmail, scope: 'weekly', created_at: new Date().toISOString() },
       { onConflict: 'email' }
     );
+    if (e2) throw new Error(e2.message);
     const resubUrl = `${baseUrl}/.netlify/functions/unsubscribe?e=${encodeURIComponent(email)}&k=${token}&action=resub`;
     return html(200, page(
       '👋', "C'est fait, vous êtes désinscrit",
-      "Vous ne recevrez plus les conseils hebdomadaires.<br><br><strong>Votre abonnement Despy n'est pas affecté</strong> : votre protection, vos alertes et votre Conseiller restent actifs.",
+      "Vous ne recevrez plus nos conseils, relances et bilans par email.<br><br><strong>Si vous êtes abonné, votre protection ne change pas</strong> : vos alertes de sécurité et votre Conseiller restent actifs.",
       '#2D5BFF',
       `<a href="${resubUrl}" style="background:#16a34a;color:#fff;padding:13px 26px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">Finalement, je me réabonne</a>`
     ));
 
   } catch (err) {
     console.error('unsubscribe error:', err.message);
-    return html(200, page(
-      '👋', 'Demande prise en compte',
-      "Votre demande a bien été enregistrée. Si vous receviez encore un conseil, écrivez-nous à contact@despy.fr.",
-      '#2D5BFF'
+    // 500 et pas 200 : le désabonnement en un clic de Gmail envoie cette
+    // requête sans afficher la page, et ne sait qu'il a échoué que par le code.
+    return html(500, page(
+      '😕', "Ça n'a pas fonctionné",
+      "Votre demande n'a pas pu être enregistrée à l'instant. Réessayez dans quelques minutes avec le même lien, ou écrivez à contact@despy.fr : on vous retire à la main.",
+      '#dc2626'
     ));
   }
 };
