@@ -5,7 +5,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('./_auth');
-const { ecrire } = require('./_db');
+const { ecrire, lire } = require('./_db');
 
 // Helper : envoi email via Resend
 async function sendResend(to, subject, html) {
@@ -75,6 +75,24 @@ exports.handler = async (event) => {
       activated_at: activated_at || new Date().toISOString()
     };
 
+    // Le client peut rouvrir ce formulaire pour corriger ses informations. Si
+    // elles ont changé, les annuaires ont reçu l'ancien numéro ou l'ancien nom :
+    // les lettres doivent repartir. Si rien n'a changé, elles ne repartent pas —
+    // avant, chaque réouverture renvoyait tout, en double chez chaque annuaire.
+    // Lu AVANT l'insertion, sinon on se comparerait à soi-même.
+    const CHAMPS = ['prenom', 'nom', 'target_email', 'phone', 'ville'];
+    const norme = (v) => String(v || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    const avant = await lire(
+      supabase.from('privacy_requests')
+        .select('prenom, nom, target_email, phone, ville')
+        .eq('user_email', insertPayload.user_email)
+        .order('activated_at', { ascending: false })
+        .limit(1),
+      `privacy_requests (demande précédente) — ${insertPayload.user_email}`
+    );
+    const precedente = avant.ok && avant.data && avant.data[0];
+    const infosChangees = !!precedente && CHAMPS.some(k => norme(precedente[k]) !== norme(insertPayload[k]));
+
     // Cette ligne EST le service. L'espace client la lit pour afficher
     // l'avancement, et le cron mensuel la lit pour relancer les vérifications :
     // sans elle, le client a payé pour un service qui n'existe nulle part.
@@ -122,7 +140,8 @@ exports.handler = async (event) => {
           target_email: insertPayload.target_email,
           phone: insertPayload.phone,
           ville: insertPayload.ville,
-          activated_at: insertPayload.activated_at
+          activated_at: insertPayload.activated_at,
+          force: infosChangees
         })
       });
       if (d.ok) {
