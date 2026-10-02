@@ -6,6 +6,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('./_auth');
 const { lire } = require('./_db');
+const { annuaire, dernieres, affichage } = require('./_privacy-suivi');
 
 exports.handler = async (event) => {
   const headers = {
@@ -88,17 +89,21 @@ exports.handler = async (event) => {
     // 1. Demandes RGPD envoyées
     const lgs = await lire(
       supabase.from('privacy_dispatch_log')
-        .select('broker_name, status, sent_at')
+        .select('broker_id, broker_name, status, sent_at')
         .eq('user_email', email),
       `privacy_dispatch_log — ${email}`
     );
     if (!lgs.ok) degrade = true;
-    (lgs.data || []).forEach(l => items.push({
-      name: l.broker_name || 'Annuaire',
-      kind: 'Demande de suppression envoyée',
-      status: l.status === 'confirmed' ? 'supprime' : 'encours',
-      date: l.sent_at
-    }));
+    // Une ligne par annuaire, la plus récente : une lettre renvoyée ou une
+    // relance ajoute une ligne au journal, pas un annuaire de plus à l'écran.
+    // Un annuaire sorti de la liste (il ne publiait pas de particuliers) ne
+    // s'affiche plus « en cours » pour toujours.
+    for (const l of dernieres(lgs.data || []).values()) {
+      const b = annuaire(l.broker_id);
+      if (!b) continue;
+      const a = affichage(l);
+      items.push({ name: b.name, kind: a.kind, status: a.status, hint: a.hint, date: l.sent_at });
+    }
 
     // 2. Trouvailles validées
     {

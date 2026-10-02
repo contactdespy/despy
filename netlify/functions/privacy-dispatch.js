@@ -137,8 +137,10 @@ function buildClientRecapHTML(c, sentBrokers, renvoi) {
         ${guides}
       </div>
       <p style="font-size:13.5px;color:#666;line-height:1.7;margin:0 0 20px">
-        Vous suivez l'avancement dans votre espace Despy, et nous revérifions chaque
-        mois que vos données ne réapparaissent pas.
+        <strong>Dans un mois</strong>, nous vous demanderons si vous figurez encore dans ces
+        annuaires : si oui, un clic suffira pour relancer. Vous suivez l'avancement dans
+        votre espace Despy, et nous revérifions chaque mois que vos données ne
+        réapparaissent pas.
       </p>
       <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px 18px;margin:0 0 24px">
         <div style="font-size:14px;color:#d97706;font-weight:700;margin-bottom:6px">💡 Le petit geste qui complète tout</div>

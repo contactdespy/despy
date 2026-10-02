@@ -242,6 +242,14 @@
                                    # QUE depuis le formulaire d'activation). Rattrape
                                    # aussi les demandes jamais dispatchées.
 
+[functions.privacy-suivi]
+  schedule = "0 8 * * *"           # Chaque jour 8h UTC — Privacy Cleanup. Un mois après
+                                   # une lettre, demande au client s'il figure encore dans
+                                   # l'annuaire. Chaque jour et non chaque mois : une lettre
+                                   # partie le 2 n'a pas un mois le 1er suivant. Sans effet
+                                   # la plupart des jours (une question par étape, jamais
+                                   # de rappel).
+
 [functions.hudsonrock-check]
   schedule = "0 7 * * 4"           # Chaque jeudi 7h — appareils infectés (infostealer)
                                    # Surveillance hebdomadaire + alerte push instantanée

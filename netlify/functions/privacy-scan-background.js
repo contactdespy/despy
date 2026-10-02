@@ -156,7 +156,7 @@ function buildReportHTML(c, findings, queries) {
       </div>` : ''}
     ${ignored.length ? `<details><summary style="cursor:pointer;color:#888;font-size:13px">${ignored.length} résultat(s) écarté(s) automatiquement (homonymes / non pertinents)</summary>
       <div style="border:1px solid #eee;border-radius:12px;overflow:hidden;margin:10px 0">${ignored.map(f => row(f, false)).join('')}</div></details>` : ''}
-    <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Les annuaires connus (Solocal, 118218, 118000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
+    <p style="color:#888;font-size:12px;margin-top:18px">Recherche par Brave Search · Les annuaires connus (PagesJaunes, PagesBlanches, 118 712, 118 000) ont déjà reçu la demande RGPD via le dispatch automatique.</p>
   </div>`;
 }
 

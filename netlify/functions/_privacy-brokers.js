@@ -20,6 +20,17 @@
 //   sans nommer la bonne plateforme : privacy-dispatch la renvoie une fois.
 //   Corriger une adresse = changer `email` ET mettre `depuis` au jour même.
 //
+//   `verif` : où le client peut chercher son nom lui-même. C'est ce qui permet
+//   de lui demander, un mois après la lettre, s'il y figure encore
+//   (privacy-suivi.js). Un annuaire sans recherche en ligne ne peut pas être
+//   suivi de cette façon — et n'a sans doute rien à faire dans cette liste.
+//
+//   Avant d'ajouter un annuaire, vérifier DEUX choses sur son site, pas une :
+//   l'adresse où écrire, et qu'il publie bien des PARTICULIERS. 118218.fr
+//   avait la bonne adresse (dpo@118218.fr) et se décrit lui-même comme un
+//   service de renseignements sur « les abonnés professionnels » : la lettre
+//   partait pour rien, et la page de vente le citait à tort.
+//
 // GUIDES_CLIENT : démarches que l'annuaire n'accepte que de la personne
 //   elle-même. Elles partent dans le récap envoyé au client.
 // ════════════════════════════════════════════
@@ -35,16 +46,11 @@ const EMAIL_BROKERS = [
     platformNote: "Plateformes concernées : pagesjaunes.fr, pagesblanches.fr et l'annuaire diffusé sur 118712.fr",
     source: 'https://www.118712.fr/politique-cookies',
     verifie: '2026-10-02',
-    depuis: '2026-10-02T11:45:00Z'      // la lettre ne nommait pas 118712.fr avant
-  },
-  {
-    id: '118218',
-    name: '118 218',
-    email: 'dpo@118218.fr',
-    platformNote: 'Annuaire 118218.fr',
-    source: 'https://www.118218.fr/75-2/index.html',   // § 6, droits d'effacement
-    verifie: '2026-10-02',
-    depuis: '2026-10-02T11:45:00Z'      // partait à service-client@118218.fr
+    depuis: '2026-10-02T11:45:00Z',     // la lettre ne nommait pas 118712.fr avant
+    verif: [
+      { nom: 'PagesBlanches', url: 'https://www.pagesjaunes.fr/pagesblanches' },
+      { nom: '118 712 (onglet « Particuliers »)', url: 'https://www.118712.fr/' }
+    ]
   },
   {
     id: '118000',
@@ -53,7 +59,10 @@ const EMAIL_BROKERS = [
     platformNote: 'Annuaire 118000.fr (Pratique Media & Services)',
     source: 'https://www.118000.fr/cgu.html',           // « Ces droits s'exercent… »
     verifie: '2026-10-02',
-    depuis: '2026-10-02T11:45:00Z'      // partait à contact@118000.fr
+    depuis: '2026-10-02T11:45:00Z',     // partait à contact@118000.fr
+    verif: [
+      { nom: '118 000 (annuaire des particuliers)', url: 'https://annuaire.118000.fr/' }
+    ]
   }
 ];
 

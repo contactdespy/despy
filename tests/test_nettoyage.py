@@ -8,7 +8,8 @@
 #     formulaires à faire » que personne n'a jamais reçu ;
 #   · deux des trois lettres automatiques partaient à une adresse que
 #     l'annuaire ne désigne pas pour ce type de demande ;
-#   · un des sept (annuaire.com) n'existait plus.
+#   · un des sept (annuaire.com) n'existait plus, et un autre (118 218) ne
+#     publiait que des professionnels.
 #
 # Ce banc fait tourner les VRAIS fichiers sur une fausse base et un faux
 # service d'email, et vérifie ce qui compte : à QUI part chaque lettre, et
@@ -133,7 +134,7 @@ function tri(a) { return a.slice().sort(); }
 
 var CLIENT = { user_email: 'marie@x.fr', prenom: 'Marie', nom: 'Durand', target_email: 'marie@x.fr',
                phone: '0601020304', ville: 'Strasbourg', activated_at: '2026-06-01T10:00:00Z' };
-var BONNES = ['dpo@118218.fr', 'dpo@solocal.com', 'privacy@groupe-pratique.com'];
+var BONNES = ['dpo@solocal.com', 'privacy@groupe-pratique.com'];
 function lettres() { return MAILS.filter(function (m) { return /Article 17/.test(m.sujet); }); }
 function destinataires() { return tri(lettres().map(function (m) { return m.to; })); }
 function envoyer(c, secret) {
@@ -146,10 +147,10 @@ function journal(ids, quand) {
 
 Promise.resolve()
   // ── Premier envoi ───────────────────────────────────────────────────────
-  .then(etape('nouveau client : 3 lettres, aux adresses officielles', function () {
+  .then(etape('nouveau client : 2 lettres, aux adresses officielles', function () {
     return envoyer(CLIENT).then(function (r) {
-      note('nouveau client : 3 lettres, aux adresses officielles',
-        { statut: 200, vers: BONNES, journal: 3 },
+      note('nouveau client : 2 lettres, aux adresses officielles',
+        { statut: 200, vers: BONNES, journal: 2 },
         { statut: r.statusCode, vers: destinataires(), journal: TABLES.privacy_dispatch_log.length }); }); }))
 
   .then(etape('la lettre à Solocal nomme 118712.fr', function () {
@@ -162,7 +163,7 @@ Promise.resolve()
   .then(etape('la réponse de l\'annuaire arrive au client ET à Despy', function () {
     return envoyer(CLIENT).then(function () {
       note('la réponse de l\'annuaire arrive au client ET à Despy',
-        [['contact@despy.fr', 'marie@x.fr'], ['contact@despy.fr', 'marie@x.fr'], ['contact@despy.fr', 'marie@x.fr']],
+        [['contact@despy.fr', 'marie@x.fr'], ['contact@despy.fr', 'marie@x.fr']],
         lettres().map(function (m) { return tri([].concat(m.reply_to)); })); }); }))
 
   .then(etape('le client reçoit le chemin pour Google et Infobel', function () {
@@ -184,7 +185,7 @@ Promise.resolve()
   .then(etape('second appel : plus rien ne part, aucun email', function () {
     return envoyer(CLIENT).then(function () { MAILS = []; return envoyer(CLIENT); }).then(function (r) {
       note('second appel : plus rien ne part, aucun email',
-        { statut: 200, emails: 0, journal: 3 },
+        { statut: 200, emails: 0, journal: 2 },
         { statut: r.statusCode, emails: MAILS.length, journal: TABLES.privacy_dispatch_log.length }); }); }))
 
   .then(etape('client d\'avant la correction : tout repart, et on le lui dit', function () {
@@ -195,9 +196,9 @@ Promise.resolve()
         { vers: BONNES, renvoi: true }, { vers: destinataires(), renvoi: /renvoyons/.test(m.html) }); }); }))
 
   .then(etape('une seule lettre manquante : une seule part', function () {
-    journal(['solocal', '118000'], HORLOGE); journal(['118218'], AVANT);
+    journal(['solocal'], HORLOGE); journal(['118000'], AVANT);
     return envoyer(CLIENT).then(function () {
-      note('une seule lettre manquante : une seule part', ['dpo@118218.fr'], destinataires()); }); }))
+      note('une seule lettre manquante : une seule part', ['privacy@groupe-pratique.com'], destinataires()); }); }))
 
   .then(etape('journal illisible : on n\'envoie rien plutôt que risquer le doublon', function () {
     PANNE.privacy_dispatch_log = true;
@@ -206,7 +207,7 @@ Promise.resolve()
         { statut: 503, lettres: 0 }, { statut: r.statusCode, lettres: lettres().length }); }); }))
 
   .then(etape('informations corrigées par le client : tout repart', function () {
-    journal(['solocal', '118218', '118000'], HORLOGE);
+    journal(['solocal', '118000'], HORLOGE);
     var c = copie(CLIENT); c.force = true; c.phone = '0699999999';
     return envoyer(c).then(function () {
       var l = lettres();
@@ -229,7 +230,7 @@ Promise.resolve()
         var c = copie(CLIENT); c.phone = '0611111111'; return h(ev(c)); })
       .then(function () {
         note('réactivation sans changement : pas de seconde salve',
-          { premiere: 3, memeInfos: 3, numeroChange: 6 },
+          { premiere: 2, memeInfos: 2, numeroChange: 4 },
           { premiere: n1, memeInfos: n2, numeroChange: lettres().length }); }); }))
 
   // ── Le passage mensuel ──────────────────────────────────────────────────
@@ -241,7 +242,7 @@ Promise.resolve()
     demande('ancien@x.fr');                               // parti avant la correction
     demande('incomplet@x.fr', { phone: '' });             // ancien formulaire
     demande('annule@x.fr', { status: 'cancelled' });
-    ['solocal', '118218', '118000'].forEach(function (id) {
+    ['solocal', '118000'].forEach(function (id) {
       TABLES.privacy_dispatch_log.push({ user_email: 'ajour@x.fr', broker_id: id, sent_at: HORLOGE });
       TABLES.privacy_dispatch_log.push({ user_email: 'ancien@x.fr', broker_id: id, sent_at: AVANT });
     });
@@ -250,7 +251,7 @@ Promise.resolve()
       lettres().forEach(function (m) { var c = [].concat(m.reply_to).filter(function (a) { return a !== 'contact@despy.fr'; })[0].split('@')[0];
         par[c] = (par[c] || 0) + 1; });
       note('passage mensuel : chacun reçoit ce qui lui manque, pas plus',
-        { lettres: { jamais: 3, ancien: 3 }, recherches: ['ajour@x.fr', 'ancien@x.fr', 'incomplet@x.fr', 'jamais@x.fr'] },
+        { lettres: { jamais: 2, ancien: 2 }, recherches: ['ajour@x.fr', 'ancien@x.fr', 'incomplet@x.fr', 'jamais@x.fr'] },
         { lettres: par, recherches: tri(SCANS) }); }); }))
 
   .then(etape('passage mensuel appelé par URL, sans planification : rien', function () {
@@ -288,6 +289,7 @@ BANNIS = [
     (r'formulaires? à faire', 'plus aucune tâche manuelle dans un email interne'),
     (r'service-client@118218\.fr', "ancienne adresse 118 218 (la bonne : dpo@118218.fr)"),
     (r'contact@118000\.fr', "ancienne adresse 118 000 (la bonne : privacy@groupe-pratique.com)"),
+    (r'118 ?218', "118 218 ne publie que des professionnels, d'après son propre site"),
 ]
 
 
@@ -329,7 +331,10 @@ def relecture():
                 fautes.append('%s : %s' % (os.path.basename(chemin), raison))
     # La page ne doit pas présenter comme envoyé par Despy ce que seul le client peut faire.
     page = open(os.path.join(RACINE, 'index.html'), encoding='utf-8').read()
-    if re.search(r'envoie[^.]{0,260}(Infobel|à Google)', re.sub(r'<[^>]+>', '', page)):
+    # La phrase visée : celle qui énumère les destinataires des demandes. Elle
+    # s'arrête au premier point — « on vous envoie le chemin pour Google » est
+    # justement ce qu'on veut lire plus loin.
+    if re.search(r"[Dd]emandes? (légale )?d'effacement[^.]{0,300}(Infobel|Google)", re.sub(r'<[^>]+>', '', page)):
         fautes.append("index.html : la page dit encore que Despy écrit à Infobel ou à Google")
     for f in fautes:
         print('  ÉCHEC ' + f)
