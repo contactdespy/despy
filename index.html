@@ -7734,7 +7734,38 @@ function loadTrustedContact() {
     if (n && d.contact_name) n.value = d.contact_name;
     if (e && d.contact_email) e.value = d.contact_email;
     if (d.contact_email) tcStatus('✅ ' + (d.contact_name || 'Votre proche') + ' veille sur vous.', true);
+    // Le bilan du mois n'est proposé que s'il y a quelqu'un à qui l'envoyer.
+    var box = document.getElementById('tc-bilan-box');
+    var cb = document.getElementById('tc-bilan');
+    if (box && cb) {
+      box.style.display = (d.veilleur && d.bilan_dispo) ? 'block' : 'none';
+      cb.checked = !!d.bilan;
+    }
   }).catch(function(){ /* silencieux : champ simplement vide */ });
+}
+
+function saveTcBilan(oui) {
+  var s = siteSession.get();
+  if (!s || !s.email) return;
+  var cb = document.getElementById('tc-bilan');
+  fetch('/.netlify/functions/trusted-contact', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
+    body: JSON.stringify({ action: 'set_bilan', email: s.email, bilan: !!oui })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d && d.ok) {
+      tcStatus(oui ? '✅ Le bilan sera partagé chaque mois. Votre proche vient d\'en être informé.'
+                   : 'Le bilan n\'est plus partagé.', true);
+    } else {
+      // Le choix n'a pas été enregistré : la case ne doit pas prétendre le contraire.
+      if (cb) cb.checked = !oui;
+      tcStatus(d && d.raison === 'pas_de_proche' ? 'Désignez d\'abord un proche de confiance.'
+             : 'Enregistrement impossible pour le moment. Réessayez.', false);
+    }
+  }).catch(function() {
+    if (cb) cb.checked = !oui;
+    tcStatus('Connexion impossible. Vérifiez votre réseau et réessayez.', false);
+  });
 }
 
 function tcStatus(msg, ok) {
@@ -7772,6 +7803,8 @@ function saveTrustedContact() {
       tcStatus(email
         ? '✅ C\'est fait ! ' + (name.trim() || 'Votre proche') + ' sera alerté en cas de danger. Un email vient de l\'en informer.'
         : 'Personne de confiance retirée.', !!email || true);
+      var boxB = document.getElementById('tc-bilan-box'), cbB = document.getElementById('tc-bilan');
+      if (boxB && cbB) { boxB.style.display = (email && d.bilan_dispo) ? 'block' : 'none'; cbB.checked = !!d.bilan; }
     } else {
       tcStatus(d.error || 'Enregistrement impossible. Réessayez.', false);
     }
@@ -9291,6 +9324,11 @@ function renderAccountPanel() {
   html += '</div>';
   html += '<div id="tc-status" style="display:none;margin-top:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:600"></div>';
   html += '<div style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">💡 Votre proche recevra un email l\'informant de son rôle. Pour le retirer, videz les champs et enregistrez.</div>';
+  // Le bilan du mois : jamais coché d'avance, c'est au client de le choisir.
+  html += '<label id="tc-bilan-box" style="display:none;margin-top:14px;padding:12px;background:var(--bg2);border-radius:10px;font-size:13px;color:var(--text2);line-height:1.6;cursor:pointer">';
+  html += '<input type="checkbox" id="tc-bilan" onchange="saveTcBilan(this.checked)" style="margin-right:8px;transform:scale(1.2)">';
+  html += '<strong>Lui envoyer aussi un bilan, une fois par mois.</strong> Des nombres seulement — combien de messages vous avez fait vérifier, combien d\'arnaques repérées. Jamais le contenu de vos messages ni de vos questions.';
+  html += '</label>';
   html += '</div>';
 
   html += '<div style="background:#fff;border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';

@@ -3979,6 +3979,37 @@ function renderConfiance(d) {
   h += '<div class="fam-note" style="margin-top:16px">Elle recevra un email lui expliquant son rôle. ' +
        'Vous pouvez la changer ou la retirer à tout moment.</div>';
 
+  // ── Le bilan du mois ──
+  // Le proche ne recevait que les mauvaises nouvelles. S'il le veut, et
+  // seulement si le senior appuie lui-même sur « Oui », il reçoit une fois par
+  // mois ce que Despy a fait — des nombres, jamais un message. Rien n'est
+  // activé d'avance : l'écran promet plus haut « il ne verra rien de votre vie
+  // privée », ce choix-ci doit donc être fait en connaissance de cause.
+  var veil = d && d.veilleur;
+  if (veil && d.bilan_dispo) {
+    var qui = (veil.nom || (veil.lien === 'famille' ? 'la personne qui vous protège' : 'votre personne de confiance'))
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    h += '<div class="sec" style="margin-top:26px">Le bilan du mois</div>';
+    if (d.bilan) {
+      h += '<div class="veille" style="cursor:default;margin-bottom:14px">' +
+             '<span class="v-dot"></span>' +
+             '<span class="v-m"><span class="v-a">' + qui + ' reçoit votre bilan</span>' +
+             '<span class="v-b">Une fois par mois · des nombres seulement</span></span></div>' +
+           '<button class="btn-secondary" onclick="reglerBilan(false)">Ne plus le partager</button>';
+    } else {
+      h += '<div class="card pad" style="margin-bottom:14px">' +
+             '<div style="font-size:15px;line-height:1.65;color:var(--p-txt)">' +
+               'Voulez-vous que <b>' + qui + '</b> reçoive, une fois par mois, un petit bilan de ce que Despy a fait pour vous ?' +
+             '</div>' +
+             '<div style="margin-top:10px;font-size:14px;line-height:1.65;color:var(--p-txt2)">' +
+               '<b>Des nombres seulement</b> : combien de messages vous avez fait vérifier, combien d’arnaques ont été repérées. ' +
+               'Jamais le contenu de vos messages, ni de vos questions.' +
+             '</div></div>' +
+           '<button class="btn-primary" onclick="reglerBilan(true)">Oui, partager mon bilan</button>';
+    }
+    h += '<div class="fam-note" style="margin-top:12px">Vous pouvez changer d’avis à tout moment.</div>';
+  }
+
   // ── Le mot de passe famille ──
   // Despy enseigne cette parade dans deux quiz de sa formation sans l'avoir
   // jamais fournie. Avec le clonage de voix, c'est la seule qui tienne
@@ -4010,6 +4041,22 @@ function renderConfiance(d) {
        '</div>';
 
   z.innerHTML = h;
+}
+
+function reglerBilan(oui) {
+  toast('Enregistrement…');
+  confAppel({ action: 'set_bilan', bilan: !!oui })
+    .then(function (d) {
+      if (!d || !d.ok) {
+        toast(d && d.raison === 'migration_absente' ? 'Fonction bientôt disponible'
+            : d && d.raison === 'pas_de_proche' ? 'Désignez d’abord une personne de confiance'
+            : 'Enregistrement impossible');
+        return;
+      }
+      toast(oui ? 'C’est noté : le bilan sera partagé chaque mois.' : 'Le bilan n’est plus partagé.');
+      chargerConfiance();
+    })
+    .catch(function () { toast('Connexion impossible. Réessayez.'); });
 }
 
 function enregistrerMotFamille() {
@@ -4053,8 +4100,10 @@ function enregistrerConfiance() {
     .then(function (d) {
       if (!d || d.error) { confErreur(d && d.error ? d.error : 'Enregistrement impossible.'); return; }
       toast('C’est fait — ' + (nom || mail) + ' veille sur vous.');
-      CONF_ETAT = d;
-      renderConfiance(d);
+      // On recharge l'état complet : la réponse ne porte ni le mot de passe
+      // famille ni le bilan, qui disparaissaient de l'écran jusqu'à la
+      // réouverture.
+      chargerConfiance();
       // La checklist de protection change : on la recharge (c'est
       // refreshHomeScore qui interroge security-score et repeint la liste).
       if (typeof refreshHomeScore === 'function') { try { refreshHomeScore(); } catch (x) {} }
@@ -4068,8 +4117,7 @@ function retirerConfiance() {
     .then(function (d) {
       if (!d || d.error) { confErreur((d && d.error) || 'Retrait impossible.'); return; }
       toast('Personne de confiance retirée.');
-      CONF_ETAT = { contact_name: null, contact_email: null };
-      renderConfiance(CONF_ETAT);
+      chargerConfiance();
       if (typeof refreshHomeScore === 'function') { try { refreshHomeScore(); } catch (x) {} }
     })
     .catch(function () { confErreur('Connexion impossible. Réessayez.'); });

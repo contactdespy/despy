@@ -242,6 +242,13 @@
                                    # QUE depuis le formulaire d'activation). Rattrape
                                    # aussi les demandes jamais dispatchées.
 
+[functions.bilan-proche]
+  schedule = "0 6 1 * *"           # 1er du mois 6h UTC — le bilan du proche. Envoie à celui
+                                   # qui veille sur un senior ce que Despy a fait le mois
+                                   # écoulé (des nombres, jamais un message), si le senior
+                                   # l'a choisi. Tôt le 1er : le compteur de questions ne
+                                   # garde qu'un mois et bascule à la première question.
+
 [functions.privacy-suivi]
   schedule = "0 8 * * *"           # Chaque jour 8h UTC — Privacy Cleanup. Un mois après
                                    # une lettre, demande au client s'il figure encore dans

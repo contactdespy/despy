@@ -39,7 +39,7 @@ const sendResend = async (to, subject, html, extras) => {
       // marketing : il n'a rien à faire sur un échec de paiement.
       html: html + (opt.unsub ? `
         <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:11.5px;color:#9aa3b2;text-align:center;line-height:1.7;margin:16px auto 0;max-width:600px">
-          Vous recevez cet email parce que vous avez laissé votre adresse à Despy.<br>
+          ${opt.pourquoi || 'Vous recevez cet email parce que vous avez laissé votre adresse à Despy.'}<br>
           <a href="${unsubUrl}" style="color:#9aa3b2;text-decoration:underline">Se désinscrire en un clic</a>
         </p>` : ''),
       ...(opt.attachments ? { attachments: opt.attachments } : {}),
@@ -973,6 +973,12 @@ exports.handler = async (event) => {
     // lien visible accompagne donc aussi les bilans et les `custom` marqués.
     const extras = {};
     if (MARKETING.has(type) || retenu) extras.unsub = true;
+    // La raison affichée au-dessus du lien de désinscription. Par défaut,
+    // « vous avez laissé votre adresse » — ce qui est faux pour quelqu'un
+    // qu'un client a désigné : l'appelant donne alors la vraie raison.
+    if (typeof data.pourquoi === 'string' && data.pourquoi.trim()) {
+      extras.pourquoi = data.pourquoi.trim().slice(0, 200).replace(/</g, '&lt;');
+    }
     if (type === "guide_delivery" && data.guideUrl) {
       try {
         const r = await fetch(data.guideUrl, { signal: AbortSignal.timeout(8000) });

@@ -3,10 +3,12 @@
 // Un proche (enfant, conjoint…) est alerté quand Despy
 // détecte un danger : fuite dark web, SOS, arnaque détectée.
 // Actions : get / set (vider les champs = retirer le proche)
+//           set_word (mot de passe famille) / set_bilan (bilan mensuel)
 // ════════════════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
 const { requireAuth } = require('./_auth');
+const { destinataire } = require('./_bilan-proche');
 
 exports.handler = async (event) => {
   const headers = {
@@ -48,6 +50,57 @@ exports.handler = async (event) => {
     }
     if (!client) {
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Compte introuvable' }) };
+    }
+
+    // ── Le bilan du mois, partagé avec le proche ──
+    // Lu à part, et sans faire échouer le reste : la colonne est récente, et
+    // la personne de confiance fonctionne depuis longtemps.
+    const lb = await supabase.from('clients').select('bilan_proche').eq('email', email).maybeSingle();
+    const bilanDispo = !lb.error;
+    const bilan = bilanDispo && !!(lb.data && lb.data.bilan_proche);
+
+    if (body.action === 'set_bilan') {
+      const veut = body.bilan === true;
+      // Le choix vaut pour UNE personne : il faut qu'elle existe.
+      const dest = veut ? await destinataire(supabase, client) : null;
+      if (veut && !dest) {
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: false, raison: 'pas_de_proche' }) };
+      }
+      const { error: eB } = await supabase.from('clients')
+        .update({ bilan_proche: veut, updated_at: new Date().toISOString() })
+        .eq('email', email);
+      if (eB) {
+        console.error('trusted-contact set_bilan:', eB.message);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: false, raison: 'migration_absente' }) };
+      }
+      // Le proche apprend ce qu'il va recevoir, et pourquoi, AVANT le premier
+      // bilan — pas en le découvrant dans sa boîte un 1er du mois.
+      if (veut && !bilan) {
+        try {
+          const prenom = client.prenom || (client.name || '').split(' ')[0] || 'Un membre Despy';
+          await fetch(`${process.env.URL}/.netlify/functions/send-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.INTERNAL_SECRET || '' },
+            body: JSON.stringify({ type: 'custom', data: {
+              email: dest.email,
+              subject: `${prenom} partage désormais son bilan Despy avec vous`,
+              html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+                <div style="background:linear-gradient(135deg,#0a1f3a,#1a3fd9);padding:26px;color:#fff;border-radius:14px 14px 0 0">
+                  <div style="font-size:11px;font-weight:700;opacity:.85;letter-spacing:2px">DESPY — CERCLE DE CONFIANCE</div>
+                  <div style="font-size:21px;font-weight:900;margin-top:6px">📋 Un bilan par mois</div>
+                </div>
+                <div style="border:1px solid #e5e7eb;border-top:0;border-radius:0 0 14px 14px;padding:26px;font-size:15px;line-height:1.75;color:#333">
+                  <p><strong>${prenom}</strong> a choisi de partager avec vous son bilan Despy, une fois par mois.</p>
+                  <p style="font-size:14px;color:#555">Vous y lirez ce que Despy a fait pour ${prenom} : combien de messages vérifiés, combien d'arnaques repérées — ou, tout simplement, que le service n'a pas été utilisé ce mois-là.</p>
+                  <p style="font-size:14px;color:#555"><strong>Des nombres seulement.</strong> Jamais le contenu d'un message ni d'une question.</p>
+                  <p style="font-size:13px;color:#888">Le premier arrivera au début du mois prochain. Chaque bilan porte un lien pour ne plus le recevoir.</p>
+                  <p style="font-size:11px;color:#aaa;text-align:center;margin-top:22px">Despy · <a href="https://despy.fr" style="color:#2D5BFF">despy.fr</a></p>
+                </div></div>`
+            }})
+          });
+        } catch (e) { console.warn('Annonce du bilan au proche échouée:', e.message); }
+      }
+      return { statusCode: 200, headers, body: JSON.stringify({ ok: true, bilan: veut }) };
     }
 
     // ── Le mot de passe famille ──
@@ -119,6 +172,14 @@ exports.handler = async (event) => {
         return { statusCode: 500, headers, body: JSON.stringify({ error: 'Enregistrement impossible' }) };
       }
 
+      // L'accord pour le bilan a été donné pour une personne précise. Si elle
+      // change ou disparaît, il ne se transmet pas à la suivante. À part, pour
+      // que l'absence de la colonne ne casse pas l'enregistrement du proche.
+      if (bilanDispo && cEmail !== (client.trusted_contact_email || '').toLowerCase().trim()) {
+        const { error: eR } = await supabase.from('clients').update({ bilan_proche: false }).eq('email', email);
+        if (eR) console.error('trusted-contact : remise à zéro du bilan impossible —', eR.message);
+      }
+
       // Prévenir le proche qu'il a été désigné (transparence + RGPD)
       if (cEmail) {
         try {
@@ -158,17 +219,27 @@ exports.handler = async (event) => {
         } catch (e) { console.warn('Email proche non envoyé:', e.message); }
       }
 
-      return { statusCode: 200, headers, body: JSON.stringify({ ok: true, contact_name: cName || null, contact_email: cEmail || null }) };
+      return { statusCode: 200, headers, body: JSON.stringify({
+        ok: true, contact_name: cName || null, contact_email: cEmail || null,
+        bilan: bilan && cEmail === (client.trusted_contact_email || '').toLowerCase().trim(), bilan_dispo: bilanDispo
+      }) };
     }
 
     // action par défaut : get
+    // `veilleur` : à qui partirait le bilan — la personne de confiance, ou à
+    // défaut celui qui paie la formule Famille. L'écran s'en sert pour nommer
+    // la personne avant de demander l'accord.
+    const veilleur = await destinataire(supabase, client);
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         contact_name: client.trusted_contact_name || null,
         contact_email: client.trusted_contact_email || null,
-        family_word: client.family_word || null
+        family_word: client.family_word || null,
+        bilan,
+        bilan_dispo: bilanDispo,
+        veilleur: veilleur ? { nom: veilleur.nom || null, lien: veilleur.lien } : null
       })
     };
 
