@@ -1,10 +1,10 @@
 // ════════════════════════════════════════════
 // DESPY — Le récapitulatif de la veille presse
 //
-// UN email par passage du robot, pas un par article. Sur les flux réels, un
-// passage propose jusqu'à dix articles : dix emails deux fois par jour, c'est
-// une boîte saturée en trois jours et une validation qui n'est plus faite.
-// Un seul message, chaque article avec ses deux boutons.
+// UN email par semaine (veille-presse.js, le lundi), pas un par article ni
+// un par passage. Deux par jour avec dix articles chacun, c'était une boîte
+// saturée et une validation qui n'était plus faite. Un seul message, cinq
+// articles, chacun avec ses boutons.
 //
 // Les liens sont signés (même HMAC que la modération des signalements) : ils
 // arrivent dans une boîte mail, transitent par des serveurs qu'on ne maîtrise
@@ -68,7 +68,8 @@ function bloc(base, a) {
 // `articles` : [{ id, title, source, url, published }] — déjà en base, statut
 // 'a_valider'. Rien ici ne publie quoi que ce soit ; l'email ne fait que
 // proposer.
-async function envoyerRecapPresse(articles) {
+async function envoyerRecapPresse(articles, options) {
+  const { nonRetenus = 0 } = options || {};
   if (!articles || !articles.length) return { envoye: 0 };
   if (!process.env.RESEND_API_KEY) {
     // Dit à voix haute plutôt que silencieusement ignoré : sans email, les
@@ -84,8 +85,8 @@ async function envoyerRecapPresse(articles) {
   // d'articles, et surtout s'il y a du local — c'est ce qui mérite qu'on
   // s'arrête tout de suite.
   const objet = locaux
-    ? `📰 ${articles.length} article(s) à valider — dont ${locaux} du Bas-Rhin`
-    : `📰 ${articles.length} article(s) de presse à valider`;
+    ? `📰 Veille de la semaine : ${articles.length} article(s) à valider — dont ${locaux} du Bas-Rhin`
+    : `📰 Veille de la semaine : ${articles.length} article(s) à valider`;
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -98,7 +99,7 @@ async function envoyerRecapPresse(articles) {
       to: [DESTINATAIRE],
       subject: objet,
       html: `<div style="font-family:Arial,Helvetica,sans-serif;color:#333;max-width:640px;margin:0 auto">
-        <h2 style="color:#0a1f3a;font-size:19px;margin-bottom:4px">Veille presse — à valider</h2>
+        <h2 style="color:#0a1f3a;font-size:19px;margin-bottom:4px">Veille presse de la semaine — à valider</h2>
         <p style="font-size:13.5px;color:#666;line-height:1.6;margin-top:0">
           Ces articles ont été trouvés dans la presse et <strong>ne sont pas visibles</strong>
           dans l'application. Ils n'y paraîtront que si vous cliquez sur « Publier ».
@@ -111,6 +112,11 @@ async function envoyerRecapPresse(articles) {
           prévention à tous les clients. C'est le seul bouton qui écrit à quelqu'un.
         </p>
         ${articles.map(a => bloc(base, a)).join('')}
+        ${nonRetenus > 0 ? `<p style="font-size:12.5px;color:#888;line-height:1.6;margin-top:6px">
+          ${nonRetenus} autre(s) article(s) trouvé(s) cette semaine, jugé(s) moins utiles : ceux qui
+          expliquent comment l'arnaque se présente passent d'abord, puis le Bas-Rhin. Ils
+          restent candidats la semaine prochaine.
+        </p>` : ''}
         <p style="font-size:11.5px;color:#aaa;line-height:1.6;border-top:1px solid #eee;padding-top:12px">
           Sources officielles (CNIL, ANSSI, Cybermalveillance) : publiées automatiquement,
           elles n'apparaissent pas dans cette liste.

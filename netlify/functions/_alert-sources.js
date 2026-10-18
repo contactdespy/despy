@@ -309,11 +309,43 @@ const HORS_SUJET_PRESSE = [
   'fraude au president', 'dirigeant', 'start-up', 'fonds d\'investissement'
 ];
 
+// Relevé sur les flux réels du 18 octobre 2026 : 37 articles retenus sur
+// trente jours, et le quart ne parlait d'aucun danger qu'un habitant du
+// Bas-Rhin puisse croiser. Les quatre « locaux » étaient trois comptes rendus
+// d'audience et un article d'histoire (« il y a 501 ans… ») ; côté national,
+// des sites de placement passés en revue, le Burkina Faso, la Suisse, la
+// Banque mondiale, une arnaque au président subie par une entreprise.
+//
+// Comparés en MOTS ENTIERS, contrairement à la liste ci-dessus : « ubs »
+// écarterait sinon « subsiste », comme « bac » y écarte déjà « tabac ».
+const HORS_SUJET_PRESSE_MOTS = [
+  // Une affaire jugée raconte le passé : elle ne prévient de rien, et ne dit
+  // pas comment l'arnaque se présente.
+  'condamne', 'condamnee', 'condamnes', 'condamnees', 'juges pour', 'juge pour',
+  'jugee pour', 'proces', 'tribunal', 'mis en examen', 'garde a vue', 'ecroue', 'prison',
+  // Hors de France.
+  'burkina', 'senegal', 'cote d ivoire', 'cameroun', 'maroc', 'algerie',
+  'ubs', 'twint', 'banque mondiale',
+  // Sites de placement passés en revue, un par article.
+  'notre avis', 'analyse avis',
+  // Escroqueries subies par une entreprise.
+  'salarie', 'salaries', 'arnaque au president', 'dmca'
+];
+const RE_HORS_SUJET_MOTS = new RegExp('(^| )(' + HORS_SUJET_PRESSE_MOTS.join('|') + ')( |$)');
+// « Nuxeros.app », « Genesisarbit.expert » : un nom de site en guise de sujet.
+const RE_SITE_EN_TITRE = /[a-z0-9-]+\.(app|expert|pro|io)( |$)/;
+// « il y a 501 ans » : de l'histoire, pas une alerte.
+const RE_HISTOIRE = /il y a \d{3,} ans/;
+
 // Même exigence que pour l'officiel, plus les exclusions de public.
 function pertinentPourPresse(titre, resume) {
   if (!pertinentPourSenior(titre, resume)) return false;
   const tout = aplatir((titre || '') + ' ' + (resume || ''));
-  return !HORS_SUJET_PRESSE.some(k => tout.indexOf(k) !== -1);
+  if (HORS_SUJET_PRESSE.some(k => tout.indexOf(k) !== -1)) return false;
+  // Ponctuation ramenée à des espaces pour comparer des mots : « Côte
+  // d'Ivoire » devient « cote d ivoire ». Le point est gardé pour les sites.
+  const mots = ' ' + tout.replace(/[^a-z0-9.]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  return !RE_HORS_SUJET_MOTS.test(mots) && !RE_SITE_EN_TITRE.test(mots) && !RE_HISTOIRE.test(mots);
 }
 
 // ── Une histoire, une entrée ─────────────────────────────────────────────

@@ -7,6 +7,9 @@
 // 3. Fiches d'arnaques de saison → voir _calendrier-arnaques.js
 // 4. Push à toutes les subscriptions actives (abonnés ou gratuits)
 //
+// La presse n'est plus ici : elle est proposée une fois par semaine par
+// veille-presse.js. Deux emails de tri par jour, c'était trop pour être lu.
+//
 // Historique : ce robot n'a jamais rien envoyé. Il n'interrogeait que le
 // CERT-FR, qui ne publie que des avis de failles logicielles destinés aux
 // administrateurs système — aucun ne pouvait passer un filtre grand public.
@@ -16,10 +19,9 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { envoyerPush, tagDepuis } = require('./_push');
-const { collecterAlertes, collecterPresse } = require('./_alert-sources');
+const { collecterAlertes } = require('./_alert-sources');
 const { fichesAPublier } = require('./_calendrier-arnaques');
 const { detecterVagues } = require('./_vagues');
-const { envoyerRecapPresse } = require('./_presse-recap');
 
 // On ne stocke que ce qui a moins de 120 jours : au-delà, ce n'est plus une
 // alerte, c'est de l'archive — et l'afficher comme « en ce moment » serait faux.
@@ -29,26 +31,6 @@ const FENETRE_JOURS = 120;
 // garde-fou, la toute première exécution réveillerait tout le monde avec des
 // articles de plusieurs mois.
 const PUSH_JOURS = 12;
-
-// Chaque flux de presse borne DÉJÀ sa propre fenêtre, dans sa requête même :
-// `when:7d` pour le national, `when:30d` pour le local. Ce plafond-ci n'est
-// qu'un filet, et il doit donc épouser la plus large des deux.
-//
-// Il était à 10 jours dans la première version, ce qui aurait vidé le local
-// sans rien dire : ce flux ne rend que 17 articles en 30 jours, et « Foire aux
-// vins de Colmar : attention aux arnaques » a 26 jours. On aurait jeté la
-// partie la plus précieuse — celle qui n'a aucun équivalent officiel — pour
-// ne garder que le national, que tout le monde voit déjà passer.
-//
-// Un fait divers local de trois semaines reste utile : l'arnaque, elle,
-// circule encore.
-const PRESSE_JOURS = 30;
-
-// Plafond par passage. Sur les flux réels, le premier passage proposerait 24
-// articles d'un coup ; un email de 24 titres ne se lit pas, il se classe. On
-// en propose dix, deux fois par jour — le reste sera repris au passage suivant
-// puisqu'il reste, par construction, absent de la table.
-const PRESSE_MAX = 10;
 
 function recente(alerte, jours) {
   if (!alerte.published) return false;
@@ -82,31 +64,28 @@ exports.handler = async (event) => {
     // `status` échoue. Sans cette vérification, le robot s'arrêterait net et
     // l'appli cesserait de recevoir des alertes sans que rien ne le dise.
     //
-    // Le repli est volontairement ASYMÉTRIQUE : on continue de publier
-    // l'officiel comme avant, mais on ne touche pas à la presse. Écrire un
-    // article de presse sans statut reviendrait à le PUBLIER — l'absence de
-    // statut valant « publié » pour ne pas faire disparaître l'historique.
-    // Le seul repli acceptable est donc de s'abstenir.
+    // Sans elle, l'officiel continue d'être publié comme avant, sans statut —
+    // l'absence de statut vaut « publié ». (La presse, qui elle ne doit jamais
+    // être écrite sans statut, est dans veille-presse.js et s'y abstient.)
     const { error: sonde } = await supabase
       .from('national_alerts').select('status').limit(1);
     const validationPrete = !sonde;
     if (!validationPrete) {
       console.error('[alertes] colonne `status` absente —'
         + ' sql_migration_veille_presse.sql n\'a pas encore été exécuté.'
-        + ' Veille presse suspendue, alertes officielles maintenues. Détail :',
+        + ' Alertes officielles écrites sans statut. Détail :',
         sonde.message);
     }
 
     // 1. Alertes externes (déjà filtrées grand public), vagues internes, et
     //    fiches de saison (voir _calendrier-arnaques.js).
-    const [externes, presse, vagues, saison] = await Promise.all([
+    const [externes, vagues, saison] = await Promise.all([
       collecterAlertes(FENETRE_JOURS),
-      collecterPresse(PRESSE_JOURS),
       detecterVagues(supabase),
       fichesAPublier(supabase)
     ]);
     const toutes = externes;
-    console.log(`[alertes] ${externes.length} externes retenues, ${presse.length} de presse,`
+    console.log(`[alertes] ${externes.length} externes retenues,`
       + ` ${vagues.length} vagues internes, ${saison.length} fiche(s) de saison`);
 
     // 2. Écarter celles déjà connues (table national_alerts)
@@ -117,10 +96,9 @@ exports.handler = async (event) => {
     // et trois fiches de saison mènent à impots.gouv.fr. La lecture ne doit pas
     // dépendre d'une unicité que nos données ne respectent pas.
     //
-    // Aucun filtre sur le statut, et c'est essentiel pour la presse : un
-    // article REJETÉ à la main doit rester connu, sinon le passage suivant le
-    // reproposerait, et on rejetterait deux fois par jour le même article
-    // jusqu'à ce qu'il sorte de la fenêtre.
+    // Aucun filtre sur le statut : ce qui est en base, quel que soit son sort,
+    // n'est pas réécrit. (Le même principe empêche veille-presse.js de
+    // reproposer un article rejeté.)
     const dejaVue = async (url) => {
       const { data } = await supabase
         .from('national_alerts')
@@ -135,20 +113,6 @@ exports.handler = async (event) => {
       if (!(await dejaVue(alerte.url))) nouvelles.push(alerte);
     }
 
-    // La presse suit le même dédoublonnage mais un tout autre destin : elle
-    // n'est pas publiée, elle est PROPOSÉE. Plafonnée par passage, et le local
-    // d'abord — une arnaque signalée à Strasbourg vaut plus pour nos membres
-    // qu'une dépêche nationale que tout le monde verra de toute façon.
-    const presseNouvelle = [];
-    const parLocalDAbord = (validationPrete ? presse : []).slice().sort((a, b) => {
-      const l = s => (s.source || '').indexOf('locale') !== -1 ? 0 : 1;
-      return l(a) - l(b);
-    });
-    for (const article of parLocalDAbord) {
-      if (presseNouvelle.length >= PRESSE_MAX) break;
-      if (!(await dejaVue(article.url))) presseNouvelle.push(article);
-    }
-
     // Vagues et fiches de saison ne passent pas par ce dédoublonnage-là : elles
     // partagent toutes la même URL, et dédoublonner par URL n'en aurait laissé
     // passer qu'une seule dans toute la vie du service. Elles se dédoublonnent
@@ -159,7 +123,7 @@ exports.handler = async (event) => {
     // déjà arrivé.
     nouvelles.unshift(...vagues, ...saison);
 
-    if (nouvelles.length === 0 && presseNouvelle.length === 0) {
+    if (nouvelles.length === 0) {
       console.log('[alertes] aucune nouveauté');
       return { statusCode: 200, body: JSON.stringify({ new: 0 }) };
     }
@@ -197,57 +161,10 @@ exports.handler = async (event) => {
       }
     }
 
-    // 4. La presse : enregistrée en attente, JAMAIS poussée, jamais affichée.
-    //    Elle n'existe pour l'instant que dans un email de validation.
-    //
-    //    On récupère l'id rendu par l'insertion : c'est lui qui signera les
-    //    liens « Publier » / « Rejeter ». Sans `.select()`, il faudrait relire
-    //    la ligne juste écrite — un aller-retour de plus et une occasion de se
-    //    tromper de ligne quand deux articles portent le même titre.
-    const enAttente = [];
-    for (const article of presseNouvelle) {
-      const { data, error } = await supabase.from('national_alerts').insert({
-        title: article.title,
-        body: article.body || '',
-        source: article.source,
-        url: article.url,
-        status: 'a_valider',
-        confiance: 'presse',
-        created_at: article.published || new Date().toISOString()
-      }).select('id').maybeSingle();
-
-      if (error) {
-        console.error('[alertes] presse non enregistrée:', error.message, '—', article.title);
-        continue;
-      }
-      if (data) enAttente.push({ id: data.id, ...article });
-    }
-
-    // Un seul email pour tout le passage. Un email par article, c'est dix
-    // emails deux fois par jour : la boîte devient le problème et la
-    // validation n'est plus faite.
-    let recap = null;
-    if (enAttente.length) {
-      try {
-        recap = await envoyerRecapPresse(enAttente);
-      } catch (e) {
-        // L'email n'est pas la source de vérité : les articles sont en base,
-        // ils attendront le prochain récapitulatif. On le dit, on ne casse pas
-        // le passage pour autant.
-        console.error('[alertes] récapitulatif presse non envoyé:', e && e.message);
-      }
-    }
-
-    console.log('[alertes] enregistrées:', nouvelles.length,
-      '| presse en attente:', enAttente.length, '| push:', resultats);
+    console.log('[alertes] enregistrées:', nouvelles.length, '| push:', resultats);
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        new: nouvelles.length,
-        pushed: resultats,
-        presse_en_attente: enAttente.length,
-        recap
-      })
+      body: JSON.stringify({ new: nouvelles.length, pushed: resultats })
     };
 
   } catch (err) {

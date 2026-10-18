@@ -14,7 +14,8 @@
 # Ce que ça vérifie, sur le VRAI code des fonctions Netlify :
 #   1. l'officiel entre en 'publie', la presse en 'a_valider' ;
 #   2. aucune notification push n'est envoyée pour un article de presse ;
-#   3. le plafond par passage est respecté, et le Bas-Rhin passe en premier ;
+#   3. la presse ne part plus avec la tournée biquotidienne : une fois par
+#      semaine, cinq articles au plus, les plus utiles d'abord ;
 #   4. un article déjà en base — même REJETÉ — n'est pas reproposé ;
 #   5. les liens de l'email sont acceptés par alert-moderate, et lui seul ;
 #   6. un deuxième clic ne change rien (idempotence) ;
@@ -36,7 +37,7 @@ JSC = ('/System/Library/Frameworks/JavaScriptCore.framework/Versions/A'
 
 # Les modules réels chargés dans le bac à sable. Tout le reste est simulé.
 REELS = ['_privacy-sign', '_presse-recap', '_alert-sources', '_push',
-         '_is-scheduled', 'national-alerts', 'alert-moderate', 'list-alerts']
+         '_is-scheduled', 'national-alerts', 'veille-presse', 'alert-moderate', 'list-alerts']
 
 
 def lire(nom):
@@ -233,7 +234,7 @@ def main():
     def rss(items):
         return '<?xml version="1.0"?><rss><channel>' + ''.join(items) + '</channel></rss>'
 
-    # 12 articles nationaux pour dépasser le plafond de 10.
+    # 12 articles nationaux pour dépasser le plafond de 5.
     #
     # Ils doivent parler de choses DIFFÉRENTES, sinon le regroupement les
     # réduit à un seul et le plafond n'est jamais atteint. Première version de
@@ -292,10 +293,18 @@ TABLE.push({ id: 8, title: 'Ancienne alerte', url: 'https://officiel.test/vieux'
              status: null, confiance: null });
 
 var cron = require('./national-alerts');
+var veille = require('./veille-presse');
 var moder = require('./alert-moderate');
 var lister = require('./list-alerts');
 
+// La tournée biquotidienne d'abord : elle ne doit plus rien proposer de presse.
 cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
+.then(function () {
+  sortie.national_a_valider = JOURNAL.insertions.filter(function(a){ return a.status === 'a_valider'; }).length;
+  sortie.national_emails = JOURNAL.emails.length;
+  // Puis la veille du lundi.
+  return veille.handler({ body: JSON.stringify({ next_run: '2026-09-07T07:00:00Z' }) });
+})
 .then(function (r) {
   sortie.retour = JSON.parse(r.body);
 
@@ -428,10 +437,12 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     SANS_COLONNE = true;
     TABLE.length = 0;
     JOURNAL.insertions = []; JOURNAL.emails = []; JOURNAL.push = [];
-    return cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T18:00:00Z' }) });
+    return cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T18:00:00Z' }) })
+      .then(function (r) { sortie.repli_code = r.statusCode;
+        return veille.handler({ body: JSON.stringify({ next_run: '2026-09-07T07:00:00Z' }) }); });
   })
   .then(function (r) {
-    sortie.repli_code = r.statusCode;
+    sortie.repli_veille_code = r.statusCode;
     sortie.repli_inserees = JOURNAL.insertions.length;
     sortie.repli_presse = JOURNAL.insertions.filter(function (a) {
       return a.confiance === 'presse' || a.status === 'a_valider';
@@ -476,12 +487,14 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     print('OÙ ATTERRIT CHAQUE ARTICLE')
     print('═' * 74)
     controle('officiel publié directement', len(d['publies']), 1)
-    controle('presse mise en attente', len(d['a_valider']), 10)
+    controle('la tournée biquotidienne ne propose plus de presse', d['national_a_valider'], 0)
+    controle('ni n\'envoie d\'email de validation', d['national_emails'], 0)
+    controle('presse mise en attente le lundi', len(d['a_valider']), 5)
     controle('aucune insertion sans statut', d['sans_statut'], 0)
     controle('presse étiquetée « presse »',
              sorted(set(a['confiance'] for a in d['a_valider'])), ['presse'])
-    controle('plafond de 10 respecté',
-             d['retour'].get('presse_en_attente'), 10)
+    controle('plafond de 5 respecté',
+             d['retour'].get('proposes'), 5)
     controle('le Bas-Rhin passe en premier',
              'Strasbourg' in d['a_valider'][0]['titre'], True)
     controle('un article rejeté n\'est pas reproposé', d['rejete_repropose'], 0)
@@ -491,18 +504,18 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     print('CE QUI SORT VERS LES GENS')
     print('═' * 74)
     controle('aucune notification pour la presse', d['push_de_presse'], [])
-    controle('un seul email pour tout le passage', d['nb_emails'], 1)
+    controle('un seul email pour la semaine', d['nb_emails'], 1)
     controle('objet signalant le local',
              'Bas-Rhin' in d['objet'], True)
     controle('envoyé à la boîte de modération',
              d['destinataire'], 'contact.despy@gmail.com')
-    controle('trois boutons par article', d['nb_liens'], 30)
+    controle('trois boutons par article', d['nb_liens'], 15)
     controle('un « publier » par article',
-             d['nb_par_decision'].get('publier'), 10)
+             d['nb_par_decision'].get('publier'), 5)
     controle('un « rejeter » par article',
-             d['nb_par_decision'].get('rejeter'), 10)
+             d['nb_par_decision'].get('rejeter'), 5)
     controle('un « publier et prévenir » par article',
-             d['nb_par_decision'].get('publier_prevenir'), 10)
+             d['nb_par_decision'].get('publier_prevenir'), 5)
     controle('chaque décision a sa propre signature',
              d['signature_distincte'], True)
 
@@ -541,6 +554,7 @@ cron.handler({ body: JSON.stringify({ next_run: '2026-08-29T09:00:00Z' }) })
     print('SI LE SCRIPT SQL N\'A PAS ENCORE ÉTÉ PASSÉ')
     print('═' * 74)
     controle('le robot ne tombe pas', d['repli_code'], 200)
+    controle('la veille du lundi non plus', d['repli_veille_code'], 200)
     controle('les alertes officielles continuent', d['repli_inserees'], 1)
     controle('aucune presse écrite', d['repli_presse'], 0)
     controle('écrites sans statut, donc publiées comme avant',
