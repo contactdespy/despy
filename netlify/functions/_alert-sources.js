@@ -253,6 +253,14 @@ const PERTINENT = [
 // Ce qui ne s'adresse pas à lui : le monde professionnel et institutionnel,
 // et les publications rétrospectives (un bilan annuel n'est pas une alerte).
 const HORS_SUJET = [
+  // La réglementation, qui partage des mots avec les arnaques sans en être
+  // une. Le 23 septembre 2026, « Amendes RGPD et interaction avec le
+  // règlement sur les services numériques : retour sur la plénière du CEPD »
+  // est entré par le mot « amende » — mis là pour les fausses amendes — et a
+  // été publié comme une alerte, puis envoyé aux abonnés.
+  'cepd', 'edpb', 'pleniere', 'lignes directrices', 'services numeriques',
+  'autorites de protection', 'amendes administratives', 'amendes rgpd',
+  'consultation publique', 'deliberation',
   'vulnerabilite', 'faille de securite', 'failles de securite', 'correctif',
   'cve-', 'zero-day', 'patch', 'exploitation active', 'bulletin d\'actualite',
   'multiples vulnerabilites', 'mise a jour de securite',

@@ -59,6 +59,26 @@ function require(n){ if (n === './_alert-sources') return SOURCES_MOD; return {}
 var SOURCES_MOD = (function(){ var module={exports:{}},exports=module.exports; __SOURCES__ ; return module.exports; })();
 var M = SOURCES_MOD;
 var veilleMod = (function(){ var module={exports:{}},exports=module.exports; __VEILLE__ ; return module.exports; })();
+// list-alerts avec une fausse base : un article de presse publié avec le
+// « résumé » de Google Actualités, et une vraie alerte officielle.
+var LIGNES = [
+  { title: "« Votre colis est en attente » : voici ce qui se passe vraiment si vous cliquez sur le lien du SMS",
+    body: "« Votre colis est en attente » : voici ce qui se passe vraiment si vous cliquez sur le lien du SMS &nbsp;&nbsp; Clubic",
+    source: 'Clubic · presse', url: 'https://x/1', created_at: new Date().toISOString() },
+  { title: "Remboursement d’impôt : attention aux tentatives d’hameçonnage",
+    body: "À l’approche de la campagne de remboursement, la vigilance est de mise.",
+    source: 'Cybermalveillance.gouv.fr', url: 'https://x/2', created_at: new Date().toISOString() },
+  { title: "Amendes RGPD et interaction avec le règlement sur les services numériques : retour sur la plénière du CEPD du 17 septembre",
+    body: "Le CEPD a adopté des lignes directrices.", source: 'CNIL · officiel', url: 'https://x/3', created_at: new Date().toISOString() }
+];
+var listeMod = (function(){ var module={exports:{}},exports=module.exports;
+  var require = function (n) {
+    if (n === './_alert-sources') return SOURCES_MOD;
+    if (n === '@supabase/supabase-js') return { createClient: function () { var q = {}; ['from','select','or','order','limit','eq'].forEach(function (k) { q[k] = function () { return q; }; });
+      q.then = function (ok) { return Promise.resolve({ data: LIGNES, error: null }).then(ok); }; return q; } };
+    return {};
+  };
+  __LISTE__ ; return module.exports; })();
 var R = { ecartes: A_ECARTER.filter(function(t){ return !M.pertinentPourPresse(t, ''); }),
           gardes:  A_GARDER.filter(function(t){ return M.pertinentPourPresse(t, ''); }) };
 print(JSON.stringify(R));
@@ -72,12 +92,25 @@ def main():
     veille = open(os.path.join(FONCTIONS, 'veille-presse.js'), encoding='utf-8').read()
     # Pour juger l'ordre, on expose la fonction de score du module du lundi.
     veille = veille + "\nmodule.exports.__score = score;"
+    liste = open(os.path.join(FONCTIONS, 'list-alerts.js'), encoding='utf-8').read()
     js = ('var A_ECARTER=%s, A_GARDER=%s;\n' % (json.dumps(A_ECARTER), json.dumps(A_GARDER))
-          + CODE.replace('__SOURCES__', src).replace('__VEILLE__', veille)
+          + CODE.replace('__SOURCES__', src).replace('__VEILLE__', veille).replace('__LISTE__', liste)
           + r"""
 var s = veilleMod.__score;
 var L = function (t) { return { title: t, source: 'Presse locale (Bas-Rhin)' }; };
 var N = function (t) { return { title: t, source: 'Presse nationale' }; };
+listeMod.handler({ httpMethod: 'GET' }).then(function (r) {
+  var a = JSON.parse(r.body).alerts;
+  var colis = a.filter(function (x) { return /colis/.test(x.title); })[0] || {};
+  var impot = a.filter(function (x) { return /Remboursement/.test(x.title); })[0] || {};
+  print(JSON.stringify({
+    la_reglementation_du_CEPD_n_est_pas_une_alerte: !a.some(function (x) { return /CEPD/.test(x.title); }),
+    une_vraie_fausse_amende_reste_une_alerte: M.pertinentPourSenior("Fausse amende de stationnement : attention à ce SMS", ""),
+    le_titre_repete_n_est_plus_affiche: colis.body === '',
+    pas_de_nbsp_en_clair: !a.some(function (x) { return /&nbsp;/.test(x.body || ''); }),
+    un_vrai_resume_reste_affiche: /vigilance est de mise/.test(impot.body || '')
+  }));
+});
 print(JSON.stringify({
   expliquee_devant_fait_divers_local: s(N("Faux commissaire de justice : les 6 signes d'un message")) > s(L("À Strasbourg, un acteur de l'hébergement d'urgence attaqué pour tentative d'escroquerie")),
   local_devant_national_a_egalite:   s(L("Une fausse amende de stationnement circule à Strasbourg : comment la reconnaître")) > s(N("Une fausse amende de stationnement circule : comment la reconnaître")),
@@ -92,10 +125,10 @@ print(JSON.stringify({
     finally:
         os.unlink(chemin)
     lignes = (r.stdout or '').strip().splitlines()
-    if r.returncode != 0 or len(lignes) < 2:
+    if r.returncode != 0 or len(lignes) < 3:
         print("ÉCHEC — le banc n'a pas pu tourner :\n" + ((r.stderr or '') + (r.stdout or ''))[:2000])
         return 1
-    tri, ordre = json.loads(lignes[-2]), json.loads(lignes[-1])
+    tri, ordre, contenus = json.loads(lignes[0]), json.loads(lignes[1]), json.loads(lignes[2])
 
     ok = True
     print('═' * 74)
@@ -118,6 +151,13 @@ print(JSON.stringify({
     print("L'ORDRE DE L'EMAIL DU LUNDI")
     print('═' * 74)
     for k, v in ordre.items():
+        ok = ok and v
+        print('  %-5s %s' % ('OK' if v else 'ÉCHEC', k.replace('_', ' ')))
+    print()
+    print('═' * 74)
+    print("CE QUE L'APPLI AFFICHE")
+    print('═' * 74)
+    for k, v in contenus.items():
         ok = ok and v
         print('  %-5s %s' % ('OK' if v else 'ÉCHEC', k.replace('_', ' ')))
     print()

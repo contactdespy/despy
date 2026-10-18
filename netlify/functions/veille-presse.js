@@ -88,7 +88,9 @@ exports.handler = async (event) => {
     for (const article of choisis) {
       const { data, error } = await supabase.from('national_alerts').insert({
         title: article.title,
-        body: article.body || '',
+        // Pas le « résumé » de Google Actualités : ce n'est que le titre
+        // répété suivi du nom du journal, et l'appli l'affichait tel quel.
+        body: '',
         source: article.source,
         url: article.url,
         status: 'a_valider',

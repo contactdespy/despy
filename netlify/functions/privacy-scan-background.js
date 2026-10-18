@@ -307,14 +307,22 @@ exports.handler = async (event) => {
     // Sans cet email, les trouvailles restent en 'found' pour toujours : rien
     // n'est validé, donc rien n'apparaît jamais chez le client. C'est le maillon
     // dont l'échec est le plus invisible de toute la chaîne.
-    try {
+    //
+    // Mais seulement s'il y a quelque chose à valider. Le passage mensuel relance
+    // une recherche par client : il partait un rapport « 0 nouvelle action » par
+    // client, tous les 1er du mois — des emails qui n'apprennent rien finissent
+    // par faire négliger celui qui compte.
+    const aValider = findings.filter(f => !f.duplicate && f.action !== 'rien');
+    if (!aValider.length) {
+      console.log(`rapport scan ${c.user_email}: rien de nouveau à valider, pas d'email`);
+    } else try {
       const rep = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'Despy — Agent Privacy <contact@despy.fr>',
           to: ['contact.despy@gmail.com'],
-          subject: `🕵️ Scan ${c.prenom} ${c.nom} : ${findings.filter(f => !f.duplicate && f.action !== 'rien').length} nouvelle(s) action(s) sur ${findings.length} résultat(s)`,
+          subject: `🕵️ Scan ${c.prenom} ${c.nom} : ${aValider.length} nouvelle(s) action(s) sur ${findings.length} résultat(s)`,
           html: buildReportHTML(c, findings, queries)
         })
       });

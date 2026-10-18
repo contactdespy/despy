@@ -17,7 +17,20 @@
 // ════════════════════════════════════════════
 
 const { createClient } = require('@supabase/supabase-js');
-const { pertinentPourSenior, collecterAlertes } = require('./_alert-sources');
+const { pertinentPourSenior, collecterAlertes, decoder, aplatir } = require('./_alert-sources');
+
+// Le « résumé » d'un article de presse, tel que Google Actualités le donne,
+// n'est que le titre répété, suivi du nom du journal : « « Votre colis est en
+// attente » : voici ce qui se passe… &nbsp;&nbsp; Clubic ». L'appli l'affichait
+// tel quel — le titre deux fois, et « &nbsp; » écrit en clair. Un texte qui ne
+// fait que répéter le titre n'apprend rien : on ne le renvoie pas.
+function corpsUtile(a) {
+  const corps = decoder(a.body || '');
+  const net = (x) => aplatir(x).replace(/[^a-z0-9]+/g, ' ').trim();
+  const t = net(a.title || ''), c = net(corps);
+  if (!c || (t && c.indexOf(t) === 0)) return '';
+  return corps;
+}
 
 const AGE_MAX_JOURS = 120;
 
@@ -93,7 +106,8 @@ exports.handler = async (event) => {
         if ((a.source || '').indexOf('Despy') !== -1) return true;
         return pertinentPourSenior(a.title, a.body);
       })
-      .slice(0, 15);
+      .slice(0, 15)
+      .map(a => Object.assign({}, a, { body: corpsUtile(a) }));
 
     if (alerts.length) {
       return { statusCode: 200, headers, body: JSON.stringify({ alerts, origine: 'base' }) };

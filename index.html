@@ -5953,7 +5953,7 @@ async function loadHomeAlerts() {
         (dateLabel ? '<span style="margin-left:auto;font-size:12px;color:var(--text3);font-weight:600">' + esc(dateLabel) + '</span>' : '') +
       '</div>' +
       '<div style="font-weight:800;font-size:15.5px;color:var(--text);margin-bottom:6px">' + esc(title) + '</div>' +
-      '<div style="font-size:14px;color:var(--text2);line-height:1.65">' + esc(body) + '</div>' +
+      (body ? '<div style="font-size:14px;color:var(--text2);line-height:1.65">' + esc(body) + '</div>' : '') +
     '</div>';
   }
 
@@ -5969,7 +5969,9 @@ async function loadHomeAlerts() {
   live.forEach(function(a) {
     var dt = '';
     try { dt = new Date(a.created_at).toLocaleDateString('fr-FR', { day:'numeric', month:'long' }); } catch(e) {}
-    html += card('🚨', a.source === 'Despy Community' ? 'Détectée par Despy' : (a.source || 'Alerte'), a.title, a.body || 'Alerte officielle en cours. Redoublez de vigilance.', dt);
+    // Sans texte, on n'invente pas « Alerte officielle » : un article de presse
+    // relu n'en est pas une, et son « résumé » n'était que le titre répété.
+    html += card('🚨', a.source === 'Despy Community' ? 'Détectée par Despy' : (a.source || 'Alerte'), a.title, a.body || '', dt);
   });
 
   // 2. Compléter jusqu'à 3 cartes avec les arnaques les plus signalées
