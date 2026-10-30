@@ -887,6 +887,29 @@ body{ background:var(--p-paper); }
 .veille .chev{ color:rgba(255,255,255,.5); flex:none; }
 
 
+/* ── panneau « Votre veille » de l'accueil ──
+   Le bleu nuit de l'en-tête, pas un aplat de plus : les lignes se distinguent
+   par leur pastille, et la pastille change de couleur selon le sens — vert ça
+   va, ambre à savoir, rouge à faire. */
+.vp{ background:linear-gradient(135deg,#0B1838 0%,#16307A 100%); color:#fff; border-radius:18px;
+  overflow:hidden; box-shadow:0 10px 28px rgba(11,24,56,.26); }
+.vp-h{ display:flex; align-items:center; gap:10px; padding:14px 16px 12px; }
+.vp-t{ flex:1; min-width:0; font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:rgba(255,255,255,.72); }
+.vp-etat{ font-size:12px; font-weight:800; color:#4ade80; }
+.vp-etat.a-faire{ color:#FF8A85; }
+.vp-row{ display:flex; align-items:center; gap:12px; width:100%; padding:13px 16px; text-align:left; font-family:inherit;
+  color:#fff; background:none; border:0; border-top:1px solid rgba(255,255,255,.10); cursor:pointer; }
+.vp-row:active{ background:rgba(255,255,255,.06); }
+.vp-ic{ width:38px; height:38px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center; }
+.vp-ic-ok{ background:rgba(74,222,128,.15); color:#4ade80; }
+.vp-ic-alerte{ background:rgba(251,191,36,.15); color:#FBBF24; }
+.vp-ic-push{ background:rgba(91,227,245,.14); color:#5BE3F5; }
+.vp-row.veille-fuite{ background:rgba(255,138,133,.09); }
+.vp-row.veille-fuite .vp-ic{ background:rgba(255,138,133,.20); color:#FF8A85; }
+.vp .v-b{ color:rgba(255,255,255,.66); }
+.vp .chev{ color:rgba(255,255,255,.45); flex:none; }
+.vp-go{ flex:none; background:#fff; color:#16307A; font-size:13px; font-weight:800; border-radius:10px; padding:9px 13px; }
+
 /* ── bilan mensuel ── */
 .bl-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 .bl-tile{ background:#fff; border-radius:16px; box-shadow:0 6px 18px rgba(12,25,55,.06); padding:15px; display:flex; flex-direction:column; }
@@ -1239,21 +1262,6 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
 
     <div class="pbody">
 
-      <div id="bandeau-impaye" style="display:none"></div>
-
-      <!-- Alerte nationale en cours. Réutilise la bande « veille » existante
-           (variante ambre) plutôt que d'inventer un composant : même forme,
-           même place, information différente. Absente tant qu'il n'y a rien
-           de récent à dire — donc invisible la plupart du temps. -->
-      <button class="veille veille-alerte" id="home-alerte-nat" style="display:none;margin-bottom:16px" onclick="openAlertes()">
-        <span class="v-dot" aria-hidden="true"></span>
-        <span class="v-m">
-          <span class="v-a" id="alerte-nat-titre"></span>
-          <span class="v-b" id="alerte-nat-sub"></span>
-        </span>
-        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-
       <button class="card hero-card" onclick="openTool('score')">
         <div class="ring" id="home-score-ring"></div>
         <div class="hero-txt">
@@ -1269,7 +1277,9 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
            décrit ce qui se passe vraiment, et pose la bonne attente : la
            personne sait qu'elle attend un appel au lieu de croire que rien ne
            s'est produit. -->
-      <div class="sec">Besoin d’aide ?</div>
+      <div id="bandeau-impaye" style="display:none"></div>
+
+      <div class="sec" id="home-aide-sec">Besoin d’aide ?</div>
       <div class="aide">
         <button class="aide-row" onclick="openTool('sos')">
           <span class="aide-ic aide-ic-sos"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
@@ -1285,28 +1295,53 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         </button>
       </div>
 
-      <div class="famband" id="home-fam" style="display:none"></div>
+      <!-- Votre veille : tout ce que Despy surveille, au même endroit.
+           C'étaient trois blocs à trois hauteurs, dans trois styles : l'alerte
+           en orange tout en haut, chevauchée par la carte de score, les fuites
+           en vert 500 px plus bas, et l'activation des alertes en gris. Une
+           actualité générale passait ainsi avant la situation du client.
+           Les identifiants ne changent pas : majAlerteNationale, renderVeille
+           et refreshPushCard continuent de piloter chacun sa ligne, et
+           suivrePanneauVeille décide du reste. -->
+      <section class="vp" id="home-vp" style="display:none" aria-label="Votre veille">
+        <div class="vp-h">
+          <span class="v-dot" id="vp-dot" aria-hidden="true"></span>
+          <span class="vp-t" id="vp-titre">Votre veille</span>
+          <span class="vp-etat" id="vp-etat">Active</span>
+        </div>
+        <button class="vp-row" id="home-veille" style="display:none" onclick="openBilan()">
+          <span class="vp-ic vp-ic-ok"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+          <span class="v-m">
+            <span class="v-a" id="veille-title">Surveillance active</span>
+            <span class="v-b" id="veille-sub">Vérification de vos données en cours…</span>
+          </span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="vp-row" id="home-alerte-nat" style="display:none" onclick="openAlertes()">
+          <span class="vp-ic vp-ic-alerte"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
+          <span class="v-m">
+            <span class="v-a" id="alerte-nat-titre"></span>
+            <span class="v-b" id="alerte-nat-sub"></span>
+          </span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="vp-row" id="home-push" style="display:none" onclick="requestPush()">
+          <span class="vp-ic vp-ic-push"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
+          <span class="v-m">
+            <span class="v-a">Notifications</span>
+            <span class="v-b">Prévenu en cas de danger</span>
+          </span>
+          <span class="vp-go">Activer</span>
+        </button>
+      </section>
 
-      <button class="veille" id="home-veille" style="display:none" onclick="openBilan()">
-        <span class="v-dot" aria-hidden="true"></span>
-        <span class="v-m">
-          <span class="v-a" id="veille-title">Surveillance active</span>
-          <span class="v-b" id="veille-sub">Vérification de vos données en cours…</span>
-        </span>
-        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
+      <div class="famband" id="home-fam" style="display:none"></div>
 
       <div class="upsell" id="home-upsell" style="display:none">
         <div class="a">Passez à la protection complète</div>
-        <div class="b">Ligne SOS humaine, conseiller illimité, surveillance en continu, votre livret offert… dès 9,99 €/mois, sans engagement.<br><b style="color:#fff">Formule Famille : vous et vos deux parents</b> — moins cher que deux abonnements séparés.</div>
+        <div class="b">Ligne SOS humaine, conseiller illimité, surveillance de vos données, votre livret offert… dès 9,99 €/mois, sans engagement.<br><b style="color:#fff">Formule Famille : vous et vos deux parents</b> — moins cher que deux abonnements séparés.</div>
         <button class="u-btn" onclick="openPaywall()">Découvrir l'abonnement →</button>
       </div>
-
-      <button class="card next" id="home-push" style="display:none;width:100%" onclick="requestPush()">
-        <span class="k">🔔</span>
-        <span class="m"><span class="a">Activer les alertes sur ce téléphone</span><span class="b">Être prévenu immédiatement en cas de danger</span></span>
-        <span class="go">Activer</span>
-      </button>
 
       <div class="sec">Accès rapide</div>
       <div class="tiles">
@@ -1332,8 +1367,8 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
       <button class="card pad stats" id="home-stats" onclick="openBilan()" style="width:100%;display:block;text-align:left;font-family:inherit;cursor:pointer">
         <div class="stats-h">Ce mois-ci, Despy a veillé sur vous</div>
         <div class="stats-g">
-          <div><div class="n" id="stat-fuites" style="color:var(--p-safe)">0</div><div class="k">fuite détectée</div></div>
-          <div><div class="n" id="stat-sites" style="color:var(--p-blue)">—</div><div class="k">sites surveillés</div></div>
+          <div><div class="n" id="stat-verifies" style="color:var(--p-blue)">—</div><div class="k">message vérifié</div></div>
+          <div><div class="n" id="stat-arnaques" style="color:var(--p-blue)">—</div><div class="k">arnaque repérée</div></div>
           <div><div class="n" id="stat-questions" style="color:var(--p-blue)">0</div><div class="k">questions posées</div></div>
         </div>
         <div class="stats-cta">Voir mon bilan complet <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
@@ -1343,7 +1378,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <div class="sec">Avec l'abonnement</div>
         <div class="plist locklist">
           <button class="lockrow" onclick="openPaywall()"><span class="ic">📞</span><span class="m"><span class="a">Ligne SOS humaine</span><span class="b">Un vrai conseiller au téléphone</span></span><span class="unlock">🔒 Débloquer</span></button>
-          <button class="lockrow" onclick="openPaywall()"><span class="ic">🛡️</span><span class="m"><span class="a">Surveillance en continu</span><span class="b">Fuites &amp; appareils infectés, 24 h/24</span></span><span class="unlock">🔒 Débloquer</span></button>
+          <button class="lockrow" onclick="openPaywall()"><span class="ic">🛡️</span><span class="m"><span class="a">Surveillance de vos données</span><span class="b">Fuites &amp; appareils infectés, contrôlés chaque semaine</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">🧹</span><span class="m"><span class="a">Nettoyage de mes données</span><span class="b">Effacer mes traces sur internet</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">🎓</span><span class="m"><span class="a">La formation complète</span><span class="b">Les 7 modules suivants · 3 offerts</span></span><span class="unlock">🔒 Débloquer</span></button>
           <button class="lockrow" onclick="openPaywall()"><span class="ic">💬</span><span class="m"><span class="a">Conseiller sans limite</span><span class="b">Gratuit : 5 questions par mois</span></span><span class="unlock">🔒 Débloquer</span></button>
@@ -2155,7 +2190,7 @@ function majBandeauImpaye() {
   if (!s.paiement_en_defaut) { z.style.display = 'none'; z.innerHTML = ''; return; }
   z.style.display = 'block';
   z.innerHTML =
-    '<div style="background:#FFF7E8;border:1px solid #F3D18B;border-radius:16px;padding:15px 16px;margin:0 0 14px">' +
+    '<div style="background:#FFF7E8;border:1px solid #F3D18B;border-radius:16px;padding:15px 16px">' +
       '<div style="display:flex;gap:12px;align-items:flex-start">' +
         '<span style="font-size:20px;line-height:1.2;flex:none">💳</span>' +
         '<div style="flex:1;min-width:0">' +
@@ -3075,8 +3110,10 @@ function majAlerteNationale() {
       // mal, surtout en gros caractères. On ne recule pas au-delà de la
       // moitié du bandeau, sinon un titre sans espaces le viderait.
       var titre = a.title || 'Alerte en cours';
-      if (titre.length > 72) {
-        var coupe = titre.slice(0, 71);
+      // 58 : deux lignes dans le panneau « Votre veille ». La coupe se fait ici
+      // et pas en CSS, qui couperait au milieu d'un mot (« pour d… »).
+      if (titre.length > 58) {
+        var coupe = titre.slice(0, 57);
         var espace = coupe.lastIndexOf(' ');
         if (espace > 40) coupe = coupe.slice(0, espace);
         titre = coupe.replace(/[\s,;:.–—-]+$/, '') + '…';
@@ -4327,31 +4364,30 @@ function renderProtection(checklist, stats) {
 // Vert seulement quand il n'y a rien : une fuite connue demande une action
 // du client (changer le mot de passe des comptes concernés), Despy ne peut
 // pas la « résoudre » à sa place.
-function fuitesTeinte(n) { return n > 0 ? '#b4892e' : 'var(--p-safe)'; }
 
 // Bloc « Ce mois-ci, Despy a veillé sur vous ».
 function renderHomeStats(stats) {
   if (!stats) return;
-  var f = document.getElementById('stat-fuites'), q = document.getElementById('stat-questions'), si = document.getElementById('stat-sites');
-  // Le nombre de fuites était affiché EN VERT, en dur, et au singulier :
-  // « 3 fuite détectée » en vert, juste à côté de « 30+ sites surveillés ».
-  // Pour une personne âgée, du vert veut dire « tout va bien » — l'inverse
-  // exact du message. On teinte selon la réalité et on accorde.
-  var nbFuites = stats.breach_count || 0;
-  if (f) {
-    f.textContent = nbFuites;
-    f.style.color = fuitesTeinte(nbFuites);
-    var lib = f.nextElementSibling;
-    if (lib) lib.textContent = nbFuites > 1 ? 'fuites détectées' : 'fuite détectée';
-  }
+  var q = document.getElementById('stat-questions');
+  // Ces deux cases disaient « 0 fuite » — déjà dit dans « Votre veille » — et
+  // « 30+ sites surveillés », un chiffre écrit en dur que rien ne mesurait.
+  // Elles disent maintenant ce que Despy a fait ce mois-ci. `null` = le serveur
+  // n'a pas pu compter : « — » plutôt qu'un zéro qu'on ne saurait pas garantir.
+  var compteur = function (id, n, un, plusieurs) {
+    var e = document.getElementById(id);
+    if (!e) return;
+    var connu = typeof n === 'number';
+    e.textContent = connu ? n : '—';
+    if (e.nextElementSibling) e.nextElementSibling.textContent = (connu && n > 1) ? plusieurs : un;
+  };
+  compteur('stat-verifies', stats.analyses_month, 'message vérifié', 'messages vérifiés');
+  compteur('stat-arnaques', stats.arnaques_month, 'arnaque repérée', 'arnaques repérées');
   // Le titre dit « Ce mois-ci » : on affiche donc le compteur MENSUEL.
   // `questions_used` est le cumul depuis l'inscription — le montrer ici
   // donnait un nombre qui ne redescendait jamais au 1er du mois.
   if (q) q.textContent = (typeof stats.questions_month === 'number')
     ? stats.questions_month
     : (stats.questions_used || 0);
-  // « sites surveillés » : nombre indicatif de courtiers/annuaires suivis pour un abonné.
-  if (si) si.textContent = (session.get() || {}).subscribed ? '30+' : '—';
 }
 
 // Carte « Ma formation » : progression lue dans localStorage.
@@ -4606,6 +4642,48 @@ function renderScenarioList() {
   z.innerHTML = h + '</div>';
   renderEntCard();
 }
+
+// Le panneau « Votre veille » suit ses lignes, sans que les fonctions qui les
+// pilotent aient à le connaître : chacune garde son identifiant et sa logique.
+//   · Aucune ligne à montrer (compte gratuit, rien de récent, alertes déjà
+//     activées) : pas de panneau vide.
+//   · Sans ligne de surveillance, c'est un compte gratuit : « Votre veille
+//     active » serait faux, le titre dit simplement « En ce moment ».
+//   · Une fuite concerne le client et lui demande un geste : le panneau passe
+//     au-dessus de « Besoin d'aide ». Le reste du temps il reste dessous, car
+//     une actualité générale n'a pas à passer avant l'aide.
+function suivrePanneauVeille() {
+  var p = document.getElementById('home-vp');
+  var veille = document.getElementById('home-veille');
+  var alerte = document.getElementById('home-alerte-nat');
+  var push = document.getElementById('home-push');
+  if (!p || !veille || !alerte || !push) return;
+  var vu = function (e) { return e.style.display !== 'none'; };
+
+  var montrer = vu(veille) || vu(alerte) || vu(push);
+  if ((p.style.display !== 'none') !== montrer) p.style.display = montrer ? 'block' : 'none';
+
+  var surveille = vu(veille);
+  var fuite = surveille && veille.classList.contains('veille-fuite');
+  var titre = document.getElementById('vp-titre'), etat = document.getElementById('vp-etat'), dot = document.getElementById('vp-dot');
+  var t = surveille ? 'Votre veille' : 'En ce moment';
+  var e = !surveille ? '' : (fuite ? 'À traiter' : 'Active');
+  if (titre && titre.textContent !== t) titre.textContent = t;
+  if (etat && etat.textContent !== e) { etat.textContent = e; etat.classList.toggle('a-faire', fuite); }
+  if (dot) {
+    var d = surveille && !fuite ? '' : 'none';
+    if (dot.style.display !== d) dot.style.display = d;
+  }
+
+  var ancre = document.getElementById(fuite ? 'home-aide-sec' : 'home-fam');
+  if (ancre && p.nextElementSibling !== ancre) ancre.parentNode.insertBefore(p, ancre);
+}
+(function () {
+  var p = document.getElementById('home-vp');
+  if (!p || !window.MutationObserver) return;
+  new MutationObserver(suivrePanneauVeille).observe(p, { subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+  suivrePanneauVeille();
+})();
 
 // Carte « Activer les alertes » : visible seulement si la permission n'est pas accordée.
 function refreshPushCard() {

@@ -161,6 +161,19 @@ exports.handler = async (event) => {
         .select('id', { count: 'exact', head: true }).eq('email', cleanEmail);
       hasPrivacy = (pc || 0) > 0;
     } catch (e) { /* table absente → étape non faite */ }
+    // Ce que Despy a fait ce mois-ci, pour la carte du bas de l'accueil. `null`
+    // si on n'a pas pu compter : l'écran affiche « — », pas un zéro inventé.
+    const debutMois = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), 1)).toISOString();
+    const compter = async (filtre) => {
+      try {
+        const { count, error: e } = await filtre(supabase.from('analyses_history')
+          .select('id', { count: 'exact', head: true }).eq('email', cleanEmail).gte('created_at', debutMois));
+        return e || typeof count !== 'number' ? null : count;
+      } catch (e) { return null; }
+    };
+    const analysesMois = await compter((q) => q);
+    const arnaquesMois = await compter((q) => q.eq('verdict', 'scam'));
+
     let nbTraining = 0;
     try {
       const { count: tc } = await supabase.from('training_tests')
@@ -213,6 +226,8 @@ exports.handler = async (event) => {
           // mensuel donnait un chiffre faux qui ne redescendait jamais.
           questions_month:   (client.chat_period === new Date().toISOString().slice(0, 7))
                                ? (client.chat_period_used || 0) : 0,
+          analyses_month:    analysesMois,
+          arnaques_month:    arnaquesMois,
           breach_count:      client.breach_count || 0,
           last_hibp_check:   client.last_hibp_check || null,
           quizzes_completed: client.quizzes_completed || 0,
