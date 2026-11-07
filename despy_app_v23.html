@@ -1177,7 +1177,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
     <h1>Ne vous faites plus avoir.</h1>
     <p>Un vrai humain à vos côtés pour repérer et déjouer les arnaques, chaque jour.</p>
     <div class="onb-feats">
-      <div class="onb-feat"><span>🛡️</span> Surveillance de vos données en continu</div>
+      <div class="onb-feat"><span>🛡️</span> Vos données contrôlées chaque semaine</div>
       <div class="onb-feat"><span>💬</span> Un conseiller qui répond en langage clair</div>
       <div class="onb-feat"><span>📞</span> Une ligne SOS humaine en cas de doute</div>
     </div>
@@ -1796,7 +1796,7 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
         <div class="pw-h">Tout est inclus</div>
         <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Conseiller « Est-ce une arnaque&nbsp;? » <b>illimité</b></div>
         <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Ligne <b>SOS humaine</b>, réponse garantie</div>
-        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Surveillance dark web <b>en continu</b></div>
+        <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Surveillance dark web <b>chaque semaine</b></div>
         <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Nettoyage de vos données personnelles</div>
         <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Alertes arnaques en temps réel</div>
         <div class="pw-it"><span class="pw-ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Formation complète (10 modules)</div>
@@ -4334,7 +4334,7 @@ function renderProtection(checklist, stats) {
   if (auto) {
     var abonne = !!(session.get() || {}).subscribed;
     if (abonne && faits < PROT_ETAPES.length) {
-      auto.innerHTML = '<span>🛡️</span><span>Pendant ce temps, <b>Despy surveille vos données en continu</b> — ' +
+      auto.innerHTML = '<span>🛡️</span><span>Pendant ce temps, <b>Despy contrôle vos données chaque semaine</b> — ' +
         'sans que vous ayez quoi que ce soit à faire. Prochain contrôle ' +
         (typeof prochainControleFr === 'function' ? prochainControleFr() : 'cette semaine') + '.</span>';
       auto.style.display = 'flex';
@@ -5660,7 +5660,7 @@ function openBilan() {
     if (breach > 0) reco = { t: 'Changez les mots de passe concernés', d: 'Vos données sont apparues dans ' + breach + ' fuite' + (breach > 1 ? 's' : '') + '. Utilisez un mot de passe différent partout.', go: 'darkweb', b: 'Voir mes fuites' };
     else if (modules < 10) reco = { t: 'Continuez votre formation', d: 'Il vous reste ' + (10 - modules) + ' module' + (10 - modules > 1 ? 's' : '') + ' pour maîtriser tous les pièges.', go: 'formation', b: 'Reprendre' };
     else if (gestes < 6) reco = { t: 'Terminez votre protection', d: 'Encore ' + (6 - gestes) + ' geste' + (6 - gestes > 1 ? 's' : '') + ' et vous êtes au maximum.', go: 'protection', b: 'Voir les gestes' };
-    else reco = { t: 'Vous êtes parfaitement protégé', d: 'Continuez comme ça — Despy veille en continu.', go: null, b: null };
+    else reco = { t: 'Vous êtes parfaitement protégé', d: 'Continuez comme ça — Despy contrôle vos données chaque semaine.', go: null, b: null };
 
     var h =
       // hero score

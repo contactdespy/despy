@@ -234,6 +234,18 @@ def main():
     controle('plus aucun « 30+ » écrit en dur', '30+' in src.replace('« 30+ sites surveillés »', ''), False)
     controle('plus de « 24 h/24 » ni de « surveillance en continu » sur l\'accueil',
              bool(re.search(r'24 h/24|[Ss]urveillance en continu', acc)), False)
+    # Les fuites sont contrôlées le lundi, les appareils infectés le jeudi
+    # (netlify.toml). Ni l'appli ni le site ne promettent mieux.
+    promesses = []
+    for nom in ('despy_app_v23.html', 'index.html'):
+        texte = open(os.path.join(RACINE, nom), encoding='utf-8').read()
+        for m in re.finditer(r'en continu|en temps r[ée]el|24 ?h ?/ ?24', texte):
+            avant = re.sub(r'<[^>]+>|\s+', ' ', texte[max(0, m.start() - 160):m.start()])[-110:]
+            # « Alertes en temps réel en cas de nouvelle fuite » : le mot est après.
+            apres = re.sub(r'<[^>]+>|\s+', ' ', texte[m.end():m.end() + 80])[:40]
+            if re.search(r'donn[ée]es|dark ?web|fuite|surveill|veill', avant + ' ' + apres, re.I):
+                promesses.append('%s:%d' % (nom, texte.count('\n', 0, m.start()) + 1))
+    controle('surveillance des données : nulle part « en continu » ni « en temps réel »', promesses, [])
 
     print()
     print('═' * 74)
