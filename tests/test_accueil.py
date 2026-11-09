@@ -56,18 +56,17 @@ function El(id, affiche) {
   return e;
 }
 var ORDRE, ELS;
-function poser(veille, fuite, alerte, push) {
+function poser(veille, fuite, push) {
   ELS = {};
-  ['home-vp', 'home-veille', 'home-alerte-nat', 'home-push', 'vp-titre', 'vp-etat', 'vp-dot', 'home-aide-sec', 'home-fam']
+  ['home-vp', 'home-veille', 'home-push', 'vp-titre', 'vp-etat', 'vp-dot', 'home-aide-sec', 'home-rp', 'home-fam']
     .forEach(function (i) { ELS[i] = El(i, false); });
   ELS['home-vp'].style.display = 'none';
   ELS['vp-dot'].style.display = '';
   ELS['home-veille'].style.display = veille ? 'flex' : 'none';
   ELS['home-veille']._cl['veille-fuite'] = !!fuite;
-  ELS['home-alerte-nat'].style.display = alerte ? 'flex' : 'none';
   ELS['home-push'].style.display = push ? 'flex' : 'none';
-  // L'accueil, réduit aux trois repères : aide, panneau, bande famille.
-  ORDRE = ['home-aide-sec', 'home-vp', 'home-fam'];
+  // L'accueil, réduit à ses repères : aide, panneau, fil « Repéré par Despy », bande famille.
+  ORDRE = ['home-aide-sec', 'home-vp', 'home-rp', 'home-fam'];
   var parent = { insertBefore: function (p, ancre) {
     ORDRE = ORDRE.filter(function (x) { return x !== p.id; });
     ORDRE.splice(ORDRE.indexOf(ancre.id), 0, p.id);
@@ -85,11 +84,11 @@ function etat() {
 
 SCENARIO_PANNEAU = r"""
 var R = {};
-poser(true, false, true, true);  suivrePanneauVeille(); R.abonne = etat();
-poser(true, true, true, false);  suivrePanneauVeille(); R.fuite = etat();
-poser(true, true, true, false);  suivrePanneauVeille(); ELS['home-veille']._cl['veille-fuite'] = false; suivrePanneauVeille(); R.fuite_reglee = etat();
-poser(false, false, true, true); suivrePanneauVeille(); R.gratuit = etat();
-poser(false, false, false, false); ELS['home-vp'].style.display = 'block'; suivrePanneauVeille(); R.rien = etat();
+poser(true, false, true);   suivrePanneauVeille(); R.abonne = etat();
+poser(true, true, false);   suivrePanneauVeille(); R.fuite = etat();
+poser(true, true, false);   suivrePanneauVeille(); ELS['home-veille']._cl['veille-fuite'] = false; suivrePanneauVeille(); R.fuite_reglee = etat();
+poser(false, false, true);  suivrePanneauVeille(); R.gratuit = etat();
+poser(false, false, false); ELS['home-vp'].style.display = 'block'; suivrePanneauVeille(); R.rien = etat();
 print(JSON.stringify(R));
 """
 
@@ -147,6 +146,7 @@ function require(n) {
   if (n === '@supabase/supabase-js') return { createClient: function () { return { from: Q }; } };
   if (n === './_auth') return { requireAuth: function () { return { ok: true }; } };
   if (n === './_famille') return { estCouvert: function () { return Promise.resolve(true); } };
+  if (n === './_repere') return __REPERE__;
   throw new Error('module inattendu : ' + n);
 }
 var module = { exports: {} }, exports = module.exports;
@@ -191,10 +191,11 @@ def main():
              re.sub(r'\s+', '', acc[acc.index('</header>') + 9:pos('<button class="card hero-card"')]), '<divclass="pbody">')
     controle('le panneau vient après l\'aide', pos('home-aide-sec') < pos('id="home-vp"'), True)
     panneau = acc[pos('id="home-vp"'):acc.index('</section>', pos('id="home-vp"'))]
-    controle('les trois lignes sont dans le panneau',
-             [('id="%s"' % i) in panneau for i in ('home-veille', 'home-alerte-nat', 'home-push')], [True, True, True])
-    controle('et ne sont nulle part ailleurs',
-             [acc.count('id="%s"' % i) for i in ('home-veille', 'home-alerte-nat', 'home-push')], [1, 1, 1])
+    controle('le panneau garde la veille et les notifications',
+             [('id="%s"' % i) in panneau for i in ('home-veille', 'home-push')], [True, True])
+    controle('et nulle part ailleurs', [acc.count('id="%s"' % i) for i in ('home-veille', 'home-push')], [1, 1])
+    controle('le fil « Repéré par Despy » suit le panneau, l\'alerte du moment y est passée',
+             [pos('id="home-vp"') < pos('id="home-rp"') < pos('id="home-fam"'), 'home-alerte-nat' in src], [True, False])
 
     print()
     print('═' * 74)
@@ -205,8 +206,8 @@ def main():
         print('ÉCHEC : ' + (r.stderr or r.stdout)[:1500])
         return 1
     p = json.loads(r.stdout.strip().splitlines()[-1])
-    SOUS = 'home-aide-sec > home-vp > home-fam'
-    DESSUS = 'home-vp > home-aide-sec > home-fam'
+    SOUS = 'home-aide-sec > home-vp > home-rp > home-fam'
+    DESSUS = 'home-vp > home-aide-sec > home-rp > home-fam'
     controle('abonné : « Votre veille », active, sous l\'aide',
              [p['abonne'][k] for k in ('panneau', 'titre', 'etat', 'point', 'ordre')],
              ['block', 'Votre veille', 'Active', '', SOUS])
@@ -215,7 +216,7 @@ def main():
     controle('fuite réglée : le panneau redescend',
              [p['fuite_reglee'][k] for k in ('etat', 'rouge', 'ordre')], ['Active', False, SOUS])
     controle('compte gratuit : ne prétend pas surveiller',
-             [p['gratuit'][k] for k in ('panneau', 'titre', 'etat', 'point')], ['block', 'En ce moment', '', 'none'])
+             [p['gratuit'][k] for k in ('panneau', 'titre', 'etat', 'point')], ['block', 'Vos alertes', '', 'none'])
     controle('rien à montrer : pas de panneau vide', p['rien']['panneau'], 'none')
 
     print()
@@ -252,7 +253,10 @@ def main():
     print('CE QUE LE SERVEUR COMPTE')
     print('═' * 74)
     code = open(os.path.join(FONCTIONS, 'security-score.js'), encoding='utf-8').read()
-    r = jsc(SCENARIO_SERVEUR + code + SCENARIO_SERVEUR_FIN)
+    repere = open(os.path.join(FONCTIONS, '_repere.js'), encoding='utf-8').read()
+    module_repere = ('var __REPERE__ = (function () { var module = { exports: {} }, exports = module.exports;\n'
+                     + repere + '\nreturn module.exports; })();\n')
+    r = jsc(SCENARIO_SERVEUR + module_repere + code + SCENARIO_SERVEUR_FIN)
     if r.returncode != 0 or not r.stdout.strip():
         print('ÉCHEC : ' + (r.stderr or r.stdout)[:1500])
         return 1

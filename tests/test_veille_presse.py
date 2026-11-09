@@ -36,7 +36,7 @@ JSC = ('/System/Library/Frameworks/JavaScriptCore.framework/Versions/A'
        '/Helpers/jsc')
 
 # Les modules réels chargés dans le bac à sable. Tout le reste est simulé.
-REELS = ['_privacy-sign', '_presse-recap', '_alert-sources', '_push',
+REELS = ['_privacy-sign', '_presse-recap', '_alert-sources', '_push', '_repere',
          '_is-scheduled', 'national-alerts', 'veille-presse', 'alert-moderate', 'list-alerts']
 
 

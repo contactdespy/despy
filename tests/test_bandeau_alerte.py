@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # ════════════════════════════════════════════
-# DESPY — Banc d'essai du bandeau d'alerte de l'accueil
+# DESPY — Banc d'essai de l'alerte du moment, sur l'accueil
+#
+# Le bandeau d'alerte est devenu la première ligne du fil « Repéré par Despy »
+# (voir tests/test_repere.py pour le fil lui-même). Ce banc garde ce qu'il
+# vérifiait, sur la VRAIE réponse de la production : la dernière alerte
+# s'affiche, son titre est coupé au mot entier, sa ligne dit d'où elle vient.
 #
 # Chrome n'étant pas toujours disponible pour regarder l'écran, on vérifie le
 # rendu autrement : on extrait les VRAIES fonctions de despy_app_v23.html, on
@@ -58,13 +63,14 @@ def main():
         sys.exit('ERREUR : JavaScriptCore introuvable — test impossible')
 
     src = io.open(APP, encoding='utf-8').read()
-    const = re.search(r'var\s+ALERTE_HOME_JOURS\s*=\s*\d+;', src)
-    if not const:
-        sys.exit('ERREUR : ALERTE_HOME_JOURS introuvable')
+    # Tout le bloc du fil : ses réglages, son état et ses fonctions.
+    try:
+        bloc = src[src.index('var ALERTE_HOME_JOURS'):src.index('function openReperes(')]
+    except ValueError:
+        sys.exit('ERREUR : bloc « Repéré par Despy » introuvable')
 
     code_app = '\n'.join([
-        const.group(0),
-        extraire(src, 'majAlerteNationale'),
+        bloc,
         extraire(src, 'timeAgoFr'),
         extraire(src, 'alerteCard'),
         extraire(src, 'escapeHtmlA')])
@@ -83,9 +89,10 @@ def main():
 var __REPONSE__ = %s;
 var console = { warn: function(){}, error: function(){}, log: function(){} };
 var __ELS__ = {
-  'home-alerte-nat':  { style: { display: 'none' }, textContent: '' },
-  'alerte-nat-titre': { style: {}, textContent: '' },
-  'alerte-nat-sub':   { style: {}, textContent: '' }
+  'home-rp':  { style: { display: 'none' }, innerHTML: '' },
+  'rp-liste': { style: {}, innerHTML: '' },
+  'rp-total': { style: {}, innerHTML: '' },
+  'rp-tout':  { style: {}, innerHTML: '' }
 };
 var document = { getElementById: function (id) { return __ELS__[id] || null; } };
 function fetch(url, opts) {
@@ -104,10 +111,12 @@ var attente = Promise.resolve();
 for (var k = 0; k < 40; k++) attente = attente.then(function () {});
 
 attente.then(function () {
+  var h = __ELS__['rp-liste'].innerHTML;
+  var dec = function (x) { return (x || '').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'); };
   print(JSON.stringify({
-    affiche: __ELS__['home-alerte-nat'].style.display,
-    titre:   __ELS__['alerte-nat-titre'].textContent,
-    sous:    __ELS__['alerte-nat-sub'].textContent,
+    affiche: __ELS__['home-rp'].style.display,
+    titre:   dec((h.match(/<span class="a">([^<]*)/) || [])[1]),
+    sous:    dec((h.match(/<span class="b">([^<]*)<\/span>/) || [])[1]),
     carte_officielle: alerteCard(__REPONSE__.alerts[0] || {}),
     carte_interne: alerteCard({ title: 'Vague de faux SMS Ameli',
                                 source: 'Despy · détecté chez nos utilisateurs',
@@ -148,7 +157,7 @@ attente.then(function () {
     print('═' * 74)
     print('BANDEAU D\'ACCUEIL')
     print('═' * 74)
-    controle('bandeau affiché', d.get('affiche') == 'flex',
+    controle('alerte du moment affichée', d.get('affiche') == 'block',
              'display = %r' % d.get('affiche'))
     controle('titre non vide', bool(d.get('titre')), d.get('titre'))
     controle('titre ≤ 72 caractères', len(d.get('titre') or '') <= 72,
@@ -164,7 +173,7 @@ attente.then(function () {
                  'dernier mot affiché : %r' % dernier)
     else:
         controle('titre affiché en entier (pas de coupure)', True)
-    controle('sous-titre : source · ancienneté',
+    controle('sous-titre : d’où elle vient · ancienneté',
              ' · ' in (d.get('sous') or ''), d.get('sous'))
 
     print()

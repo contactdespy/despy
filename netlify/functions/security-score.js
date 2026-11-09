@@ -7,6 +7,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const { estCouvert } = require('./_famille');
 const { requireAuth } = require('./_auth');
+const { reperesDuClient, arnaquesChezLesMembres } = require('./_repere');
 
 // ════════════════════════════════════════════
 // LE SCORE DE SÉCURITÉ
@@ -173,6 +174,9 @@ exports.handler = async (event) => {
     };
     const analysesMois = await compter((q) => q);
     const arnaquesMois = await compter((q) => q.eq('verdict', 'scam'));
+    // « Repéré par Despy » sur l'accueil (voir _repere.js).
+    const [reperes, arnaquesMembres] = await Promise.all([
+      reperesDuClient(supabase, cleanEmail), arnaquesChezLesMembres(supabase)]);
 
     let nbTraining = 0;
     try {
@@ -228,6 +232,8 @@ exports.handler = async (event) => {
                                ? (client.chat_period_used || 0) : 0,
           analyses_month:    analysesMois,
           arnaques_month:    arnaquesMois,
+          reperes:           reperes,
+          arnaques_membres:  arnaquesMembres,
           breach_count:      client.breach_count || 0,
           last_hibp_check:   client.last_hibp_check || null,
           quizzes_completed: client.quizzes_completed || 0,

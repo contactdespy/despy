@@ -19,6 +19,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 const { envoyerPush, tagDepuis } = require('./_push');
+const { textePush } = require('./_repere');
 const { collecterAlertes } = require('./_alert-sources');
 const { fichesAPublier } = require('./_calendrier-arnaques');
 const { detecterVagues } = require('./_vagues');
@@ -40,10 +41,14 @@ function recente(alerte, jours) {
 
 // La plomberie web-push vit dans _push.js, partagée avec « Publier et
 // prévenir ». Ici on ne décide plus que du texte affiché sur l'écran.
+// Le titre dit ce que Despy a fait (« Repéré par Despy », « Détecté chez les
+// membres Despy »…), le corps dit l'arnaque : c'est ainsi que le client voit,
+// sur son écran verrouillé, Despy travailler pour lui. Voir _repere.js.
 function sendPushToAll(supabase, alert) {
+  const t = textePush(alert);
   return envoyerPush(supabase, {
-    title: alert.title.length > 80 ? alert.title.slice(0, 77) + '…' : alert.title,
-    body: alert.body || ('Source : ' + (alert.source || 'Despy')),
+    title: t.title,
+    body: t.body,
     url: alert.url || 'https://despy.fr',
     tag: tagDepuis(alert.url || alert.title)
   });

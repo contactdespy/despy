@@ -902,13 +902,30 @@ body{ background:var(--p-paper); }
 .vp-row:active{ background:rgba(255,255,255,.06); }
 .vp-ic{ width:38px; height:38px; border-radius:11px; flex:none; display:flex; align-items:center; justify-content:center; }
 .vp-ic-ok{ background:rgba(74,222,128,.15); color:#4ade80; }
-.vp-ic-alerte{ background:rgba(251,191,36,.15); color:#FBBF24; }
 .vp-ic-push{ background:rgba(91,227,245,.14); color:#5BE3F5; }
 .vp-row.veille-fuite{ background:rgba(255,138,133,.09); }
 .vp-row.veille-fuite .vp-ic{ background:rgba(255,138,133,.20); color:#FF8A85; }
 .vp .v-b{ color:rgba(255,255,255,.66); }
 .vp .chev{ color:rgba(255,255,255,.45); flex:none; }
 .vp-go{ flex:none; background:#fff; color:#16307A; font-size:13px; font-weight:800; border-radius:10px; padding:9px 13px; }
+
+/* ── « Repéré par Despy » ──
+   Le panneau bleu nuit dit l'état de la veille ; cette carte dit ce que Despy
+   a repéré, en vrai. La pastille donne la nature : vert = repérée pour vous,
+   rouge = détectée chez les membres, ambre = arnaque de saison, bleu = relevée
+   par la veille auprès d'une source officielle ou de la presse. */
+.rp{ overflow:hidden; }
+.rp-h{ display:flex; align-items:center; gap:10px; padding:14px 16px 6px; }
+.rp-t{ flex:1; min-width:0; font-size:12px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--p-muted); }
+.rp-tout{ background:none; border:0; padding:4px 0; font-family:inherit; font-size:13px; font-weight:800; color:var(--p-blue); cursor:pointer; }
+.rp-total{ padding:0 16px 12px; font-size:13px; color:var(--p-muted); line-height:1.45; }
+.rp-total b{ color:var(--p-ink); font-weight:900; }
+.rp .listrow:first-child{ border-top:1px solid var(--p-line); }
+.rp-ic-perso{ background:#E6F6EF; color:#159B6B; }
+.rp-ic-vague{ background:#FDECEC; color:#B42318; }
+.rp-ic-saison{ background:#FBF3E0; color:#92400E; }
+.rp-ic-veille{ background:#E8EDFF; color:#3730A3; }
+.rp-new{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:10.5px; font-weight:800; letter-spacing:.02em; color:#fff; background:var(--p-blue); border-radius:20px; padding:2px 7px; }
 
 /* ── bilan mensuel ── */
 .bl-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -1317,14 +1334,6 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           </span>
           <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="vp-row" id="home-alerte-nat" style="display:none" onclick="openAlertes()">
-          <span class="vp-ic vp-ic-alerte"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>
-          <span class="v-m">
-            <span class="v-a" id="alerte-nat-titre"></span>
-            <span class="v-b" id="alerte-nat-sub"></span>
-          </span>
-          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
         <button class="vp-row" id="home-push" style="display:none" onclick="requestPush()">
           <span class="vp-ic vp-ic-push"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>
           <span class="v-m">
@@ -1333,6 +1342,15 @@ html.dys .a11y-t, html.dys .fm-t, html.dys .hero-txt h2, html.dys h1, html.dys h
           </span>
           <span class="vp-go">Activer</span>
         </button>
+      </section>
+
+      <section class="card rp" id="home-rp" style="display:none" aria-label="Repéré par Despy">
+        <div class="rp-h">
+          <span class="rp-t">Repéré par Despy</span>
+          <button class="rp-tout" id="rp-tout" onclick="openReperes()">Tout voir</button>
+        </div>
+        <div class="rp-total" id="rp-total" style="display:none"></div>
+        <div id="rp-liste"></div>
       </section>
 
       <div class="famband" id="home-fam" style="display:none"></div>
@@ -3084,52 +3102,166 @@ function openAlertes() {
   loadAlertesFeed();
 }
 
-// Le bandeau d'alerte de l'accueil.
+// ─── « Repéré par Despy » ───
 //
-// Il n'affiche QUE la dernière alerte récente. Au-delà de trois semaines,
-// annoncer « en ce moment » serait faux, et un bandeau qui reste en place en
-// permanence finit par ne plus être lu — c'est le contraire du but.
+// Le fil de l'accueil : ce que Despy a repéré, en vrai — voir _repere.js côté
+// serveur. Deux sources arrivent séparément : les alertes publiées
+// (list-alerts) et ce que security-score sait de CE client (les arnaques
+// qu'il nous a montrées, le total chez les membres). D'où cet état partagé.
+//
+// Les alertes de plus de trois semaines n'y entrent pas : « repéré » doit
+// rester une nouvelle, et un fil qui ne bouge jamais cesse d'être lu.
+// Jamais « bloquée » ni « interceptée » : Despy ne bloque rien.
 var ALERTE_HOME_JOURS = 21;
+var REPERE_MAX_ACCUEIL = 3;
+var REPERE_TOTAL_MIN = 10;      // en dessous, un total n'impressionne pas : on se tait
+var REPERE_NOUVEAU_JOURS = 7;
+var REPERE = { veille: null, perso: null, total: null };
 
 function majAlerteNationale() {
-  var el = document.getElementById('home-alerte-nat');
-  if (!el) return;
   fetch('/.netlify/functions/list-alerts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       var liste = (d && Array.isArray(d.alerts)) ? d.alerts : [];
       var limite = Date.now() - ALERTE_HOME_JOURS * 24 * 3600 * 1000;
-      var a = null;
-      for (var i = 0; i < liste.length; i++) {
-        var t = new Date(liste[i].created_at).getTime();
-        if (!isNaN(t) && t >= limite) { a = liste[i]; break; }
-      }
-      if (!a) { el.style.display = 'none'; return; }
-
-      // Couper au dernier mot entier : « les vérifications sont e… » se lit
-      // mal, surtout en gros caractères. On ne recule pas au-delà de la
-      // moitié du bandeau, sinon un titre sans espaces le viderait.
-      var titre = a.title || 'Alerte en cours';
-      // 58 : deux lignes dans le panneau « Votre veille ». La coupe se fait ici
-      // et pas en CSS, qui couperait au milieu d'un mot (« pour d… »).
-      if (titre.length > 58) {
-        var coupe = titre.slice(0, 57);
-        var espace = coupe.lastIndexOf(' ');
-        if (espace > 40) coupe = coupe.slice(0, espace);
-        titre = coupe.replace(/[\s,;:.–—-]+$/, '') + '…';
-      }
-      var tEl = document.getElementById('alerte-nat-titre');
-      var sEl = document.getElementById('alerte-nat-sub');
-      if (tEl) tEl.textContent = titre;
-      if (sEl) sEl.textContent = (a.source || 'Alerte') + ' · ' + timeAgoFr(a.created_at);
-      el.style.display = 'flex';
+      REPERE.veille = liste.filter(function (a) {
+        var t = new Date(a && a.created_at).getTime();
+        return !isNaN(t) && t >= limite;
+      });
+      renderReperes();
     })
     .catch(function (e) {
-      // Masqué plutôt qu'en erreur : sur l'accueil, un message d'échec
-      // inquiéterait sans rien apporter. La trace reste en console.
-      console.warn('alerte nationale indisponible', e);
-      el.style.display = 'none';
+      // Pas de message d'échec sur l'accueil : il inquiéterait sans rien
+      // apporter. Le fil se contente de ce qu'il a, la trace reste en console.
+      console.warn('alertes indisponibles', e);
+      REPERE.veille = [];
+      renderReperes();
     });
+}
+
+function majReperesClient(stats) {
+  var st = stats || {};
+  REPERE.perso = Array.isArray(st.reperes) ? st.reperes : [];
+  REPERE.total = typeof st.arnaques_membres === 'number' ? st.arnaques_membres : null;
+  renderReperes();
+}
+
+// Couper au dernier mot entier : « les vérifications sont e… » se lit mal,
+// surtout en gros caractères. On ne recule pas au-delà des deux tiers, sinon
+// un titre sans espaces serait vidé.
+function couperTitre(titre, n) {
+  titre = String(titre || '');
+  if (titre.length <= n) return titre;
+  var coupe = titre.slice(0, n - 1);
+  var espace = coupe.lastIndexOf(' ');
+  if (espace > n * 0.66) coupe = coupe.slice(0, espace);
+  return coupe.replace(/[\s,;:.–—«-]+$/, '') + '…';
+}
+
+// Même lecture des sources que alerteCard() et _repere.js.
+function natureRepere(source) {
+  var s = String(source || '');
+  if (s.indexOf('Anticipation') !== -1) return 'saison';
+  if (s.indexOf('Despy') !== -1) return 'vague';
+  return 'veille';
+}
+
+function elementsReperes() {
+  var items = [];
+  (REPERE.perso || []).forEach(function (p) {
+    if (!p || !p.at) return;
+    items.push({ nature: 'perso', at: p.at, texte: p.extrait || '',
+                 titre: '« ' + couperTitre(p.extrait || 'Message', 50) + ' »',
+                 etiquette: 'Arnaque repérée pour vous' });
+  });
+  (REPERE.veille || []).forEach(function (a) {
+    var nature = natureRepere(a.source);
+    var src = String(a.source || '').split(' · ')[0].trim();
+    items.push({ nature: nature, at: a.created_at, alerte: a,
+                 titre: couperTitre(a.title || 'Alerte arnaque', 58),
+                 etiquette: nature === 'vague' ? 'Détectée chez les membres Despy'
+                   : nature === 'saison' ? 'Anticipée par Despy'
+                   : 'Veille Despy' + (src ? ' · ' + src : '') });
+  });
+  items.sort(function (x, y) { return new Date(y.at).getTime() - new Date(x.at).getTime(); });
+  return items;
+}
+
+function repereVu() {
+  try { return parseInt(localStorage.getItem('despy_repere_vu') || '0', 10) || 0; } catch (e) { return 0; }
+}
+
+// « Nouveau » : pas encore vu dans la fiche, et de moins d'une semaine. Une
+// seule pastille sur l'accueil, sur la plus récente : trois à la fois, c'est
+// du bruit, et une suffit à dire qu'il y a du neuf.
+function repereNouveau(at, vu) {
+  var t = new Date(at).getTime();
+  return !isNaN(t) && t > vu && t > Date.now() - REPERE_NOUVEAU_JOURS * 24 * 3600 * 1000;
+}
+
+var REPERE_ICONES = {
+  perso:  '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  vague:  '<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  saison: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  veille: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+};
+
+function texteTotalReperes() {
+  if (typeof REPERE.total !== 'number' || REPERE.total < REPERE_TOTAL_MIN) return '';
+  return '<b>' + REPERE.total.toLocaleString('fr-FR') + '</b> arnaques repérées chez les membres de Despy, au total';
+}
+
+function renderReperes() {
+  var carte = document.getElementById('home-rp');
+  var liste = document.getElementById('rp-liste');
+  var total = document.getElementById('rp-total');
+  var tout = document.getElementById('rp-tout');
+  if (!carte || !liste) return;
+  var items = elementsReperes();
+  var vu = repereVu();
+  var t = texteTotalReperes();
+  var pastille = false;
+  liste.innerHTML = items.slice(0, REPERE_MAX_ACCUEIL).map(function (it) {
+    var neuf = !pastille && repereNouveau(it.at, vu);
+    if (neuf) pastille = true;
+    // L'ancienneté ne se coupe pas en fin de ligne (« il / y a 2 j »).
+    var quand = timeAgoFr(it.at).replace(/ /g, '\u00a0');
+    return '<button class="listrow" onclick="openReperes()">' +
+      '<span class="ic rp-ic-' + it.nature + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + REPERE_ICONES[it.nature] + '</svg></span>' +
+      '<span class="m"><span class="a">' + escapeHtmlA(it.titre) +
+        (neuf ? '<span class="rp-new">Nouveau</span>' : '') + '</span>' +
+      '<span class="b">' + escapeHtmlA(it.etiquette) + ' · ' + escapeHtmlA(quand) + '</span></span>' +
+      '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>' +
+      '</button>';
+  }).join('');
+  if (total) { total.innerHTML = t; total.style.display = t ? 'block' : 'none'; }
+  if (tout) tout.style.display = items.length ? '' : 'none';
+  carte.style.display = (items.length || t) ? 'block' : 'none';
+}
+
+function openReperes() {
+  var items = elementsReperes();
+  var t = texteTotalReperes();
+  var h = '<p class="sheet-help">Ce que Despy a repéré : les arnaques que vous nous avez montrées, ' +
+          'celles détectées chez les membres, et celles que la veille Despy a relevées auprès des ' +
+          'sources officielles et de la presse.</p>';
+  if (t) h += '<div class="result-card" style="text-align:left;margin-bottom:12px;font-size:15px;color:var(--text2)">' + t + '.</div>';
+  items.forEach(function (it) {
+    if (it.nature !== 'perso') { h += alerteCard(it.alerte); return; }
+    h += '<div class="result-card" style="text-align:left;margin-bottom:10px">' +
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">' +
+      '<span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:20px;background:#E6F6EF;color:#14633F">Repérée pour vous</span>' +
+      '<span style="font-size:12px;color:var(--text3)">' + escapeHtmlA(timeAgoFr(it.at)) + '</span></div>' +
+      '<div style="font-weight:700;font-size:15px;color:var(--text);line-height:1.35">Vous nous avez montré ce message : c’était une arnaque.</div>' +
+      '<div style="font-size:14px;color:var(--text2);margin-top:5px;line-height:1.45">« ' + escapeHtmlA(it.texte) + ' »</div>' +
+      '</div>';
+  });
+  if (!items.length) h += '<div class="result-card" style="color:var(--text2)">Rien de repéré ces trois dernières semaines.</div>';
+  h += '<button class="btn-secondary" style="margin-top:12px" onclick="closeSheet();setTimeout(openAlertes,280)">Toutes les alertes et les notifications</button>';
+  openSheet('Repéré par Despy', h);
+  // Vu : les pastilles « Nouveau » disparaissent de l'accueil.
+  try { localStorage.setItem('despy_repere_vu', String(Date.now())); } catch (e) {}
+  renderReperes();
 }
 
 function loadAlertesFeed() {
@@ -4655,18 +4787,17 @@ function renderScenarioList() {
 function suivrePanneauVeille() {
   var p = document.getElementById('home-vp');
   var veille = document.getElementById('home-veille');
-  var alerte = document.getElementById('home-alerte-nat');
   var push = document.getElementById('home-push');
-  if (!p || !veille || !alerte || !push) return;
+  if (!p || !veille || !push) return;
   var vu = function (e) { return e.style.display !== 'none'; };
 
-  var montrer = vu(veille) || vu(alerte) || vu(push);
+  var montrer = vu(veille) || vu(push);
   if ((p.style.display !== 'none') !== montrer) p.style.display = montrer ? 'block' : 'none';
 
   var surveille = vu(veille);
   var fuite = surveille && veille.classList.contains('veille-fuite');
   var titre = document.getElementById('vp-titre'), etat = document.getElementById('vp-etat'), dot = document.getElementById('vp-dot');
-  var t = surveille ? 'Votre veille' : 'En ce moment';
+  var t = surveille ? 'Votre veille' : 'Vos alertes';
   var e = !surveille ? '' : (fuite ? 'À traiter' : 'Active');
   if (titre && titre.textContent !== t) titre.textContent = t;
   if (etat && etat.textContent !== e) { etat.textContent = e; etat.classList.toggle('a-faire', fuite); }
@@ -4675,7 +4806,8 @@ function suivrePanneauVeille() {
     if (dot.style.display !== d) dot.style.display = d;
   }
 
-  var ancre = document.getElementById(fuite ? 'home-aide-sec' : 'home-fam');
+  // Sans fuite, le panneau reste juste au-dessus du fil « Repéré par Despy ».
+  var ancre = document.getElementById(fuite ? 'home-aide-sec' : 'home-rp');
   if (ancre && p.nextElementSibling !== ancre) ancre.parentNode.insertBefore(p, ancre);
 }
 (function () {
@@ -4735,6 +4867,8 @@ function refreshHomeScore() {
   renderAccountState();
   refreshFormationCard();
   refreshPushCard();
+  // Ce que le compte précédent avait repéré ne doit pas rester à l'écran.
+  REPERE.perso = null; REPERE.total = null;
   majAlerteNationale();   // avant le garde-fou : une alerte nationale ne dépend pas du compte
   if (!s.email) return;
 
@@ -4756,6 +4890,7 @@ function refreshHomeScore() {
       if (subEl && d.tips && d.tips.length) subEl.textContent = d.tips[0].text;
       renderProtection(d.checklist, d.stats);
       renderHomeStats(d.stats);
+      majReperesClient(d.stats);      // le fil « Repéré par Despy »
       renderVeille(d.stats);          // surveillance rendue visible (abonnés)
       renderAccountState();  // rétablit l'état gratuit/abonné après la donnée
     } else {
