@@ -928,11 +928,22 @@ body{ background:var(--p-paper); }
 .rp-new{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:10.5px; font-weight:800; letter-spacing:.02em; color:#fff; background:var(--p-blue); border-radius:20px; padding:2px 7px; }
 
 /* ── bilan mensuel ── */
-.bl-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.bl-tile{ background:#fff; border-radius:16px; box-shadow:0 6px 18px rgba(12,25,55,.06); padding:15px; display:flex; flex-direction:column; }
-.bl-ic{ width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:10px; }
-.bl-v{ font-size:26px; font-weight:850; letter-spacing:-.02em; color:var(--p-ink); line-height:1; font-variant-numeric:tabular-nums; }
-.bl-k{ font-size:12px; color:var(--p-muted); margin-top:4px; line-height:1.3; }
+.bl-body{ display:flex; flex-direction:column; gap:14px; }
+.bl-mois{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.bl-st{ display:flex; flex-direction:column; align-items:flex-start; min-width:0; }
+.bl-st .n{ font-size:26px; font-weight:800; letter-spacing:-.02em; color:var(--p-ink); line-height:1; font-variant-numeric:tabular-nums; }
+.bl-st .k{ font-size:11.5px; color:var(--p-muted); margin-top:4px; line-height:1.3; }
+.bl-prec{ margin-top:14px; padding-top:12px; border-top:1px solid var(--p-line,#E7EBF3); font-size:13px; color:var(--p-muted); line-height:1.5; }
+.bl-prec b{ color:var(--p-ink); font-weight:800; }
+.bl-prog{ display:block; width:100%; background:none; border:0; padding:0; text-align:left; font-family:inherit; cursor:pointer; }
+.bl-prog + .bl-prog{ margin-top:16px; }
+.bl-prog-h{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; font-size:14.5px; font-weight:800; color:var(--p-ink); }
+.bl-prog-h b{ font-size:13px; font-weight:800; color:var(--p-blue); white-space:nowrap; }
+.bl-prog .pbar{ display:block; }
+.bl-prio-t{ font-size:16px; font-weight:800; color:var(--p-ink); margin-bottom:5px; }
+.bl-prio-d{ font-size:14.5px; line-height:1.55; color:var(--p-muted); }
+.bl-pied{ text-align:center; font-size:12.5px; color:var(--p-muted); line-height:1.6; }
+.bl-ic{ width:36px; height:36px; border-radius:11px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
 
 
 /* ── écran d'accueil (onboarding nouveaux venus) ── */
@@ -983,8 +994,8 @@ body{ background:var(--p-paper); }
 html.hc{ --p-muted:#2b3547; --p-ink:#000; --p-line:#8b97ad;
   --text:#000; --text2:#1c2536; --text3:#3a4459; --border:#8b97ad; --separator:rgba(11,18,32,.28); }
 html.hc .hero-ey, html.hc .sec, html.hc .stats-h, html.hc .mod-label{ color:#1c2536 !important; }
-html.hc .card, html.hc .plist, html.hc .tile, html.hc .bl-tile, html.hc .fm-row{ border:1px solid #b6c0d2; }
-html.hc .a11y-s, html.hc .fm-s, html.hc .bl-k{ color:#2b3547; }
+html.hc .card, html.hc .plist, html.hc .tile, html.hc .fm-row{ border:1px solid #b6c0d2; }
+html.hc .a11y-s, html.hc .fm-s, html.hc .bl-st .k, html.hc .bl-prec{ color:#2b3547; }
 
 /* ── confort de lecture (dyslexie) ── */
 html.dys, html.dys body, html.dys input, html.dys textarea, html.dys button{
@@ -4926,27 +4937,38 @@ function prochainControleFr() {
   return 'sous peu';
 }
 
+// Ce que dit la ligne de veille. Une seule source pour l'accueil et pour le
+// bilan mensuel : ils ne peuvent plus se contredire.
+// `hebdo` : le contrôle automatique de la semaine, réservé aux abonnés.
+function texteVeille(stats, hebdo) {
+  var st = stats || {};
+  var fuites = st.breach_count || 0;
+  var bouts = [];
+  if (st.last_hibp_check) { var q = timeAgoFr(st.last_hibp_check); if (q) bouts.push('vérifié ' + q); }
+  if (hebdo) bouts.push('prochain contrôle ' + prochainControleFr());
+  return {
+    fuites: fuites,
+    // « sous surveillance » laissait croire que Despy s'en occupe. Non : la
+    // surveillance détecte, mais c'est au client de changer ses mots de passe.
+    titre: fuites > 0 ? (fuites + (fuites > 1 ? ' fuites vous concernent' : ' fuite vous concerne'))
+                      : 'Aucune fuite détectée',
+    sous: bouts.join(' · ')
+  };
+}
+
 function renderVeille(stats) {
   var el = document.getElementById('home-veille');
   if (!el) return;
   if (!((session.get() || {}).subscribed)) { el.style.display = 'none'; return; }
   el.style.display = 'flex';
-  var st = stats || {};
-  var fuites = st.breach_count || 0;
+  var v = texteVeille(stats, true);
   var t = document.getElementById('veille-title');
   var b = document.getElementById('veille-sub');
-  // « sous surveillance » laissait croire que Despy s'en occupe. Non : la
-  // surveillance détecte, mais c'est au client de changer ses mots de passe.
-  if (t) t.textContent = fuites > 0
-    ? (fuites + (fuites > 1 ? ' fuites vous concernent' : ' fuite vous concerne'))
-    : 'Aucune fuite détectée';
+  if (t) t.textContent = v.titre;
   // Rouge, pas moutarde : voir le commentaire de .veille-fuite dans le style.
   el.classList.remove('veille-alerte');
-  el.classList.toggle('veille-fuite', fuites > 0);
-  var bouts = [];
-  if (st.last_hibp_check) { var q = timeAgoFr(st.last_hibp_check); if (q) bouts.push('vérifié ' + q); }
-  bouts.push('prochain contrôle ' + prochainControleFr());
-  if (b) b.textContent = bouts.join(' · ');
+  el.classList.toggle('veille-fuite', v.fuites > 0);
+  if (b) b.textContent = v.sous;
 }
 
 function timeAgoFr(iso) {
@@ -5741,10 +5763,174 @@ function closeBilan() {
   document.getElementById('bilan').classList.remove('on');
   document.body.style.overflow = '';
 }
-function bilanTuile(icone, cls, valeur, libelle) {
-  return '<div class="bl-tile"><span class="bl-ic ' + cls + '">' + icone + '</span>' +
-    '<span class="bl-v">' + valeur + '</span><span class="bl-k">' + libelle + '</span></div>';
+// ─── LE BILAN MENSUEL ───
+//
+// Il affichait, sous « Ce mois-ci », des cumuls depuis l'inscription : 23
+// questions là où l'accueil en comptait 2, le total des fuites, « Surveillance
+// dark web : Active » écrit en dur, même pour un compte gratuit. Rien ne
+// bougeait d'un mois sur l'autre : il avait l'air périmé, et il l'était.
+//
+// Règles de cet écran :
+//   - sous un titre daté, uniquement des chiffres DU MOIS, les mêmes que
+//     l'accueil ; « — » si on n'a pas pu compter, jamais un zéro inventé ;
+//   - le mois écoulé à côté : les premiers jours du mois, le mois en cours
+//     est vide par nature ;
+//   - ce qui est un état (fuites, gestes, formation) est présenté comme un
+//     état, pas comme une activité du mois ;
+//   - rien n'est annoncé à un compte gratuit qu'il n'a pas.
+var BILAN_ICONES = {
+  message:  '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><polyline points="9 10 11 12 15 8"/>',
+  bouclier: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  question: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+  oeil:     '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  cadenas:  '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  alerte:   '<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'
+};
+function bilanIcone(nom, taille) {
+  return '<svg width="' + (taille || 19) + '" height="' + (taille || 19) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' + BILAN_ICONES[nom] + '</svg>';
 }
+var BILAN_CHEVRON = '<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+// « 4 messages vérifiés », « 1 arnaque repérée », « — message vérifié ».
+function bilanCompte(n, un, plusieurs) {
+  var connu = typeof n === 'number';
+  return { n: connu ? String(n) : '—', k: connu && n > 1 ? plusieurs : un };
+}
+function bilanChiffre(icone, teinte, c) {
+  return '<div class="bl-st"><span class="bl-ic ' + teinte + '">' + bilanIcone(icone) + '</span>' +
+    '<span class="n">' + c.n + '</span><span class="k">' + c.k + '</span></div>';
+}
+
+// « Du 1er au 13 novembre » : le lecteur voit jusqu'où va le bilan.
+function bilanPeriode(maintenant) {
+  var d = maintenant || new Date();
+  var mois = d.toLocaleDateString('fr-FR', { month: 'long' });
+  return d.getDate() === 1 ? 'Le 1er ' + mois : 'Du 1er au ' + d.getDate() + ' ' + mois;
+}
+function bilanMoisPrecedent(maintenant) {
+  var d = maintenant || new Date();
+  return new Date(d.getFullYear(), d.getMonth() - 1, 1).toLocaleDateString('fr-FR', { month: 'long' });
+}
+
+function bilanVers(ou) {
+  closeBilan();
+  setTimeout(function () {
+    if (ou === 'formation') openFormation();
+    else if (ou === 'protection') switchAppTab('protection');
+    else if (ou === 'reperes') openReperes();
+    else if (ou === 'paywall') openPaywall();
+    else openTool(ou);
+  }, 260);
+}
+
+// La priorité du moment, selon les données.
+function bilanPriorite(st, modules, gestes, abonne) {
+  var breach = st.breach_count || 0;
+  if (breach > 0) return { t: 'Changez les mots de passe concernés', d: 'Vos données sont apparues dans ' + breach + ' fuite' + (breach > 1 ? 's' : '') + '. Utilisez un mot de passe différent partout.', go: 'darkweb', b: 'Voir mes fuites' };
+  if (!st.last_hibp_check) return { t: 'Faites vérifier vos données', d: 'Tant qu’on ne sait pas ce qui circule sur vous, le reste n’est qu’une supposition. Cela prend dix secondes.', go: 'darkweb', b: 'Vérifier maintenant' };
+  if (modules < 10) return { t: 'Continuez votre formation', d: 'Il vous reste ' + (10 - modules) + ' module' + (10 - modules > 1 ? 's' : '') + ' pour maîtriser tous les pièges.', go: 'formation', b: 'Reprendre' };
+  if (gestes < 6) return { t: 'Terminez votre protection', d: 'Encore ' + (6 - gestes) + ' geste' + (6 - gestes > 1 ? 's' : '') + ' et vous êtes au maximum.', go: 'protection', b: 'Voir les gestes' };
+  return { t: 'Tout est en place', d: 'Vos six protections sont activées et votre formation est terminée.' + (abonne ? ' Despy contrôle vos données chaque semaine.' : ''), go: null, b: null };
+}
+
+function bilanHtml(d, s, maintenant) {
+  var st = d.stats || {}, ck = d.checklist || {};
+  var score = (typeof d.score === 'number') ? d.score : 0;
+  var color = d.color || '#2D5BFF';
+  // Le serveur sait si le compte est couvert (abonné, ou proche d'une formule
+  // Famille) ; la session ne sert que s'il ne l'a pas dit.
+  var abonne = st.plan ? st.plan !== 'free' : !!(s && s.subscribed);
+
+  // modules de formation terminés (localStorage)
+  var modules = 0;
+  try { for (var i = 1; i <= 10; i++) if (localStorage.getItem('despy_module_' + i) === '1') modules++; } catch (e) {}
+  // gestes de protection activés (6)
+  var gestes = ['darkweb','trusted','conseiller','formation','privacy','training'].filter(function (k) { return !!ck[k]; }).length;
+
+  // ── Le mois ──
+  var h = '<div class="bl-body">' +
+    '<button class="card hero-card" style="margin-top:0;width:100%;text-align:left;font-family:inherit" onclick="bilanVers(\'score\')">' +
+      '<div class="ring">' + heroScoreRing(score, color) + '</div>' +
+      '<div class="hero-txt"><div class="hero-ey" style="color:' + color + '">Votre protection</div>' +
+      '<h2>' + (d.emoji ? d.emoji + ' ' : '') + escapeHtmlA(d.label || 'Score de sécurité') + '</h2>' +
+      '<p>Touchez pour voir d’où viennent vos points.</p></div></button>' +
+
+    '<div class="sec">' + escapeHtmlA(bilanPeriode(maintenant)) + '</div>' +
+    '<div class="card pad">' +
+      '<div class="bl-mois">' +
+        bilanChiffre('message', 'ic-blue', bilanCompte(st.analyses_month, 'message vérifié', 'messages vérifiés')) +
+        bilanChiffre('bouclier', 'ic-green', bilanCompte(st.arnaques_month, 'arnaque repérée', 'arnaques repérées')) +
+        bilanChiffre('question', 'ic-violet', bilanCompte(st.questions_month, 'question posée', 'questions posées')) +
+      '</div>';
+  var mp = st.mois_precedent;
+  if (mp && (typeof mp.analyses === 'number' || typeof mp.arnaques === 'number')) {
+    var a = bilanCompte(mp.analyses, 'message vérifié', 'messages vérifiés');
+    var r = bilanCompte(mp.arnaques, 'arnaque repérée', 'arnaques repérées');
+    h += '<div class="bl-prec">En ' + escapeHtmlA(bilanMoisPrecedent(maintenant)) + ' : <b>' + a.n + '</b> ' + a.k + ', <b>' + r.n + '</b> ' + r.k + '.</div>';
+  }
+  h += '</div>';
+
+  // ── La veille : un état, pas une activité du mois ──
+  var v = texteVeille(st, abonne);
+  var nbRep = (typeof elementsReperes === 'function') ? elementsReperes().length : 0;
+  h += '<section class="vp" aria-label="Votre veille"><div class="vp-h">' +
+    (abonne && !v.fuites ? '<span class="v-dot" aria-hidden="true"></span>' : '') +
+    '<span class="vp-t">Votre veille</span>' +
+    (abonne ? '<span class="vp-etat' + (v.fuites ? ' a-faire' : '') + '">' + (v.fuites ? 'À traiter' : 'Active') + '</span>' : '') + '</div>';
+  if (abonne || st.last_hibp_check) {
+    h += '<button class="vp-row' + (v.fuites ? ' veille-fuite' : '') + '" onclick="bilanVers(\'darkweb\')">' +
+      '<span class="vp-ic vp-ic-ok">' + bilanIcone('bouclier') + '</span>' +
+      '<span class="v-m"><span class="v-a">' + escapeHtmlA(v.titre) + '</span>' +
+      (v.sous ? '<span class="v-b">' + escapeHtmlA(v.sous) + '</span>' : '') + '</span>' + BILAN_CHEVRON + '</button>';
+  } else {
+    h += '<button class="vp-row" onclick="bilanVers(\'darkweb\')">' +
+      '<span class="vp-ic vp-ic-push">' + bilanIcone('alerte') + '</span>' +
+      '<span class="v-m"><span class="v-a">Vos données n’ont jamais été vérifiées</span>' +
+      '<span class="v-b">Dix secondes pour savoir ce qui circule sur vous</span></span>' + BILAN_CHEVRON + '</button>';
+  }
+  if (!abonne) {
+    h += '<button class="vp-row" onclick="bilanVers(\'paywall\')">' +
+      '<span class="vp-ic vp-ic-push">' + bilanIcone('cadenas') + '</span>' +
+      '<span class="v-m"><span class="v-a">Contrôle chaque semaine</span>' +
+      '<span class="v-b">Fuites &amp; appareils infectés, avec l’abonnement</span></span>' +
+      '<span class="vp-go">Débloquer</span></button>';
+  }
+  h += '<button class="vp-row" onclick="bilanVers(\'reperes\')">' +
+      '<span class="vp-ic vp-ic-push">' + bilanIcone('oeil') + '</span>' +
+      '<span class="v-m"><span class="v-a">Repéré par Despy</span>' +
+      '<span class="v-b">' + (nbRep ? nbRep + ' à consulter' : 'Rien de nouveau pour le moment') + '</span></span>' + BILAN_CHEVRON + '</button>' +
+    '</section>';
+
+  // ── Où il en est ──
+  h += '<div class="sec">Où vous en êtes</div>' +
+    '<div class="card pad">' +
+      '<button class="bl-prog" onclick="bilanVers(\'protection\')">' +
+        '<span class="bl-prog-h"><span>Gestes de protection</span><b>' + gestes + ' / 6</b></span>' +
+        '<span class="pbar"><i style="width:' + Math.round(gestes / 6 * 100) + '%"></i></span></button>' +
+      '<button class="bl-prog" onclick="bilanVers(\'formation\')">' +
+        '<span class="bl-prog-h"><span>Formation</span><b>' + modules + ' / 10 modules</b></span>' +
+        '<span class="pbar"><i style="width:' + (modules * 10) + '%"></i></span></button>' +
+    '</div>';
+
+  // ── La priorité ──
+  var reco = bilanPriorite(st, modules, gestes, abonne);
+  h += '<div class="sec">Votre priorité</div>' +
+    '<div class="card pad">' +
+      '<div class="bl-prio-t">' + reco.t + '</div>' +
+      '<div class="bl-prio-d">' + reco.d + '</div>' +
+      (reco.go ? '<button class="btn-primary" style="margin-top:13px" onclick="bilanVers(\'' + reco.go + '\')">' + reco.b + '</button>' : '') +
+    '</div>';
+
+  var depuis = '';
+  if (st.member_since) {
+    try { depuis = new Date(st.member_since).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); } catch (e) {}
+  }
+  // L'email du 1er ne part qu'aux comptes couverts par un abonnement.
+  h += '<div class="bl-pied">' + (depuis ? 'Membre Despy depuis ' + escapeHtmlA(depuis) : '') +
+    (abonne ? (depuis ? '<br>' : '') + 'Le 1er de chaque mois, vous recevez par email le bilan du mois écoulé.' : '') + '</div>';
+  return h + '</div>';
+}
+
 function openBilan() {
   var s = session.get() || {};
   var mois = new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
@@ -5761,80 +5947,10 @@ function openBilan() {
   fetch('/.netlify/functions/security-score', {
     method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, authHeaders()),
-    body: JSON.stringify({ email: s.email })
+    body: JSON.stringify({ email: s.email, bilan: true })
   }).then(function (r) { return r.json(); }).then(function (d) {
-    var st = d.stats || {}, ck = d.checklist || {};
-    var score = (typeof d.score === 'number') ? d.score : 0;
-    var color = d.color || '#2D5BFF';
-
-    // modules de formation terminés (localStorage)
-    var modules = 0;
-    try { for (var i = 1; i <= 10; i++) if (localStorage.getItem('despy_module_' + i) === '1') modules++; } catch (e) {}
-    // gestes de protection activés (6)
-    var gestes = ['darkweb','trusted','conseiller','formation','privacy','training'].filter(function (k) { return !!ck[k]; }).length;
-
-    // dernière vérification dark web
-    var dwTxt = 'chaque semaine';
-    if (st.last_hibp_check) {
-      try {
-        var jours = Math.floor((Date.now() - new Date(st.last_hibp_check)) / 86400000);
-        dwTxt = jours <= 0 ? "aujourd'hui" : (jours === 1 ? 'hier' : 'il y a ' + jours + ' j');
-      } catch (e) {}
-    }
-    // membre depuis
-    var depuis = '';
-    if (st.member_since) {
-      try { depuis = new Date(st.member_since).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }); } catch (e) {}
-    }
-
-    var breach = st.breach_count || 0;
-    var quest = st.questions_used || 0;
-
-    // recommandation prioritaire, selon les données
-    var reco;
-    if (breach > 0) reco = { t: 'Changez les mots de passe concernés', d: 'Vos données sont apparues dans ' + breach + ' fuite' + (breach > 1 ? 's' : '') + '. Utilisez un mot de passe différent partout.', go: 'darkweb', b: 'Voir mes fuites' };
-    else if (modules < 10) reco = { t: 'Continuez votre formation', d: 'Il vous reste ' + (10 - modules) + ' module' + (10 - modules > 1 ? 's' : '') + ' pour maîtriser tous les pièges.', go: 'formation', b: 'Reprendre' };
-    else if (gestes < 6) reco = { t: 'Terminez votre protection', d: 'Encore ' + (6 - gestes) + ' geste' + (6 - gestes > 1 ? 's' : '') + ' et vous êtes au maximum.', go: 'protection', b: 'Voir les gestes' };
-    else reco = { t: 'Vous êtes parfaitement protégé', d: 'Continuez comme ça — Despy contrôle vos données chaque semaine.', go: null, b: null };
-
-    var h =
-      // hero score
-      '<div class="card hero-card" style="margin-top:0;cursor:default">' +
-        '<div class="ring">' + heroScoreRing(score, color) + '</div>' +
-        '<div class="hero-txt"><div class="hero-ey" style="color:' + color + '">Votre protection</div>' +
-        '<h2>' + (d.emoji ? d.emoji + ' ' : '') + (d.label || 'Score de sécurité') + '</h2>' +
-        '<p>Score global sur 100. Plus vous utilisez Despy, plus il monte.</p></div></div>' +
-
-      // stats du mois
-      '<div class="sec">Ce mois-ci, Despy a veillé sur vous</div>' +
-      '<div class="bl-grid">' +
-        bilanTuile('🛡️', 'ic-green', 'Active', 'Surveillance dark web') +
-        bilanTuile('🔎', 'ic-blue', breach, 'Fuite' + (breach > 1 ? 's' : '') + ' détectée' + (breach > 1 ? 's' : '')) +
-        bilanTuile('💬', 'ic-violet', quest, 'Question' + (quest > 1 ? 's' : '') + ' au Conseiller') +
-        bilanTuile('🎓', 'ic-gold', modules + '/10', 'Module' + (modules > 1 ? 's' : '') + ' terminé' + (modules > 1 ? 's' : '')) +
-      '</div>' +
-
-      // barre de protection
-      '<div class="card pad" style="margin-top:14px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">' +
-          '<span style="font-size:15px;font-weight:800;color:var(--p-ink)">Votre protection</span>' +
-          '<span class="pill ' + (gestes === 6 ? 'pill-green' : 'pill-blue') + '">' + gestes + ' / 6 activée' + (gestes > 1 ? 's' : '') + '</span></div>' +
-        '<div class="pbar"><i style="width:' + Math.round(gestes / 6 * 100) + '%"></i></div>' +
-        '<div style="font-size:13px;color:var(--p-muted);margin-top:10px">Dernière vérification dark web : ' + dwTxt + '.</div>' +
-      '</div>' +
-
-      // recommandation
-      '<div class="sec">Votre priorité</div>' +
-      '<div class="card pad" style="border-left:4px solid ' + color + '">' +
-        '<div style="font-size:16px;font-weight:800;color:var(--p-ink);margin-bottom:5px">' + reco.t + '</div>' +
-        '<div style="font-size:14.5px;line-height:1.55;color:var(--p-muted)">' + reco.d + '</div>' +
-        (reco.go ? '<button class="btn-primary" style="margin-top:13px" onclick="closeBilan();setTimeout(function(){' + (reco.go === 'formation' ? 'openFormation()' : reco.go === 'protection' ? "switchAppTab('protection')" : "openTool('" + reco.go + "')") + '},260)">' + reco.b + '</button>' : '') +
-      '</div>' +
-
-      (depuis ? '<div style="text-align:center;font-size:12.5px;color:var(--p-muted);margin-top:16px">Membre Despy depuis ' + depuis + '</div>' : '') +
-      '<div style="text-align:center;font-size:12px;color:var(--p-muted);margin-top:6px">Vous recevez aussi ce bilan par email le 1er de chaque mois.</div>';
-
-    document.getElementById('bilan-body').innerHTML = h;
+    if (!d || d.error || typeof d.score !== 'number') throw new Error('bilan indisponible');
+    document.getElementById('bilan-body').innerHTML = bilanHtml(d, s);
   }).catch(function () {
     document.getElementById('bilan-body').innerHTML =
       '<div class="card pad" style="text-align:center;color:var(--p-muted)">Impossible de charger votre bilan pour le moment. Réessayez dans un instant.</div>';

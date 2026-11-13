@@ -412,19 +412,24 @@ const templates = {
     </div>`
   }),
 
-  monthly_report: ({ name, prenom, monthName, stats }) => {
+  // Le bilan du mois ÉCOULÉ (voir monthly-report.js). `mois` : « octobre ».
+  // Jamais « bloquée » : Despy repère une arnaque dans un message qu'on lui
+  // montre, il n'arrête rien en chemin.
+  monthly_report: ({ name, prenom, monthName, mois, stats, alerte }) => {
     const s = stats || {};
     const analyses = s.analyses || 0;
-    const scams = s.scams_blocked || 0;
+    const scams = s.arnaques != null ? s.arnaques : (s.scams_blocked || 0);
+    const enMois = mois ? `En ${esc(mois)}` : 'Le mois dernier';
+    const leMois = mois ? esc(mois.charAt(0).toUpperCase() + mois.slice(1)) : 'Le mois dernier';
     const quizzes = s.quizzes || 0;
     const breaches = s.breaches || 0;
     const bonusMonths = s.bonus_months || 0;
     const refCode = s.referral_code || '';
     const intro = scams > 0
-      ? `Ce mois-ci, Despy a détecté <strong>${scams} arnaque${scams > 1 ? 's' : ''}</strong> avant qu'elle${scams > 1 ? 's' : ''} ne vous touche${scams > 1 ? 'nt' : ''}. Bravo d'avoir le réflexe de vérifier !`
+      ? `${enMois}, Despy a repéré <strong>${scams} arnaque${scams > 1 ? 's' : ''}</strong> dans les messages que vous lui avez montrés. Bravo d'avoir le réflexe de vérifier !`
       : analyses > 0
-        ? `Vous avez analysé <strong>${analyses} message${analyses > 1 ? 's' : ''}</strong> ce mois-ci. C'est ce réflexe qui vous protège.`
-        : `Ce mois-ci a été calme — aucune analyse demandée. Pensez à utiliser l'analyseur dès qu'un message vous semble suspect.`;
+        ? `${enMois}, vous avez fait vérifier <strong>${analyses} message${analyses > 1 ? 's' : ''}</strong>. C'est ce réflexe qui vous protège.`
+        : `${leMois} a été calme : vous n'avez fait vérifier aucun message. Pensez à l'analyseur dès qu'un message vous semble suspect.`;
     return {
       subject: `Votre bilan Despy — ${monthName}`,
       html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;max-width:600px;margin:0 auto;background:#f7f9fc">
@@ -438,11 +443,11 @@ const templates = {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0">
             <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">
               <div style="font-size:28px;font-weight:900;color:#16a34a">${scams}</div>
-              <div style="font-size:12px;color:#555">arnaque${scams > 1 ? 's' : ''} bloquée${scams > 1 ? 's' : ''}</div>
+              <div style="font-size:12px;color:#555">arnaque${scams > 1 ? 's' : ''} repérée${scams > 1 ? 's' : ''}</div>
             </div>
             <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px;text-align:center">
               <div style="font-size:28px;font-weight:900;color:#2D5BFF">${analyses}</div>
-              <div style="font-size:12px;color:#555">analyse${analyses > 1 ? 's' : ''} effectuée${analyses > 1 ? 's' : ''}</div>
+              <div style="font-size:12px;color:#555">message${analyses > 1 ? 's' : ''} vérifié${analyses > 1 ? 's' : ''}</div>
             </div>
             <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:16px;text-align:center">
               <div style="font-size:28px;font-weight:900;color:#d97706">${quizzes}</div>
@@ -450,7 +455,7 @@ const templates = {
             </div>
             <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:12px;padding:16px;text-align:center">
               <div style="font-size:28px;font-weight:900;color:${breaches > 0 ? '#dc2626' : '#16a34a'}">${breaches}</div>
-              <div style="font-size:12px;color:#555">fuite${breaches > 1 ? 's' : ''} dark web</div>
+              <div style="font-size:12px;color:#555">fuite${breaches > 1 ? 's' : ''} vous concernant</div>
             </div>
           </div>
 
@@ -460,9 +465,9 @@ const templates = {
             ${bonusMonths > 0 ? `<div style="font-size:12px;color:#16a34a;margin-top:6px"><strong>${bonusMonths} mois bonus</strong> déjà gagné${bonusMonths > 1 ? 's' : ''}</div>` : ''}
           </div>` : ''}
 
-          <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px;border-radius:0 10px 10px 0;margin:16px 0;font-size:14px">
-            <strong>Arnaque du mois :</strong> Les SMS imitant La Poste, Chronopost et Ameli sont en hausse. Ne cliquez jamais sur un lien — passez par l'app officielle ou tapez l'adresse à la main.
-          </div>
+          ${alerte && alerte.title ? `<div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px;border-radius:0 10px 10px 0;margin:16px 0;font-size:14px;line-height:1.55">
+            <strong>${esc(alerte.etiquette || 'Repéré par Despy')} :</strong> ${esc(alerte.title)}${alerte.body ? `<br><span style="color:#555">${esc(alerte.body)}</span>` : ''}
+          </div>` : ''}
 
           <div style="text-align:center;margin:24px 0">
             <a href="https://despy.fr" style="background:#2D5BFF;color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700">Ouvrir mon espace</a>

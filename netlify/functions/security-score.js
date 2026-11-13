@@ -174,6 +174,23 @@ exports.handler = async (event) => {
     };
     const analysesMois = await compter((q) => q);
     const arnaquesMois = await compter((q) => q.eq('verdict', 'scam'));
+    // Le mois écoulé, pour l'écran « Bilan mensuel » seulement : deux requêtes
+    // que l'accueil ne paie pas. Les premiers jours du mois, « ce mois-ci » est
+    // presque vide par nature ; sans le mois écoulé à côté, le bilan a l'air en
+    // panne. (Les questions n'y sont pas : leur compteur ne garde qu'un mois.)
+    let moisPrecedent;
+    if (body.bilan === true) {
+      const debutPrec = new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth() - 1, 1)).toISOString();
+      const compterPrec = async (filtre) => {
+        try {
+          const { count, error: e } = await filtre(supabase.from('analyses_history')
+            .select('id', { count: 'exact', head: true }).eq('email', cleanEmail)
+            .gte('created_at', debutPrec).lt('created_at', debutMois));
+          return e || typeof count !== 'number' ? null : count;
+        } catch (e) { return null; }
+      };
+      moisPrecedent = { analyses: await compterPrec((q) => q), arnaques: await compterPrec((q) => q.eq('verdict', 'scam')) };
+    }
     // « Repéré par Despy » sur l'accueil (voir _repere.js).
     const [reperes, arnaquesMembres] = await Promise.all([
       reperesDuClient(supabase, cleanEmail), arnaquesChezLesMembres(supabase)]);
@@ -232,6 +249,7 @@ exports.handler = async (event) => {
                                ? (client.chat_period_used || 0) : 0,
           analyses_month:    analysesMois,
           arnaques_month:    arnaquesMois,
+          mois_precedent:    moisPrecedent,
           reperes:           reperes,
           arnaques_membres:  arnaquesMembres,
           breach_count:      client.breach_count || 0,
